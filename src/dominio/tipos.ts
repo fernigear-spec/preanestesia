@@ -159,4 +159,11 @@ export interface ContextoReglas {
   aclaramiento: number | null;
   /** Indicación del fármaco (para reglas que dependen de ella). */
   indicacion?: string;
+  /** Pauta horaria del fármaco en evaluación (horas de toma del paciente). */
+  pautaFarmaco?: PautaHorariaCtx;
+}
+
+/** Pauta horaria: horas "HH:MM" de toma en un día. */
+export interface PautaHorariaCtx {
+  horas: string[];
 }

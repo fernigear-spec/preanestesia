@@ -12,6 +12,7 @@
  */
 import type { ContextoReglas, ResultadoFarmaco, Alerta } from '../tipos.ts';
 import { neuroaxialOProfundo, plazoDesdeHoras } from './motor.ts';
+import { fechaHoraLimite } from '../fechas/plazos.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.4 (SETH; ASRA 2018; protocolo del servicio)';
 
@@ -68,7 +69,7 @@ export function reglaHbpm(e: EntradaHbpm, ctx: ContextoReglas): ResultadoFarmaco
   }
 
   const horas = e.tipo === 'profilactica' ? 12 : 24;
-  const plazo = plazoDesdeHoras(ctx, horas);
+  const plazo = plazoDesdeHoras(ctx, horas, { permitirAdelanto: true });
   const res: ResultadoFarmaco = {
     ...base,
     accion: 'suspender',
@@ -86,13 +87,15 @@ export function reglaHbpm(e: EntradaHbpm, ctx: ContextoReglas): ResultadoFarmaco
 // ————————————— Heparina sódica IV —————————————
 
 export function reglaHeparinaSodica(idFarmaco: string, nombreComercial: string, ctx: ContextoReglas): ResultadoFarmaco {
-  const plazo = plazoDesdeHoras(ctx, 6); // 4-6 h; se usa el extremo conservador
+  // Perfusión IV hospitalaria: no hay "toma del paciente"; la última administración
+  // permitida es el propio límite (6 h antes, extremo conservador de 4-6 h).
+  const limite = fechaHoraLimite(ctx.fechaHoraIntervencion, 6);
   return {
     idFarmaco,
     nombreComercial,
     principiosActivos: ['heparina_sodica'],
     accion: 'suspender',
-    fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
+    fechaHoraUltimaToma: limite,
     textoPaciente: 'Uso hospitalario: se suspenderá 4-6 h antes en el hospital.',
     reglaAplicada: 'Heparina sódica IV: suspender 4-6 h antes (uso hospitalario)',
     fuente: FUENTE,
@@ -146,7 +149,7 @@ export function reglaFondaparinux(e: EntradaFondaparinux, ctx: ContextoReglas): 
       };
     }
     const horas = neuroaxialOProfundo(ctx) || altoRiesgoHemo ? 48 : 36;
-    const plazo = plazoDesdeHoras(ctx, horas);
+    const plazo = plazoDesdeHoras(ctx, horas, { permitirAdelanto: true });
     return {
       farmaco: {
         ...base,
@@ -162,7 +165,7 @@ export function reglaFondaparinux(e: EntradaFondaparinux, ctx: ContextoReglas): 
   // Terapéutico: 48 h; 72 h con neuroaxial/bloqueo profundo/alto riesgo hemorrágico/CrCl < 50.
   const alarga = neuroaxialOProfundo(ctx) || altoRiesgoHemo || (crcl !== null && crcl < 50);
   const horas = alarga ? 72 : 48;
-  const plazo = plazoDesdeHoras(ctx, horas);
+  const plazo = plazoDesdeHoras(ctx, horas, { permitirAdelanto: true });
   return {
     farmaco: {
       ...base,

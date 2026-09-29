@@ -1,5 +1,5 @@
 # Programa de apoyo a la entrevista preanestésica de enfermería
-Documento fuente, versión 3 (29/09/2026). Integra las 14 decisiones del servicio y las correcciones de la revisión de requirements.md v0.2. Ruta en el repositorio: `docs/documento_fuente.md`.
+Documento fuente, versión 4 (29/09/2026). Integra las 14 decisiones del servicio, las correcciones de la revisión de requirements.md v0.2 y las tres decisiones sobre cálculo de fechas surgidas de la batería de casos de referencia (`docs/casos_referencia.md`). Ruta en el repositorio: `docs/documento_fuente.md`.
 AnesHealth · Servicio de Anestesiología, Reanimación y Terapéutica del Dolor · Hospital Vithas Barcelona
 
 ## 0. Cómo quiero que trabajes
@@ -320,7 +320,9 @@ Recordatorio en la salida: la valoración debería hacerse idealmente entre 2 y 
 ## 8. Reglas de medicación
 
 ### 8.0 Convenciones del motor
-- Los plazos se expresan en horas desde la última toma hasta la hora prevista de la intervención; los plazos en días se convierten a horas (× 24).
+- Plazos expresados en horas (ACOD, heparinas, fondaparinux, litio, moclobemida, AINE, dipiridamol, sulodexida, GP IIb/IIIa): se cuentan desde la última toma hasta la hora prevista de la intervención. Una toma que cae exactamente en el límite está permitida.
+- Plazos expresados en días (antivitamina K, AAS, P2Y12, triflusal, cilostazol, SGLT2, JAK, fitoterapia, IMAO irreversibles): «suspender N días» significa no tomarlo los N días previos ni el día de la intervención.
+- Anticoagulantes con plazo en horas (ACOD, heparinas, fondaparinux): si la primera toma habitual posterior al límite cae como máximo 10 horas después de él, la hoja indica adelantarla a la hora límite («el lunes 12/10, tome la dosis a las 08:00 en lugar de a las 09:00; será la última») en lugar de suprimirla, siempre que quede al menos la mitad del intervalo habitual desde la toma anterior (6 h en pautas cada 12 h, 12 h en pautas cada 24 h). Si no se cumple, la última toma es la anterior permitida. Nunca se atrasa una toma. En el resto de fármacos no se adelantan tomas.
 - La aplicación calcula la fecha y hora límite de la última toma y la traduce a lenguaje del paciente según su pauta y hora habitual: «Tome la última dosis el martes 13 de octubre por la mañana. Después no vuelva a tomarlo hasta que se lo indiquen». Siempre con el día de la semana.
 - «Mantener» se traduce en «Siga tomándolo como siempre, también el día de la intervención, con un sorbo de agua».
 - Sin hora de intervención, se usa 08:00 y la hoja avisa de que si cambia la fecha o la hora debe llamar.
@@ -372,7 +374,7 @@ Recordatorio en la salida: la valoración debería hacerse idealmente entre 2 y 
 - Sulfonilureas (glibenclamida, glipizida, gliclazida, glimepirida) y glinidas (repaglinida, nateglinida): no tomar el día de la intervención.
 - Inhibidores DPP-4: tomar hasta el día previo; no tomar la mañana de la intervención.
 - Pioglitazona: no tomar el día de la intervención.
-- Agonistas GLP-1 y tirzepatida, con cualquier indicación, también la obesidad: semanales, si la dosis semanal cae entre 7 días antes y el día de la intervención (ambos incluidos) no se administra, la hoja indica la fecha exacta de la dosis que se omite, y dieta de líquidos claros las 24 h previas (hoja anexa); diarios, no tomar los 3 días previos ni el día de la intervención (última dosis 4 días antes: intervención el jueves, última toma el domingo) y ayuno estándar.
+- Agonistas GLP-1 y tirzepatida, con cualquier indicación, también la obesidad: semanales, la última dosis debe ser al menos 7 días antes de la intervención; se omite la única dosis que cae en los 6 días previos o el mismo día de la intervención y la hoja indica su fecha exacta, y dieta de líquidos claros las 24 h previas (hoja anexa); diarios, no tomar los 3 días previos ni el día de la intervención (última dosis 4 días antes: intervención el jueves, última toma el domingo) y ayuno estándar.
 - Inhibidores SGLT2: suspender 3 días (4 días ertugliflozina).
 - Insulina basal (glargina, detemir, degludec): 70 a 80 % de la dosis habitual la noche previa y la mañana de la intervención, redondeando a la unidad inferior.
 - Insulina NPH: dosis completa la noche previa y 50 % la mañana de la intervención.
@@ -405,7 +407,7 @@ Ibuprofeno 24 h; naproxeno 72 h (rango 48 a 72); diclofenaco, dexketoprofeno y k
 - Antiangiogénicos sistémicos (bevacizumab, aflibercept oncológico, ramucirumab): última dosis hace menos de 6 a 8 semanas, alerta «retrasar cirugía programada al menos 6 a 8 semanas desde la última dosis», requiere confirmación. El aflibercept intravítreo no activa esta regla.
 
 ### 8.10 Cardiovasculares
-- IECA y ARA-II: suspender 24 h antes, salvo insuficiencia cardiaca con disfunción sistólica, infarto reciente o proteinuria o nefropatía, en cuyo caso se mantienen. La aplicación decide con los módulos y, si falta información, pregunta.
+- IECA y ARA-II: no tomar el día de la intervención (la toma de la noche anterior sí se hace), salvo insuficiencia cardiaca con disfunción sistólica, infarto reciente o proteinuria o nefropatía, en cuyo caso se mantienen. La aplicación decide con los módulos y, si falta información, pregunta.
 - Sacubitrilo/valsartán: requiere confirmación.
 - Betabloqueantes, antagonistas del calcio, nitratos, amiodarona, digoxina, estatinas: mantener (ESC 2022).
 - Diuréticos: no tomar la dosis de la mañana de la intervención.

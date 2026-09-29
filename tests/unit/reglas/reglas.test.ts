@@ -30,6 +30,12 @@ function ctx(parcial: Partial<ContextoReglas> = {}): ContextoReglas {
     regimen: 'ingreso',
     pesoKg: 80,
     aclaramiento: null,
+    // Pauta a las 08:00 (igual que la hora de la intervención): así, para un plazo
+    // en horas, la última toma cae EXACTAMENTE en el límite y `horasAntes` mide el
+    // plazo aplicado; y para un plazo en días, la última toma es el día (N+1) a las 08:00.
+    // Las fechas/horas EXACTAS con pautas realistas se verifican en la batería de
+    // docs/casos_referencia.md (tests/casos-referencia).
+    pautaFarmaco: { horas: ['08:00'] },
     ...parcial,
   };
 }
@@ -37,6 +43,11 @@ function ctx(parcial: Partial<ContextoReglas> = {}): ContextoReglas {
 /** Horas entre la fecha límite y la intervención. */
 function horasAntes(limite: Date): number {
   return Math.round((IV.getTime() - limite.getTime()) / 3_600_000);
+}
+
+/** Días entre la última toma y la intervención (para plazos en días con pauta 08:00). */
+function diasAntes(ultima: Date): number {
+  return Math.round((IV.getTime() - ultima.getTime()) / 86_400_000);
 }
 
 describe('ACOD (§8.2)', () => {
@@ -102,20 +113,20 @@ describe('Antiagregantes (§8.3)', () => {
     expect(r.accion).toBe('mantener');
   });
 
-  it('caso 7 §15: prótesis de cadera con raquídea y ticagrelor → 7 días', () => {
+  it('caso 7 §15: prótesis de cadera con raquídea y ticagrelor → 7 días (última toma día 8 previo)', () => {
     const r = reglaP2y12(
       { idFarmaco: 'ticagrelor', nombreComercial: 'Brilique', principio: 'ticagrelor', monoterapia: false },
       ctx({ neuroaxial: true }),
     );
-    expect(horasAntes(r.fechaHoraUltimaToma as Date)).toBe(7 * 24);
+    expect(diasAntes(r.fechaHoraUltimaToma as Date)).toBe(8);
   });
 
-  it('clopidogrel sin neuroaxial → 5 días', () => {
+  it('clopidogrel sin neuroaxial → 5 días (última toma día 6 previo)', () => {
     const r = reglaP2y12(
       { idFarmaco: 'clopidogrel', nombreComercial: 'Plavix', principio: 'clopidogrel', monoterapia: false },
       ctx({ neuroaxial: false }),
     );
-    expect(horasAntes(r.fechaHoraUltimaToma as Date)).toBe(5 * 24);
+    expect(diasAntes(r.fechaHoraUltimaToma as Date)).toBe(6);
   });
 
   it('caso 6 §15: vitrectomía (oftalmo moderado/alto) con clopidogrel monoterapia → sustituir por AAS y suspender 5 días', () => {
@@ -123,7 +134,7 @@ describe('Antiagregantes (§8.3)', () => {
       { idFarmaco: 'clopidogrel', nombreComercial: 'Plavix', principio: 'clopidogrel', monoterapia: true },
       ctx({ grupoOftalmologico: 'riesgo_moderado_alto', riesgoHemorragico: 'minimo' }),
     );
-    expect(horasAntes(r.fechaHoraUltimaToma as Date)).toBe(5 * 24);
+    expect(diasAntes(r.fechaHoraUltimaToma as Date)).toBe(6);
     expect(r.textoAnestesiologo).toContain('AAS 100');
   });
 
@@ -175,12 +186,12 @@ describe('Antivitamina K (§8.1)', () => {
     expect(r.puente?.intervaloHoras).toBe(24);
   });
 
-  it('acenocumarol estándar → suspender 3 días', () => {
+  it('acenocumarol estándar → suspender 3 días (última toma día 4 previo)', () => {
     const r = reglaAvk(
       { idFarmaco: 'acenocumarol', nombreComercial: 'Sintrom', principio: 'acenocumarol', altoRiesgoTromboembolico: false },
       ctx({ riesgoHemorragico: 'alto' }),
     );
-    expect(horasAntes(r.farmaco.fechaHoraUltimaToma as Date)).toBe(3 * 24);
+    expect(diasAntes(r.farmaco.fechaHoraUltimaToma as Date)).toBe(4);
   });
 });
 
@@ -220,16 +231,14 @@ describe('Antidiabéticos (§8.5)', () => {
     expect((r.fechaHoraUltimaToma as Date).getDate()).toBe(14);
   });
 
-  it('caso 4 §15: empagliflozina (SGLT2) → 3 días', () => {
+  it('caso 4 §15: empagliflozina (SGLT2) → 3 días (última toma día 4 previo)', () => {
     const r = reglaSglt2({ idFarmaco: 'empagliflozina', nombreComercial: 'Jardiance', principio: 'empagliflozina' }, ctx());
-    const dias = Math.round((IV.getTime() - (r.fechaHoraUltimaToma as Date).getTime()) / 86_400_000);
-    expect(dias).toBe(3);
+    expect(diasAntes(r.fechaHoraUltimaToma as Date)).toBe(4);
   });
 
-  it('ertugliflozina → 4 días', () => {
+  it('ertugliflozina → 4 días (última toma día 5 previo)', () => {
     const r = reglaSglt2({ idFarmaco: 'ertugliflozina', nombreComercial: 'Steglatro', principio: 'ertugliflozina' }, ctx());
-    const dias = Math.round((IV.getTime() - (r.fechaHoraUltimaToma as Date).getTime()) / 86_400_000);
-    expect(dias).toBe(4);
+    expect(diasAntes(r.fechaHoraUltimaToma as Date)).toBe(5);
   });
 
   it('caso 4 §15: semaglutida semanal cuya dosis cae en la ventana de 7 días → omitir + dieta líquida', () => {

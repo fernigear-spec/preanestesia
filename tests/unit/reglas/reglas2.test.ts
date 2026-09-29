@@ -15,7 +15,11 @@ function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
   return {
     fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio',
     grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false,
-    riesgoTromboticoAlto: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null, ...p,
+    riesgoTromboticoAlto: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null,
+    // Pauta a las 08:00: plazos en horas caen en el límite exacto; plazos en días,
+    // última toma el día (N+1) a las 08:00. (Fechas exactas: docs/casos_referencia.)
+    pautaFarmaco: { horas: ['08:00'] },
+    ...p,
   };
 }
 const H = (d?: Date) => (d ? Math.round((IV.getTime() - d.getTime()) / 3_600_000) : NaN);
@@ -27,12 +31,12 @@ describe('Heparinas y fondaparinux (§8.4)', () => {
     expect(clasificarHbpm(120, { profilaxis_max: 40, tratamiento_min: 60 })).toBe('terapeutica');
     expect(clasificarHbpm(50, { profilaxis_max: 40, tratamiento_min: 60 })).toBe('indeterminada');
   });
-  it('HBPM profiláctica → 12 h', () => {
-    const r = reglaHbpm({ idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'profilactica' }, ctx());
+  it('HBPM profiláctica (dosis a las 20:00) → 12 h', () => {
+    const r = reglaHbpm({ idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'profilactica' }, ctx({ pautaFarmaco: { horas: ['20:00'] } }));
     expect(H(r.fechaHoraUltimaToma)).toBe(12);
   });
-  it('HBPM terapéutica → 24 h + nota anti-Xa', () => {
-    const r = reglaHbpm({ idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'terapeutica' }, ctx());
+  it('HBPM terapéutica (dosis a las 08:00) → 24 h + nota anti-Xa', () => {
+    const r = reglaHbpm({ idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'terapeutica' }, ctx({ pautaFarmaco: { horas: ['08:00'] } }));
     expect(H(r.fechaHoraUltimaToma)).toBe(24);
     expect(r.textoAnestesiologo).toContain('anti-Xa');
   });
@@ -44,18 +48,20 @@ describe('Heparinas y fondaparinux (§8.4)', () => {
     const r = reglaHeparinaSodica('heparina_sodica', 'Heparina', ctx());
     expect(H(r.fechaHoraUltimaToma)).toBe(6);
   });
-  it('fondaparinux profiláctico → 36 h; 48 h con neuroaxial', () => {
-    expect(H(reglaFondaparinux({ idFarmaco: 'f', nombreComercial: 'Arixtra', dosis: 'profilactico' }, ctx({ riesgoHemorragico: 'bajo' })).farmaco.fechaHoraUltimaToma)).toBe(36);
-    expect(H(reglaFondaparinux({ idFarmaco: 'f', nombreComercial: 'Arixtra', dosis: 'profilactico' }, ctx({ neuroaxial: true })).farmaco.fechaHoraUltimaToma)).toBe(48);
+  it('fondaparinux profiláctico → 36 h; 48 h con neuroaxial (dosis en la hora del límite)', () => {
+    // Pauta a las 20:00: 36 h antes de las 08:00 cae a las 20:00 → última dosis en el límite exacto.
+    expect(H(reglaFondaparinux({ idFarmaco: 'f', nombreComercial: 'Arixtra', dosis: 'profilactico' }, ctx({ riesgoHemorragico: 'bajo', pautaFarmaco: { horas: ['20:00'] } })).farmaco.fechaHoraUltimaToma)).toBe(36);
+    // 48 h antes de las 08:00 cae a las 08:00 → pauta a las 08:00.
+    expect(H(reglaFondaparinux({ idFarmaco: 'f', nombreComercial: 'Arixtra', dosis: 'profilactico' }, ctx({ neuroaxial: true, pautaFarmaco: { horas: ['08:00'] } })).farmaco.fechaHoraUltimaToma)).toBe(48);
   });
   it('fondaparinux profiláctico CrCl < 20 → contraindicado, alerta roja', () => {
     const r = reglaFondaparinux({ idFarmaco: 'f', nombreComercial: 'Arixtra', dosis: 'profilactico' }, ctx({ aclaramiento: 15 }));
     expect(r.farmaco.requiereConfirmacion).toBeTrue();
     expect(r.alerta?.gravedad).toBe('roja');
   });
-  it('fondaparinux terapéutico → 48 h; 72 h con CrCl < 50', () => {
-    expect(H(reglaFondaparinux({ idFarmaco: 'f', nombreComercial: 'Arixtra', dosis: 'terapeutico' }, ctx({ riesgoHemorragico: 'bajo', aclaramiento: 80 })).farmaco.fechaHoraUltimaToma)).toBe(48);
-    expect(H(reglaFondaparinux({ idFarmaco: 'f', nombreComercial: 'Arixtra', dosis: 'terapeutico' }, ctx({ riesgoHemorragico: 'bajo', aclaramiento: 40 })).farmaco.fechaHoraUltimaToma)).toBe(72);
+  it('fondaparinux terapéutico → 48 h; 72 h con CrCl < 50 (dosis a las 08:00)', () => {
+    expect(H(reglaFondaparinux({ idFarmaco: 'f', nombreComercial: 'Arixtra', dosis: 'terapeutico' }, ctx({ riesgoHemorragico: 'bajo', aclaramiento: 80, pautaFarmaco: { horas: ['08:00'] } })).farmaco.fechaHoraUltimaToma)).toBe(48);
+    expect(H(reglaFondaparinux({ idFarmaco: 'f', nombreComercial: 'Arixtra', dosis: 'terapeutico' }, ctx({ riesgoHemorragico: 'bajo', aclaramiento: 40, pautaFarmaco: { horas: ['08:00'] } })).farmaco.fechaHoraUltimaToma)).toBe(72);
   });
 });
 
@@ -93,9 +99,9 @@ describe('Inmunosupresores y reumatología (§8.8)', () => {
   it('leflunomida → mantener', () => {
     expect(reglaFameMantener({ idFarmaco: 'leflunomida', nombreComercial: 'Arava', principio: 'leflunomida' }).accion).toBe('mantener');
   });
-  it('JAK → suspender 3 días', () => {
+  it('JAK → suspender 3 días (última toma día 4 previo)', () => {
     const r = reglaJak({ idFarmaco: 'tofacitinib', nombreComercial: 'Xeljanz', principio: 'tofacitinib' }, ctx());
-    expect(D(r.fechaHoraUltimaToma)).toBe(3);
+    expect(D(r.fechaHoraUltimaToma)).toBe(4);
   });
   it('biológico → requiere confirmación, pide fecha de última dosis', () => {
     const r = reglaBiologico({ idFarmaco: 'adalimumab', nombreComercial: 'Humira', principio: 'adalimumab' });
@@ -125,9 +131,9 @@ describe('Oncológicos (§8.9)', () => {
 });
 
 describe('Otros (§8.11)', () => {
-  it('fitoterapia → suspender 14 días', () => {
+  it('fitoterapia → suspender 14 días (última toma día 15 previo)', () => {
     const r = reglaFitoterapia({ idFarmaco: 'ginkgo', nombreComercial: 'Ginkgo', principio: 'ginkgo' }, ctx());
-    expect(D(r.fechaHoraUltimaToma)).toBe(14);
+    expect(D(r.fechaHoraUltimaToma)).toBe(15);
   });
   it('anticonceptivo con riesgo trombótico alto → requiere confirmación; texto de anticonceptivo en hoja', () => {
     const r = reglaAnticonceptivoThs({ idFarmaco: 'aco', nombreComercial: 'ACO', principio: 'etinilestradiol', esOral: true }, ctx({ riesgoTromboticoAlto: true }));
@@ -166,17 +172,17 @@ describe('Sugammadex (§8.15)', () => {
 });
 
 describe('Otros antiagregantes (§8.3)', () => {
-  it('triflusal → 7 días; 10 días con neuroaxial', () => {
-    expect(D(reglaTriflusal('t', 'Disgren', ctx()).fechaHoraUltimaToma)).toBe(7);
-    expect(D(reglaTriflusal('t', 'Disgren', ctx({ neuroaxial: true })).fechaHoraUltimaToma)).toBe(10);
+  it('triflusal → 7 días (última toma día 8); 10 días con neuroaxial (día 11)', () => {
+    expect(D(reglaTriflusal('t', 'Disgren', ctx()).fechaHoraUltimaToma)).toBe(8);
+    expect(D(reglaTriflusal('t', 'Disgren', ctx({ neuroaxial: true })).fechaHoraUltimaToma)).toBe(11);
   });
   it('dipiridamol → 24 h; 48 h con bloqueo profundo', () => {
     expect(H(reglaDipiridamol('d', 'Persantin', ctx()).fechaHoraUltimaToma)).toBe(24);
     expect(H(reglaDipiridamol('d', 'Persantin', ctx({ bloqueoProfundo: true })).fechaHoraUltimaToma)).toBe(48);
   });
-  it('cilostazol → mantener si riesgo bajo; 3 días si alto', () => {
+  it('cilostazol → mantener si riesgo bajo; 3 días si alto (última toma día 4 previo)', () => {
     expect(reglaCilostazol('c', 'Pletal', ctx({ riesgoHemorragico: 'bajo' })).accion).toBe('mantener');
-    expect(D(reglaCilostazol('c', 'Pletal', ctx({ riesgoHemorragico: 'alto' })).fechaHoraUltimaToma)).toBe(3);
+    expect(D(reglaCilostazol('c', 'Pletal', ctx({ riesgoHemorragico: 'alto' })).fechaHoraUltimaToma)).toBe(4);
   });
   it('sulodexida → mantener si riesgo bajo; 48 h si neuroaxial', () => {
     expect(reglaSulodexida('s', 'Aterina', ctx({ riesgoHemorragico: 'bajo' })).accion).toBe('mantener');
@@ -203,7 +209,7 @@ describe('Combinación fija Synjardy (§8.0 / Decisión 5)', () => {
     const sglt2 = reglaSglt2({ idFarmaco: 'empagliflozina', nombreComercial: 'Synjardy', principio: 'empagliflozina' }, ctx());
     const met = reglaMetformina({ idFarmaco: 'metformina', nombreComercial: 'Synjardy' }, ctx());
     const r = combinacionFija('empagliflozina_metformina', 'Synjardy', [sglt2, met], true);
-    expect(D(r.fechaHoraUltimaToma)).toBe(3);
+    expect(D(r.fechaHoraUltimaToma)).toBe(4); // SGLT2 3 días → última toma día 4 previo
     expect(r.textoPaciente).toContain('Synjardy');
     expect(r.textoAnestesiologo).toContain('glucemia');
     // Una sola instrucción: principios activos combinados.

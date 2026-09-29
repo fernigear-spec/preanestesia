@@ -108,7 +108,7 @@ export function reglaAcod(e: EntradaAcod, ctx: ContextoReglas): ResultadoFarmaco
     }
   }
 
-  const plazo = plazoDesdeHoras(ctx, horas);
+  const plazo = plazoDesdeHoras(ctx, horas, { permitirAdelanto: true });
 
   const resultado: ResultadoFarmaco = {
     ...base,

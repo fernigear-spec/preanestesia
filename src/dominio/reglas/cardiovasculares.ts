@@ -1,13 +1,25 @@
 /**
- * Cardiovasculares — docs/documento_fuente.md §8.10.
- * - IECA/ARA-II: suspender 24 h antes, salvo IC con disfunción sistólica,
- *   infarto reciente o proteinuria/nefropatía (mantener). Si falta info, preguntar.
+ * Cardiovasculares — docs/documento_fuente.md §8.10 (v4).
+ * - IECA/ARA-II: no tomar el día de la intervención (la toma de la noche anterior
+ *   sí se hace), salvo IC con disfunción sistólica, infarto reciente o
+ *   proteinuria/nefropatía (mantener). Si falta info, preguntar.
  * - Diuréticos: no tomar la dosis de la mañana de la intervención.
  * - Betabloqueantes, calcioantagonistas, nitratos, amiodarona, digoxina,
  *   estatinas: mantener.
  */
 import type { ContextoReglas, ResultadoFarmaco } from '../tipos.ts';
-import { plazoDesdeHoras, TEXTO_MANTENER } from './motor.ts';
+import { TEXTO_MANTENER } from './motor.ts';
+import { fechaLarga, horaReloj } from '../fechas/ultimaToma.ts';
+
+/** Última toma el día previo a la intervención, a la hora habitual más tardía de la pauta. */
+function ultimaTomaDiaPrevio(ctx: ContextoReglas): Date {
+  const d = new Date(ctx.fechaHoraIntervencion);
+  d.setDate(d.getDate() - 1);
+  const horas = [...(ctx.pautaFarmaco?.horas ?? ['09:00'])].sort();
+  const [hh, mm] = (horas[horas.length - 1] ?? '09:00').split(':').map((x) => parseInt(x, 10));
+  d.setHours(hh ?? 9, mm ?? 0, 0, 0);
+  return d;
+}
 
 const FUENTE = 'docs/documento_fuente.md §8.10 (ESC 2022)';
 
@@ -62,13 +74,13 @@ export function reglaIecaAra2(e: EntradaIecaAra2, ctx: ContextoReglas): Resultad
     };
   }
 
-  const p = plazoDesdeHoras(ctx, 24);
+  const ultima = ultimaTomaDiaPrevio(ctx);
   return {
     ...base,
     accion: 'suspender',
-    fechaHoraUltimaToma: p.fechaHoraUltimaToma,
-    textoPaciente: p.textoPaciente,
-    reglaAplicada: 'IECA/ARA-II: suspender 24 h',
+    fechaHoraUltimaToma: ultima,
+    textoPaciente: `No lo tome el día de la intervención (la toma de la noche anterior sí). Su última toma será el ${fechaLarga(ultima)} a las ${horaReloj(ultima)}.`,
+    reglaAplicada: 'IECA/ARA-II: no tomar el día de la intervención',
     requiereConfirmacion: false,
   };
 }
@@ -99,13 +111,15 @@ export interface EntradaDiuretico {
   principio: string;
 }
 
-export function reglaDiuretico(e: EntradaDiuretico): ResultadoFarmaco {
+export function reglaDiuretico(e: EntradaDiuretico, ctx: ContextoReglas): ResultadoFarmaco {
+  const ultima = ultimaTomaDiaPrevio(ctx);
   return {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,
     principiosActivos: [e.principio],
-    accion: 'ajustar',
-    textoPaciente: 'No tome la dosis de la mañana del día de la intervención. El resto, como siempre.',
+    accion: 'suspender',
+    fechaHoraUltimaToma: ultima,
+    textoPaciente: `No tome la dosis de la mañana del día de la intervención. Su última toma será el ${fechaLarga(ultima)} a las ${horaReloj(ultima)}.`,
     reglaAplicada: 'Diuréticos: no tomar la dosis de la mañana de la intervención',
     fuente: FUENTE,
     requiereConfirmacion: false,

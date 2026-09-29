@@ -13,7 +13,16 @@ import type {
   ResultadoFarmaco,
   AccionFarmaco,
 } from '../tipos.ts';
-import { diasAHoras, fechaHoraLimite, fechaConFranja } from '../fechas/plazos.ts';
+import { diasAHoras } from '../fechas/plazos.ts';
+import {
+  ultimaTomaPorHoras,
+  ultimaTomaPorDias,
+  textoUltimaToma,
+  textoUltimaTomaDias,
+  fechaLarga,
+  horaReloj,
+  type PautaHoraria,
+} from '../fechas/ultimaToma.ts';
 
 /** Resuelve el contexto de reglas a partir de la intervención y el aclaramiento. */
 export function construirContexto(
@@ -55,15 +64,28 @@ export interface PlazoCalculado {
   textoPaciente: string;
 }
 
-/** Construye el plazo (fecha/hora límite + texto) a partir de un plazo en horas. */
-export function plazoDesdeHoras(ctx: ContextoReglas, horas: number): PlazoCalculado {
-  const limite = fechaHoraLimite(ctx.fechaHoraIntervencion, horas);
-  const texto = `Tome la última dosis ${fechaConFranja(limite)}. Después no vuelva a tomarlo hasta que se lo indiquen.`;
-  return { horas, fechaHoraUltimaToma: limite, textoPaciente: texto };
+/** Pauta por defecto si la enfermera no registró horas: una toma a las 09:00. */
+const PAUTA_DEFECTO: PautaHoraria = { horas: ['09:00'] };
+
+/**
+ * Plazo en HORAS (§8.0 v4). Usa la pauta horaria del paciente.
+ * @param permitirAdelanto true solo para anticoagulantes (ACOD/heparinas/fondaparinux).
+ */
+export function plazoDesdeHoras(
+  ctx: ContextoReglas,
+  horas: number,
+  opts: { permitirAdelanto?: boolean } = {},
+): PlazoCalculado {
+  const pauta = ctx.pautaFarmaco ?? PAUTA_DEFECTO;
+  const r = ultimaTomaPorHoras(ctx.fechaHoraIntervencion, horas, pauta, opts.permitirAdelanto === true);
+  return { horas, fechaHoraUltimaToma: r.ultimaToma, textoPaciente: textoUltimaToma(r) };
 }
 
+/** Plazo en DÍAS (§8.0 v4): no tomar los N días previos ni el día de la intervención. */
 export function plazoDesdeDias(ctx: ContextoReglas, dias: number): PlazoCalculado {
-  return plazoDesdeHoras(ctx, diasAHoras(dias));
+  const pauta = ctx.pautaFarmaco ?? PAUTA_DEFECTO;
+  const ultima = ultimaTomaPorDias(ctx.fechaHoraIntervencion, dias, pauta);
+  return { horas: diasAHoras(dias), fechaHoraUltimaToma: ultima, textoPaciente: textoUltimaTomaDias(ultima) };
 }
 
 /** Texto estándar de "mantener" (§8.0). */
@@ -100,7 +122,7 @@ export function combinacionFija(
       ganador.accion === 'mantener'
         ? TEXTO_MANTENER
         : ganador.fechaHoraUltimaToma
-          ? `Deje de tomar ${nombreComercial}: la última toma permitida es ${fechaConFranja(ganador.fechaHoraUltimaToma)}.`
+          ? `Deje de tomar ${nombreComercial}: la última toma permitida es el ${fechaLarga(ganador.fechaHoraUltimaToma)} a las ${horaReloj(ganador.fechaHoraUltimaToma)}.`
           : ganador.textoPaciente,
     reglaAplicada: `Combinación fija ${nombreComercial}: se aplica el plazo más restrictivo (${ganador.reglaAplicada})`,
   };

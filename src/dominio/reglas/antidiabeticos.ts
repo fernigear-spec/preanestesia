@@ -5,7 +5,9 @@
  *  como reglas simples análogas; el motor y las pruebas ya validan el patrón.)
  */
 import type { ContextoReglas, ResultadoFarmaco } from '../tipos.ts';
-import { fechaLarga, startOfDay, endOfDay } from '../fechas/plazos.ts';
+import { startOfDay, endOfDay } from '../fechas/plazos.ts';
+import { fechaLarga, horaReloj } from '../fechas/ultimaToma.ts';
+import { plazoDesdeDias } from './motor.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.5 (protocolo de preanestesia en diabéticos; CPOC)';
 
@@ -34,14 +36,17 @@ export function reglaMetformina(e: EntradaMetformina, ctx: ContextoReglas): Resu
       reglaAplicada: 'Metformina con contraste yodado: suspender 24-48 h antes',
     };
   }
-  // "No tomar el día de la intervención": la última toma permitida es el día previo.
+  // "No tomar el día de la intervención": última toma el día previo a su hora habitual más tardía.
   const ultima = new Date(intervencion);
   ultima.setDate(ultima.getDate() - 1);
+  const horas = [...(ctx.pautaFarmaco?.horas ?? ['09:00'])].sort();
+  const [hh, mm] = (horas[horas.length - 1] ?? '09:00').split(':').map((x) => parseInt(x, 10));
+  ultima.setHours(hh ?? 9, mm ?? 0, 0, 0);
   return {
     ...base,
     accion: 'suspender',
     fechaHoraUltimaToma: ultima,
-    textoPaciente: 'No la tome el día de la intervención. Los días previos, tómela como siempre.',
+    textoPaciente: `No la tome el día de la intervención. Su última toma será el ${fechaLarga(ultima)} a las ${horaReloj(ultima)}.`,
     reglaAplicada: 'Metformina: no tomar el día de la intervención',
   };
 }
@@ -56,15 +61,14 @@ export interface EntradaSglt2 {
 
 export function reglaSglt2(e: EntradaSglt2, ctx: ContextoReglas): ResultadoFarmaco {
   const dias = e.principio === 'ertugliflozina' ? 4 : 3;
-  const limite = new Date(ctx.fechaHoraIntervencion);
-  limite.setDate(limite.getDate() - dias);
+  const plazo = plazoDesdeDias(ctx, dias); // no tomar N días previos ni el día de la IQ
   return {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,
     principiosActivos: [e.principio],
     accion: 'suspender',
-    fechaHoraUltimaToma: limite,
-    textoPaciente: `Deje de tomarlo ${dias} días antes (última toma el ${fechaLarga(limite)}).`,
+    fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
+    textoPaciente: plazo.textoPaciente,
     reglaAplicada: `SGLT2 (${e.principio}): suspender ${dias} días`,
     fuente: FUENTE,
     requiereConfirmacion: false,
@@ -86,11 +90,13 @@ export interface EntradaGlp1Semanal {
  * incluidos), no se administra; se indica la fecha exacta de la dosis omitida.
  */
 export function reglaGlp1Semanal(e: EntradaGlp1Semanal, ctx: ContextoReglas): ResultadoFarmaco {
+  // §8.5 v4: la última dosis debe ser al menos 7 días antes; se omite solo la
+  // dosis que cae en los 6 días previos o el mismo día de la intervención. La que
+  // cae exactamente 7 días antes SÍ se administra.
   const iv = ctx.fechaHoraIntervencion;
   const inicioVentana = new Date(iv);
-  inicioVentana.setDate(inicioVentana.getDate() - 7);
+  inicioVentana.setDate(inicioVentana.getDate() - 6);
 
-  // Comparación por día (ambos incluidos): inicioVentana (00:00) .. fin del día de la intervención.
   const dosisDia = startOfDay(e.proximaDosis).getTime();
   const desde = startOfDay(inicioVentana).getTime();
   const hasta = endOfDay(iv).getTime();
@@ -110,15 +116,15 @@ export function reglaGlp1Semanal(e: EntradaGlp1Semanal, ctx: ContextoReglas): Re
       accion: 'suspender',
       fechaHoraUltimaToma: e.proximaDosis,
       textoPaciente: `No se ponga la dosis del ${fechaLarga(e.proximaDosis)}. Además, dieta de líquidos claros durante las 24 h previas a la intervención (siga la hoja adjunta).`,
-      reglaAplicada: 'GLP-1 semanal: dosis dentro de la ventana de 7 días (ambos incluidos) → omitir; dieta líquida 24 h',
+      reglaAplicada: 'GLP-1 semanal: dosis en los 6 días previos o el día de la IQ → omitir; dieta líquida 24 h',
     };
   }
 
   return {
     ...base,
     accion: 'mantener',
-    textoPaciente: 'Puede ponerse su dosis semanal como siempre; no cae en la semana previa a la intervención.',
-    reglaAplicada: 'GLP-1 semanal: la dosis no cae en la ventana de 7 días previos',
+    textoPaciente: 'Puede ponerse su dosis semanal como siempre; deja al menos 7 días hasta la intervención.',
+    reglaAplicada: 'GLP-1 semanal: la dosis queda al menos 7 días antes de la intervención',
   };
 }
 
@@ -131,17 +137,16 @@ export interface EntradaGlp1Diario {
 }
 
 export function reglaGlp1Diario(e: EntradaGlp1Diario, ctx: ContextoReglas): ResultadoFarmaco {
-  // Omitir los 3 días previos y el día de la intervención → última dosis 4 días antes.
-  const limite = new Date(ctx.fechaHoraIntervencion);
-  limite.setDate(limite.getDate() - 4);
+  // Omitir los 3 días previos y el día de la intervención → última dosis el día 4 previo.
+  const plazo = plazoDesdeDias(ctx, 3);
   return {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,
     principiosActivos: [e.principio],
     accion: 'suspender',
-    fechaHoraUltimaToma: limite,
-    textoPaciente: `Deje de tomarlo los 3 días previos y el día de la intervención. La última toma será el ${fechaLarga(limite)}.`,
-    reglaAplicada: 'GLP-1 diario: omitir 3 días previos + día de la IQ (última dosis 4 días antes)',
+    fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
+    textoPaciente: `Deje de tomarlo los 3 días previos y el día de la intervención. ${plazo.textoPaciente}`,
+    reglaAplicada: 'GLP-1 diario: omitir 3 días previos + día de la IQ (última dosis el día 4 previo)',
     fuente: FUENTE,
     requiereConfirmacion: false,
   };

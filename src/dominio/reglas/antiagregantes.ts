@@ -7,6 +7,7 @@
  */
 import type { ContextoReglas, ResultadoFarmaco, Alerta } from '../tipos.ts';
 import { neuroaxialOProfundo, plazoDesdeDias, TEXTO_MANTENER } from './motor.ts';
+import { fechaHoraLimite } from '../fechas/plazos.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.3 (ESC 2022; protocolo del servicio)';
 
@@ -250,10 +251,11 @@ const HORAS_GP: Record<GpIibIiia, { estandar: number; neuroaxial: number }> = {
 
 export function reglaGpIibIiia(idFarmaco: string, nombreComercial: string, principio: GpIibIiia, ctx: ContextoReglas): ResultadoFarmaco {
   const horas = neuroaxialOProfundo(ctx) ? HORAS_GP[principio].neuroaxial : HORAS_GP[principio].estandar;
-  const plazo = plazoDesdeHoras(ctx, horas);
+  // Perfusión IV hospitalaria: la última administración permitida es el propio límite.
+  const limite = fechaHoraLimite(ctx.fechaHoraIntervencion, horas);
   return {
     idFarmaco, nombreComercial, principiosActivos: [principio],
-    accion: 'consultar', fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
+    accion: 'consultar', fechaHoraUltimaToma: limite,
     textoPaciente: 'Uso hospitalario: el anestesiólogo indicará la pauta. No lo cambie por su cuenta.',
     reglaAplicada: `${principio} (GP IIb/IIIa o cangrelor): ${horas} h (uso hospitalario); requiere confirmación`,
     fuente: FUENTE, requiereConfirmacion: true,
