@@ -115,9 +115,21 @@ export function plazoDesdeDias(ctx: ContextoReglas, dias: number): PlazoResultad
   return { horas: diasAHoras(dias), fechaHoraUltimaToma: ultima, textoPaciente: textoUltimaTomaDias(ultima) };
 }
 
-/** Texto estándar de "mantener" (§8.0). */
+/** Texto estándar de "mantener" para fármacos ORALES (§8.0). */
 export const TEXTO_MANTENER =
   'Siga tomándolo como siempre, también el día de la intervención, con un sorbo de agua.';
+
+/** Texto de "mantener" para vías NO orales (implante, parche, inyectable, inhalador, DIU). */
+export const TEXTO_MANTENER_NO_ORAL =
+  'No cambie nada: siga con su tratamiento como siempre.';
+
+/** Vías de administración no orales. */
+export type ViaAdministracion = 'oral' | 'no_oral';
+
+/** Devuelve el texto de "mantener" adecuado a la vía. */
+export function textoMantener(via: ViaAdministracion = 'oral'): string {
+  return via === 'no_oral' ? TEXTO_MANTENER_NO_ORAL : TEXTO_MANTENER;
+}
 
 /**
  * Combinación fija (una sola pastilla, §8.0 / Decisión 5): una única instrucción

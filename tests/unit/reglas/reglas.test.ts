@@ -12,8 +12,9 @@ import { reglaLitio } from '../../../src/dominio/reglas/psicofarmacos.ts';
 import { reglaAine } from '../../../src/dominio/reglas/aine.ts';
 import { reglaMetformina, reglaSglt2, reglaGlp1Semanal, reglaGlp1Diario, reglaBombaInsulina } from '../../../src/dominio/reglas/antidiabeticos.ts';
 import { reglaSacubitriloValsartan, reglaIecaAra2 } from '../../../src/dominio/reglas/cardiovasculares.ts';
-import { reglaNoCatalogado, aplicarPlazoNoAlcanzable } from '../../../src/dominio/reglas/otros.ts';
+import { reglaNoCatalogado, reglaMantener, aplicarPlazoNoAlcanzable } from '../../../src/dominio/reglas/otros.ts';
 import { fechaHoraLimite } from '../../../src/dominio/fechas/plazos.ts';
+import { textoHojaPaciente, confirmar } from '../../../src/dominio/salidas/hojaFarmaco.ts';
 
 // Intervención de referencia: jueves 15 de octubre de 2026, 08:00.
 const IV = new Date(2026, 9, 15, 8, 0);
@@ -318,6 +319,26 @@ describe('Cardiovasculares (§8.10)', () => {
       ctx(),
     );
     expect(r.requiereConfirmacion).toBeTrue();
+  });
+});
+
+describe('Texto no oral y comportamiento de requiere-confirmación (§8.0, §12)', () => {
+  it('fármaco no oral: "mantener" no dice "con un sorbo de agua"', () => {
+    const r = reglaMantener('fent', 'Durogesic', ['fentanilo'], 'parche: mantener', 'no_oral');
+    expect(r.textoPaciente).not.toContain('sorbo de agua');
+    expect(r.textoPaciente).toContain('No cambie nada');
+  });
+  it('fármaco oral: "mantener" mantiene "con un sorbo de agua"', () => {
+    const r = reglaMantener('ena', 'Renitec', ['enalapril'], 'mantener');
+    expect(r.textoPaciente).toContain('sorbo de agua');
+  });
+  it('requiere confirmación: la hoja del paciente solo muestra "el anestesiólogo le llamará" hasta confirmar', () => {
+    const r = reglaP2y12({ idFarmaco: 'clopidogrel', nombreComercial: 'Plavix', principio: 'clopidogrel', monoterapia: true }, ctx({ neuroaxial: true }));
+    const antes = textoHojaPaciente(r);
+    expect(antes).toContain('el anestesiólogo le llamará');
+    expect(antes).not.toContain('Tome la última dosis');
+    const despues = textoHojaPaciente(confirmar(r, 'Dra. X'));
+    expect(despues).toContain('Tome la última dosis');
   });
 });
 

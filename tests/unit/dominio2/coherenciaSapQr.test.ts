@@ -16,7 +16,8 @@ describe('Coherencia §5b (caso 22)', () => {
     expect(t).not.toBe(null);
     expect(t?.tipo).toBe('farmaco_a_enfermedad');
     expect(t?.mensaje).toContain('Enalapril');
-    expect(t?.opciones).toContain('hipertension');
+    expect(t?.opciones).toContain('hipertensión'); // etiqueta legible, no el id interno
+    expect(t?.mensaje).toContain('insuficiencia cardiaca');
     expect(t?.opciones).toContain('no lo sabe');
   });
 

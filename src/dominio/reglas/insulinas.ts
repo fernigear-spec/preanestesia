@@ -1,18 +1,23 @@
 /**
  * Insulinas — docs/documento_fuente.md §8.5.
- * - Basal (glargina, detemir, degludec): 70-80 % de la dosis habitual la noche
- *   previa y la mañana de la intervención, redondeando a la unidad inferior.
+ * - Basal (glargina, detemir, degludec): 80 % de la dosis habitual (reducción del
+ *   20 %, guía CPOC), redondeando a la unidad inferior, en las tomas que caen la
+ *   noche previa o la mañana de la intervención. Las tomas de días anteriores se
+ *   ponen completas.
  * - NPH: dosis completa la noche previa y 50 % la mañana de la intervención.
  * - Premezcladas: 50 % de la dosis de la mañana de la intervención.
  * - Rápida/ultrarrápida: suspender la del desayuno; solo pauta correctora según
  *   glucemia capilar.
  *
- * Se calcula la dosis ajustada (unidad inferior) por momento: noche previa y/o
- * mañana de la intervención. No usa plazos horarios; el "momento" es fijo.
+ * El "momento" se decide con las horas de toma registradas y la fecha/hora de la
+ * intervención: noche previa = tomas del día anterior a partir de las 18:00;
+ * mañana de la intervención = tomas del propio día antes de la inducción.
  */
 import type { ResultadoFarmaco } from '../tipos.ts';
+import { fechaLarga } from '../fechas/ultimaToma.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.5';
+export const PCT_BASAL = 80; // reducción del 20 % (CPOC)
 
 export interface AjusteInsulina {
   momento: 'noche_previa' | 'manana_intervencion';
@@ -34,37 +39,51 @@ export function dosisAjustada(dosisHabitual: number, pct: number): number {
 
 // ————————————— Basal (70-80 %) —————————————
 
+export interface TomaBasal {
+  /** Hora "HH:MM". */
+  hora: string;
+  /** Dosis habitual en UI a esa hora. */
+  dosisUi: number;
+}
+
 export interface EntradaInsulinaBasal {
   idFarmaco: string;
   nombreComercial: string;
   principio: string;
-  /** Dosis habitual de la noche (UI). */
-  dosisNocheUi: number;
-  /** Dosis habitual de la mañana (UI), si la pone por la mañana. */
-  dosisMananaUi?: number;
-  /** Porcentaje a aplicar (70-80). Por defecto 75. */
-  pct?: number;
+  /** Tomas habituales (hora + dosis). Una sola en pauta diaria, dos si mañana y noche. */
+  tomas: TomaBasal[];
+  /** Fecha/hora de la intervención (para decidir qué tomas se reducen). */
+  intervencion: Date;
+}
+
+/** Clasifica una toma por su hora habitual: >=18:00 → noche previa; si no, mañana de la intervención. */
+function momentoDeToma(hora: string): 'noche_previa' | 'manana_intervencion' {
+  const [h] = hora.split(':').map((x) => parseInt(x, 10));
+  return (h ?? 0) >= 18 ? 'noche_previa' : 'manana_intervencion';
 }
 
 export function reglaInsulinaBasal(e: EntradaInsulinaBasal): ResultadoInsulina {
-  const pct = e.pct ?? 75;
   const ajustes: AjusteInsulina[] = [];
-  const noche = dosisAjustada(e.dosisNocheUi, pct);
-  ajustes.push({ momento: 'noche_previa', dosisUi: noche, descripcion: `${noche} UI (${pct} % de ${e.dosisNocheUi})` });
-  if (e.dosisMananaUi !== undefined) {
-    const manana = dosisAjustada(e.dosisMananaUi, pct);
-    ajustes.push({ momento: 'manana_intervencion', dosisUi: manana, descripcion: `${manana} UI (${pct} % de ${e.dosisMananaUi})` });
+  const frases: string[] = [];
+  for (const t of e.tomas) {
+    const momento = momentoDeToma(t.hora);
+    const reducida = dosisAjustada(t.dosisUi, PCT_BASAL);
+    if (momento === 'noche_previa') {
+      ajustes.push({ momento: 'noche_previa', dosisUi: reducida, descripcion: `${reducida} UI (80 % de ${t.dosisUi}) la noche previa` });
+      frases.push(`la noche previa, ${reducida} UI (en vez de ${t.dosisUi})`);
+    } else {
+      ajustes.push({ momento: 'manana_intervencion', dosisUi: reducida, descripcion: `${reducida} UI (80 % de ${t.dosisUi}) la mañana de la intervención` });
+      const dia = new Date(e.intervencion);
+      frases.push(`la mañana de la intervención (${fechaLarga(dia)}), ${reducida} UI (en vez de ${t.dosisUi})`);
+    }
   }
-  const textoManana = e.dosisMananaUi !== undefined
-    ? ` y ${dosisAjustada(e.dosisMananaUi, pct)} UI la mañana de la intervención`
-    : '';
   return {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,
     principiosActivos: [e.principio],
     accion: 'ajustar',
-    textoPaciente: `Póngase ${noche} UI la noche previa${textoManana} (${pct} % de su dosis habitual).`,
-    reglaAplicada: `Insulina basal: ${pct} % la noche previa y la mañana (redondeo a la unidad inferior)`,
+    textoPaciente: `Reduzca su insulina basal al 80 %: ${frases.join('; ')}. Los días anteriores, la dosis de siempre.`,
+    reglaAplicada: 'Insulina basal: 80 % (reducción del 20 %, CPOC) en la noche previa y la mañana de la intervención',
     fuente: FUENTE,
     requiereConfirmacion: false,
     ajustes,

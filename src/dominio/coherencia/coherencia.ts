@@ -25,6 +25,54 @@ export interface FarmacoAnadido {
   indicacionesPosibles: string[];
 }
 
+/** Etiquetas legibles de las indicaciones (§5b.1). Nunca se muestran los ids internos. */
+export const ETIQUETAS_INDICACION: Record<string, string> = {
+  hipertension: 'hipertensión',
+  insuficiencia_cardiaca: 'insuficiencia cardiaca',
+  cardiopatia_isquemica: 'cardiopatía isquémica',
+  arritmia: 'arritmia',
+  nefropatia_proteinuria: 'nefropatía o proteinuria',
+  migrana: 'migraña',
+  edemas: 'síndrome nefrótico o edemas',
+  trasplante: 'trasplante',
+  polimialgia_reumatica: 'polimialgia reumática',
+  artritis_reumatoide: 'artritis reumatoide',
+  lupus: 'lupus',
+  enfermedad_inflamatoria_intestinal: 'enfermedad inflamatoria intestinal',
+  asma_epoc: 'asma o EPOC',
+  insuficiencia_suprarrenal: 'insuficiencia suprarrenal',
+  enfermedad_oncohematologica: 'enfermedad oncohematológica',
+  enfermedad_autoinmune: 'enfermedad autoinmune',
+  dermatologica: 'enfermedad dermatológica',
+  fibrilacion_auricular: 'fibrilación auricular',
+  protesis_valvular: 'prótesis valvular',
+  tromboembolismo_venoso: 'tromboembolismo venoso',
+  trombofilia: 'trombofilia',
+  stent_coronario: 'stent coronario',
+  infarto: 'infarto',
+  ictus_ait: 'ictus o AIT',
+  arteriopatia_periferica: 'arteriopatía periférica',
+  prevencion_primaria: 'prevención primaria',
+  diabetes: 'diabetes',
+  obesidad: 'obesidad',
+  epilepsia: 'epilepsia',
+  dolor_neuropatico: 'dolor neuropático',
+  trastorno_bipolar: 'trastorno bipolar',
+  parkinson: 'Parkinson',
+  hipotiroidismo: 'hipotiroidismo',
+  tiroidectomia: 'tiroidectomía',
+  dolor_cronico: 'dolor crónico',
+  espondilitis: 'espondilitis',
+  psoriasis: 'psoriasis',
+  gota: 'gota',
+  reflujo: 'reflujo',
+  otra: 'otra',
+};
+
+export function etiquetaIndicacion(id: string): string {
+  return ETIQUETAS_INDICACION[id] ?? id.replace(/_/g, ' ');
+}
+
 /**
  * Si ninguna de las indicaciones posibles del fármaco está recogida en la
  * entrevista, devuelve una tarjeta. `indicacionesRecogidas` = módulos/casillas ya marcados.
@@ -36,10 +84,11 @@ export function tarjetaFarmacoAEnfermedad(
   if (f.indicacionesPosibles.length === 0) return null;
   const algunaRecogida = f.indicacionesPosibles.some((i) => indicacionesRecogidas.has(i));
   if (algunaRecogida) return null;
+  const etiquetas = f.indicacionesPosibles.map(etiquetaIndicacion);
   return {
     tipo: 'farmaco_a_enfermedad',
-    mensaje: `${f.nombre} suele tomarse por ${listar(f.indicacionesPosibles)}. Pregúntele por qué lo toma.`,
-    opciones: [...f.indicacionesPosibles, 'otra razón', 'no lo sabe'],
+    mensaje: `${f.nombre} suele tomarse por ${listar(etiquetas)}. Pregúntele por qué lo toma.`,
+    opciones: [...etiquetas, 'otra razón', 'no lo sabe'],
     origen: '§5b.1',
   };
 }

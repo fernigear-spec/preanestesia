@@ -134,7 +134,7 @@ Esperado: una sola dosis omitida, la del jueves 15/10 (día de la intervención)
 Esperado: no tomar los 3 días previos ni el día de la intervención. Última toma domingo 11/10.
 
 **D7.** Tresiba 30 UI a las 09:00.
-Esperado: dosis completa el miércoles 14/10. El jueves 15/10, entre 21 y 24 UI.
+Esperado: al ser una dosis diaria de mañana, no hay «noche previa» que ajustar. La mañana de la intervención (jueves 15/10), 24 UI (80 % de 30, redondeado a la unidad inferior). Los días anteriores, la dosis de siempre.
 
 **D8.** Insulatard 20 UI a las 08:00 y 10 UI a las 21:00.
 Esperado: miércoles 14/10 a las 21:00, 10 UI (completa). Jueves 15/10 por la mañana, 10 UI (50 %).
@@ -143,7 +143,7 @@ Esperado: miércoles 14/10 a las 21:00, 10 UI (completa). Jueves 15/10 por la ma
 Esperado: 10 UI la mañana de la intervención.
 
 **D10.** Bomba de insulina. Tumorectomía de mama en CMA (riesgo bajo).
-Esperado: basal al 70-80 % y suspender bolos. Sin confirmación.
+Esperado: basal al 80 % y suspender bolos. Sin confirmación.
 
 **D11.** Bomba de insulina. Colectomía con ingreso.
 Esperado: requiere confirmación.

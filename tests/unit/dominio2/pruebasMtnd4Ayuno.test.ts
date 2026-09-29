@@ -94,10 +94,10 @@ describe('mtND4 §9 (caso 9)', () => {
     expect(r.alerta.gravedad).toBe('informativa');
     expect(r.alerta.mensaje).toContain('ausente');
   });
-  it('sin factores ni test → informativa (solo anestesiólogo)', () => {
+  it('sin factores de línea materna ni test → ninguna alerta ni línea en la hoja', () => {
     const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: false, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'no_hecho' });
-    expect(r.alerta.gravedad).toBe('informativa');
-    expect(r.alerta.soloAnestesiologo).toBeTrue();
+    expect(r.alerta).toBe(null);
+    expect(r.textoPaciente).toBe('');
   });
 });
 

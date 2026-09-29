@@ -133,7 +133,7 @@ export interface EntradaBiologico {
 }
 
 /** Biológicos (anti-TNF, rituximab, tocilizumab, abatacept...): planificación por ciclo; confirmación. */
-export function reglaBiologico(e: EntradaBiologico): ResultadoFarmaco {
+export function reglaBiologico(e: EntradaBiologico, intervencion?: Date): ResultadoFarmaco {
   const res: ResultadoFarmaco = {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,
@@ -150,6 +150,17 @@ export function reglaBiologico(e: EntradaBiologico): ResultadoFarmaco {
   };
   if (e.fechaUltimaDosis === undefined) {
     res.datoQueFalta = 'fecha de la última dosis del biológico';
+    return res;
+  }
+  // Con fecha y periodicidad, se calcula en qué punto del ciclo cae la cirugía.
+  if (e.periodicidadDias !== undefined && intervencion !== undefined) {
+    const diasDesde = Math.round((intervencion.getTime() - e.fechaUltimaDosis.getTime()) / 86_400_000);
+    const puntoCiclo = diasDesde % e.periodicidadDias;
+    const proxima = e.periodicidadDias - puntoCiclo;
+    const mitad = puntoCiclo > 0 && proxima > 0;
+    res.textoAnestesiologo +=
+      ` La cirugía cae a ${diasDesde} días de la última dosis (ciclo de ${e.periodicidadDias} días): ` +
+      `${mitad ? 'a mitad de ciclo; próxima dosis en ' + proxima + ' días — valorar reprogramar cerca de la siguiente dosis' : 'al final del ciclo'}.`;
   }
   return res;
 }

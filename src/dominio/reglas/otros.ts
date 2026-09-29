@@ -7,8 +7,9 @@
  */
 import type { ContextoReglas, ResultadoFarmaco, Alerta } from '../tipos.ts';
 import { TEXTO_MANTENER } from './motor.ts';
+// (textoMantener y ViaAdministracion se importan más abajo junto a plazoDesdeDias)
 import { plazoNoAlcanzable } from '../fechas/plazos.ts';
-import { plazoDesdeDias, faltaHora, resultadoFaltaHora } from './motor.ts';
+import { plazoDesdeDias, faltaHora, resultadoFaltaHora, textoMantener, type ViaAdministracion } from './motor.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.0';
 
@@ -30,13 +31,14 @@ export function reglaMantener(
   nombreComercial: string,
   principiosActivos: string[],
   motivo = 'mantener',
+  via: ViaAdministracion = 'oral',
 ): ResultadoFarmaco {
   return {
     idFarmaco,
     nombreComercial,
     principiosActivos,
     accion: 'mantener',
-    textoPaciente: TEXTO_MANTENER,
+    textoPaciente: textoMantener(via),
     reglaAplicada: motivo,
     fuente: FUENTE,
     requiereConfirmacion: false,

@@ -175,9 +175,9 @@ export function reglaBombaInsulina(e: EntradaBombaInsulina, ctx: ContextoReglas)
     accion: requiereConfirmacion ? 'consultar' : 'ajustar',
     textoPaciente: requiereConfirmacion
       ? 'Sobre su bomba de insulina, el anestesiólogo le indicará qué hacer. No cambie la pauta por su cuenta.'
-      : 'Ponga la basal al 70-80 % de lo habitual y no se administre bolos el día de la intervención.',
+      : 'Ponga la basal al 80 % de lo habitual y no se administre bolos el día de la intervención.',
     reglaAplicada: cmaBajoRiesgo
-      ? 'Bomba de insulina, CMA de riesgo bajo: basal 70-80 %, suspender bolos (sin confirmación)'
+      ? 'Bomba de insulina, CMA de riesgo bajo: basal 80 %, suspender bolos (sin confirmación)'
       : 'Bomba de insulina, riesgo intermedio/alto o ingreso: requiere confirmación',
     fuente: FUENTE,
     requiereConfirmacion,

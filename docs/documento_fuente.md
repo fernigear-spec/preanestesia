@@ -376,11 +376,11 @@ Recordatorio en la salida: la valoración debería hacerse idealmente entre 2 y 
 - Pioglitazona: no tomar el día de la intervención.
 - Agonistas GLP-1 y tirzepatida, con cualquier indicación, también la obesidad: semanales, la última dosis debe ser al menos 7 días antes de la intervención; se omite la única dosis que cae en los 6 días previos o el mismo día de la intervención y la hoja indica su fecha exacta, y dieta de líquidos claros las 24 h previas (hoja anexa); diarios, no tomar los 3 días previos ni el día de la intervención (última dosis 4 días antes: intervención el jueves, última toma el domingo) y ayuno estándar.
 - Inhibidores SGLT2: suspender 3 días (4 días ertugliflozina).
-- Insulina basal (glargina, detemir, degludec): 70 a 80 % de la dosis habitual la noche previa y la mañana de la intervención, redondeando a la unidad inferior.
+- Insulina basal (glargina, detemir, degludec): 80 % de la dosis habitual (reducción del 20 %, guía CPOC) en las tomas que caen la noche previa y la mañana de la intervención, redondeando a la unidad inferior; las tomas de días anteriores se ponen completas.
 - Insulina NPH: dosis completa la noche previa y 50 % la mañana de la intervención.
 - Insulina rápida o ultrarrápida: suspender la del desayuno; solo pauta correctora según glucemia capilar.
 - Insulinas premezcladas: 50 % de la dosis habitual de la mañana de la intervención.
-- Bomba de insulina: basal al 70 a 80 % y suspender los bolos. Cirugía de riesgo bajo en CMA: sin confirmación. Riesgo intermedio o alto, o ingreso: requiere confirmación.
+- Bomba de insulina: basal al 80 % y suspender los bolos. Cirugía de riesgo bajo en CMA: sin confirmación. Riesgo intermedio o alto, o ingreso: requiere confirmación.
 - Combinaciones fijas de insulina basal con GLP-1 (degludec más liraglutida, glargina más lixisenatida): requiere confirmación, porque omitir el GLP-1 dejaría sin insulina basal.
 - Combinaciones orales: regla más restrictiva de sus componentes.
 - Nota para el anestesiólogo en diabéticos: objetivo de glucemia perioperatoria 100 a 180 mg/dL; monitorización preinducción, cada 2 h en cirugía prolongada y cada 2 a 4 h en el postoperatorio hasta reiniciar dieta; si no se ha suspendido el SGLT2, controles cada 1 a 2 h, gasometría en cirugía prolongada, cuerpos cetónicos, fluidos balanceados y vigilancia de cetoacidosis euglucémica (pH < 7,3, bicarbonato < 18 mmol/L o anión gap elevado).

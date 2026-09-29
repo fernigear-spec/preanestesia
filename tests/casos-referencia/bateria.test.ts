@@ -178,11 +178,12 @@ describe('Casos C · antiagregantes', () => {
     expect(s.suprimirPautaAntiagregantesEnHoja).toBeTrue();
     expect(s.alertas[0]?.gravedad).toBe('roja');
   });
-  it('C6 stent por SCA hace 14 meses: no reciente; clopidogrel 5 días (vie 09/10 09:00)', () => {
+  it('C6 stent por SCA hace 14 meses: no reciente; clopidogrel 5 días (vie 09/10 09:00) PERO requiere confirmación por portar stent', () => {
     const s = evaluarStent({ mesesDesdeImplante: 14, traSca: true }, ctx());
     expect(s.recienteRequiereConfirmacion).toBeFalse();
-    const r = reglaP2y12({ idFarmaco: 'clopidogrel', nombreComercial: 'Plavix', principio: 'clopidogrel', monoterapia: false }, ctx({ pautaFarmaco: P('09:00') }));
+    const r = reglaP2y12({ idFarmaco: 'clopidogrel', nombreComercial: 'Plavix', principio: 'clopidogrel', monoterapia: false, portadorStent: true }, ctx({ pautaFarmaco: P('09:00') }));
     expect(esFecha(r.fechaHoraUltimaToma, 2026, 9, 9, 9, 0)).toBeTrue();
+    expect(r.requiereConfirmacion).toBeTrue(); // §8.3: ninguna suspensión sin confirmación en portador de stent
   });
   it('C7 clopidogrel 09:00 monoterapia, raquídea: 7 días, última mié 07/10 09:00, confirmación', () => {
     const r = reglaP2y12({ idFarmaco: 'clopidogrel', nombreComercial: 'Plavix', principio: 'clopidogrel', monoterapia: true }, ctx({ neuroaxial: true, pautaFarmaco: P('09:00') }));
@@ -229,12 +230,12 @@ describe('Casos D · antidiabéticos', () => {
     const r = reglaGlp1Diario({ idFarmaco: 'r', nombreComercial: 'Rybelsus', principio: 'semaglutida' }, ctx({ pautaFarmaco: P('08:00') }));
     expect(esFecha(r.fechaHoraUltimaToma, 2026, 9, 11, 8, 0)).toBeTrue();
   });
-  it('D7 Tresiba 30 UI: completa la noche previa no; 70-80 % → mañana 21-24 UI (75 %: 22)', () => {
-    const r = reglaInsulinaBasal({ idFarmaco: 't', nombreComercial: 'Tresiba', principio: 'insulina_degludec', dosisNocheUi: 30, dosisMananaUi: 30 });
+  it('D7 Tresiba 30 UI a las 09:00 (diaria): jueves mañana 24 UI (80 %); no hay "noche previa"', () => {
+    const r = reglaInsulinaBasal({ idFarmaco: 't', nombreComercial: 'Tresiba', principio: 'insulina_degludec', tomas: [{ hora: '09:00', dosisUi: 30 }], intervencion: IV });
     const manana = r.ajustes.find((a) => a.momento === 'manana_intervencion');
-    expect(manana?.dosisUi).toBeGreaterThanOrEqual(21);
-    expect(manana?.dosisUi as number).toBeLessThan(25);
-    expect(manana?.dosisUi).toBe(22); // 75 % de 30 = 22,5 → 22 (unidad inferior)
+    const noche = r.ajustes.find((a) => a.momento === 'noche_previa');
+    expect(manana?.dosisUi).toBe(24); // 80 % de 30
+    expect(noche).toBeUndefined();
   });
   it('D8 Insulatard NPH 20 mañana / 10 noche: noche 10 completa, mañana 10 (50 % de 20)', () => {
     const r = reglaInsulinaNph({ idFarmaco: 'n', nombreComercial: 'Insulatard', dosisNocheUi: 10, dosisMananaUi: 20 });
@@ -306,8 +307,11 @@ describe('Casos E · otros fármacos', () => {
   it('E11 metotrexato 15 mg/sem: mantener', () => {
     expect(reglaMetotrexato({ idFarmaco: 'm', nombreComercial: 'Metoject', dosisSemanalMg: 15 }).accion).toBe('mantener');
   });
-  it('E12 adalimumab: confirmación (planificación por ciclo)', () => {
-    expect(reglaBiologico({ idFarmaco: 'a', nombreComercial: 'Humira', principio: 'adalimumab' }).requiereConfirmacion).toBeTrue();
+  it('E12 adalimumab cada 2 semanas, última dosis jue 08/10: confirmación + detecta mitad de ciclo', () => {
+    const r = reglaBiologico({ idFarmaco: 'a', nombreComercial: 'Humira', principio: 'adalimumab', periodicidadDias: 14, fechaUltimaDosis: new Date(2026, 9, 8) }, IV);
+    expect(r.requiereConfirmacion).toBeTrue();
+    expect(r.datoQueFalta).toBeUndefined(); // ya tiene la fecha
+    expect(r.textoAnestesiologo).toContain('mitad de ciclo');
   });
   it('E13 bevacizumab hace 4 semanas: alerta de diferir + confirmación', () => {
     const r = reglaAntiangiogenico({ idFarmaco: 'b', nombreComercial: 'Avastin', principio: 'bevacizumab', semanasDesdeUltimaDosis: 4 });
@@ -473,9 +477,10 @@ describe('Casos I · mtND4 y coherencia', () => {
     const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: true, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'no_hecho' });
     expect(r.alerta.gravedad).toBe('roja');
   });
-  it('I3 abuela paterna venezolana (no línea materna): sin alerta roja', () => {
+  it('I3 abuela paterna venezolana (no línea materna): ninguna alerta y ninguna línea en la hoja', () => {
     const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: false, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'no_hecho' });
-    expect(r.alerta.gravedad).toBe('informativa');
+    expect(r.alerta).toBe(null);
+    expect(r.textoPaciente).toBe('');
   });
   it('I4 prednisona sin indicación recogida: tarjeta de coherencia; no marca enfermedad', () => {
     const t = tarjetaFarmacoAEnfermedad({ nombre: 'Prednisona', indicacionesPosibles: ['trasplante', 'artritis_reumatoide', 'lupus', 'asma_epoc', 'insuficiencia_suprarrenal'] }, new Set());

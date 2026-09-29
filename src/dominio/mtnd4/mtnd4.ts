@@ -19,8 +19,9 @@ export interface EntradaMtnd4 {
 }
 
 export interface ResultadoMtnd4 {
-  alerta: Alerta;
-  /** Texto neutro para la hoja del paciente (§9.5). */
+  /** Alerta a mostrar, o null si no procede ninguna (I3). */
+  alerta: Alerta | null;
+  /** Texto para la hoja del paciente (§9.5); cadena vacía si no procede ninguna línea. */
   textoPaciente: string;
   /** Medidas para las notas del anestesiólogo (§9.4). */
   notasAnestesiologo: string[];
@@ -85,15 +86,13 @@ export function evaluarMtnd4(e: EntradaMtnd4): ResultadoMtnd4 {
     };
   }
 
-  // Sin factores y sin test: cribado negativo, informativa neutra.
+  // Sin factores de línea materna y sin test: NINGUNA alerta y NINGUNA línea en
+  // la hoja del paciente (I3: abuela paterna venezolana no cuenta). Solo la línea
+  // materna, el origen materno desconocido, la ovodonación, los antecedentes
+  // familiares compatibles o un test genético generan alerta o texto.
   return {
-    alerta: {
-      gravedad: 'informativa',
-      mensaje: 'cribado mtND4 sin factores de riesgo.',
-      origen,
-      soloAnestesiologo: true,
-    },
-    textoPaciente: TEXTO_PACIENTE,
+    alerta: null,
+    textoPaciente: '',
     notasAnestesiologo: [],
   };
 }

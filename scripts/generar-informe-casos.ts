@@ -5,7 +5,7 @@
  *
  * Ejecutar: node --experimental-strip-types scripts/generar-informe-casos.ts
  */
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import type { ContextoReglas } from '../src/dominio/tipos.ts';
@@ -37,6 +37,8 @@ import { decidirPruebas, pruebaVigente, type FactoresPruebas } from '../src/domi
 import { calcularAyuno } from '../src/dominio/ayuno/ayuno.ts';
 import { evaluarMtnd4 } from '../src/dominio/mtnd4/mtnd4.ts';
 import { tarjetaFarmacoAEnfermedad, tarjetasEnfermedadAFarmaco } from '../src/dominio/coherencia/coherencia.ts';
+import { combinacionFija } from '../src/dominio/reglas/motor.ts';
+import { textoHojaPaciente, confirmar } from '../src/dominio/salidas/hojaFarmaco.ts';
 import type { ResultadoFarmaco } from '../src/dominio/tipos.ts';
 
 const IV = new Date(2026, 9, 15, 8, 0);
@@ -60,16 +62,43 @@ function esc(s: string): string {
   return s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
 }
 
+// —— Esperado LITERAL leído de docs/casos_referencia.md ——
+const __dirnameParse = dirname(fileURLToPath(import.meta.url));
+const mdCasos = readFileSync(join(__dirnameParse, '..', 'docs', 'casos_referencia.md'), 'utf8');
+const ESPERADO_LITERAL: Record<string, string> = {};
+{
+  const lineas = mdCasos.split('\n');
+  let idActual: string | null = null;
+  for (const linea of lineas) {
+    const mId = linea.match(/^\*\*([A-Z][0-9]+[a-z]?)\.\*\*/);
+    if (mId) { idActual = mId[1] ?? null; continue; }
+    const mEsp = linea.match(/^Esperado:\s*(.*)$/);
+    if (mEsp && idActual) { ESPERADO_LITERAL[idActual] = mEsp[1] ?? ''; idActual = null; }
+  }
+}
+
+type Veredicto = 'coincide' | 'dudoso' | 'no_coincide';
 interface Fila {
   id: string;
   calculado: string;
   textoPaciente: string;
-  esperado: string;
-  coincide: boolean;
+  esperado: string; // literal de casos_referencia.md
+  veredicto: Veredicto;
 }
 const filas: Fila[] = [];
-function add(id: string, calculado: string, textoPaciente: string, esperado: string, coincide: boolean): void {
-  filas.push({ id, calculado, textoPaciente, esperado, coincide });
+
+/**
+ * El esperado SIEMPRE sale del literal de docs/casos_referencia.md (no se teclea).
+ * Compatibilidad de firma: las llamadas históricas pasan (id, calc, texto,
+ * esperadoTecleado, comprueba). El 4.º argumento (si es string) se IGNORA; el
+ * veredicto usa el último booleano. Nuevas llamadas pueden pasar (id, calc, texto, comprueba).
+ * Si no hay booleano, el veredicto es "dudoso" (revisión manual).
+ */
+function add(id: string, calculado: string, textoPaciente: string, a?: string | boolean, b?: boolean): void {
+  const esperado = ESPERADO_LITERAL[id] ?? '(no encontrado en casos_referencia.md)';
+  const comprueba = typeof a === 'boolean' ? a : b;
+  const veredicto: Veredicto = comprueba === undefined ? 'dudoso' : comprueba ? 'coincide' : 'no_coincide';
+  filas.push({ id, calculado, textoPaciente, esperado, veredicto });
 }
 
 // ————————————————————— A —————————————————————
@@ -112,7 +141,7 @@ function add(id: string, calculado: string, textoPaciente: string, esperado: str
 }
 {
   const r = reglaAcod({ idFarmaco: 'apixaban', nombreComercial: 'Eliquis', principioActivo: 'apixaban', subtipo: 'antixa', altoRiesgoTromboticoConfirmar: true }, ctx({ pautaFarmaco: P('09:00', '21:00') }));
-  add('A8', farmacoResumen(r), r.textoPaciente, 'alerta ictus; confirmación con cambio a acenocumarol', r.requiereConfirmacion && (r.textoAnestesiologo ?? '').includes('acenocumarol'));
+  add('A8', `${farmacoResumen(r)}; nota anestesiólogo: ${r.textoAnestesiologo ?? '—'}`, r.textoPaciente, r.requiereConfirmacion && (r.textoAnestesiologo ?? '').includes('acenocumarol'));
 }
 {
   const r = reglaAvk({ idFarmaco: 'acenocumarol', nombreComercial: 'Sintrom', principio: 'acenocumarol', altoRiesgoTromboembolico: false }, ctx({ riesgoHemorragico: 'bajo', pautaFarmaco: P('18:00') }));
@@ -124,11 +153,13 @@ function add(id: string, calculado: string, textoPaciente: string, esperado: str
 }
 {
   const r = reglaAvk({ idFarmaco: 'warfarina', nombreComercial: 'Aldocumar', principio: 'warfarina', altoRiesgoTromboembolico: false, portadorValvulaMecanicaOStent: true }, ctx({ riesgoHemorragico: 'alto', pautaFarmaco: P('18:00') }));
-  add('A11', farmacoResumen(r.farmaco), r.farmaco.textoPaciente, 'confirmación por válvula mecánica; sin puente', r.farmaco.requiereConfirmacion && !r.puente);
+  const a11antes = textoHojaPaciente(r.farmaco);
+  const a11despues = textoHojaPaciente(confirmar(r.farmaco, 'Dr. X'));
+  add('A11', farmacoResumen(r.farmaco), `SIN confirmar: "${a11antes}" // CONFIRMADO: "${a11despues}"`, r.farmaco.requiereConfirmacion && !r.puente);
 }
 {
   const r = reglaAvk({ idFarmaco: 'acenocumarol', nombreComercial: 'Sintrom', principio: 'acenocumarol', altoRiesgoTromboembolico: true }, ctx({ pesoKg: 70, aclaramiento: 25, pautaFarmaco: P('18:00') }));
-  add('A12', `${farmacoResumen(r.farmaco)}; puente enoxaparina ${r.puente?.dosisMgPorToma} mg/${r.puente?.intervaloHoras} h`, r.farmaco.textoPaciente, 'puente enoxaparina 70 mg/24 h; confirmación', r.puente?.dosisMgPorToma === 70 && r.puente?.intervaloHoras === 24 && r.farmaco.requiereConfirmacion);
+  add('A12', `${farmacoResumen(r.farmaco)}; puente enoxaparina ${r.puente?.dosisMgPorToma} mg/${r.puente?.intervaloHoras} h; nota anestesiólogo: ${r.farmaco.textoAnestesiologo ?? '—'}`, r.farmaco.textoPaciente, r.puente?.dosisMgPorToma === 70 && r.puente?.intervaloHoras === 24 && r.farmaco.requiereConfirmacion);
 }
 {
   const r = reglaAvk({ idFarmaco: 'acenocumarol', nombreComercial: 'Sintrom', principio: 'acenocumarol', altoRiesgoTromboembolico: false }, ctx({ grupoOftalmologico: 'riesgo_moderado_alto', riesgoHemorragico: 'bajo', pautaFarmaco: P('18:00') }));
@@ -139,6 +170,12 @@ function add(id: string, calculado: string, textoPaciente: string, esperado: str
 {
   const r = reglaHbpm({ idFarmaco: 'enox', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'profilactica' }, ctx({ neuroaxial: true, pautaFarmaco: P('18:00') }));
   add('B1', farmacoResumen(r), r.textoPaciente, '12 h; última mié 14/10 18:00', fh(r.fechaHoraUltimaToma) === 'mié 14/10 18:00');
+}
+{
+  // B2: enoxaparina profiláctica con la dosis a las 21:00 (raquídea). El límite 12 h
+  // antes es el mié 14/10 20:00; la dosis de las 21:00 cae después → se adelanta a las 20:00.
+  const r = reglaHbpm({ idFarmaco: 'enox', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'profilactica' }, ctx({ neuroaxial: true, pautaFarmaco: P('21:00') }));
+  add('B2', farmacoResumen(r), r.textoPaciente, fh(r.fechaHoraUltimaToma) === 'mié 14/10 20:00');
 }
 {
   const clas = clasificarHbpm(160, { profilaxis_max: 40, tratamiento_min: 60 });
@@ -177,12 +214,14 @@ function add(id: string, calculado: string, textoPaciente: string, esperado: str
 }
 {
   const s = evaluarStent({ mesesDesdeImplante: 14, traSca: true }, ctx());
-  const r = reglaP2y12({ idFarmaco: 'clopidogrel', nombreComercial: 'Plavix', principio: 'clopidogrel', monoterapia: false }, ctx({ pautaFarmaco: P('09:00') }));
-  add('C6', `stent reciente: ${s.recienteRequiereConfirmacion}; ${farmacoResumen(r)}`, r.textoPaciente, 'no reciente; clopidogrel 5 días (vie 09/10 09:00)', !s.recienteRequiereConfirmacion && fh(r.fechaHoraUltimaToma) === 'vie 09/10 09:00');
+  const r = reglaP2y12({ idFarmaco: 'clopidogrel', nombreComercial: 'Plavix', principio: 'clopidogrel', monoterapia: false, portadorStent: true }, ctx({ pautaFarmaco: P('09:00') }));
+  add('C6', `stent reciente: ${s.recienteRequiereConfirmacion}; ${farmacoResumen(r)}`, textoHojaPaciente(r), !s.recienteRequiereConfirmacion && fh(r.fechaHoraUltimaToma) === 'vie 09/10 09:00' && r.requiereConfirmacion);
 }
 {
   const r = reglaP2y12({ idFarmaco: 'clopidogrel', nombreComercial: 'Plavix', principio: 'clopidogrel', monoterapia: true }, ctx({ neuroaxial: true, pautaFarmaco: P('09:00') }));
-  add('C7', farmacoResumen(r), r.textoPaciente, '7 días; última mié 07/10 09:00; confirmación', fh(r.fechaHoraUltimaToma) === 'mié 07/10 09:00' && r.requiereConfirmacion);
+  const antes = textoHojaPaciente(r);
+  const despues = textoHojaPaciente(confirmar(r, 'Dr. X'));
+  add('C7', farmacoResumen(r), `SIN confirmar: "${antes}" // CONFIRMADO: "${despues}"`, fh(r.fechaHoraUltimaToma) === 'mié 07/10 09:00' && r.requiereConfirmacion);
 }
 {
   const r = reglaTriflusal('t', 'Disgren', ctx({ pautaFarmaco: P('09:00', '21:00') }));
@@ -198,6 +237,16 @@ function add(id: string, calculado: string, textoPaciente: string, esperado: str
 }
 
 // ————————————————————— D —————————————————————
+{
+  // D1: Synjardy = combinación fija empagliflozina + metformina (09:00 y 21:00).
+  // Una sola instrucción, gobernada por el componente más restrictivo (SGLT2, 3 días);
+  // como retira la metformina antes de su plazo, añade nota de vigilar glucemia.
+  const cSyn = ctx({ pautaFarmaco: P('09:00', '21:00') });
+  const empSyn = reglaSglt2({ idFarmaco: 'synjardy', nombreComercial: 'Synjardy', principio: 'empagliflozina' }, cSyn);
+  const metSyn = reglaMetformina({ idFarmaco: 'synjardy', nombreComercial: 'Synjardy' }, cSyn);
+  const syn = combinacionFija('synjardy', 'Synjardy', [empSyn, metSyn], true);
+  add('D1', `${farmacoResumen(syn)}; nota anestesiólogo: ${syn.textoAnestesiologo ?? '—'}`, syn.textoPaciente, fh(syn.fechaHoraUltimaToma) === 'dom 11/10 21:00' && (syn.textoAnestesiologo ?? '').toLowerCase().includes('glucemia'));
+}
 {
   const emp = reglaSglt2({ idFarmaco: 'e', nombreComercial: 'Jardiance', principio: 'empagliflozina' }, ctx({ pautaFarmaco: P('09:00') }));
   const met = reglaMetformina({ idFarmaco: 'm', nombreComercial: 'Dianben' }, ctx({ pautaFarmaco: P('09:00', '21:00') }));
@@ -221,9 +270,10 @@ function add(id: string, calculado: string, textoPaciente: string, esperado: str
   add('D6', farmacoResumen(r), r.textoPaciente, 'última dom 11/10', fh(r.fechaHoraUltimaToma) === 'dom 11/10 08:00');
 }
 {
-  const r = reglaInsulinaBasal({ idFarmaco: 't', nombreComercial: 'Tresiba', principio: 'insulina_degludec', dosisNocheUi: 30, dosisMananaUi: 30 });
+  const r = reglaInsulinaBasal({ idFarmaco: 't', nombreComercial: 'Tresiba', principio: 'insulina_degludec', tomas: [{ hora: '09:00', dosisUi: 30 }], intervencion: IV });
   const manana = r.ajustes.find((a) => a.momento === 'manana_intervencion')?.dosisUi;
-  add('D7', `mañana: ${manana} UI (70-80 %)`, r.textoPaciente, 'mañana 21-24 UI (70-80 % de 30)', (manana ?? 0) >= 21 && (manana ?? 0) <= 24);
+  const noche7 = r.ajustes.find((a) => a.momento === 'noche_previa');
+  add('D7', `mañana IQ: ${manana} UI (80 % de 30); noche previa: ${noche7 ? noche7.dosisUi + ' UI' : 'no aplica (dosis diaria)'}`, r.textoPaciente, manana === 24 && noche7 === undefined);
 }
 {
   const r = reglaInsulinaNph({ idFarmaco: 'n', nombreComercial: 'Insulatard', dosisNocheUi: 10, dosisMananaUi: 20 });
@@ -238,7 +288,7 @@ function add(id: string, calculado: string, textoPaciente: string, esperado: str
 }
 {
   const r = reglaBombaInsulina({ idFarmaco: 'b', nombreComercial: 'Bomba' }, ctx({ regimen: 'cma', riesgoCardiovascular: 'bajo' }));
-  add('D10', farmacoResumen(r), r.textoPaciente, 'basal 70-80 %, sin bolos; sin confirmación', !r.requiereConfirmacion);
+  add('D10', farmacoResumen(r), r.textoPaciente, !r.requiereConfirmacion && r.textoPaciente.includes('80 %'));
 }
 {
   const r = reglaBombaInsulina({ idFarmaco: 'b', nombreComercial: 'Bomba' }, ctx({ regimen: 'ingreso' }));
@@ -295,8 +345,8 @@ function add(id: string, calculado: string, textoPaciente: string, esperado: str
   add('E11', farmacoResumen(r), r.textoPaciente, 'mantener', r.accion === 'mantener');
 }
 {
-  const r = reglaBiologico({ idFarmaco: 'a', nombreComercial: 'Humira', principio: 'adalimumab' });
-  add('E12', farmacoResumen(r), r.textoPaciente, 'confirmación (planificación por ciclo)', r.requiereConfirmacion);
+  const r = reglaBiologico({ idFarmaco: 'a', nombreComercial: 'Humira', principio: 'adalimumab', periodicidadDias: 14, fechaUltimaDosis: new Date(2026, 9, 8) }, IV);
+  add('E12', `${farmacoResumen(r)}; nota anestesiólogo: ${r.textoAnestesiologo ?? '—'}`, r.textoPaciente, r.requiereConfirmacion && (r.textoAnestesiologo ?? '').includes('mitad de ciclo'));
 }
 {
   const r = reglaAntiangiogenico({ idFarmaco: 'b', nombreComercial: 'Avastin', principio: 'bevacizumab', semanasDesdeUltimaDosis: 4 });
@@ -345,7 +395,7 @@ function add(id: string, calculado: string, textoPaciente: string, esperado: str
 {
   const h = calcularAclaramiento({ edadAnios: 80, pesoKg: 60, sexo: 'hombre', creatinina: 1.2, unidad: 'mg_dl' });
   const m = calcularAclaramiento({ edadAnios: 80, pesoKg: 60, sexo: 'mujer', creatinina: 1.2, unidad: 'mg_dl' });
-  add('F6', `varón ${h}; mujer ${m}`, '—', '42; 35', Math.round(h ?? 0) === 42 && Math.round(m ?? 0) === 35);
+  add('F6', `varón ${Math.round(h ?? 0)}; mujer ${Math.round(m ?? 0)}`, '—', Math.round(h ?? 0) === 42 && Math.round(m ?? 0) === 35);
 }
 {
   const r = calcular4AT({ alerta: 'normal', amt4: '1_error', meses: 'menos_de_7', cambioAgudo: 'no' });
@@ -421,15 +471,15 @@ const nombres = (ps: { prueba: string }[]) => ps.map((p) => p.prueba).sort().joi
 // ————————————————————— I —————————————————————
 {
   const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: true, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'negativo' });
-  add('I1', `alerta: ${r.alerta.gravedad} — ${r.alerta.mensaje}`, r.textoPaciente, 'informativa (variante ausente)', r.alerta.gravedad === 'informativa' && r.alerta.mensaje.includes('ausente'));
+  add('I1', `alerta: ${r.alerta?.gravedad ?? 'ninguna'} — ${r.alerta?.mensaje ?? ''}`, r.textoPaciente, r.alerta?.gravedad === 'informativa' && (r.alerta?.mensaje ?? '').includes('ausente'));
 }
 {
   const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: true, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'no_hecho' });
-  add('I2', `alerta: ${r.alerta.gravedad}`, r.textoPaciente, 'alerta roja', r.alerta.gravedad === 'roja');
+  add('I2', `alerta: ${r.alerta?.gravedad ?? 'ninguna'}`, r.textoPaciente, r.alerta?.gravedad === 'roja');
 }
 {
   const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: false, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'no_hecho' });
-  add('I3', `alerta: ${r.alerta.gravedad}`, r.textoPaciente, 'sin alerta roja (no línea materna)', r.alerta.gravedad === 'informativa');
+  add('I3', `alerta: ${r.alerta === null ? 'ninguna' : r.alerta.gravedad}; texto hoja: ${r.textoPaciente === '' ? '(ninguno)' : r.textoPaciente}`, r.textoPaciente || '(ninguno)', r.alerta === null && r.textoPaciente === '');
 }
 {
   const t = tarjetaFarmacoAEnfermedad({ nombre: 'Prednisona', indicacionesPosibles: ['trasplante', 'artritis_reumatoide', 'lupus', 'asma_epoc', 'insuficiencia_suprarrenal'] }, new Set());
@@ -442,23 +492,24 @@ const nombres = (ps: { prueba: string }[]) => ps.map((p) => p.prueba).sort().joi
 
 // ————————————————————— Escritura del informe —————————————————————
 const total = filas.length;
-const ok = filas.filter((f) => f.coincide).length;
+const nOk = filas.filter((f) => f.veredicto === 'coincide').length;
+const nDudoso = filas.filter((f) => f.veredicto === 'dudoso').length;
+const nNo = filas.filter((f) => f.veredicto === 'no_coincide').length;
+const marca = (v: Veredicto) => (v === 'coincide' ? '✅' : v === 'dudoso' ? '❓' : '❌');
 
 let md = `# Informe de casos de referencia (ejecución del motor)\n\n`;
 md += `> Generado automáticamente por \`scripts/generar-informe-casos.ts\` ejecutando el MOTOR con la entrada de cada caso de \`docs/casos_referencia.md\`.\n`;
-md += `> Los valores de la columna "Motor" salen de la ejecución del motor, no de las aserciones de las pruebas.\n`;
-md += `> Intervención de referencia: jueves 15/10/2026 a las 08:00 (salvo A2b y A3b: 13:00).\n\n`;
-md += `**Resultado: ${ok}/${total} casos coinciden con lo esperado.**\n\n`;
-md += `| Caso | Motor (cálculo) | Texto del paciente | Esperado | ¿Coincide? |\n`;
+md += `> La columna **"Motor"** sale de la ejecución del motor. La columna **"Esperado (literal)"** se copia tal cual de \`docs/casos_referencia.md\` (no se teclea en el script).\n`;
+md += `> Intervención de referencia: jueves 15/10/2026 a las 08:00 (salvo A2b y A3b: 13:00).\n`;
+md += `> Leyenda: ✅ coincide · ❓ dudoso (revisión manual) · ❌ no coincide.\n\n`;
+md += `**Resultado: ${nOk} coinciden, ${nDudoso} dudosos, ${nNo} no coinciden (de ${total}).**\n\n`;
+md += `| Caso | Motor (cálculo) | Texto del paciente | Esperado (literal de casos_referencia.md) | Veredicto |\n`;
 md += `|---|---|---|---|---|\n`;
 for (const f of filas) {
-  md += `| ${f.id} | ${esc(f.calculado)} | ${esc(f.textoPaciente)} | ${esc(f.esperado)} | ${f.coincide ? '✅' : '❌'} |\n`;
+  md += `| ${f.id} | ${esc(f.calculado)} | ${esc(f.textoPaciente)} | ${esc(f.esperado)} | ${marca(f.veredicto)} |\n`;
 }
-md += `\n## Casos pendientes (módulos del flujo de entrevista aún no construidos)\n\n`;
-md += `- D1 (Synjardy): cubierto en \`tests/unit/reglas/reglas2.test.ts\` (combinación fija).\n`;
-md += `- Las consecuencias clínicas de todos los casos que dependían de insulinas (D7-D9) y HEMSTOP (F13) ya están implementadas y verificadas arriba.\n`;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const salida = join(__dirname, '..', 'docs', 'informe_casos_referencia.md');
 writeFileSync(salida, md, 'utf8');
-console.log(`Informe escrito en ${salida}: ${ok}/${total} coinciden.`);
+console.log(`Informe escrito en ${salida}: ${nOk} coinciden, ${nDudoso} dudosos, ${nNo} no coinciden (de ${total}).`);

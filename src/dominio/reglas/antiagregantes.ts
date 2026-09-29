@@ -93,6 +93,8 @@ export interface EntradaP2y12 {
   principio: P2y12;
   /** true si el paciente NO toma AAS (monoterapia P2Y12). */
   monoterapia: boolean;
+  /** true si es portador de stent (aunque no sea reciente): ninguna suspensión sin confirmación (§8.3). */
+  portadorStent?: boolean;
 }
 
 export function reglaP2y12(e: EntradaP2y12, ctx: ContextoReglas): ResultadoFarmaco {
@@ -109,11 +111,15 @@ export function reglaP2y12(e: EntradaP2y12, ctx: ContextoReglas): ResultadoFarma
     fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
     textoPaciente: plazo.textoPaciente,
     reglaAplicada: `${e.principio}: suspender ${dias} días${neuroaxialOProfundo(ctx) ? ' (neuroaxial/bloqueo profundo)' : ''}`,
-    requiereConfirmacion: e.monoterapia,
+    requiereConfirmacion: e.monoterapia === true || e.portadorStent === true,
   };
   if (e.monoterapia) {
     res.accion = 'consultar';
     res.textoAnestesiologo = 'Valorar sustituir por AAS 100 mg/día durante la retirada.';
+  }
+  if (e.portadorStent) {
+    res.accion = 'consultar';
+    res.reglaAplicada += ' — portador de stent: ninguna suspensión sin confirmación (§8.3)';
   }
   return res;
 }
