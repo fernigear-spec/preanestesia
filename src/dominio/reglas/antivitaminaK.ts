@@ -20,6 +20,8 @@ export interface EntradaAvk {
   principio: Avk;
   /** true si el paciente cumple algún criterio de alto riesgo tromboembólico (§8.1). */
   altoRiesgoTromboembolico: boolean;
+  /** true si es portador de válvula mecánica o stent: ninguna suspensión sin confirmación (§8.3). */
+  portadorValvulaMecanicaOStent?: boolean;
 }
 
 export interface ResultadoAvk {
@@ -76,6 +78,22 @@ export function reglaAvk(e: EntradaAvk, ctx: ContextoReglas): ResultadoAvk {
         dosisMgPorToma: dosisPorToma,
         intervaloHoras: intervalo,
         textoAnestesiologo: `enoxaparina ${dosisPorToma} mg cada ${intervalo} h`,
+      },
+    };
+  }
+
+  // Portador de válvula mecánica o stent: se calcula la suspensión, pero ninguna
+  // suspensión sin confirmación (§8.3).
+  if (e.portadorValvulaMecanicaOStent) {
+    return {
+      farmaco: {
+        ...base,
+        accion: 'consultar',
+        fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
+        textoPaciente:
+          'Sobre este anticoagulante, el anestesiólogo le confirmará qué hacer. No lo cambie por su cuenta.',
+        reglaAplicada: `AVK ${e.principio}: portador de válvula mecánica/stent → suspensión ${dias} días, requiere confirmación (§8.3)`,
+        requiereConfirmacion: true,
       },
     };
   }

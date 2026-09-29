@@ -21,6 +21,8 @@ export interface EntradaAcod {
   nombreComercial: string;
   principioActivo: string;
   subtipo: SubtipoAcod;
+  /** true si cumple criterio de alto riesgo trombótico de §8.1 (p. ej. ictus < 3 meses). */
+  altoRiesgoTromboticoConfirmar?: boolean;
 }
 
 export function reglaAcod(e: EntradaAcod, ctx: ContextoReglas): ResultadoFarmaco {
@@ -39,6 +41,21 @@ export function reglaAcod(e: EntradaAcod, ctx: ContextoReglas): ResultadoFarmaco
       textoPaciente: TEXTO_MANTENER,
       reglaAplicada: 'ACOD, oftalmología de riesgo bajo: no suspender',
       requiereConfirmacion: false,
+    };
+  }
+
+  // Criterio de alto riesgo trombótico de §8.1 (§8.2): requiere confirmación con
+  // la sugerencia de cambiar a acenocumarol para poder hacer terapia puente.
+  if (e.altoRiesgoTromboticoConfirmar) {
+    return {
+      ...base,
+      accion: 'consultar',
+      textoPaciente:
+        'Sobre este anticoagulante, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta.',
+      reglaAplicada: 'ACOD con alto riesgo trombótico (§8.1): requiere confirmación',
+      requiereConfirmacion: true,
+      textoAnestesiologo:
+        'Consultar con hematología o cardiología el cambio a acenocumarol para poder hacer terapia puente.',
     };
   }
 
