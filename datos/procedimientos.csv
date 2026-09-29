@@ -1,17 +1,71 @@
 id;procedimiento;especialidad;riesgo_cardiovascular;riesgo_hemorragico;grupo_oftalmologico;neuroaxial_o_bloqueo_profundo_probable;duracion_mayor_30min;riesgo_trombotico_alto
+hernioplastia_inguinal;Hernioplastia inguinal;cirugia_general;bajo;bajo;no_aplica;no;si;no
+hernioplastia_laparoscopica;Hernioplastia laparoscopica;cirugia_general;bajo;bajo;no_aplica;no;si;no
+colecistectomia_lap;Colecistectomia laparoscopica;cirugia_general;intermedio;bajo;no_aplica;no;si;no
+colectomia_no_oncologica;Cirugia colorrectal no oncologica;cirugia_general;intermedio;alto;no_aplica;no;si;no
+colectomia_oncologica;Colectomia oncologica;cirugia_general;alto;alto;no_aplica;no;si;si
+exeresis_cutanea;Exeresis cutanea pequena;cirugia_general;bajo;minimo;no_aplica;no;no;no
+drenaje_absceso;Drenaje de absceso;cirugia_general;bajo;minimo;no_aplica;no;no;no
+tumorectomia_mama;Tumorectomia de mama;cirugia_general;bajo;bajo;no_aplica;no;si;no
+mastectomia;Mastectomia;cirugia_general;bajo;bajo;no_aplica;no;si;no
+gastrectomia;Gastrectomia;digestivo;alto;alto;no_aplica;no;si;si
+hepatectomia;Reseccion hepatica;digestivo;alto;alto;no_aplica;no;si;si
+endoscopia_diagnostica;Endoscopia digestiva diagnostica;digestivo;bajo;minimo;no_aplica;no;no;no
+endoscopia_biopsia;Endoscopia digestiva con biopsia;digestivo;bajo;bajo;no_aplica;no;no;no
+cpre_esfinterotomia;CPRE con esfinterotomia;digestivo;intermedio;alto;no_aplica;no;si;no
+polipectomia;Polipectomia endoscopica;digestivo;intermedio;alto;no_aplica;no;si;no
+rtu_prostata;Reseccion transuretral de prostata;urologia;intermedio;alto;no_aplica;si;si;no
+rtu_vesical;Reseccion transuretral de tumor vesical;urologia;intermedio;alto;no_aplica;si;si;no
+nefrolitotomia;Nefrolitotomia percutanea;urologia;intermedio;alto;no_aplica;no;si;no
+biopsia_prostata;Biopsia de prostata;urologia;bajo;bajo;no_aplica;no;no;no
+biopsia_renal;Biopsia renal;urologia;intermedio;alto;no_aplica;no;si;no
+litotricia;Litotricia extracorporea;urologia;intermedio;alto;no_aplica;no;si;no
+prostatectomia_radical;Prostatectomia radical;urologia;intermedio;alto;no_aplica;si;si;no
+histerectomia;Histerectomia;ginecologia;intermedio;alto;no_aplica;no;si;no
+legrado;Legrado uterino;ginecologia;bajo;bajo;no_aplica;no;no;no
+laparoscopia_ginecologica;Laparoscopia ginecologica;ginecologia;bajo;bajo;no_aplica;no;si;no
+cesarea;Cesarea;obstetricia;intermedio;alto;no_aplica;si;si;no
+parto_instrumental;Parto instrumental;obstetricia;intermedio;alto;no_aplica;si;si;no
 protesis_rodilla;Artroplastia total de rodilla;traumatologia;intermedio;alto;no_aplica;si;si;si
 protesis_cadera;Artroplastia total de cadera;traumatologia;intermedio;alto;no_aplica;si;si;si
 fractura_cadera;Osteosintesis de fractura de cadera;traumatologia;intermedio;alto;no_aplica;si;si;si
 artroscopia_rodilla;Artroscopia de rodilla;traumatologia;bajo;bajo;no_aplica;si;si;no
-colecistectomia_lap;Colecistectomia laparoscopica;cirugia_general;intermedio;bajo;no_aplica;no;si;no
-hernioplastia_inguinal;Hernioplastia inguinal;cirugia_general;bajo;bajo;no_aplica;no;si;no
-tumorectomia_mama;Tumorectomia de mama;cirugia_general;bajo;bajo;no_aplica;no;si;no
-colectomia_oncologica;Colectomia oncologica;cirugia_general;alto;alto;no_aplica;no;si;si
+cirugia_columna;Cirugia de columna;traumatologia;alto;alto;no_aplica;si;si;si
+cirugia_mano;Cirugia de mano;traumatologia;bajo;bajo;no_aplica;si;si;no
 catarata_topica;Cirugia de catarata con anestesia topica;oftalmologia;bajo;minimo;riesgo_bajo;no;no;no
-vitrectomia;Vitrectomia;oftalmologia;bajo;minimo;riesgo_moderado_alto;no;si;no
+chalazion;Cirugia de chalazion;oftalmologia;bajo;minimo;riesgo_bajo;no;no;no
+catarata_retrobulbar;Cirugia de catarata con bloqueo retrobulbar;oftalmologia;bajo;bajo;riesgo_moderado_alto;no;no;no
+cirugia_palpebral;Cirugia palpebral;oftalmologia;bajo;bajo;riesgo_moderado_alto;no;no;no
+dacriocistorrinostomia;Dacriocistorrinostomia;oftalmologia;bajo;bajo;riesgo_moderado_alto;no;si;no
+queratoplastia;Queratoplastia;oftalmologia;bajo;bajo;riesgo_moderado_alto;no;si;no
+vitrectomia;Vitrectomia;oftalmologia;bajo;bajo;riesgo_moderado_alto;no;si;no
+cirugia_glaucoma;Cirugia de glaucoma;oftalmologia;bajo;bajo;riesgo_moderado_alto;no;si;no
+estrabismo;Cirugia de estrabismo;oftalmologia;bajo;bajo;riesgo_moderado_alto;no;si;no
 amigdalectomia;Amigdalectomia;orl;bajo;bajo;no_aplica;no;si;no
-rtu_prostata;Reseccion transuretral de prostata;urologia;intermedio;alto;no_aplica;si;si;no
-cesarea;Cesarea;obstetricia;intermedio;alto;no_aplica;si;si;no
-neurocirugia_intracraneal;Craneotomia;neurocirugia;alto;alto;no_aplica;no;si;si
+septoplastia;Septoplastia;orl;bajo;bajo;no_aplica;no;si;no
+tiroidectomia;Tiroidectomia;orl;intermedio;bajo;no_aplica;no;si;no
+laringectomia;Laringectomia;orl;intermedio;alto;no_aplica;no;si;no
+cirugia_maxilofacial;Cirugia ortognatica;maxilofacial;intermedio;alto;no_aplica;no;si;no
+extraccion_dental;Extraccion de 1 a 3 piezas dentarias;maxilofacial;bajo;minimo;no_aplica;no;no;no
+implante_dental_simple;Implante dental simple;maxilofacial;bajo;minimo;no_aplica;no;no;no
+cirugia_periodontal;Cirugia periodontal;maxilofacial;bajo;minimo;no_aplica;no;no;no
+rinoplastia;Rinoplastia;plastica;bajo;bajo;no_aplica;no;si;no
+abdominoplastia;Abdominoplastia;plastica;intermedio;bajo;no_aplica;no;si;no
 cirugia_aorta;Cirugia de aorta abdominal;vascular;alto;alto;no_aplica;no;si;si
-endoscopia_diagnostica;Endoscopia digestiva diagnostica;digestivo;bajo;minimo;no_aplica;no;no;no
+revascularizacion_periferica;Revascularizacion arterial periferica;vascular;alto;alto;no_aplica;no;si;si
+varices_escleroterapia;Escleroterapia de varices;vascular;bajo;minimo;no_aplica;no;no;no
+varices_ligadura;Ligadura de varices;vascular;bajo;minimo;no_aplica;no;si;no
+neumonectomia;Neumonectomia;toracica;alto;alto;no_aplica;no;si;si
+lobectomia;Lobectomia pulmonar;toracica;alto;alto;no_aplica;no;si;si
+mediastinoscopia;Mediastinoscopia;toracica;intermedio;bajo;no_aplica;no;si;no
+craneotomia;Craneotomia;neurocirugia;alto;alto;no_aplica;no;si;si
+cirugia_canal_medular;Cirugia del canal medular;neurocirugia;alto;alto;no_aplica;si;si;si
+puncion_lumbar;Puncion lumbar;neurocirugia;bajo;alto;no_aplica;si;no;no
+implante_marcapasos;Implante de marcapasos o DAI;cardiologia;intermedio;bajo;no_aplica;no;si;no
+ablacion;Ablacion o estudio electrofisiologico;cardiologia;intermedio;bajo;no_aplica;no;si;no
+angiografia_no_coronaria;Angiografia no coronaria;radiologia_intervencionista;intermedio;bajo;no_aplica;no;si;no
+cirugia_cardiaca;Cirugia cardiaca;cardiaca;alto;alto;no_aplica;no;si;si
+amigdalectomia_pediatrica;Amigdalectomia pediatrica;pediatria;bajo;bajo;no_aplica;no;si;no
+circuncision;Circuncision;pediatria;bajo;minimo;no_aplica;no;no;no
+herniorrafia_pediatrica;Herniorrafia inguinal pediatrica;pediatria;bajo;bajo;no_aplica;si;si;no
+cirugia_perineal;Cirugia perineal o proctologica;cirugia_general;bajo;bajo;no_aplica;si;si;no
