@@ -123,7 +123,7 @@ console.log('Pautas horarias de referencia usadas: apixabán 09:00/21:00, enalap
 {
   console.log('\nCaso 9 · adulto con madre venezolana (sin test)');
   const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: true, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'no_hecho' });
-  console.log(`      alerta: ${r.alerta.gravedad} — ${r.alerta.mensaje}`);
+  console.log(`      alerta: ${r.alerta?.gravedad ?? 'ninguna'} — ${r.alerta?.mensaje ?? ''}`);
   console.log(`      texto paciente (neutro): ${r.textoPaciente}`);
 }
 // Caso 10

@@ -470,12 +470,12 @@ describe('Casos H · ayuno', () => {
 describe('Casos I · mtND4 y coherencia', () => {
   it('I1 madre venezolana, test negativo: informativa (variante ausente)', () => {
     const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: true, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'negativo' });
-    expect(r.alerta.gravedad).toBe('informativa');
-    expect(r.alerta.mensaje).toContain('ausente');
+    expect(r.alerta?.gravedad).toBe('informativa');
+    expect(r.alerta?.mensaje).toContain('ausente');
   });
   it('I2 abuela materna venezolana, sin test: alerta roja', () => {
     const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: true, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'no_hecho' });
-    expect(r.alerta.gravedad).toBe('roja');
+    expect(r.alerta?.gravedad).toBe('roja');
   });
   it('I3 abuela paterna venezolana (no línea materna): ninguna alerta y ninguna línea en la hoja', () => {
     const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: false, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'no_hecho' });

@@ -80,19 +80,19 @@ describe('mtND4 §9 (caso 9)', () => {
       antecedentesFamiliaresCompatibles: false,
       testGenetico: 'no_hecho',
     });
-    expect(r.alerta.gravedad).toBe('roja');
+    expect(r.alerta?.gravedad).toBe('roja');
     expect(r.textoPaciente).toContain('El anestesiólogo hablará con usted');
     expect(r.notasAnestesiologo.length).toBeGreaterThan(0);
   });
   it('test positivo → roja + vigilancia postoperatoria', () => {
     const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: false, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'positivo' });
-    expect(r.alerta.gravedad).toBe('roja');
+    expect(r.alerta?.gravedad).toBe('roja');
     expect(r.notasAnestesiologo[0]).toContain('Vigilancia postoperatoria');
   });
   it('test negativo → informativa', () => {
     const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: false, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'negativo' });
-    expect(r.alerta.gravedad).toBe('informativa');
-    expect(r.alerta.mensaje).toContain('ausente');
+    expect(r.alerta?.gravedad).toBe('informativa');
+    expect(r.alerta?.mensaje).toContain('ausente');
   });
   it('sin factores de línea materna ni test → ninguna alerta ni línea en la hoja', () => {
     const r = evaluarMtnd4({ ascendenciaVenezolanaMaterna: false, origenMaternoDesconocidoUOvodonacion: false, antecedentesFamiliaresCompatibles: false, testGenetico: 'no_hecho' });
