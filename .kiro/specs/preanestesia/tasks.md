@@ -160,6 +160,8 @@ Cada subtarea incluye su fichero en `src/dominio/escalas/` **y** sus pruebas uni
 - [ ] **12.6** Aviso de versión de contenido distinta. _(R11.7)_
 - [ ] **12.7** Botón «Copiar enlace para el paciente». _(R11.10)_
 - [ ] **12.8** Pruebas: round-trip sin pérdida, tamaño dentro del límite, enlace caducado, versión distinta. _(caso 19)_
+- [x] **12.9** Formato del QR del paciente para §8.16d y recálculo: por fármaco (tipo de plazo, duración, horas de toma, adelanto, anticoagulante), teléfono, fecha de intervención (o null) y caducidad; función pura `recalcularHoja` (margen sin fecha; fecha + margen con fecha; plazo no cumplible → teléfono) y `caducidadQrPaciente` (90 días sin fecha / 30 tras la intervención). Pruebas de codificación/decodificación, tamaño y recálculo (A1, A10, C6, D2, E1, B2; recálculo = fechas del informe; clopidogrel a 2 días → sin pauta). _(§8.16 b–f; `src/dominio/salidas/qr/hojaPaciente.ts`)_
+- [ ] **12.10** **Vista interactiva del paciente** desde el QR: modo de solo lectura que, además, muestra el botón «Me han dado la fecha o me la han cambiado»; al introducir/cambiar la fecha llama a `recalcularHoja` y vuelve a pintar todas las instrucciones; recalcula la caducidad sobre la nueva fecha; incluye el aviso «Si le cambian la fecha o la hora de la intervención, abra de nuevo este código e introduzca la nueva fecha». _(§8.16 a, d, e, g — se construye en este bloque de salidas)_
 
 ---
 
@@ -168,7 +170,7 @@ Cada subtarea incluye su fichero en `src/dominio/escalas/` **y** sus pruebas uni
 - [ ] **13.1** Navegación por pasos con barra de progreso e indicación de preguntas faltantes. _(R3.1)_
 - [ ] **13.2** Panel lateral/inferior con resumen, alertas y cálculos en tiempo real. _(R3.1.2)_
 - [ ] **13.3** Selector de modalidad (presencial/telefónica). _(R3.1.5)_
-- [ ] **13.4** Paso 1 — datos de intervención (buscador de procedimientos, avisos de fecha, selector con bloqueo periférico y profundo separados). _(R3.2.1–R3.2.6)_
+- [ ] **13.4** Paso 1 — datos de intervención (buscador de procedimientos, avisos de fecha, selector con bloqueo periférico y profundo separados, casilla «fecha aún no conocida» §8.16a). _(R3.2.1–R3.2.6b)_
 - [ ] **13.5** Paso 2 — datos básicos (IMC, activación de módulos pediátrico/obstétrico). _(R3.2.6–R3.2.8)_
 - [ ] **13.6** Paso 3 — antecedentes anestésicos/quirúrgicos. _(R3.2.9–R3.2.11)_
 - [ ] **13.7** Paso 4 — mtND4 (usa tarea 9). _(R3.2.12)_

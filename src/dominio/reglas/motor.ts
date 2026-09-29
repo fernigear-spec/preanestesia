@@ -36,6 +36,13 @@ export function construirContexto(
     (intervencion.tecnica === 'no_se_sabe' && intervencion.neuroaxialProbable);
   const bloqueoProfundo = intervencion.tecnica === 'bloqueo_profundo';
 
+  // El contexto con fechas solo se construye cuando hay fecha de intervención.
+  // Sin fecha (§8.16), las instrucciones se generan como margen (véase la hoja
+  // del paciente del QR: recalcularHoja), no por este camino.
+  if (intervencion.fechaHora === null) {
+    throw new Error('construirContexto requiere fecha de intervención; sin fecha se usa el modo margen (§8.16).');
+  }
+
   const ctx: ContextoReglas = {
     fechaHoraIntervencion: intervencion.fechaHora,
     riesgoHemorragico: intervencion.riesgoHemorragico,

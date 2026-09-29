@@ -47,6 +47,7 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
 
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('');
+  const [fechaDesconocida, setFechaDesconocida] = useState(false);
   const [consulta, setConsulta] = useState('');
   const [elegido, setElegido] = useState<Procedimiento | null>(null);
   const [lateralidad, setLateralidad] = useState<'no_aplica' | 'derecha' | 'izquierda' | 'bilateral'>('no_aplica');
@@ -60,21 +61,24 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
   );
 
   // Avisos.
-  const horaAsumida = fecha !== '' && hora === '';
+  const horaAsumida = !fechaDesconocida && fecha !== '' && hora === '';
   const diasHasta = useMemo(() => {
-    if (fecha === '') return null;
+    if (fechaDesconocida || fecha === '') return null;
     const f = new Date(`${fecha}T${hora === '' ? '08:00' : hora}`);
     return Math.round((f.getTime() - Date.now()) / MS_DIA);
-  }, [fecha, hora]);
+  }, [fecha, hora, fechaDesconocida]);
   const avisoMas60 = diasHasta !== null && diasHasta > 60;
 
-  const puedeContinuar = fecha !== '' && elegido !== null;
+  // Se puede continuar con fecha, o marcando "fecha aún no conocida".
+  const puedeContinuar = elegido !== null && (fechaDesconocida || fecha !== '');
 
   function continuar() {
-    if (!elegido || fecha === '') return;
-    const fechaHora = new Date(`${fecha}T${hora === '' ? '08:00' : hora}`);
+    if (!elegido) return;
+    if (!fechaDesconocida && fecha === '') return;
+    const fechaHora = fechaDesconocida ? null : new Date(`${fecha}T${hora === '' ? '08:00' : hora}`);
     const datos: DatosIntervencion = {
       fechaHora,
+      fechaDesconocida,
       horaAsumida,
       procedimientoId: elegido.id,
       riesgoCardiovascular: elegido.riesgoCardiovascular,
@@ -96,13 +100,25 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
 
       {/* Fecha y hora */}
       <div className="campo">
+        <label className={`radio-tarjeta ${fechaDesconocida ? 'seleccionado' : ''}`}>
+          <input type="checkbox" checked={fechaDesconocida} onChange={() => setFechaDesconocida(!fechaDesconocida)} />
+          La fecha de la intervención aún no se conoce
+        </label>
+      </div>
+      <div className="campo">
         <label htmlFor="fecha">Fecha prevista de la intervención</label>
-        <input id="fecha" type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+        <input id="fecha" type="date" value={fecha} disabled={fechaDesconocida} onChange={(e) => setFecha(e.target.value)} />
       </div>
       <div className="campo">
         <label htmlFor="hora">Hora prevista (opcional)</label>
-        <input id="hora" type="time" value={hora} onChange={(e) => setHora(e.target.value)} />
+        <input id="hora" type="time" value={hora} disabled={fechaDesconocida} onChange={(e) => setHora(e.target.value)} />
       </div>
+      {fechaDesconocida && (
+        <p className="aviso aviso-info" role="note">
+          Sin fecha, las instrucciones se darán como <strong>margen</strong> (por ejemplo, «como mínimo 72 horas antes de la intervención»)
+          y no se adelantarán tomas. Cuando se conozca la fecha, se recalculará todo.
+        </p>
+      )}
       {horaAsumida && (
         <p className="aviso aviso-info" role="note">
           No ha indicado la hora: se asumirán las <strong>08:00</strong>. La hoja del paciente lo advertirá.

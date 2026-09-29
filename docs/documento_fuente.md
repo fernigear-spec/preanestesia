@@ -450,6 +450,16 @@ Situaciones especiales:
 - Nota para el anestesiólogo cuando el contenido gástrico sea incierto (demencia, barrera idiomática, dolor intenso, enfermedad neuromuscular, GLP-1 no suspendido): valorar ecografía gástrica.
 - Indicaciones de profilaxis de aspiración (solo notas del anestesiólogo): ayuno insuficiente, embarazo avanzado, reflujo grave sintomático, obesidad mórbida, diabetes descompensada, gastroparesia, bariátrica sintomática. Incluir la tabla del protocolo con dosis y tiempos (citrato sódico 0,3 M 30 mL VO 10 a 30 min antes; famotidina 20 mg VO 1 a 2 h antes o IV 30 a 60 min antes; omeprazol 40 mg VO la noche previa y/o 2 a 3 h antes, o pantoprazol 40 mg IV 30 a 60 min antes; metoclopramida 10 mg IV 15 a 30 min antes o VO 60 a 90 min antes; eritromicina 3 mg/kg IV, máximo 250 mg, 30 a 60 min antes) con sus precauciones.
 
+### 8.16 Fecha desconocida, márgenes y recálculo
+
+a) El paso 1 permite marcar 'fecha de intervención aún no conocida' y continuar la entrevista.
+b) Sin fecha, la hoja del paciente expresa cada instrucción como margen: plazos en días, 'no lo tome los N días anteriores a la intervención ni ese mismo día'; plazos en horas, 'su última toma debe ser como mínimo N horas antes de la hora de la intervención'; 'no tomar el día de la intervención' se mantiene igual; el ayuno, en horas antes de la intervención. Sin fecha no se aplican adelantos de tomas: solo el margen mínimo.
+c) Con fecha, la hoja muestra la fecha y hora calculadas y, a continuación, el margen entre paréntesis ('como mínimo 72 horas antes de la intervención'), para que el paciente pueda adaptarse si cambian el día o la hora.
+d) El QR del paciente incluye, para cada fármaco, el tipo de plazo, su duración, las horas habituales de toma, si admite adelanto y si es anticoagulante; y la vista del paciente tiene un botón 'Me han dado la fecha o me la han cambiado'. Al introducir la fecha y hora, recalcula todas las instrucciones con las mismas reglas del motor (§8.0), incluidos los adelantos de anticoagulantes.
+e) Si al recalcular algún plazo ya no se puede cumplir, la vista del paciente no da pauta para ese fármaco y muestra: 'Con esta fecha ya no es posible seguir la pauta de [nombre comercial]. Llame al [teléfono del servicio] lo antes posible'.
+f) Sin fecha, el QR del paciente caduca a los 90 días de su creación (configurable en config.json); con fecha, a los 30 días después de la intervención, como hasta ahora. Si el paciente introduce una fecha nueva, la caducidad se calcula sobre ella.
+g) El texto del paciente siempre incluye: 'Si le cambian la fecha o la hora de la intervención, abra de nuevo este código e introduzca la nueva fecha'.
+
 ## 9. Cribado de riesgo mitocondrial mtND4 (consenso SEDAR 2026)
 
 Pregunta obligatoria en todos los pacientes, con un guion para la enfermera que explique el motivo con respeto, por ejemplo: «Hacemos esta pregunta a todos los pacientes porque se ha descrito una variante genética heredada por vía materna, más frecuente en familias de origen venezolano, que puede influir en cómo se elige la anestesia».

@@ -26,7 +26,10 @@ export type RiesgoHemorragico = 'minimo' | 'bajo' | 'alto';
 export type GrupoOftalmologico = 'no_aplica' | 'riesgo_bajo' | 'riesgo_moderado_alto';
 
 export interface DatosIntervencion {
-  fechaHora: Date;
+  /** Fecha/hora prevista, o null si aún no se conoce (§8.16a). */
+  fechaHora: Date | null;
+  /** true si la fecha de la intervención aún no se conoce (§8.16a). */
+  fechaDesconocida: boolean;
   /** true si la hora era desconocida y se asumieron las 08:00 (R3.2.2). */
   horaAsumida: boolean;
   procedimientoId: string | null;

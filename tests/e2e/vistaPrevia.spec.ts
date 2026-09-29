@@ -35,6 +35,20 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('heading', { name: /Paso 2 · Datos básicos/ })).toBeVisible();
   });
 
+  test('paso 1: fecha desconocida permite continuar y avisa de márgenes (§8.16)', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    await page.getByRole('checkbox', { name: /La fecha de la intervención aún no se conoce/ }).check();
+    await expect(page.getByText(/las instrucciones se darán como/)).toBeVisible();
+
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await expect(page.getByRole('heading', { name: /Paso 2 · Datos básicos/ })).toBeVisible();
+  });
+
   test('recorre pasos 2-4 hasta el resumen', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Presencial' }).click();

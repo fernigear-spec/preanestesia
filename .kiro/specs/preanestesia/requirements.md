@@ -94,6 +94,7 @@ Todo el contenido clínico (preguntas, fármacos, reglas, procedimientos, planti
 - **R3.2.4** Aviso si la intervención está a más de 60 días («las suspensiones deben recalcularse si cambia la fecha»).
 - **R3.2.5** Alerta por fármaco si alguna fecha límite de suspensión calculada ya ha pasado o cae hoy: «ya no se puede cumplir el plazo; consultar con el anestesiólogo». Ese fármaco pasa a requerir confirmación.
 - **R3.2.6** El selector de técnica anestésica distingue explícitamente «bloqueo periférico» y «bloqueo profundo» como opciones separadas (véase R8.0 para la clasificación por defecto). *(Decisión 9.)*
+- **R3.2.6b** El paso 1 permite marcar «fecha de intervención aún no conocida» y continuar. Sin fecha, la hoja del paciente expresa cada instrucción como margen (sin adelantos de tomas); con fecha, muestra la fecha y hora calculadas y el margen entre paréntesis. El QR del paciente permite recalcular al introducir o cambiar la fecha, y su caducidad depende de si hay fecha. *(§8.16; véase R11 para el QR y R10 para la vista del paciente.)*
 
 **Paso 2 — Datos básicos**
 - **R3.2.7** Campos: edad (fecha de nacimiento o años; en menores de 2 años, meses), sexo, peso, talla. IMC se calcula automáticamente.

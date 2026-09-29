@@ -5,6 +5,7 @@
   "edad_pediatrica_maxima": 17,
   "limite_caracteres_sap": 2000,
   "dias_validez_qr_paciente": 30,
+  "dias_validez_qr_paciente_sin_fecha": 90,
   "dias_validez_qr_anestesiologo": 60,
   "prehabilitacion_activa": false,
   "url_prehabilitame": "https://holaaneshealth-eng.github.io/Prehabilitame/",
