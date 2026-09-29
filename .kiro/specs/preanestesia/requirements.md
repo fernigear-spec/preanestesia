@@ -14,6 +14,14 @@ La enfermera hace el cribado; el anestesiólogo valida. El programa emite recome
 
 ---
 
+## R0. Fuente única de verdad clínica
+
+- **R0.1** El documento clínico fuente es `docs/documento_fuente.md`. Toda mención al «documento fuente» en `requirements.md`, `design.md` y `tasks.md` se refiere a ese fichero y, siempre que aplique a una regla concreta, se cita con su sección (por ejemplo, `docs/documento_fuente.md §8.4`).
+- **R0.2** Las reglas clínicas (escalas, plazos de medicación, tablas de pruebas, umbrales de alerta) se toman **siempre** de `docs/documento_fuente.md` y de los ficheros de `datos/`, **nunca de memoria ni de resúmenes**. Los números concretos viven en `datos/` (R2), y el documento fuente es la referencia de la que se derivan.
+- **R0.3** Si en algún momento `requirements.md` (u otro documento del spec) discrepa de `docs/documento_fuente.md`, **se avisa al servicio por el chat antes de decidir**; no se resuelve la discrepancia por cuenta propia.
+
+---
+
 ## R1. Arquitectura y privacidad
 
 ### R1.1 Sitio estático sin backend
@@ -26,7 +34,7 @@ La enfermera hace el cribado; el anestesiólogo valida. El programa emite recome
 - **R1.2.3** Existe un botón «Nuevo paciente» que borra completamente el estado en memoria y reinicia la aplicación.
 - **R1.2.4** Al intentar cerrar o recargar la pestaña con una entrevista en curso, el navegador muestra un aviso de confirmación estándar (`beforeunload`).
 - **R1.2.5** Tras 30 minutos de inactividad (valor configurable en `config.json`), la sesión se borra automáticamente mostrando un aviso al usuario antes de hacerlo.
-- **R1.2.6** El único dato que persiste localmente, fuera de la sesión, es la preferencia del «modo guiado» activado/desactivado (sin datos clínicos).
+- **R1.2.6** Lo único que persiste en el `localStorage` del dispositivo, fuera de la sesión, es la preferencia del «modo guiado» activado/desactivado y el cuadro de mando de uso de R14.3; ambos **sin datos clínicos ni identificadores**. Nada más.
 - **R1.2.7** La única información que puede salir de la sesión es la embebida en los QR y enlaces (véase R11), que nunca contiene nombre, número de historia ni el campo de identificación opcional.
 
 ### R1.3 Sin peticiones a terceros
@@ -141,7 +149,7 @@ El asistente de coherencia está basado en reglas (sin IA), definido en `coheren
 ### R4.2 De fármaco a enfermedad
 - **R4.2.1** Cada fármaco tiene una lista de indicaciones posibles en `farmacos.csv` (`indicaciones_posibles`). Al añadir un fármaco, si ninguna de sus indicaciones está recogida en la entrevista, aparece la tarjeta: «[Fármaco] suele tomarse por [lista]. Pregúntele por qué lo toma».
 - **R4.2.2** La tarjeta ofrece un botón por indicación que abre el módulo correspondiente con la casilla propuesta, **sin marcarla** hasta que la enfermera confirme explícitamente, más las opciones «otra razón» (campo libre) y «no lo sabe».
-- **R4.2.3** Los datos iniciales incluyen las correspondencias del documento fuente para: IECA/ARA-II/betabloqueantes/antagonistas del calcio/diuréticos, corticoides, inmunosupresores, anticoagulantes, antiagregantes, insulina/antidiabéticos, inhaladores, antiepilépticos, levodopa/IMAO-B, levotiroxina, opioides y biológicos.
+- **R4.2.3** Los datos iniciales incluyen las correspondencias de `docs/documento_fuente.md §5b.1` para: IECA/ARA-II/betabloqueantes/antagonistas del calcio/diuréticos, corticoides, inmunosupresores, anticoagulantes, antiagregantes, insulina/antidiabéticos, inhaladores, antiepilépticos, levodopa/IMAO-B, levotiroxina, opioides y biológicos.
 
 ### R4.3 De enfermedad a fármaco
 - **R4.3.1** Si hay una enfermedad marcada cuyo tratamiento habitual no aparece en la medicación, la tarjeta sugiere preguntar si lo ha dejado, se lo retiraron o se ha olvidado de mencionarlo.
@@ -265,10 +273,10 @@ Suma de (dosis diaria × factor) de `opioides.json`. Factores CDC 2022: morfina 
 Según `procedimientos.csv`: bajo (< 1 %), intermedio (1-5 %), alto (> 5 %).
 
 ### R7.2 Clase de riesgo del paciente
-La más alta asignada por los módulos: bajo, bajo-moderado, moderado, alto (definiciones del documento fuente).
+La más alta asignada por los módulos: bajo, bajo-moderado, moderado, alto (definiciones de `docs/documento_fuente.md §7.2`).
 
 ### R7.3 Tabla de decisión de pruebas
-La aplicación aplica la tabla completa del documento fuente (notas *, ** y ***) y pregunta los supuestos de excepción para Rx de tórax. Incluye la lógica de ecocardiograma. La sulodexida **no** interviene en la petición de pruebas (es solo una regla de medicación; véase Decisión 2).
+La aplicación aplica la tabla completa de `docs/documento_fuente.md §7.3` (notas *, ** y ***) y pregunta los supuestos de excepción para Rx de tórax. Incluye la lógica de ecocardiograma. La sulodexida **no** interviene en la petición de pruebas (es solo una regla de medicación; véase Decisión 2).
 
 ### R7.4 Validez de pruebas
 Hemograma 30 días, bioquímica 30 días, coagulación 14 días, ECG 3 meses, Rx tórax 3 meses, ecocardiograma 12 meses (18 si función conocida y estable). La aplicación pregunta por pruebas recientes con su fecha y compara con la fecha de la intervención.
@@ -289,29 +297,29 @@ Hemograma 30 días, bioquímica 30 días, coagulación 14 días, ECG 3 meses, Rx
 - **Combinaciones fijas (Decisión 5):** una combinación fija (una sola pastilla) genera **una única instrucción** por medicamento comercial, aplicando el plazo **más restrictivo** de sus componentes (p. ej. «Deje de tomar Synjardy 3 días antes»). Si los principios activos se toman en medicamentos separados, se genera una instrucción por medicamento. Cuando la combinación obligue a retirar la metformina antes de su plazo propio, se añade en las notas del anestesiólogo: «vigilar glucemia en los días sin tratamiento».
 
 ### R8.1 Antivitamina K (warfarina, acenocumarol)
-Según riesgo hemorrágico y oftalmológico: no suspender si oftalmología de riesgo bajo o hemorrágico mínimo (verificar INR). Resto: coordinar o suspender (warfarina 5 días, acenocumarol 3 días). Terapia puente con los criterios del documento fuente (siempre requiere confirmación).
+Según riesgo hemorrágico y oftalmológico: no suspender si oftalmología de riesgo bajo o hemorrágico mínimo (verificar INR). Resto: coordinar o suspender (warfarina 5 días, acenocumarol 3 días). Terapia puente con los criterios de `docs/documento_fuente.md §8.1` (siempre requiere confirmación).
 
 ### R8.2 ACOD (dabigatrán, rivaroxabán, apixabán, edoxabán)  *(Decisión 1.)*
 - No suspender en oftalmología de riesgo bajo.
 - Riesgo hemorrágico bajo sin neuroaxial ni bloqueo profundo: 48 h.
 - Riesgo hemorrágico alto, neuroaxial o bloqueo profundo: 72 h.
-- **Dabigatrán con técnica neuroaxial (los ajustes por aclaramiento se suman al plazo de neuroaxial):** CrCl > 80 mL/min → **72 h**; CrCl 50-80 → **96 h**; CrCl < 50 → **120 h**. Fuera de neuroaxial, mantiene los ajustes del documento fuente (+24 h con CrCl 50-80; +48 h con CrCl < 50 sobre el plazo base).
+- **Dabigatrán con técnica neuroaxial (los ajustes por aclaramiento se suman al plazo de neuroaxial):** CrCl > 80 mL/min → **72 h**; CrCl 50-80 → **96 h**; CrCl < 50 → **120 h**. Fuera de neuroaxial, mantiene los ajustes de `docs/documento_fuente.md §8.2` (+24 h con CrCl 50-80; +48 h con CrCl < 50 sobre el plazo base).
 - **Anti-Xa (rivaroxabán, apixabán, edoxabán) con técnica neuroaxial y CrCl < 30 mL/min → 96 h.** Fuera de neuroaxial, +24 h con CrCl < 30 sobre el plazo base.
 - Nota informativa para el anestesiólogo con riesgo hemorrágico bajo, sin neuroaxial ni bloqueo profundo y CrCl > 50: «podría considerarse suspender solo 24 h».
 - Criterio de alto riesgo trombótico de R8.1: requiere confirmación con el texto «consultar con hematología o cardiología el cambio a acenocumarol para poder hacer terapia puente».
 
 ### R8.3 Antiagregantes
-AAS ≤ 200 mg: mantener (excepto neurocirugía intracraneal/canal medular: confirmación). AAS > 200 mg: suspender 7 días (indicación cardiovascular: confirmación con sugerencia de pasar a 100 mg/día). Stent < 6 meses tras programado o < 12 meses tras SCA: alerta de diferir, requiere confirmación. Inhibidores P2Y12 (clopidogrel 5 días, ticagrelor 5 días, prasugrel 7 días; con neuroaxial o bloqueo profundo 7/7/10 días). Situaciones específicas de oftalmología. Triflusal, dipiridamol, cilostazol, sulodexida, GP IIb/IIIa y cangrelor según el documento fuente. Demás reglas según documento fuente.
+AAS ≤ 200 mg: mantener (excepto neurocirugía intracraneal/canal medular: confirmación). AAS > 200 mg: suspender 7 días (indicación cardiovascular: confirmación con sugerencia de pasar a 100 mg/día). Stent < 6 meses tras programado o < 12 meses tras SCA: alerta de diferir, requiere confirmación. Inhibidores P2Y12 (clopidogrel 5 días, ticagrelor 5 días, prasugrel 7 días; con neuroaxial o bloqueo profundo 7/7/10 días). Situaciones específicas de oftalmología. Triflusal, dipiridamol, cilostazol, sulodexida, GP IIb/IIIa y cangrelor según `docs/documento_fuente.md §8.3`. Demás reglas según `docs/documento_fuente.md §8.3`.
 
 ### R8.4 Heparinas y fondaparinux
 Plazos según tipo (profiláctica/terapéutica), técnica anestésica y aclaramiento. Tablas SETH para clasificación dosis profiláctica/terapéutica.
 
 ### R8.5 Antidiabéticos e insulina  *(Decisiones 5, 6 y 8.)*
-Reglas específicas para cada grupo farmacológico según el protocolo de preanestesia en diabéticos y CPOC (detalle completo en el documento fuente). Precisiones acordadas:
+Reglas específicas para cada grupo farmacológico según el protocolo de preanestesia en diabéticos y CPOC (detalle completo en `docs/documento_fuente.md §8.5`). Precisiones acordadas:
 - **Combinaciones fijas:** ver R8.0 (una instrucción por medicamento comercial, plazo más restrictivo; nota de vigilar glucemia si retira la metformina antes de su plazo).
 - **Combinaciones fijas de insulina + GLP-1** (Xultophy, Suliqua): requiere confirmación (omitir el GLP-1 dejaría sin insulina basal).
 - **GLP-1 diarios (semaglutida oral, liraglutida, lixisenatida):** «omitir 3 dosis» significa **no tomar los 3 días previos ni el día de la intervención**; la última dosis es **4 días antes** (ejemplo: intervención el jueves → última toma el domingo). Ayuno estándar.
-- **GLP-1 semanales:** si la dosis semanal cae en los **7 días previos** a la intervención, **no se administra**; la hoja del paciente indica **la fecha exacta de la dosis que se omite**. Dieta de líquidos claros las 24 h previas (hoja anexa).
+- **GLP-1 semanales:** si la dosis semanal cae **entre 7 días antes y el día de la intervención (ambos incluidos)**, **no se administra**; la hoja del paciente indica **la fecha exacta de la dosis que se omite**. Dieta de líquidos claros las 24 h previas (hoja anexa). *(docs/documento_fuente.md §8.5.)*
 - **Bomba de insulina:** basal al 70-80 % y suspender los bolos. En **cirugía de riesgo bajo en CMA**, la enfermera registra la pauta del protocolo **sin confirmación**. En **cirugía de riesgo intermedio o alto, o con ingreso**, **requiere confirmación**.
 
 ### R8.6 AINE
@@ -333,7 +341,7 @@ IECA/ARA-II: suspender 24 h (excepto IC con disfunción sistólica, infarto reci
 Fitoterapia/suplementos con efecto sobre coagulación: suspender 14 días (mínimo 7). **Anticonceptivos hormonales combinados y THS con riesgo trombótico alto (Decisión 4):** la sugerencia de suspensión (valorar suspender 4-6 semanas antes y método alternativo) va **solo en las notas del anestesiólogo**. Además, **la hoja del paciente muestra la línea del mecanismo general de requiere confirmación (R12.1) referida al anticonceptivo** —«Sobre su anticonceptivo, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta»— **hasta que el punto se confirme**; una vez confirmado (R12.2) se muestra la pauta indicada por el anestesiólogo. Corticoides: mantener. Levotiroxina, inhaladores, IBP, alopurinol, bifosfonatos, opioides crónicos: mantener.
 
 ### R8.12 Reanudación posoperatoria
-Solo en notas del anestesiólogo (detalle completo en el documento fuente).
+Solo en notas del anestesiólogo (detalle completo en `docs/documento_fuente.md §8.12`).
 
 ### R8.13 Salida por fármaco
 Nombre comercial y principio activo, acción recomendada, fecha/hora de última toma, regla aplicada, fuente, si requiere confirmación.
@@ -451,7 +459,7 @@ PDF generado desde los módulos con el guion de preguntas y casillas para anotar
 ### R15.1 Cobertura mínima obligatoria
 - Pruebas unitarias de cada escala (ASA, EGRI, Langeron, STOP-Bang, STBUR, Apfel, POVOC, CHA2DS2-VA, DASI/METs, Cockcroft-Gault, dosis morfina equivalente, AUDIT-C, CFS, 4AT).
 - Pruebas unitarias de cada regla de medicación (R8.1 a R8.15).
-- Pruebas de extremo a extremo con los 23 casos del documento fuente (véase R15.2) que deben incluirse también en `datos/casos_entrenamiento/`.
+- Pruebas de extremo a extremo con los 23 casos de `docs/documento_fuente.md §15` (véase R15.2) que deben incluirse también en `datos/casos_entrenamiento/`.
 - Prueba de privacidad: tras una entrevista completa, verificar que no queda ningún dato clínico en `localStorage`, `sessionStorage`, `IndexedDB`, cookies ni caché del service worker.
 - Prueba de tamaño de QR con los casos más complejos.
 - Prueba de validación de ficheros de datos corruptos (R2.3).
@@ -484,7 +492,7 @@ Las ambigüedades detectadas en la versión 0.1 quedaron resueltas por el servic
 5. **Combinaciones orales de antidiabéticos** → una instrucción por medicamento comercial con el plazo más restrictivo; nota de vigilar glucemia si se retira la metformina antes de su plazo. *(R8.0, R8.5.)*
 6. **Bomba de insulina** → sin confirmación en CMA de bajo riesgo; con confirmación en riesgo intermedio/alto o ingreso. *(R8.5.)*
 7. **4AT sustituye al Mini-Cog** → en ≥ 65 años, presencial y telefónica; puntuación e interpretación en R6.10; caso 17 actualizado.
-8. **GLP-1** → diarios: última dosis 4 días antes (omitir 3 días previos + día de la IQ). Semanales: omitir la dosis que caiga en los 7 días previos, indicando fecha exacta. *(R8.5.)*
+8. **GLP-1** → diarios: última dosis 4 días antes (omitir 3 días previos + día de la IQ). Semanales: omitir la dosis que caiga entre 7 días antes y el día de la intervención (ambos incluidos), indicando fecha exacta. *(R8.5; docs/documento_fuente.md §8.5.)*
 9. **Técnica anestésica** → «bloqueo periférico» y «bloqueo profundo» separados; planos fasciales = periféricos; profundos por defecto: paravertebral, plexo lumbar/psoas, plexo cervical profundo, intercostal (lista editable). *(R3.2.6, R8.0.)*
 10. **mtND4** → test positivo = alerta roja + vigilancia postoperatoria estrecha; test negativo = alerta informativa; factores de riesgo sin test = alerta roja. *(R9.3.)*
 11. **Sugammadex y anticoncepción** → advertencia condicional en la hoja del paciente (oral: dosis olvidada; no oral: barrera 7 días) y recordatorio al alta en las notas del anestesiólogo. *(R8.15, R5.14.)*

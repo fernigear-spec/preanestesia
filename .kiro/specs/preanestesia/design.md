@@ -14,6 +14,8 @@ El servicio ha aprobado el stack (Decisión 12) y ha indicado **no usar PreHabil
 
 El diseño mantiene la separación entre el **motor de dominio** (cálculos y reglas, funciones puras sin dependencias de UI) y la **capa de presentación**, de modo que la lógica clínica es verificable de forma aislada y reutilizable.
 
+**Fuente única de verdad clínica (R0):** toda referencia al «documento fuente» en este documento apunta a `docs/documento_fuente.md`, citando la sección concreta cuando aplica a una regla (p. ej. `docs/documento_fuente.md §8.4`). Las reglas clínicas se implementan tomando los valores de `docs/documento_fuente.md` y de `datos/`, nunca de memoria ni de resúmenes; ante cualquier discrepancia entre el spec y el documento fuente se consulta al servicio antes de decidir.
+
 ---
 
 ## Visión general de la arquitectura
@@ -52,7 +54,7 @@ El diseño mantiene la separación entre el **motor de dominio** (cálculos y re
 
 | Área | Elección | Justificación |
 |---|---|---|
-| Lenguaje | **TypeScript** con `strict: true` | Exigido por el documento fuente (§2). Tipado estricto obligatorio para seguridad clínica. |
+| Lenguaje | **TypeScript** con `strict: true` | Exigido por `docs/documento_fuente.md §2`. Tipado estricto obligatorio para seguridad clínica. |
 | Build / bundler | **Vite** | Estándar de facto para SPA estáticas modernas; genera artefactos estáticos ideales para GitHub Pages; empaqueta todas las dependencias localmente (requisito R1.3). |
 | UI | **React 18** + componentes funcionales | Aprobado (Decisión 12). Ecosistema maduro, buen soporte táctil, fácil de aislar de la lógica de dominio. |
 | Estilos | **CSS Modules + variables CSS** | Sin dependencias remotas. Color principal `#0027c2` como variable de tema. Diseño táctil con utilidades propias. |

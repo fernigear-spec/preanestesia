@@ -107,7 +107,7 @@ Cada subtarea incluye su fichero en `src/dominio/escalas/` **y** sus pruebas uni
 - [ ] **7.18** Notas de reanudación posoperatoria (solo anestesiólogo). _(R8.12)_
 - [ ] **7.19** Salida por fármaco con fuente y estado de confirmación. _(R8.13)_
 - [ ] **7.20** Regla combinada stent reciente + neuroaxial: doble alerta (stent primero y en rojo), sin pauta de antiagregantes en la hoja del paciente hasta confirmación. _(R12.7 — Decisión 3)_
-- [ ] **7.21** Pruebas unitarias de todas las reglas con los casos del documento y los añadidos de R15.2 (dabigatrán/anti-Xa con neuroaxial por tramos de aclaramiento; GLP-1 diario y semanal; bomba de insulina CMA vs. ingreso; sugammadex oral/no oral).
+- [ ] **7.21** Pruebas unitarias de todas las reglas con los casos de `docs/documento_fuente.md §15` y los añadidos de R15.2 (dabigatrán/anti-Xa con neuroaxial por tramos de aclaramiento; GLP-1 diario y semanal; bomba de insulina CMA vs. ingreso; sugammadex oral/no oral).
 
 ---
 
@@ -212,8 +212,8 @@ Cada subtarea incluye su fichero en `src/dominio/escalas/` **y** sus pruebas uni
 
 ## 17. Casos de entrenamiento y E2E
 
-- [ ] **17.1** Codificar los 23 casos del documento en `datos/casos_entrenamiento/` con resultados esperados. El caso 17 usa 4AT en lugar de Mini-Cog. _(§15, R15.2)_
-- [ ] **17.2** Añadir los casos derivados de las decisiones: GLP-1 diario (última dosis 4 días antes), GLP-1 semanal (dosis omitida en los 7 días previos con fecha exacta), dabigatrán + neuroaxial en 72/96/120 h, anti-Xa + neuroaxial con CrCl < 30 (96 h), stent reciente + neuroaxial (doble alerta), bomba de insulina CMA bajo riesgo (sin confirmación) vs. ingreso (con confirmación), sugammadex oral y no oral. _(R15.2)_
+- [ ] **17.1** Codificar los 23 casos de `docs/documento_fuente.md §15` en `datos/casos_entrenamiento/` con resultados esperados. El caso 17 usa 4AT en lugar de Mini-Cog. _(docs/documento_fuente.md §15, R15.2)_
+- [ ] **17.2** Añadir los casos derivados de las decisiones: GLP-1 diario (última dosis 4 días antes), GLP-1 semanal (dosis omitida entre 7 días antes y el día de la intervención, ambos incluidos, con fecha exacta), dabigatrán + neuroaxial en 72/96/120 h, anti-Xa + neuroaxial con CrCl < 30 (96 h), stent reciente + neuroaxial (doble alerta), bomba de insulina CMA bajo riesgo (sin confirmación) vs. ingreso (con confirmación), sugammadex oral y no oral. _(R15.2)_
 - [ ] **17.3** Pruebas E2E que ejecutan cada caso como flujo completo y comparan con lo esperado. _(R15.1)_
 
 ---
