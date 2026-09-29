@@ -88,14 +88,16 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: '09:00', exact: true }).first().click();
     await expect(page.getByText(/como mínimo 48 horas antes/)).toBeVisible();
 
-    // Plavix (plazo en días) → margen "los N días anteriores".
+    // Plavix (plazo en días) → margen "los N días anteriores". Necesita hora de toma.
     await page.locator('#med').fill('Plavix');
     await page.getByRole('button', { name: /Plavix/ }).first().click();
+    await page.getByRole('button', { name: '09:00', exact: true }).nth(1).click();
     await expect(page.getByText(/días anteriores a la intervención/)).toBeVisible();
 
-    // Renitec (IECA) → "No lo tome el día de la intervención".
+    // Renitec (IECA) → "No lo tome el día de la intervención". Necesita hora de toma.
     await page.locator('#med').fill('Renitec');
     await page.getByRole('button', { name: /Renitec/ }).first().click();
+    await page.getByRole('button', { name: '09:00', exact: true }).nth(2).click();
     await expect(page.getByText(/No lo tome el día de la intervención/)).toBeVisible();
 
     // No debe haberse producido ningún error de página (construirContexto no se llama sin fecha).
@@ -146,6 +148,15 @@ test.describe('Vista previa', () => {
     await page.locator('#a2').selectOption('4');
     await page.locator('#a3').selectOption('4');
     await expect(page.getByText(/síndrome de abstinencia/)).toBeVisible();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 7 — cribado. Ninguna enfermedad conocida.
+    await expect(page.getByRole('heading', { name: /Paso 7 · Enfermedades/ })).toBeVisible();
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 8 — medicación. Sin fármacos, continuar.
+    await expect(page.getByRole('heading', { name: /Paso 8 · Medicación/ })).toBeVisible();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
     // Resumen.
