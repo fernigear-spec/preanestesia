@@ -14,6 +14,67 @@ const HORAS_LITIO: Record<RiesgoCardiovascular, number> = {
   alto: 72,
 };
 
+/** Nota "anestesia segura con IMAO" (§8.7), común a IMAO irreversibles, moclobemida e IMAO-B. */
+export const NOTA_ANESTESIA_SEGURA_IMAO =
+  'Anestesia segura con IMAO: evitar meperidina, tramadol, metadona, efedrina, anfetaminas, ' +
+  'linezolid y azul de metileno; preferir morfina (fentanilo y remifentanilo con precaución a ' +
+  'dosis bajas), droperidol, dexametasona (ondansetrón con precaución) y vasopresores directos ' +
+  '(fenilefrina, adrenalina, noradrenalina).';
+
+export interface EntradaImao {
+  idFarmaco: string;
+  nombreComercial: string;
+  principio: string;
+}
+
+/** IMAO irreversibles (tranilcipromina, fenelzina, isocarboxazida): retirar 10-14 días, requiere confirmación. */
+export function reglaImaoIrreversible(e: EntradaImao): ResultadoFarmaco {
+  return {
+    idFarmaco: e.idFarmaco,
+    nombreComercial: e.nombreComercial,
+    principiosActivos: [e.principio],
+    accion: 'consultar',
+    textoPaciente:
+      'Sobre este medicamento, el anestesiólogo (con su psiquiatra) le indicará qué hacer. No lo cambie por su cuenta.',
+    reglaAplicada: 'IMAO irreversible: retirar idealmente 10-14 días antes, de acuerdo con su psiquiatra',
+    fuente: 'docs/documento_fuente.md §8.7',
+    requiereConfirmacion: true,
+    textoAnestesiologo: NOTA_ANESTESIA_SEGURA_IMAO,
+  };
+}
+
+/** Moclobemida (IMAO-A reversible): suspender 24 h + misma nota. */
+export function reglaMoclobemida(e: EntradaImao, ctx: ContextoReglas): ResultadoFarmaco {
+  const plazo = plazoDesdeHoras(ctx, 24);
+  return {
+    idFarmaco: e.idFarmaco,
+    nombreComercial: e.nombreComercial,
+    principiosActivos: ['moclobemida'],
+    accion: 'suspender',
+    fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
+    textoPaciente: plazo.textoPaciente,
+    reglaAplicada: 'Moclobemida (IMAO-A reversible): suspender 24 h',
+    fuente: 'docs/documento_fuente.md §8.7',
+    requiereConfirmacion: false,
+    textoAnestesiologo: NOTA_ANESTESIA_SEGURA_IMAO,
+  };
+}
+
+/** IMAO-B antiparkinsonianos (rasagilina, selegilina, safinamida): mantener + nota. */
+export function reglaImaoB(e: EntradaImao): ResultadoFarmaco {
+  return {
+    idFarmaco: e.idFarmaco,
+    nombreComercial: e.nombreComercial,
+    principiosActivos: [e.principio],
+    accion: 'mantener',
+    textoPaciente: 'Siga tomándolo como siempre, también el día de la intervención, con un sorbo de agua.',
+    reglaAplicada: 'IMAO-B antiparkinsoniano: mantener',
+    fuente: 'docs/documento_fuente.md §8.7',
+    requiereConfirmacion: false,
+    textoAnestesiologo: NOTA_ANESTESIA_SEGURA_IMAO,
+  };
+}
+
 export interface EntradaLitio {
   idFarmaco: string;
   nombreComercial: string;

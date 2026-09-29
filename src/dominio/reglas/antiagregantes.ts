@@ -170,6 +170,96 @@ export function evaluarStent(e: EntradaStent, ctx: ContextoReglas): ResultadoSte
   };
 }
 
+// ————————————— Otros antiagregantes (§8.3) —————————————
+
+import { plazoDesdeHoras } from './motor.ts';
+
+/** Triflusal: 7 días; 10 días con neuroaxial o bloqueo profundo. */
+export function reglaTriflusal(idFarmaco: string, nombreComercial: string, ctx: ContextoReglas): ResultadoFarmaco {
+  const dias = neuroaxialOProfundo(ctx) ? 10 : 7;
+  const plazo = plazoDesdeDias(ctx, dias);
+  return {
+    idFarmaco, nombreComercial, principiosActivos: ['triflusal'],
+    accion: 'suspender', fechaHoraUltimaToma: plazo.fechaHoraUltimaToma, textoPaciente: plazo.textoPaciente,
+    reglaAplicada: `Triflusal: suspender ${dias} días${neuroaxialOProfundo(ctx) ? ' (neuroaxial/bloqueo profundo)' : ''}`,
+    fuente: FUENTE, requiereConfirmacion: false,
+  };
+}
+
+/** Dipiridamol: 24 h; 48 h con neuroaxial o bloqueo profundo. */
+export function reglaDipiridamol(idFarmaco: string, nombreComercial: string, ctx: ContextoReglas): ResultadoFarmaco {
+  const horas = neuroaxialOProfundo(ctx) ? 48 : 24;
+  const plazo = plazoDesdeHoras(ctx, horas);
+  return {
+    idFarmaco, nombreComercial, principiosActivos: ['dipiridamol'],
+    accion: 'suspender', fechaHoraUltimaToma: plazo.fechaHoraUltimaToma, textoPaciente: plazo.textoPaciente,
+    reglaAplicada: `Dipiridamol: suspender ${horas} h${neuroaxialOProfundo(ctx) ? ' (neuroaxial/bloqueo profundo)' : ''}`,
+    fuente: FUENTE, requiereConfirmacion: false,
+  };
+}
+
+/** Cilostazol: 3 días si riesgo hemorrágico alto o neuroaxial/bloqueo profundo; si no, mantener. */
+export function reglaCilostazol(idFarmaco: string, nombreComercial: string, ctx: ContextoReglas): ResultadoFarmaco {
+  const suspende = ctx.riesgoHemorragico === 'alto' || neuroaxialOProfundo(ctx);
+  if (!suspende) {
+    return {
+      idFarmaco, nombreComercial, principiosActivos: ['cilostazol'],
+      accion: 'mantener', textoPaciente: TEXTO_MANTENER,
+      reglaAplicada: 'Cilostazol: mantener (riesgo hemorrágico no alto, sin neuroaxial/bloqueo profundo)',
+      fuente: FUENTE, requiereConfirmacion: false,
+    };
+  }
+  const plazo = plazoDesdeDias(ctx, 3);
+  return {
+    idFarmaco, nombreComercial, principiosActivos: ['cilostazol'],
+    accion: 'suspender', fechaHoraUltimaToma: plazo.fechaHoraUltimaToma, textoPaciente: plazo.textoPaciente,
+    reglaAplicada: 'Cilostazol: suspender 3 días (riesgo hemorrágico alto o neuroaxial/bloqueo profundo)',
+    fuente: FUENTE, requiereConfirmacion: false,
+  };
+}
+
+/** Sulodexida: 48 h si riesgo hemorrágico alto o neuroaxial/bloqueo profundo; si no, mantener. (No interviene en pruebas, §7.3). */
+export function reglaSulodexida(idFarmaco: string, nombreComercial: string, ctx: ContextoReglas): ResultadoFarmaco {
+  const suspende = ctx.riesgoHemorragico === 'alto' || neuroaxialOProfundo(ctx);
+  if (!suspende) {
+    return {
+      idFarmaco, nombreComercial, principiosActivos: ['sulodexida'],
+      accion: 'mantener', textoPaciente: TEXTO_MANTENER,
+      reglaAplicada: 'Sulodexida: mantener (riesgo hemorrágico no alto, sin neuroaxial/bloqueo profundo)',
+      fuente: 'docs/documento_fuente.md §8.3', requiereConfirmacion: false,
+    };
+  }
+  const plazo = plazoDesdeHoras(ctx, 48);
+  return {
+    idFarmaco, nombreComercial, principiosActivos: ['sulodexida'],
+    accion: 'suspender', fechaHoraUltimaToma: plazo.fechaHoraUltimaToma, textoPaciente: plazo.textoPaciente,
+    reglaAplicada: 'Sulodexida: suspender 48 h (riesgo hemorrágico alto o neuroaxial/bloqueo profundo)',
+    fuente: 'docs/documento_fuente.md §8.3', requiereConfirmacion: false,
+  };
+}
+
+/** Inhibidores GP IIb/IIIa y cangrelor: uso hospitalario, con sus plazos; siempre requieren confirmación. */
+export type GpIibIiia = 'eptifibatida' | 'tirofiban' | 'cangrelor' | 'abciximab';
+
+const HORAS_GP: Record<GpIibIiia, { estandar: number; neuroaxial: number }> = {
+  eptifibatida: { estandar: 4, neuroaxial: 6 },
+  tirofiban: { estandar: 8, neuroaxial: 8 }, // 4-8 h → extremo conservador 8
+  cangrelor: { estandar: 1, neuroaxial: 3 },
+  abciximab: { estandar: 48, neuroaxial: 48 }, // 24-48 h → extremo conservador 48
+};
+
+export function reglaGpIibIiia(idFarmaco: string, nombreComercial: string, principio: GpIibIiia, ctx: ContextoReglas): ResultadoFarmaco {
+  const horas = neuroaxialOProfundo(ctx) ? HORAS_GP[principio].neuroaxial : HORAS_GP[principio].estandar;
+  const plazo = plazoDesdeHoras(ctx, horas);
+  return {
+    idFarmaco, nombreComercial, principiosActivos: [principio],
+    accion: 'consultar', fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
+    textoPaciente: 'Uso hospitalario: el anestesiólogo indicará la pauta. No lo cambie por su cuenta.',
+    reglaAplicada: `${principio} (GP IIb/IIIa o cangrelor): ${horas} h (uso hospitalario); requiere confirmación`,
+    fuente: FUENTE, requiereConfirmacion: true,
+  };
+}
+
 // ————————————— Oftalmología moderada/alta (§8.3) —————————————
 
 /**

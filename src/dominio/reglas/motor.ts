@@ -71,6 +71,54 @@ export const TEXTO_MANTENER =
   'Siga tomándolo como siempre, también el día de la intervención, con un sorbo de agua.';
 
 /**
+ * Combinación fija (una sola pastilla, §8.0 / Decisión 5): una única instrucción
+ * por medicamento comercial con el plazo más restrictivo de sus componentes.
+ * Si la combinación obliga a retirar la metformina antes de su plazo propio
+ * (es decir, el ganador NO es la metformina pero la combinación la contiene),
+ * añade la nota de vigilar glucemia a las notas del anestesiólogo.
+ *
+ * @param nombreComercial nombre de la combinación (p. ej. "Synjardy").
+ * @param componentes resultados de cada principio activo evaluado por su regla.
+ * @param contieneMetformina true si uno de los componentes es metformina.
+ */
+export function combinacionFija(
+  idFarmaco: string,
+  nombreComercial: string,
+  componentes: ResultadoFarmaco[],
+  contieneMetformina: boolean,
+): ResultadoFarmaco {
+  const ganador = masRestrictiva(componentes);
+  const principios = componentes.flatMap((c) => c.principiosActivos);
+
+  const combinado: ResultadoFarmaco = {
+    ...ganador,
+    idFarmaco,
+    nombreComercial,
+    principiosActivos: principios,
+    // Texto del paciente referido al nombre comercial de la combinación.
+    textoPaciente:
+      ganador.accion === 'mantener'
+        ? TEXTO_MANTENER
+        : ganador.fechaHoraUltimaToma
+          ? `Deje de tomar ${nombreComercial}: la última toma permitida es ${fechaConFranja(ganador.fechaHoraUltimaToma)}.`
+          : ganador.textoPaciente,
+    reglaAplicada: `Combinación fija ${nombreComercial}: se aplica el plazo más restrictivo (${ganador.reglaAplicada})`,
+  };
+
+  // Nota de glucemia si la metformina se retira antes de su plazo propio
+  // (el componente ganador no es la metformina).
+  const ganadorEsMetformina = ganador.principiosActivos.includes('metformina');
+  if (contieneMetformina && !ganadorEsMetformina && ganador.accion !== 'mantener') {
+    const nota = 'Vigilar glucemia en los días sin tratamiento (combinación fija que retira la metformina antes de su plazo).';
+    combinado.textoAnestesiologo = combinado.textoAnestesiologo
+      ? `${combinado.textoAnestesiologo} ${nota}`
+      : nota;
+  }
+
+  return combinado;
+}
+
+/**
  * Resuelve la acción más restrictiva entre varios resultados de los componentes
  * de una combinación. Orden de restricción: consultar > suspender/ajustar (mayor
  * plazo) > mantener. Devuelve el resultado ganador.

@@ -7,7 +7,7 @@
  */
 import type { ContextoReglas, ResultadoFarmaco, Alerta } from '../tipos.ts';
 import { TEXTO_MANTENER } from './motor.ts';
-import { plazoNoAlcanzable } from '../fechas/plazos.ts';
+import { plazoNoAlcanzable, fechaLarga } from '../fechas/plazos.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.0';
 
@@ -40,6 +40,101 @@ export function reglaMantener(
     fuente: FUENTE,
     requiereConfirmacion: false,
   };
+}
+
+// ————————————— Fitoterapia y suplementos (§8.11) —————————————
+
+export interface EntradaFitoterapia {
+  idFarmaco: string;
+  nombreComercial: string;
+  principio: string;
+}
+
+/** Fitoterapia/suplementos con efecto sobre coagulación/metabolismo: suspender 14 días (mínimo 7). */
+export function reglaFitoterapia(e: EntradaFitoterapia, ctx: ContextoReglas): ResultadoFarmaco {
+  const limite = new Date(ctx.fechaHoraIntervencion);
+  limite.setDate(limite.getDate() - 14);
+  return {
+    idFarmaco: e.idFarmaco,
+    nombreComercial: e.nombreComercial,
+    principiosActivos: [e.principio],
+    accion: 'suspender',
+    fechaHoraUltimaToma: limite,
+    textoPaciente: `Deje de tomarlo 14 días antes si es posible (mínimo 7). Última toma recomendada: el ${fechaLarga(limite)}.`,
+    reglaAplicada: 'Fitoterapia/suplemento con efecto sobre coagulación: suspender 14 días (mínimo 7)',
+    fuente: 'docs/documento_fuente.md §8.11',
+    requiereConfirmacion: false,
+  };
+}
+
+// ————————————— Anticonceptivos / THS (§8.11, Decisión 4) —————————————
+
+export interface EntradaAnticonceptivoThs {
+  idFarmaco: string;
+  nombreComercial: string;
+  principio: string;
+  /** Tipo de anticonceptivo hormonal (para la advertencia de sugammadex, §8.15). */
+  esOral?: boolean;
+}
+
+/**
+ * Anticonceptivos hormonales combinados y THS: en procedimientos de riesgo
+ * trombótico alto, requiere confirmación. La sugerencia de suspensión va solo en
+ * las notas del anestesiólogo; la hoja del paciente muestra la línea general de
+ * requiere confirmación referida al anticonceptivo hasta que se confirme.
+ */
+export function reglaAnticonceptivoThs(e: EntradaAnticonceptivoThs, ctx: ContextoReglas): ResultadoFarmaco {
+  const base = {
+    idFarmaco: e.idFarmaco,
+    nombreComercial: e.nombreComercial,
+    principiosActivos: [e.principio],
+    fuente: 'docs/documento_fuente.md §8.11',
+  };
+  if (ctx.riesgoTromboticoAlto) {
+    return {
+      ...base,
+      accion: 'consultar',
+      textoPaciente:
+        'Sobre su anticonceptivo, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta.',
+      reglaAplicada: 'Anticonceptivo/THS con riesgo trombótico alto: requiere confirmación',
+      requiereConfirmacion: true,
+      textoAnestesiologo: 'Valorar suspender 4-6 semanas antes y método anticonceptivo alternativo.',
+    };
+  }
+  return {
+    ...base,
+    accion: 'mantener',
+    textoPaciente: TEXTO_MANTENER,
+    reglaAplicada: 'Anticonceptivo/THS sin riesgo trombótico alto: mantener',
+    requiereConfirmacion: false,
+  };
+}
+
+// ————————————— Corticoides sistémicos (§8.11 / §5.3) —————————————
+
+export interface EntradaCorticoide {
+  idFarmaco: string;
+  nombreComercial: string;
+  principio: string;
+  /** true si cumple el criterio de dosis de estrés (≥ 5 mg/día prednisona > 3 sem). */
+  dosisEstres?: boolean;
+}
+
+export function reglaCorticoide(e: EntradaCorticoide): ResultadoFarmaco {
+  const res: ResultadoFarmaco = {
+    idFarmaco: e.idFarmaco,
+    nombreComercial: e.nombreComercial,
+    principiosActivos: [e.principio],
+    accion: 'mantener',
+    textoPaciente: TEXTO_MANTENER,
+    reglaAplicada: 'Corticoide sistémico: mantener',
+    fuente: 'docs/documento_fuente.md §8.11',
+    requiereConfirmacion: false,
+  };
+  if (e.dosisEstres) {
+    res.textoAnestesiologo = 'Valorar dosis de estrés perioperatoria (§5.3).';
+  }
+  return res;
 }
 
 /**
