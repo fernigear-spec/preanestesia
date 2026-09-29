@@ -28,16 +28,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
-      - name: Instalar dependencias
-        run: npm install --no-audit --no-fund
-
-      - name: Subir package-lock.json generado (para fijar dependencias)
-        uses: actions/upload-artifact@v4
-        with:
-          name: package-lock
-          path: package-lock.json
-          if-no-files-found: error
+      - name: Instalar dependencias (deterministas con package-lock.json)
+        run: npm ci --no-audit --no-fund
 
       - name: Typecheck
         run: npx tsc --noEmit
