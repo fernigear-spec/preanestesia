@@ -1,6 +1,6 @@
 # Casos clínicos de referencia (batería independiente)
 
-Preanestesia · AnesHealth · versión 2 (29/09/2026)
+Preanestesia · AnesHealth · versión 3 (29/09/2026)
 Ruta en el repositorio: `docs/casos_referencia.md`
 
 Resultados esperados calculados a mano a partir de `docs/documento_fuente.md`, sin mirar el código. Cada caso debe convertirse en una prueba automática. Si el programa da un resultado distinto, no se corrige la prueba para que pase: se informa al servicio de la discrepancia y se decide cuál de los dos está mal.
@@ -12,29 +12,36 @@ Resultados esperados calculados a mano a partir de `docs/documento_fuente.md`, s
 - «Última toma» es la toma habitual más tardía que respeta el plazo, según las horas de toma del paciente.
 - Aclaramiento: Cockcroft-Gault salvo que se indique.
 - Plazos expresados en días (antivitamina K, AAS, P2Y12, triflusal, cilostazol, SGLT2, JAK, fitoterapia, IMAO): «suspender N días» significa no tomarlo los N días previos ni el día de la intervención.
-- Plazos expresados en horas: se cuentan hasta la hora de la intervención. Solo en heparinas y fondaparinux, si la toma habitual cae como máximo 3 horas después del límite, la hoja indica adelantarla a la hora límite en lugar de suprimirla.
+- Plazos expresados en horas: se cuentan hasta la hora de la intervención.
+- Anticoagulantes con plazo en horas (ACOD, heparinas, fondaparinux): si la primera toma habitual posterior al límite cae como máximo 10 horas después de él, se adelanta a la hora límite, siempre que quede al menos la mitad del intervalo habitual desde la toma anterior (6 h en pautas cada 12 h, 12 h en pautas cada 24 h). Si no se cumple, la última toma es la anterior permitida. Nunca se atrasa una toma.
 - IECA y ARA-II: no tomar el día de la intervención (la toma de la noche anterior sí se hace).
 - GLP-1 semanales: la última dosis debe ser al menos 7 días antes de la intervención.
 
 ## A. Anticoagulantes
 
 **A1.** Varón 70 años, 80 kg, HTA, FA. Apixabán 5 mg a las 09:00 y 21:00. Aclaramiento 70 mL/min. Hernioplastia inguinal laparoscópica (riesgo hemorrágico bajo), anestesia general.
-Esperado: 48 h. Límite martes 13/10 08:00. Última toma lunes 12/10 21:00. Nota del anestesiólogo «podría considerarse suspender solo 24 h». CHA2DS2-VA 2 (HTA 1, edad 65-74 1). Sin confirmación.
+Esperado: 48 h. Límite martes 13/10 08:00. Adelantar la toma del martes 13/10 de las 09:00 a las 08:00; es la última. Nota del anestesiólogo «podría considerarse suspender solo 24 h». CHA2DS2-VA 2 (HTA 1, edad 65-74 1). Sin confirmación.
 
 **A2.** Igual que A1 con aclaramiento 25 mL/min.
-Esperado: 48 + 24 = 72 h. Última toma domingo 11/10 21:00. Sin la nota de 24 h.
+Esperado: 48 + 24 = 72 h. Adelantar la toma del lunes 12/10 de las 09:00 a las 08:00; es la última. Sin la nota de 24 h.
+
+**A2b.** Igual que A1 (48 h), pero la intervención es el jueves 15/10 a las 13:00.
+Esperado: límite martes 13/10 13:00. La toma de las 21:00 cae 8 h después del límite, pero adelantarla a las 13:00 la dejaría a 4 h de la de las 09:00 (menos de 6 h). No se adelanta: última toma martes 13/10 09:00.
 
 **A3.** Rivaroxabán 20 mg a las 21:00. Aclaramiento 25 mL/min. Prótesis total de rodilla con raquídea.
-Esperado: 96 h (anti-Xa con neuroaxial y aclaramiento < 30). Última toma sábado 10/10 21:00.
+Esperado: 96 h (anti-Xa con neuroaxial y aclaramiento < 30). Límite domingo 11/10 08:00. La toma del domingo a las 21:00 cae 13 h después del límite: no se adelanta. Última toma sábado 10/10 21:00.
+
+**A3b.** Rivaroxabán 20 mg a las 21:00, aclaramiento 60, prótesis de rodilla con raquídea (72 h), intervención el jueves 15/10 a las 13:00.
+Esperado: límite lunes 12/10 13:00. Adelantar la toma del lunes 12/10 de las 21:00 a las 13:00 (8 h de adelanto; quedan 16 h desde la toma anterior).
 
 **A4.** Dabigatrán 150 mg a las 09:00 y 21:00. Aclaramiento 90 mL/min. Raquídea.
-Esperado: 72 h. Última toma domingo 11/10 21:00.
+Esperado: 72 h. Adelantar la toma del lunes 12/10 de las 09:00 a las 08:00; es la última.
 
 **A5.** Igual que A4 con aclaramiento 65 mL/min.
-Esperado: 96 h. Última toma sábado 10/10 21:00.
+Esperado: 96 h. Adelantar la toma del domingo 11/10 de las 09:00 a las 08:00; es la última.
 
 **A6.** Igual que A4 con aclaramiento 45 mL/min.
-Esperado: 120 h. Última toma viernes 09/10 21:00.
+Esperado: 120 h. Adelantar la toma del sábado 10/10 de las 09:00 a las 08:00; es la última.
 
 **A7.** Edoxabán 60 mg a las 09:00. Sin creatinina disponible. Colecistectomía laparoscópica.
 Esperado: requiere confirmación, indicando que falta el aclaramiento. Tarjeta de coherencia de dato que falta. En la hoja del paciente, la línea «el anestesiólogo le llamará».
@@ -69,7 +76,7 @@ Esperado: adelantar la dosis del miércoles 14/10 a las 20:00 o antes.
 Esperado: clasificada como terapéutica. 24 h. Adelantar la dosis del miércoles 14/10 de las 09:00 a las 08:00; no ponerse la de las 21:00.
 
 **B4.** Fondaparinux 2,5 mg a las 09:00, aclaramiento 60. Cirugía de riesgo hemorrágico bajo sin neuroaxial.
-Esperado: 36 h. Límite martes 13/10 20:00. Última dosis martes 13/10 09:00.
+Esperado: 36 h. Límite martes 13/10 20:00. La dosis del miércoles a las 09:00 cae 13 h después del límite: no se adelanta. Última dosis martes 13/10 09:00.
 
 **B5.** Fondaparinux 7,5 mg a las 09:00, 70 kg, aclaramiento 40 (terapéutico).
 Esperado: 72 h (aclaramiento < 50). Adelantar la dosis del lunes 12/10 de las 09:00 a las 08:00; ya no ponerse más.
@@ -174,7 +181,7 @@ Esperado: mantener, con la nota de fármacos a evitar.
 Esperado: 24 h. Última toma miércoles 14/10 08:00 (cae justo en el límite y está permitida). Texto de alternativa con paracetamol o metamizol.
 
 **E10.** Naproxeno 500 mg a las 09:00 y 21:00.
-Esperado: 72 h. Última toma domingo 11/10 21:00.
+Esperado: 72 h. Adelantar la toma del lunes 12/10 de las 09:00 a las 08:00; es la última.
 
 **E11.** Metotrexato 15 mg semanal por artritis reumatoide. Prótesis de cadera.
 Esperado: mantener.
@@ -284,4 +291,4 @@ Esperado: tarjeta inversa sugiriendo preguntar por la CPAP.
 
 1. IECA y ARA-II: no tomar el día de la intervención, para que el paciente no esté dos días sin tratamiento.
 2. GLP-1 semanales: la última dosis debe ser al menos 7 días antes de la intervención.
-3. Adelantar la toma habitual cuando cae como máximo 3 horas después del límite, en heparinas y fondaparinux.
+3. Anticoagulantes con plazo en horas (ACOD, heparinas, fondaparinux): adelantar a la hora límite la primera toma posterior al límite si cae como máximo 10 horas después, siempre que quede al menos la mitad del intervalo habitual desde la toma anterior. Nunca se atrasa una toma. En el resto de fármacos no se adelantan tomas.
