@@ -6,6 +6,8 @@ import { PasoAntecedentes } from './pasos/PasoAntecedentes.tsx';
 import { PasoMtnd4 } from './pasos/PasoMtnd4.tsx';
 import { PasoAlergias } from './pasos/PasoAlergias.tsx';
 import { PasoHabitos } from './pasos/PasoHabitos.tsx';
+import { PasoCribado } from './pasos/PasoCribado.tsx';
+import { PasoMedicacion } from './pasos/PasoMedicacion.tsx';
 import { ESTADO_INICIAL, INCIDENCIAS_ANESTESICAS, type EstadoEntrevista, type IntervencionPrevia } from './estadoEntrevista.ts';
 import type { Modalidad } from '../dominio/tipos.ts';
 
@@ -23,7 +25,7 @@ function incidenciaLegible(id: string): string {
   return INCIDENCIAS_ANESTESICAS.find((x) => x.id === id)?.etiqueta ?? id;
 }
 
-type Pantalla = 'inicio' | 'paso1' | 'paso2' | 'paso3' | 'paso4' | 'paso5' | 'paso6' | 'resumen';
+type Pantalla = 'inicio' | 'paso1' | 'paso2' | 'paso3' | 'paso4' | 'paso5' | 'paso6' | 'paso7' | 'paso8' | 'resumen';
 
 const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 function fechaLegible(d: Date): string {
@@ -41,7 +43,7 @@ export function App() {
     setPantalla('inicio');
   }
 
-  const { intervencion, procedimiento, basicos, antecedentes, mtnd4, alergias, habitos } = entrevista;
+  const { intervencion, procedimiento, basicos, antecedentes, mtnd4, alergias, habitos, cribado, medicacion } = entrevista;
 
   return (
     <div className="app">
@@ -148,6 +150,30 @@ export function App() {
             onVolver={() => setPantalla('paso5')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, habitos: datos }));
+              setPantalla('paso7');
+            }}
+          />
+        )}
+
+        {pantalla === 'paso7' && (
+          <PasoCribado
+            inicial={cribado}
+            onVolver={() => setPantalla('paso6')}
+            onContinuar={(datos) => {
+              setEntrevista((e) => ({ ...e, cribado: datos }));
+              setPantalla('paso8');
+            }}
+          />
+        )}
+
+        {pantalla === 'paso8' && intervencion && (
+          <PasoMedicacion
+            inicial={medicacion}
+            intervencion={intervencion}
+            enfermedades={cribado?.enfermedades ?? []}
+            onVolver={() => setPantalla('paso7')}
+            onContinuar={(datos) => {
+              setEntrevista((e) => ({ ...e, medicacion: datos }));
               setPantalla('resumen');
             }}
           />
@@ -251,6 +277,31 @@ export function App() {
                   <li><strong>Capacidad funcional:</strong> {habitos.subeDosPisos === 'si' ? 'sube dos pisos sin parar' : 'DASI evaluado'}</li>
                   {habitos.cfs !== undefined && <li><strong>CFS:</strong> {habitos.cfs}</li>}
                 </ul>
+              </>
+            )}
+
+            {cribado && (
+              <>
+                <h3>Enfermedades y hemostasia</h3>
+                <ul className="resumen-lista">
+                  <li><strong>Enfermedades:</strong> {cribado.ningunaConocida ? 'ninguna conocida' : (cribado.enfermedades.length > 0 ? cribado.enfermedades.join(', ') : '—')}</li>
+                  <li><strong>HEMSTOP:</strong> {Object.values(cribado.hemstop).filter(Boolean).length} respuestas positivas</li>
+                </ul>
+              </>
+            )}
+
+            {medicacion && (
+              <>
+                <h3>Medicación</h3>
+                {medicacion.length === 0 ? (
+                  <p>Sin medicación habitual.</p>
+                ) : (
+                  <ul className="resumen-lista">
+                    {medicacion.map((f, i) => (
+                      <li key={`${f.idFarmaco}-${i}`}>{f.nombreComercial}{f.horas.length > 0 ? ` (${f.horas.join(', ')})` : ''}</li>
+                    ))}
+                  </ul>
+                )}
               </>
             )}
 

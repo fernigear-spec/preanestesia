@@ -49,6 +49,59 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('heading', { name: /Paso 2 · Datos básicos/ })).toBeVisible();
   });
 
+  test('entrevista completa SIN fecha: márgenes en horas, días y "no tomar el día" sin fallar (§8.16)', async ({ page }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(String(e)));
+
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    // Paso 1 sin fecha.
+    await page.getByRole('checkbox', { name: /La fecha de la intervención aún no se conoce/ }).check();
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 2.
+    await page.locator('#edad').fill('60');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('80');
+    await page.locator('#talla').fill('175');
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Pasos 3-7 sin datos extra.
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
+    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+
+    // Paso 8: añadir fármacos con distintos tipos de plazo.
+    await expect(page.getByRole('heading', { name: /Paso 8 · Medicación/ })).toBeVisible();
+
+    // Eliquis (plazo en horas) → margen "como mínimo N horas antes".
+    await page.locator('#med').fill('Eliquis');
+    await page.getByRole('button', { name: /Eliquis/ }).first().click();
+    await page.getByRole('button', { name: '09:00', exact: true }).first().click();
+    await expect(page.getByText(/como mínimo 48 horas antes/)).toBeVisible();
+
+    // Plavix (plazo en días) → margen "los N días anteriores".
+    await page.locator('#med').fill('Plavix');
+    await page.getByRole('button', { name: /Plavix/ }).first().click();
+    await expect(page.getByText(/días anteriores a la intervención/)).toBeVisible();
+
+    // Renitec (IECA) → "No lo tome el día de la intervención".
+    await page.locator('#med').fill('Renitec');
+    await page.getByRole('button', { name: /Renitec/ }).first().click();
+    await expect(page.getByText(/No lo tome el día de la intervención/)).toBeVisible();
+
+    // No debe haberse producido ningún error de página (construirContexto no se llama sin fecha).
+    expect(errores).toHaveLength(0);
+  });
+
   test('recorre pasos 2-4 hasta el resumen', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Presencial' }).click();

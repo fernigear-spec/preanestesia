@@ -78,6 +78,44 @@ export interface HabitosUi {
   };
 }
 
+import type { EntradaHemstop } from '../dominio/escalas/hemstop.ts';
+
+/** Cribado por aparatos del paso 7 (R3.2.21–R3.2.23). */
+export interface CribadoUi {
+  /** «Ninguna enfermedad conocida» marcado explícitamente (R3.2.22). */
+  ningunaConocida: boolean;
+  /** Enfermedades marcadas (ids del catálogo por aparatos). */
+  enfermedades: string[];
+  /** HEMSTOP, que se hace siempre (R3.2.23). */
+  hemstop: EntradaHemstop;
+}
+
+/** Un fármaco que el paciente toma, recogido en el paso 8. */
+export interface FarmacoTomadoUi {
+  idFarmaco: string;
+  nombreComercial: string;
+  principiosActivos: string[];
+  idRegla: string;
+  grupo: string;
+  subgrupo: string;
+  pautaTipica: string;
+  via: 'oral' | 'no_oral';
+  requiereConfirmacionCatalogo: boolean;
+  indicacionesPosibles: string[];
+  /** Horas de toma ("HH:MM"). */
+  horas: string[];
+  dosisMg?: number;
+  /** Día de la semana (0-6) del fármaco semanal. */
+  diaSemana?: number;
+  /** Fecha de la última dosis (ISO) para biológicos/antiangiogénicos. */
+  fechaUltimaDosis?: string;
+  periodicidadDias?: number;
+  insulinaBasalUi?: number;
+  insulinaNocheUi?: number;
+  insulinaMananaUi?: number;
+  tipoHbpm?: 'profilactica' | 'terapeutica' | 'indeterminada';
+}
+
 export interface EstadoEntrevista {
   intervencion: DatosIntervencion | null;
   procedimiento: Procedimiento | null;
@@ -86,6 +124,22 @@ export interface EstadoEntrevista {
   mtnd4: EntradaMtnd4 | null;
   alergias: AlergiasUi | null;
   habitos: HabitosUi | null;
+  cribado: CribadoUi | null;
+  medicacion: FarmacoTomadoUi[] | null;
+}
+
+/** Horas más habituales para los botones rápidos del paso 8 (tablet). */
+export const HORAS_FRECUENTES = ['08:00', '09:00', '14:00', '20:00', '21:00', '22:00'];
+
+/** ¿La regla necesita las horas de toma para calcular un plazo? */
+export function reglaNecesitaHoras(idRegla: string): boolean {
+  const sinHoras = new Set([
+    'biologico', 'antiangiogenico', 'antiangiogenico_intravitreo', 'tirosina_cinasa',
+    'corticoide_sistemico', 'fame_mantener', 'inmunosupresor_clasico', 'jak',
+    'mantener_generico', 'metotrexato', 'imao_irreversible', 'imao_b',
+    'sacubitrilo_valsartan', 'glp1_semanal',
+  ]);
+  return !sinHoras.has(idRegla);
 }
 
 export const ESTADO_INICIAL: EstadoEntrevista = {
@@ -96,7 +150,108 @@ export const ESTADO_INICIAL: EstadoEntrevista = {
   mtnd4: null,
   alergias: null,
   habitos: null,
+  cribado: null,
+  medicacion: null,
 };
+
+/** HEMSTOP vacío (todas las respuestas en «no»). */
+export const HEMSTOP_VACIO: EntradaHemstop = {
+  hematomasSinTrauma: false,
+  sangradoProlongadoHeridas: false,
+  menstruacionAbundante: false,
+  sangradoTrasCirugia: false,
+  sangradoTrasDental: false,
+  sangradoEnParto: false,
+  familiaresTrastornoCoagulacion: false,
+};
+
+/** Preguntas del HEMSTOP (§5.5), en el orden del cuestionario. */
+export const PREGUNTAS_HEMSTOP: Array<{ id: keyof EntradaHemstop; etiqueta: string }> = [
+  { id: 'hematomasSinTrauma', etiqueta: '¿Hematomas o sangrados sin golpe que le llevaran a consultar o a tratamiento?' },
+  { id: 'sangradoProlongadoHeridas', etiqueta: '¿Sangrado que dura mucho tras una herida?' },
+  { id: 'menstruacionAbundante', etiqueta: '¿Reglas muy abundantes que motivaran consulta o tratamiento?' },
+  { id: 'sangradoTrasCirugia', etiqueta: '¿Sangrado anómalo tras una operación?' },
+  { id: 'sangradoTrasDental', etiqueta: '¿Sangrado anómalo tras una extracción dental?' },
+  { id: 'sangradoEnParto', etiqueta: '¿Sangrado anómalo en el parto?' },
+  { id: 'familiaresTrastornoCoagulacion', etiqueta: '¿Familiares con trastorno de la coagulación?' },
+];
+
+/** Cribado por aparatos (R3.2.21). Los ids que empiezan por una enfermedad de
+ *  §5b.2 permiten al asistente de coherencia detectar tratamientos ausentes. */
+export const APARATOS: Array<{ aparato: string; enfermedades: Array<{ id: string; etiqueta: string }> }> = [
+  {
+    aparato: 'Cardiovascular',
+    enfermedades: [
+      { id: 'hta', etiqueta: 'Hipertensión' },
+      { id: 'fibrilacion_auricular', etiqueta: 'Fibrilación auricular' },
+      { id: 'insuficiencia_cardiaca', etiqueta: 'Insuficiencia cardiaca' },
+      { id: 'cardiopatia_isquemica', etiqueta: 'Cardiopatía isquémica / infarto' },
+      { id: 'stent_o_infarto', etiqueta: 'Stent coronario' },
+      { id: 'protesis_mecanica', etiqueta: 'Prótesis valvular mecánica' },
+      { id: 'valvulopatia', etiqueta: 'Valvulopatía' },
+      { id: 'marcapasos', etiqueta: 'Marcapasos o DAI' },
+    ],
+  },
+  {
+    aparato: 'Respiratorio',
+    enfermedades: [
+      { id: 'asma_epoc', etiqueta: 'Asma o EPOC' },
+      { id: 'saos', etiqueta: 'Apnea del sueño (SAOS)' },
+    ],
+  },
+  {
+    aparato: 'Endocrino y metabolismo',
+    enfermedades: [
+      { id: 'diabetes', etiqueta: 'Diabetes' },
+      { id: 'hipotiroidismo', etiqueta: 'Hipotiroidismo' },
+      { id: 'obesidad', etiqueta: 'Obesidad' },
+    ],
+  },
+  {
+    aparato: 'Renal y hepático',
+    enfermedades: [
+      { id: 'enfermedad_renal', etiqueta: 'Enfermedad renal crónica' },
+      { id: 'enfermedad_hepatica', etiqueta: 'Enfermedad hepática' },
+    ],
+  },
+  {
+    aparato: 'Hematológico',
+    enfermedades: [
+      { id: 'anticoagulacion', etiqueta: 'Toma anticoagulantes' },
+      { id: 'trastorno_coagulacion', etiqueta: 'Trastorno de la coagulación conocido' },
+      { id: 'anemia', etiqueta: 'Anemia' },
+    ],
+  },
+  {
+    aparato: 'Neurológico y psiquiátrico',
+    enfermedades: [
+      { id: 'epilepsia', etiqueta: 'Epilepsia' },
+      { id: 'ictus_o_tvp', etiqueta: 'Ictus o AIT' },
+      { id: 'parkinson', etiqueta: 'Parkinson' },
+      { id: 'depresion_ansiedad', etiqueta: 'Depresión o ansiedad' },
+    ],
+  },
+  {
+    aparato: 'Musculoesquelético y reumatológico',
+    enfermedades: [
+      { id: 'artritis_reumatoide', etiqueta: 'Artritis reumatoide u otra enfermedad autoinmune' },
+    ],
+  },
+  {
+    aparato: 'Digestivo',
+    enfermedades: [
+      { id: 'reflujo', etiqueta: 'Reflujo gastroesofágico' },
+      { id: 'enfermedad_inflamatoria_intestinal', etiqueta: 'Enfermedad inflamatoria intestinal' },
+    ],
+  },
+  {
+    aparato: 'Oncológico e infeccioso',
+    enfermedades: [
+      { id: 'cancer', etiqueta: 'Cáncer en tratamiento' },
+      { id: 'trasplante', etiqueta: 'Trasplante de órgano' },
+    ],
+  },
+];
 
 /** Alimentos relevantes en alergias (R3.2.14). */
 export const ALIMENTOS_ALERGIA: Array<{ id: string; etiqueta: string }> = [

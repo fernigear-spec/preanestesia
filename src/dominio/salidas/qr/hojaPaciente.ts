@@ -17,6 +17,7 @@ import {
   textoUltimaTomaDias,
 } from '../../fechas/ultimaToma.ts';
 import { plazoNoAlcanzable } from '../../fechas/plazos.ts';
+import { fraseNoConfirmado } from '../hojaFarmaco.ts';
 
 /** Tipo de plazo de un fármaco en el QR (claves cortas para el payload). */
 export type TipoPlazo =
@@ -41,6 +42,8 @@ export interface FarmacoQr {
   ac: boolean;
   /** Requiere confirmación del anestesiólogo. */
   rc: boolean;
+  /** Nombre del anestesiólogo que ha confirmado (si `rc`); ausente = no confirmado. */
+  cf?: string;
   /** Texto fijo del paciente para fármacos sin plazo (mantener/consultar). */
   tx?: string;
 }
@@ -130,6 +133,11 @@ export function recalcularHoja(
   const iv = fiMs !== null ? new Date(fiMs) : null;
 
   return contenido.far.map((f) => {
+    // Requiere confirmación y NO confirmado: nunca se muestra la pauta, ni con
+    // fecha ni sin ella. Se muestra la frase única de §12 (garantía §8.16/§12).
+    if (f.rc && (f.cf === undefined || f.cf === '')) {
+      return { nombre: f.n, texto: fraseNoConfirmado(f.n), plazoNoCumplible: false };
+    }
     // Sin fecha: instrucción como margen, sin adelantos (§8.16b).
     if (iv === null) {
       return { nombre: f.n, texto: textoMargenSinFecha(f), plazoNoCumplible: false };

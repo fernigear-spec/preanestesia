@@ -27,8 +27,9 @@ function contenido(fi: number | null): ContenidoQrPaciente {
       { n: 'Eliquis', pt: 'horas', pd: 48, hh: ['09:00', '21:00'], ad: true, ac: true, rc: false },
       // A10 warfarina: plazo en días 5, pauta 18:00, sin adelanto.
       { n: 'Aldocumar', pt: 'dias', pd: 5, hh: ['18:00'], ad: false, ac: true, rc: false },
-      // C6 clopidogrel: plazo en días 5, pauta 09:00, requiere confirmación.
-      { n: 'Plavix', pt: 'dias', pd: 5, hh: ['09:00'], ad: false, ac: false, rc: true },
+      // C6 clopidogrel: plazo en días 5, pauta 09:00, requiere confirmación (aquí, ya confirmado
+      // para poder comprobar el cálculo del plazo; la confirmación se prueba aparte).
+      { n: 'Plavix', pt: 'dias', pd: 5, hh: ['09:00'], ad: false, ac: false, rc: true, cf: 'Dra. Ruiz' },
       // D2 empagliflozina: plazo en días 3, pauta 09:00.
       { n: 'Jardiance', pt: 'dias', pd: 3, hh: ['09:00'], ad: false, ac: false, rc: false },
       // D2 metformina: no tomar el día de la intervención, pauta 09:00/21:00.
@@ -139,6 +140,40 @@ describe('QR del paciente §8.16 — recálculo CON fecha = mismas fechas del in
   });
 });
 
+describe('QR del paciente §8.16/§12 — fármaco que requiere confirmación', () => {
+  const FRASE = 'el anestesiólogo le llamará para indicarle qué hacer';
+  // C6 clopidogrel portador de stent: requiere confirmación; plazo en días 5.
+  function contenidoC6(cf?: string): ContenidoQrPaciente {
+    const far = { n: 'Plavix', pt: 'dias' as const, pd: 5, hh: ['09:00'], ad: false, ac: false, rc: true, ...(cf ? { cf } : {}) };
+    return { tel: TEL, fi: IV_MS, far: [far] };
+  }
+
+  it('SIN confirmar: aunque haya fecha, no muestra la pauta, sino la frase única §12', () => {
+    const inst = recalcularHoja(contenidoC6(), IV, AHORA_LEJANO);
+    const p = inst.find((i) => i.nombre === 'Plavix');
+    expect(p?.texto).toContain(FRASE);
+    expect(p?.texto).not.toContain('viernes 9 de octubre');
+    expect(p?.plazoNoCumplible).toBe(false);
+  });
+
+  it('SIN confirmar y SIN fecha: también la frase única (no el margen)', () => {
+    const c = contenidoC6();
+    c.fi = null;
+    const inst = recalcularHoja(c, null, AHORA_LEJANO);
+    const p = inst.find((i) => i.nombre === 'Plavix');
+    expect(p?.texto).toContain(FRASE);
+    expect(p?.texto).not.toContain('días anteriores');
+  });
+
+  it('CONFIRMADO: muestra la pauta calculada (última toma viernes 9 a las 09:00)', () => {
+    const inst = recalcularHoja(contenidoC6('Dra. Ruiz'), IV, AHORA_LEJANO);
+    const p = inst.find((i) => i.nombre === 'Plavix');
+    expect(p?.texto).toContain('viernes 9 de octubre');
+    expect(p?.texto).toContain('09:00');
+    expect(p?.texto).not.toContain(FRASE);
+  });
+});
+
 describe('QR del paciente §8.16 — recálculo con fecha demasiado cercana', () => {
   it('clopidogrel con intervención dentro de 2 días: sin pauta y remite al teléfono', () => {
     // "Ahora" = lunes 12/10; intervención el miércoles 14/10 (dentro de 2 días).
@@ -148,7 +183,8 @@ describe('QR del paciente §8.16 — recálculo con fecha demasiado cercana', ()
     const c: ContenidoQrPaciente = {
       tel: TEL,
       fi: ivCercana.getTime(),
-      far: [{ n: 'Plavix', pt: 'dias', pd: 5, hh: ['09:00'], ad: false, ac: false, rc: true }],
+      // Confirmado (cf): así el recálculo llega al cálculo y detecta el plazo no cumplible.
+      far: [{ n: 'Plavix', pt: 'dias', pd: 5, hh: ['09:00'], ad: false, ac: false, rc: true, cf: 'Dra. Ruiz' }],
     };
     const inst = recalcularHoja(c, ivCercana, ahora);
     const plavix = inst.find((i) => i.nombre === 'Plavix');
