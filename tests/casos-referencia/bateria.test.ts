@@ -237,14 +237,19 @@ describe('Casos D · antidiabéticos', () => {
     expect(manana?.dosisUi).toBe(24); // 80 % de 30
     expect(noche).toBeUndefined();
   });
-  it('D8 Insulatard NPH 20 mañana / 10 noche: noche 10 completa, mañana 10 (50 % de 20)', () => {
-    const r = reglaInsulinaNph({ idFarmaco: 'n', nombreComercial: 'Insulatard', dosisNocheUi: 10, dosisMananaUi: 20 });
+  it('D8 Insulatard NPH 20 mañana / 10 noche: noche 10 completa, mañana 10 (50 % de 20); texto con día y hora', () => {
+    const r = reglaInsulinaNph({ idFarmaco: 'n', nombreComercial: 'Insulatard', dosisNocheUi: 10, dosisMananaUi: 20, intervencion: IV, horaNoche: '21:00', horaManana: '08:00' });
     expect(r.ajustes.find((a) => a.momento === 'noche_previa')?.dosisUi).toBe(10);
     expect(r.ajustes.find((a) => a.momento === 'manana_intervencion')?.dosisUi).toBe(10);
+    // La noche previa (miércoles 14) a las 21:00 y la mañana del jueves 15.
+    expect(r.textoPaciente).toContain('miércoles 14 de octubre');
+    expect(r.textoPaciente).toContain('21:00');
+    expect(r.textoPaciente).toContain('jueves 15 de octubre');
   });
-  it('D9 NovoMix 30, 20 UI mañana: 10 UI (50 %) la mañana', () => {
-    const r = reglaInsulinaPremezclada({ idFarmaco: 'nm', nombreComercial: 'NovoMix 30', dosisMananaUi: 20 });
+  it('D9 NovoMix 30, 20 UI mañana: 10 UI (50 %) la mañana del jueves 15', () => {
+    const r = reglaInsulinaPremezclada({ idFarmaco: 'nm', nombreComercial: 'NovoMix 30', dosisMananaUi: 20, intervencion: IV, horaManana: '08:00' });
     expect(r.ajustes.find((a) => a.momento === 'manana_intervencion')?.dosisUi).toBe(10);
+    expect(r.textoPaciente).toContain('jueves 15 de octubre');
   });
   it('D10 bomba CMA riesgo bajo: sin confirmación', () => {
     expect(reglaBombaInsulina({ idFarmaco: 'b', nombreComercial: 'Bomba' }, ctx({ regimen: 'cma', riesgoCardiovascular: 'bajo' })).requiereConfirmacion).toBeFalse();

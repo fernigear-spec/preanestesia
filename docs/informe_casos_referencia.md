@@ -6,7 +6,7 @@
 > Intervención de referencia: jueves 15/10/2026 a las 08:00 (salvo A2b y A3b: 13:00).
 > Leyenda: ✅ coincide (todos los datos del esperado están en la salida) · ❓ dudoso (falta algún dato) · 👁️ revisión manual (el esperado no tiene datos comprobables).
 
-**Resultado: 39 coinciden, 6 dudosos, 39 de revisión manual (de 84).**
+**Resultado: 40 coinciden, 5 dudosos, 39 de revisión manual (de 84).**
 
 | Caso | Motor (cálculo) | Texto del paciente | Esperado (literal de casos_referencia.md) | Veredicto | Datos no encontrados |
 |---|---|---|---|---|---|
@@ -47,8 +47,8 @@
 | D5 | dosis jue 15/10: suspender; dosis jue 08/10: mantener | Su última dosis será la del jueves 8 de octubre. No se ponga la dosis del jueves 15 de octubre. Además, tome solo líquidos claros desde el miércoles 14 de octubre a las 08:00 (siga la hoja adjunta). | una sola dosis omitida, la del jueves 15/10 (día de la intervención). La del jueves 08/10 se toma (7 días antes). | ✅ | — |
 | D6 | acción: suspender; última toma: dom 11/10 08:00 | Deje de tomarlo los 3 días previos y el día de la intervención. Tome la última dosis el domingo 11 de octubre a las 08:00. Después no vuelva a tomarlo hasta que se lo indiquen. | no tomar los 3 días previos ni el día de la intervención. Última toma domingo 11/10. | ✅ | — |
 | D7 | mañana IQ: 24 UI (80 % de 30); noche previa: no aplica (dosis diaria) | Reduzca su insulina basal al 80 %: la mañana de la intervención (jueves 15 de octubre), 24 UI (en vez de 30). Los días anteriores, la dosis de siempre. | al ser una dosis diaria de mañana, no hay «noche previa» que ajustar. La mañana de la intervención (jueves 15/10), 24 UI (80 % de 30, redondeado a la unidad inferior). Los días anteriores, la dosis de siempre. | ✅ | — |
-| D8 | noche: 10 UI (completa); mañana: 10 UI (50 %) | Póngase su dosis completa (10 UI) la noche previa y 10 UI (la mitad) la mañana de la intervención. | miércoles 14/10 a las 21:00, 10 UI (completa). Jueves 15/10 por la mañana, 10 UI (50 %). | ❓ | 14/10, 15/10, 21:00 |
-| D9 | mañana: 10 UI (50 %) | Póngase 10 UI (la mitad de su dosis habitual) la mañana de la intervención. | 10 UI la mañana de la intervención. | ✅ | — |
+| D8 | noche: 10 UI (completa); mañana: 10 UI (50 %) | El miércoles 14 de octubre a las 21:00, su dosis completa (10 UI). El jueves 15 de octubre por la mañana, 10 UI en lugar de 20 (la mitad). | miércoles 14/10 a las 21:00, 10 UI (completa). Jueves 15/10 por la mañana, 10 UI (50 %). | ✅ | — |
+| D9 | mañana: 10 UI (50 %) | El jueves 15 de octubre por la mañana, póngase 10 UI en lugar de 20 (la mitad de su dosis habitual). | 10 UI la mañana de la intervención. | ✅ | — |
 | D10 | acción: ajustar; última toma: — | Ponga la basal al 80 % de lo habitual y no se administre bolos el día de la intervención. | basal al 80 % y suspender bolos. Sin confirmación. | 👁️ | — |
 | D11 | acción: consultar; última toma: —; requiere confirmación | Sobre su bomba de insulina, el anestesiólogo le indicará qué hacer. No cambie la pauta por su cuenta. | requiere confirmación. | 👁️ | — |
 | E1 | acción: suspender; última toma: mié 14/10 09:00 | No lo tome el día de la intervención. Su última toma será el miércoles 14 de octubre a las 09:00. | no tomar el día de la intervención. Última toma miércoles 14/10 09:00. | ✅ | — |

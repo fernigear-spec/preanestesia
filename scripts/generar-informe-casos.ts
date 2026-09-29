@@ -359,13 +359,13 @@ function add(id: string, calculado: string, textoPaciente: string, _a?: string |
   add('D7', `mañana IQ: ${manana} UI (80 % de 30); noche previa: ${noche7 ? noche7.dosisUi + ' UI' : 'no aplica (dosis diaria)'}`, r.textoPaciente, manana === 24 && noche7 === undefined);
 }
 {
-  const r = reglaInsulinaNph({ idFarmaco: 'n', nombreComercial: 'Insulatard', dosisNocheUi: 10, dosisMananaUi: 20 });
+  const r = reglaInsulinaNph({ idFarmaco: 'n', nombreComercial: 'Insulatard', dosisNocheUi: 10, dosisMananaUi: 20, intervencion: IV, horaNoche: '21:00', horaManana: '08:00' });
   const noche = r.ajustes.find((a) => a.momento === 'noche_previa')?.dosisUi;
   const man = r.ajustes.find((a) => a.momento === 'manana_intervencion')?.dosisUi;
   add('D8', `noche: ${noche} UI (completa); mañana: ${man} UI (50 %)`, r.textoPaciente, 'noche 10 UI completa; mañana 10 UI (50 %)', noche === 10 && man === 10);
 }
 {
-  const r = reglaInsulinaPremezclada({ idFarmaco: 'nm', nombreComercial: 'NovoMix 30', dosisMananaUi: 20 });
+  const r = reglaInsulinaPremezclada({ idFarmaco: 'nm', nombreComercial: 'NovoMix 30', dosisMananaUi: 20, intervencion: IV, horaManana: '08:00' });
   const man = r.ajustes.find((a) => a.momento === 'manana_intervencion')?.dosisUi;
   add('D9', `mañana: ${man} UI (50 %)`, r.textoPaciente, 'mañana 10 UI (50 % de 20)', man === 10);
 }
