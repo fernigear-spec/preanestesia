@@ -7,7 +7,7 @@ import { reglaTirosinaCinasa, reglaAntiangiogenico } from '../../../src/dominio/
 import { reglaFitoterapia, reglaAnticonceptivoThs, reglaCorticoide } from '../../../src/dominio/reglas/otros.ts';
 import { avisoSugammadex } from '../../../src/dominio/reglas/sugammadex.ts';
 import { reglaTriflusal, reglaDipiridamol, reglaCilostazol, reglaSulodexida, reglaGpIibIiia, reglaAas } from '../../../src/dominio/reglas/antiagregantes.ts';
-import { reglaSglt2, reglaMetformina, reglaBombaInsulina } from '../../../src/dominio/reglas/antidiabeticos.ts';
+import { reglaSglt2, reglaMetformina } from '../../../src/dominio/reglas/antidiabeticos.ts';
 import { combinacionFija } from '../../../src/dominio/reglas/motor.ts';
 
 const IV = new Date(2026, 9, 15, 8, 0);

@@ -21,7 +21,6 @@ import {
   textoUltimaTomaDias,
   fechaLarga,
   horaReloj,
-  type PautaHoraria,
 } from '../fechas/ultimaToma.ts';
 
 /** Resuelve el contexto de reglas a partir de la intervención y el aclaramiento. */

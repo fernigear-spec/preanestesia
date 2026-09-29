@@ -30,7 +30,7 @@ import type { ResultadoFarmaco } from '../src/dominio/tipos.ts';
 
 const IV = new Date(2026, 9, 15, 8, 0); // jueves 15 oct 2026, 08:00
 const H = (d?: Date) => (d ? Math.round((IV.getTime() - d.getTime()) / 3_600_000) : NaN);
-const D = (d?: Date) => (d ? Math.round((IV.getTime() - d.getTime()) / 86_400_000) : NaN);
+
 
 function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
   return {

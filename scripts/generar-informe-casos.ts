@@ -11,7 +11,7 @@ import { dirname, join } from 'node:path';
 import type { ContextoReglas } from '../src/dominio/tipos.ts';
 import { reglaAcod } from '../src/dominio/reglas/acod.ts';
 import { reglaAvk } from '../src/dominio/reglas/antivitaminaK.ts';
-import { reglaAas, reglaP2y12, reglaP2y12Oftalmo, evaluarStent, reglaTriflusal, reglaCilostazol } from '../src/dominio/reglas/antiagregantes.ts';
+import { reglaAas, reglaP2y12, evaluarStent, reglaTriflusal, reglaCilostazol } from '../src/dominio/reglas/antiagregantes.ts';
 import { reglaHbpm, clasificarHbpm, reglaFondaparinux } from '../src/dominio/reglas/heparinas.ts';
 import { reglaMetformina, reglaSglt2, reglaGlp1Semanal, reglaGlp1Diario, reglaBombaInsulina } from '../src/dominio/reglas/antidiabeticos.ts';
 import { reglaInsulinaBasal, reglaInsulinaNph, reglaInsulinaPremezclada } from '../src/dominio/reglas/insulinas.ts';

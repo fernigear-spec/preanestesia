@@ -146,7 +146,7 @@ export function reglaCorticoide(e: EntradaCorticoide): ResultadoFarmaco {
  */
 export function aplicarPlazoNoAlcanzable(
   r: ResultadoFarmaco,
-  ctx: ContextoReglas,
+  _ctx: ContextoReglas,
   ahora: Date,
 ): { resultado: ResultadoFarmaco; alerta?: Alerta } {
   if (r.fechaHoraUltimaToma === undefined || r.accion === 'mantener') {
