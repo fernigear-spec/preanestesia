@@ -35,12 +35,57 @@ export interface AntecedentesUi {
   familiaresComplicacionesGraves: boolean;
 }
 
+/** Una alergia a medicamento con su reacción (paso 5, R3.2.14). */
+export interface AlergiaMedicamento {
+  farmaco: string;
+  reaccion: string;
+}
+
+/** Alergias del paso 5 (R3.2.14–R3.2.15). */
+export interface AlergiasUi {
+  /** «No alergias conocidas» marcado explícitamente (R3.2.15). */
+  ningunaConocida: boolean;
+  medicamentos: AlergiaMedicamento[];
+  latex: boolean;
+  contrastesYodados: boolean;
+  clorhexidina: boolean;
+  adhesivos: boolean;
+  /** Alimentos relevantes marcados (huevo, soja, frutos secos, frutas tropicales). */
+  alimentos: string[];
+}
+
+/** Hábitos y capacidad funcional del paso 6 (R3.2.16–R3.2.20). */
+export interface HabitosUi {
+  tabaco: 'nunca' | 'activo' | 'exfumador';
+  /** Datos de exfumador. */
+  paquetesAnio?: number;
+  fechaAbandonoTabaco?: string;
+  /** AUDIT-C (0-4 cada pregunta). */
+  auditFrecuencia: number;
+  auditCantidad: number;
+  auditAtracon: number;
+  /** Capacidad funcional: ¿sube dos pisos sin parar? */
+  subeDosPisos: 'si' | 'no' | 'dudoso';
+  /** Ítems DASI positivos (solo si no sube dos pisos con claridad). */
+  itemsDasi: string[];
+  /** Solo si edad >= 65: CFS 1-9 y 4AT. */
+  cfs?: number;
+  cuatroAt?: {
+    alerta: 'normal' | 'alterado';
+    amt4: '0_errores' | '1_error' | '2_o_mas_o_no_valorable';
+    meses: '7_o_mas' | 'menos_de_7' | 'no_valorable';
+    cambioAgudo: 'no' | 'si';
+  };
+}
+
 export interface EstadoEntrevista {
   intervencion: DatosIntervencion | null;
   procedimiento: Procedimiento | null;
   basicos: DatosBasicosUi | null;
   antecedentes: AntecedentesUi | null;
   mtnd4: EntradaMtnd4 | null;
+  alergias: AlergiasUi | null;
+  habitos: HabitosUi | null;
 }
 
 export const ESTADO_INICIAL: EstadoEntrevista = {
@@ -49,7 +94,17 @@ export const ESTADO_INICIAL: EstadoEntrevista = {
   basicos: null,
   antecedentes: null,
   mtnd4: null,
+  alergias: null,
+  habitos: null,
 };
+
+/** Alimentos relevantes en alergias (R3.2.14). */
+export const ALIMENTOS_ALERGIA: Array<{ id: string; etiqueta: string }> = [
+  { id: 'huevo', etiqueta: 'Huevo' },
+  { id: 'soja', etiqueta: 'Soja' },
+  { id: 'frutos_secos', etiqueta: 'Frutos secos' },
+  { id: 'frutas_tropicales', etiqueta: 'Frutas tropicales (si alergia al látex)' },
+];
 
 /** Incidencias anestésicas a preguntar de forma explícita (R3.2.11). */
 export const INCIDENCIAS_ANESTESICAS: Array<{ id: string; etiqueta: string }> = [

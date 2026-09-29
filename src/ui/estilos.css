@@ -353,3 +353,9 @@ body {
   margin: 0;
   font-style: italic;
 }
+
+/* Peso DASI junto a cada ítem */
+.peso {
+  color: #555;
+  font-size: 0.85rem;
+}

@@ -77,13 +77,28 @@ test.describe('Vista previa', () => {
 
     // Paso 4 — mtND4. Marcar factor materno y ver la alerta roja.
     await expect(page.getByRole('heading', { name: /Paso 4 · Origen materno/ })).toBeVisible();
+    await expect(page.getByText(/Guion para explicar la pregunta/)).toBeVisible();
     await page.getByRole('checkbox', { name: /Ascendencia venezolana por línea materna/ }).check();
     await expect(page.getByText(/Alerta roja/)).toBeVisible();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 5 — alergias. Marcar "No alergias conocidas".
+    await expect(page.getByRole('heading', { name: /Paso 5 · Alergias/ })).toBeVisible();
+    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 6 — hábitos. AUDIT-C alto para ver la alerta de abstinencia.
+    await expect(page.getByRole('heading', { name: /Paso 6 · Hábitos/ })).toBeVisible();
+    await page.locator('#a1').selectOption('4');
+    await page.locator('#a2').selectOption('4');
+    await page.locator('#a3').selectOption('4');
+    await expect(page.getByText(/síndrome de abstinencia/)).toBeVisible();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
     // Resumen.
     await expect(page.getByRole('heading', { name: /Resumen de la entrevista/ })).toBeVisible();
     await expect(page.getByText(/Hernioplastia inguinal abierta/)).toBeVisible();
+    await expect(page.getByText(/No alergias conocidas/)).toBeVisible();
   });
 
   test('privacidad (caso 23): sin datos clínicos en localStorage/sessionStorage/cookies', async ({ page }) => {

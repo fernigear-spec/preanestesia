@@ -4,6 +4,8 @@ import { PasoIntervencion } from './pasos/PasoIntervencion.tsx';
 import { PasoBasicos } from './pasos/PasoBasicos.tsx';
 import { PasoAntecedentes } from './pasos/PasoAntecedentes.tsx';
 import { PasoMtnd4 } from './pasos/PasoMtnd4.tsx';
+import { PasoAlergias } from './pasos/PasoAlergias.tsx';
+import { PasoHabitos } from './pasos/PasoHabitos.tsx';
 import { ESTADO_INICIAL, INCIDENCIAS_ANESTESICAS, type EstadoEntrevista, type IntervencionPrevia } from './estadoEntrevista.ts';
 import type { Modalidad } from '../dominio/tipos.ts';
 
@@ -21,7 +23,7 @@ function incidenciaLegible(id: string): string {
   return INCIDENCIAS_ANESTESICAS.find((x) => x.id === id)?.etiqueta ?? id;
 }
 
-type Pantalla = 'inicio' | 'paso1' | 'paso2' | 'paso3' | 'paso4' | 'resumen';
+type Pantalla = 'inicio' | 'paso1' | 'paso2' | 'paso3' | 'paso4' | 'paso5' | 'paso6' | 'resumen';
 
 const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 function fechaLegible(d: Date): string {
@@ -39,7 +41,7 @@ export function App() {
     setPantalla('inicio');
   }
 
-  const { intervencion, procedimiento, basicos, antecedentes, mtnd4 } = entrevista;
+  const { intervencion, procedimiento, basicos, antecedentes, mtnd4, alergias, habitos } = entrevista;
 
   return (
     <div className="app">
@@ -122,6 +124,30 @@ export function App() {
             onVolver={() => setPantalla('paso3')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, mtnd4: datos }));
+              setPantalla('paso5');
+            }}
+          />
+        )}
+
+        {pantalla === 'paso5' && (
+          <PasoAlergias
+            inicial={alergias}
+            onVolver={() => setPantalla('paso4')}
+            onContinuar={(datos) => {
+              setEntrevista((e) => ({ ...e, alergias: datos }));
+              setPantalla('paso6');
+            }}
+          />
+        )}
+
+        {pantalla === 'paso6' && basicos && (
+          <PasoHabitos
+            inicial={habitos}
+            edadAnios={basicos.edadAnios}
+            sexo={basicos.sexo}
+            onVolver={() => setPantalla('paso5')}
+            onContinuar={(datos) => {
+              setEntrevista((e) => ({ ...e, habitos: datos }));
               setPantalla('resumen');
             }}
           />
@@ -187,6 +213,46 @@ export function App() {
                 {mtnd4 ? describirMtnd4(mtnd4) : 'no recogido'}
               </li>
             </ul>
+
+            {alergias && (
+              <>
+                <h3>Alergias</h3>
+                <ul className="resumen-lista">
+                  {alergias.ningunaConocida ? (
+                    <li>No alergias conocidas</li>
+                  ) : (
+                    <>
+                      {alergias.medicamentos.length > 0 && (
+                        <li><strong>Medicamentos:</strong> {alergias.medicamentos.map((m) => m.reaccion ? `${m.farmaco} (${m.reaccion})` : m.farmaco).join(', ')}</li>
+                      )}
+                      {(alergias.latex || alergias.contrastesYodados || alergias.clorhexidina || alergias.adhesivos) && (
+                        <li><strong>Otras:</strong> {[
+                          alergias.latex ? 'látex' : null,
+                          alergias.contrastesYodados ? 'contrastes yodados' : null,
+                          alergias.clorhexidina ? 'clorhexidina' : null,
+                          alergias.adhesivos ? 'adhesivos' : null,
+                        ].filter(Boolean).join(', ')}</li>
+                      )}
+                      {alergias.alimentos.length > 0 && (
+                        <li><strong>Alimentos:</strong> {alergias.alimentos.join(', ')}</li>
+                      )}
+                    </>
+                  )}
+                </ul>
+              </>
+            )}
+
+            {habitos && (
+              <>
+                <h3>Hábitos y capacidad funcional</h3>
+                <ul className="resumen-lista">
+                  <li><strong>Tabaco:</strong> {habitos.tabaco === 'nunca' ? 'nunca ha fumado' : habitos.tabaco === 'activo' ? 'fumador activo' : `exfumador${habitos.paquetesAnio !== undefined ? ` (${habitos.paquetesAnio} paquetes-año)` : ''}`}</li>
+                  <li><strong>AUDIT-C:</strong> {habitos.auditFrecuencia + habitos.auditCantidad + habitos.auditAtracon} puntos</li>
+                  <li><strong>Capacidad funcional:</strong> {habitos.subeDosPisos === 'si' ? 'sube dos pisos sin parar' : 'DASI evaluado'}</li>
+                  {habitos.cfs !== undefined && <li><strong>CFS:</strong> {habitos.cfs}</li>}
+                </ul>
+              </>
+            )}
 
             <div className="acciones">
               <button type="button" className="boton-secundario" onClick={() => setPantalla('paso1')}>Editar desde el paso 1</button>
