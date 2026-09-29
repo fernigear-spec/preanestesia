@@ -28,7 +28,7 @@ jobs:
           npm install -g typescript@5.6.3
           tsc --noEmit --strict --exactOptionalPropertyTypes \
             --noUncheckedIndexedAccess --module esnext --moduleResolution bundler \
-            --allowImportingTsExtensions --target ES2022 --lib ES2022 \
+            --allowImportingTsExtensions --target ES2022 --lib ES2022,DOM \
             $(find src -name '*.ts')
 
       - name: Pruebas (node:test)
