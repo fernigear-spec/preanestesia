@@ -108,7 +108,8 @@ export function reglaAnticonceptivoThs(e: EntradaAnticonceptivoThs, ctx: Context
   return {
     ...base,
     accion: 'mantener',
-    textoPaciente: TEXTO_MANTENER,
+    // Implantes, parches, inyectables o DIU no son orales: no digas "con un sorbo de agua".
+    textoPaciente: textoMantener(e.esOral === false ? 'no_oral' : 'oral'),
     reglaAplicada: 'Anticonceptivo/THS sin riesgo trombótico alto: mantener',
     requiereConfirmacion: false,
   };

@@ -8,6 +8,7 @@
  */
 import type { ContextoReglas, ResultadoFarmaco } from '../tipos.ts';
 import { plazoDesdeDias, faltaHora, resultadoFaltaHora } from './motor.ts';
+import { fechaLarga } from '../fechas/ultimaToma.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.1 (protocolo del servicio; ESC 2022)';
 
@@ -64,16 +65,20 @@ export function reglaAvk(e: EntradaAvk, ctx: ContextoReglas): ResultadoAvk {
   if (e.altoRiesgoTromboembolico) {
     const dosisPorToma = Math.round(ctx.pesoKg * 1); // 1 mg/kg
     const intervalo = ctx.aclaramiento !== null && ctx.aclaramiento < 30 ? 24 : 12;
+    // Última dosis del puente: la mañana del día previo a la intervención.
+    const ultimaPuente = new Date(ctx.fechaHoraIntervencion);
+    ultimaPuente.setDate(ultimaPuente.getDate() - 1);
     return {
       farmaco: {
         ...base,
         accion: 'consultar',
         fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
-        textoPaciente:
-          'Sobre este anticoagulante, el anestesiólogo le llamará para indicarle cómo hacer el cambio. No lo modifique por su cuenta.',
+        // La pauta calculada (se muestra en la hoja SOLO tras confirmar; antes, textoHojaPaciente
+        // impone la frase única). Los matices del puente van a textoAnestesiologo.
+        textoPaciente: plazo.textoPaciente,
         reglaAplicada: `AVK con alto riesgo tromboembólico: suspender ${dias} días + terapia puente con enoxaparina`,
         requiereConfirmacion: true,
-        textoAnestesiologo: `Terapia puente: enoxaparina ${dosisPorToma} mg SC cada ${intervalo} h (1 mg/kg, peso ${ctx.pesoKg} kg${intervalo === 24 ? '; CrCl < 30 → cada 24 h' : ''}); última dosis la mañana del día previo (24 h antes).`,
+        textoAnestesiologo: `Terapia puente: enoxaparina ${dosisPorToma} mg SC cada ${intervalo} h (1 mg/kg, peso ${ctx.pesoKg} kg${intervalo === 24 ? '; CrCl < 30 → cada 24 h' : ''}); última dosis la mañana del ${fechaLarga(ultimaPuente)} (24 h antes).`,
       },
       puente: {
         dosisMgPorToma: dosisPorToma,
@@ -91,10 +96,13 @@ export function reglaAvk(e: EntradaAvk, ctx: ContextoReglas): ResultadoAvk {
         ...base,
         accion: 'consultar',
         fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
-        textoPaciente:
-          'Sobre este anticoagulante, el anestesiólogo le confirmará qué hacer. No lo cambie por su cuenta.',
+        // Tras confirmar, la hoja muestra la pauta calculada (última toma). Antes,
+        // textoHojaPaciente impone la frase única. El matiz de por qué requiere
+        // confirmación va a las notas del anestesiólogo.
+        textoPaciente: plazo.textoPaciente,
         reglaAplicada: `AVK ${e.principio}: portador de válvula mecánica/stent → suspensión ${dias} días, requiere confirmación (§8.3)`,
         requiereConfirmacion: true,
+        textoAnestesiologo: 'Portador de válvula mecánica o stent: ninguna suspensión sin confirmación (§8.3).',
       },
     };
   }

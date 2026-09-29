@@ -482,10 +482,15 @@ describe('Casos I · mtND4 y coherencia', () => {
     expect(r.alerta).toBe(null);
     expect(r.textoPaciente).toBe('');
   });
-  it('I4 prednisona sin indicación recogida: tarjeta de coherencia; no marca enfermedad', () => {
-    const t = tarjetaFarmacoAEnfermedad({ nombre: 'Prednisona', indicacionesPosibles: ['trasplante', 'artritis_reumatoide', 'lupus', 'asma_epoc', 'insuficiencia_suprarrenal'] }, new Set());
+  it('I4 prednisona sin indicación recogida: tarjeta de coherencia con la lista §5b.1 completa; no marca enfermedad', () => {
+    // Lista completa de corticoides (§5b.1): incluye polimialgia reumática, EII y oncohematológica.
+    const indicaciones = ['trasplante', 'polimialgia_reumatica', 'artritis_reumatoide', 'lupus', 'enfermedad_inflamatoria_intestinal', 'asma_epoc', 'insuficiencia_suprarrenal', 'enfermedad_oncohematologica', 'otra'];
+    const t = tarjetaFarmacoAEnfermedad({ nombre: 'Prednisona', indicacionesPosibles: indicaciones }, new Set());
     expect(t).not.toBe(null);
     expect(t?.tipo).toBe('farmaco_a_enfermedad');
+    expect(t?.mensaje).toContain('polimialgia reumática');
+    expect(t?.mensaje).toContain('enfermedad inflamatoria intestinal');
+    expect(t?.mensaje).toContain('enfermedad oncohematológica');
   });
   it('I5 SAOS marcado sin CPAP: tarjeta inversa', () => {
     const ts = tarjetasEnfermedadAFarmaco(new Set(['saos']), new Set());

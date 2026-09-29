@@ -34,12 +34,14 @@ export function reglaImaoIrreversible(e: EntradaImao): ResultadoFarmaco {
     nombreComercial: e.nombreComercial,
     principiosActivos: [e.principio],
     accion: 'consultar',
+    // Tras confirmar, la hoja muestra esta pauta; antes, textoHojaPaciente impone
+    // la frase única. El matiz "de acuerdo con su psiquiatra" va a las notas.
     textoPaciente:
-      'Sobre este medicamento, el anestesiólogo (con su psiquiatra) le indicará qué hacer. No lo cambie por su cuenta.',
+      'Deberá dejar de tomarlo unos 10-14 días antes de la intervención. El anestesiólogo se lo confirmará.',
     reglaAplicada: 'IMAO irreversible: retirar idealmente 10-14 días antes, de acuerdo con su psiquiatra',
     fuente: 'docs/documento_fuente.md §8.7',
     requiereConfirmacion: true,
-    textoAnestesiologo: NOTA_ANESTESIA_SEGURA_IMAO,
+    textoAnestesiologo: `Coordinar la retirada (10-14 días) con su psiquiatra. ${NOTA_ANESTESIA_SEGURA_IMAO}`,
   };
 }
 

@@ -113,12 +113,21 @@ export function reglaGlp1Semanal(e: EntradaGlp1Semanal, ctx: ContextoReglas): Re
   };
 
   if (caeEnVentana) {
+    // Última dosis administrada = la semana anterior a la que se omite (7 días antes).
+    const ultimaDosis = new Date(e.proximaDosis);
+    ultimaDosis.setDate(ultimaDosis.getDate() - 7);
+    // La dieta de líquidos claros empieza 24 h antes de la intervención.
+    const inicioDieta = new Date(iv);
+    inicioDieta.setDate(inicioDieta.getDate() - 1);
     return {
       ...base,
       accion: 'suspender',
-      fechaHoraUltimaToma: e.proximaDosis,
-      textoPaciente: `No se ponga la dosis del ${fechaLarga(e.proximaDosis)}. Además, dieta de líquidos claros durante las 24 h previas a la intervención (siga la hoja adjunta).`,
-      reglaAplicada: 'GLP-1 semanal: dosis en los 6 días previos o el día de la IQ → omitir; dieta líquida 24 h',
+      fechaHoraUltimaToma: ultimaDosis,
+      textoPaciente:
+        `Su última dosis será la del ${fechaLarga(ultimaDosis)}. ` +
+        `No se ponga la dosis del ${fechaLarga(e.proximaDosis)}. ` +
+        `Además, tome solo líquidos claros desde el ${fechaLarga(inicioDieta)} a las ${horaReloj(inicioDieta)} (siga la hoja adjunta).`,
+      reglaAplicada: 'GLP-1 semanal: dosis en los 6 días previos o el día de la IQ → omitir; última dosis 7 días antes; dieta líquida desde 24 h antes',
     };
   }
 

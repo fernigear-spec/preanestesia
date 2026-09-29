@@ -75,6 +75,9 @@ export interface FarmacoCatalogo {
   grupo: string;
   subgrupo: string;
   pautaTipica: PautaTipica;
+  /** Vía de administración (§8.0). Por defecto 'oral'. Los no orales (implante,
+   *  parche, inyectable, inhalador, DIU) no usan "con un sorbo de agua". */
+  via?: 'oral' | 'no_oral';
   /** id de regla por principio activo (se aplica la más restrictiva). */
   idRegla: string[];
   textoPaciente?: string;

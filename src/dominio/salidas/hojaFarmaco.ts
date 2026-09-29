@@ -9,9 +9,19 @@
  */
 import type { ResultadoFarmaco } from '../tipos.ts';
 
+/**
+ * Frase ÚNICA para cualquier fármaco no confirmado (§12). Es idéntica para todos
+ * los fármacos; los matices (con su psiquiatra, uso hospitalario, etc.) van a las
+ * notas del anestesiólogo, nunca a la hoja del paciente.
+ * @param nombreComercial nombre comercial del fármaco (o genérico si no se conoce).
+ */
+export function fraseNoConfirmado(nombreComercial: string): string {
+  return `Sobre ${nombreComercial}, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta.`;
+}
+
 export function textoHojaPaciente(r: ResultadoFarmaco): string {
   if (r.requiereConfirmacion && !r.confirmadoPor) {
-    return `Sobre ${r.nombreComercial}, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta.`;
+    return fraseNoConfirmado(r.nombreComercial);
   }
   return r.textoPaciente;
 }

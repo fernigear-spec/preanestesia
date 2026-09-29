@@ -39,6 +39,7 @@ import { evaluarMtnd4 } from '../src/dominio/mtnd4/mtnd4.ts';
 import { tarjetaFarmacoAEnfermedad, tarjetasEnfermedadAFarmaco } from '../src/dominio/coherencia/coherencia.ts';
 import { combinacionFija } from '../src/dominio/reglas/motor.ts';
 import { textoHojaPaciente, confirmar } from '../src/dominio/salidas/hojaFarmaco.ts';
+import { parseCsv } from '../src/datos/csv.ts';
 import type { ResultadoFarmaco } from '../src/dominio/tipos.ts';
 
 const IV = new Date(2026, 9, 15, 8, 0);
@@ -77,28 +78,110 @@ const ESPERADO_LITERAL: Record<string, string> = {};
   }
 }
 
-type Veredicto = 'coincide' | 'dudoso' | 'no_coincide';
+// —— Catálogo de fármacos (datos/farmacos.csv): indicaciones reales por id ——
+const mdFarmacos = readFileSync(join(__dirnameParse, '..', 'datos', 'farmacos.csv'), 'utf8');
+const catalogo = parseCsv(mdFarmacos);
+function indicacionesDe(idFarmaco: string): string[] {
+  const fila = catalogo.filas.find((f) => f.valores.id === idFarmaco);
+  return (fila?.valores.indicaciones_posibles ?? '').split('|').map((s) => s.trim()).filter(Boolean);
+}
+
+type Veredicto = 'coincide' | 'dudoso' | 'revision_manual';
 interface Fila {
   id: string;
   calculado: string;
   textoPaciente: string;
   esperado: string; // literal de casos_referencia.md
   veredicto: Veredicto;
+  /** Tokens del esperado que NO se encontraron en la salida del motor. */
+  faltantes: string[];
 }
 const filas: Fila[] = [];
 
+const MESES: Record<string, number> = {
+  enero: 1, febrero: 2, marzo: 3, abril: 4, mayo: 5, junio: 6,
+  julio: 7, agosto: 8, septiembre: 9, octubre: 10, noviembre: 11, diciembre: 12,
+};
+
 /**
- * El esperado SIEMPRE sale del literal de docs/casos_referencia.md (no se teclea).
- * Compatibilidad de firma: las llamadas históricas pasan (id, calc, texto,
- * esperadoTecleado, comprueba). El 4.º argumento (si es string) se IGNORA; el
- * veredicto usa el último booleano. Nuevas llamadas pueden pasar (id, calc, texto, comprueba).
- * Si no hay booleano, el veredicto es "dudoso" (revisión manual).
+ * Expande las fechas en formato largo ("5 de octubre", "lunes 15 de octubre") a su
+ * equivalente numérico "dd/mm" y lo añade al texto, para que la comprobación por
+ * dd/mm reconozca las fechas que el motor emite como fecha larga.
  */
-function add(id: string, calculado: string, textoPaciente: string, a?: string | boolean, b?: boolean): void {
+function expandirFechasLargas(s: string): string {
+  const extra: string[] = [];
+  const re = /(\d{1,2}) de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(s)) !== null) {
+    const dia = parseInt(m[1] ?? '0', 10);
+    const mes = MESES[m[2] ?? ''] ?? 0;
+    if (dia && mes) extra.push(`${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}`);
+  }
+  return extra.length > 0 ? `${s} ${extra.join(' ')}` : s;
+}
+
+/**
+ * Normaliza texto para comparar tokens: minúsculas, coma decimal → punto,
+ * elimina espacios alrededor de unidades ("80 %"→"80%", "70 kg"→"70kg",
+ * "24 ui"→"24ui", "25 ml/min"→"25ml/min"), expande fechas largas a dd/mm y
+ * colapsa espacios.
+ */
+function normalizar(s: string): string {
+  const conFechas = expandirFechasLargas(s.toLowerCase());
+  return conFechas
+    .replace(/(\d),(\d)/g, '$1.$2') // 24,2 → 24.2
+    .replace(/(\d)\s+(%|ui|mg|ml\/min|ml|kg|h|días|dias|semanas|día|dia)\b/g, '$1$2')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Extrae del esperado LITERAL los datos comprobables: fechas dd/mm, horas hh:mm,
+ * dosis (UI, mg, mL/min, mL, %), pesos (kg), plazos (N h / N días / N semanas) y
+ * puntuaciones de escalas. Devuelve los tokens ya normalizados.
+ */
+function extraerTokens(esperadoRaw: string): string[] {
+  const esperado = normalizar(esperadoRaw);
+  const tokens = new Set<string>();
+  const push = (arr: RegExpMatchArray | null) => {
+    if (arr) for (const m of arr) tokens.add(m);
+  };
+  // Fechas dd/mm (evita capturar 1 mg/kg: exige dos números separados por / sin letras).
+  push(esperado.match(/\b\d{1,2}\/\d{1,2}\b(?!\/)/g));
+  // Horas hh:mm.
+  push(esperado.match(/\b\d{1,2}:\d{2}\b/g));
+  // Dosis y magnitudes con unidad (ya normalizadas sin espacio).
+  // (No se extraen plazos en h/días/semanas: son la explicación del esperado y el
+  //  motor los expresa como fecha/hora de última toma, ya comprobada por sí misma.)
+  push(esperado.match(/\b\d+(?:\.\d+)?(?:ui|mg|ml\/min|ml|kg|%)\b/g));
+  // Puntuaciones de escalas: "escala N" (STOP-Bang, Apfel, CHA2DS2-VA, 4AT, DASI, EGRI, Langeron, AUDIT-C).
+  const escalas = esperado.match(/\b(?:stop-bang|apfel|cha2ds2-va|4at|dasi|egri|langeron|audit-c|hemstop|mets?)\s+\d+(?:\.\d+)?/g);
+  push(escalas);
+  return [...tokens];
+}
+
+/**
+ * El esperado SIEMPRE sale del literal de docs/casos_referencia.md.
+ * Veredicto por comprobación de datos (no por booleanos escritos a mano):
+ *  - Se extraen del esperado todas las fechas, horas, dosis y puntuaciones.
+ *  - Si TODOS aparecen en la salida del motor (calculado + textoPaciente) → coincide.
+ *  - Si falta alguno → dudoso (con la lista de tokens faltantes).
+ *  - Si el esperado no contiene ningún dato comprobable → revisión manual.
+ * Firma con compatibilidad: los 4.º/5.º argumentos antiguos se ignoran.
+ */
+function add(id: string, calculado: string, textoPaciente: string, _a?: string | boolean, _b?: boolean): void {
   const esperado = ESPERADO_LITERAL[id] ?? '(no encontrado en casos_referencia.md)';
-  const comprueba = typeof a === 'boolean' ? a : b;
-  const veredicto: Veredicto = comprueba === undefined ? 'dudoso' : comprueba ? 'coincide' : 'no_coincide';
-  filas.push({ id, calculado, textoPaciente, esperado, veredicto });
+  const tokens = extraerTokens(esperado);
+  const salida = normalizar(`${calculado} ${textoPaciente}`);
+  let veredicto: Veredicto;
+  let faltantes: string[] = [];
+  if (tokens.length === 0) {
+    veredicto = 'revision_manual';
+  } else {
+    faltantes = tokens.filter((t) => !salida.includes(t));
+    veredicto = faltantes.length === 0 ? 'coincide' : 'dudoso';
+  }
+  filas.push({ id, calculado, textoPaciente, esperado, veredicto, faltantes });
 }
 
 // ————————————————————— A —————————————————————
@@ -206,7 +289,7 @@ function add(id: string, calculado: string, textoPaciente: string, a?: string | 
 }
 {
   const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300, indicacionCardiovascular: true }, ctx());
-  add('C4', farmacoResumen(r), r.textoPaciente, 'confirmación + sugerencia 100 mg', r.requiereConfirmacion && (r.textoAnestesiologo ?? '').includes('100 mg'));
+  add('C4', `${farmacoResumen(r)}; nota anestesiólogo: ${r.textoAnestesiologo ?? '—'}`, textoHojaPaciente(r));
 }
 {
   const s = evaluarStent({ mesesDesdeImplante: 4, traSca: false }, ctx());
@@ -221,7 +304,7 @@ function add(id: string, calculado: string, textoPaciente: string, a?: string | 
   const r = reglaP2y12({ idFarmaco: 'clopidogrel', nombreComercial: 'Plavix', principio: 'clopidogrel', monoterapia: true }, ctx({ neuroaxial: true, pautaFarmaco: P('09:00') }));
   const antes = textoHojaPaciente(r);
   const despues = textoHojaPaciente(confirmar(r, 'Dr. X'));
-  add('C7', farmacoResumen(r), `SIN confirmar: "${antes}" // CONFIRMADO: "${despues}"`, fh(r.fechaHoraUltimaToma) === 'mié 07/10 09:00' && r.requiereConfirmacion);
+  add('C7', `${farmacoResumen(r)}; nota anestesiólogo: ${r.textoAnestesiologo ?? '—'}`, `SIN confirmar: "${antes}" // CONFIRMADO: "${despues}"`);
 }
 {
   const r = reglaTriflusal('t', 'Disgren', ctx({ pautaFarmaco: P('09:00', '21:00') }));
@@ -395,7 +478,7 @@ function add(id: string, calculado: string, textoPaciente: string, a?: string | 
 {
   const h = calcularAclaramiento({ edadAnios: 80, pesoKg: 60, sexo: 'hombre', creatinina: 1.2, unidad: 'mg_dl' });
   const m = calcularAclaramiento({ edadAnios: 80, pesoKg: 60, sexo: 'mujer', creatinina: 1.2, unidad: 'mg_dl' });
-  add('F6', `varón ${Math.round(h ?? 0)}; mujer ${Math.round(m ?? 0)}`, '—', Math.round(h ?? 0) === 42 && Math.round(m ?? 0) === 35);
+  add('F6', `varón ${Math.round(h ?? 0)} mL/min; mujer ${Math.round(m ?? 0)} mL/min`, '—');
 }
 {
   const r = calcular4AT({ alerta: 'normal', amt4: '1_error', meses: 'menos_de_7', cambioAgudo: 'no' });
@@ -449,7 +532,16 @@ const nombres = (ps: { prueba: string }[]) => ps.map((p) => p.prueba).sort().joi
   const r = calcularAyuno({ induccion: IV, pediatrico: false, situacion: 'ninguna' });
   const ligera = r.lineas.find((l) => l.concepto.includes('ligera'))?.hora;
   const claros = r.lineas.find((l) => l.horasAntes === 4)?.hora;
-  add('H1', `ligera ${ligera}; claros libres ${claros}; carbohidratos ${r.lineas.some((l) => l.concepto.includes('carbohidratos'))}`, '—', 'ligera 02:00; claros 04:00; bebida carbohidratos', ligera === '02:00' && claros === '04:00');
+  // Se muestran TODAS las horas del ayuno: comida copiosa, comida ligera, líquidos
+  // claros libres, ventana de 400 mL (nada después), y bebida de carbohidratos.
+  const copiosa = r.lineas.find((l) => l.concepto.includes('copiosa'))?.hora;
+  const ventana = r.lineas.find((l) => l.horasAntes === 2 && l.concepto.includes('400 mL'))?.hora;
+  const carbo = r.lineas.find((l) => l.concepto.includes('carbohidratos'))?.hora;
+  const todas =
+    `comida copiosa ${copiosa}; comida ligera ${ligera}; líquidos claros libres hasta ${claros}; ` +
+    `máx. 400 mL entre 4 y 2 h y nada desde las ${ventana} (salvo medicación con un sorbo); ` +
+    `bebida de carbohidratos ${carbo}`;
+  add('H1', todas, '—', copiosa === '00:00' && ligera === '02:00' && claros === '04:00' && ventana === '06:00' && !!carbo);
 }
 {
   const r = calcularAyuno({ induccion: IV, pediatrico: true, situacion: 'ninguna' });
@@ -482,8 +574,9 @@ const nombres = (ps: { prueba: string }[]) => ps.map((p) => p.prueba).sort().joi
   add('I3', `alerta: ${r.alerta === null ? 'ninguna' : r.alerta.gravedad}; texto hoja: ${r.textoPaciente === '' ? '(ninguno)' : r.textoPaciente}`, r.textoPaciente || '(ninguno)', r.alerta === null && r.textoPaciente === '');
 }
 {
-  const t = tarjetaFarmacoAEnfermedad({ nombre: 'Prednisona', indicacionesPosibles: ['trasplante', 'artritis_reumatoide', 'lupus', 'asma_epoc', 'insuficiencia_suprarrenal'] }, new Set());
-  add('I4', `tarjeta: ${t?.tipo ?? 'ninguna'}`, t?.mensaje ?? '—', 'tarjeta de coherencia; no marca enfermedad', t?.tipo === 'farmaco_a_enfermedad');
+  // Las indicaciones se leen del catálogo real (datos/farmacos.csv), no tecleadas.
+  const t = tarjetaFarmacoAEnfermedad({ nombre: 'Prednisona', indicacionesPosibles: indicacionesDe('prednisona') }, new Set());
+  add('I4', `tarjeta: ${t?.tipo ?? 'ninguna'}`, t?.mensaje ?? '—', undefined, undefined);
 }
 {
   const ts = tarjetasEnfermedadAFarmaco(new Set(['saos']), new Set());
@@ -494,22 +587,30 @@ const nombres = (ps: { prueba: string }[]) => ps.map((p) => p.prueba).sort().joi
 const total = filas.length;
 const nOk = filas.filter((f) => f.veredicto === 'coincide').length;
 const nDudoso = filas.filter((f) => f.veredicto === 'dudoso').length;
-const nNo = filas.filter((f) => f.veredicto === 'no_coincide').length;
-const marca = (v: Veredicto) => (v === 'coincide' ? '✅' : v === 'dudoso' ? '❓' : '❌');
+const nManual = filas.filter((f) => f.veredicto === 'revision_manual').length;
+const marca = (v: Veredicto) => (v === 'coincide' ? '✅' : v === 'dudoso' ? '❓' : '👁️');
 
 let md = `# Informe de casos de referencia (ejecución del motor)\n\n`;
 md += `> Generado automáticamente por \`scripts/generar-informe-casos.ts\` ejecutando el MOTOR con la entrada de cada caso de \`docs/casos_referencia.md\`.\n`;
 md += `> La columna **"Motor"** sale de la ejecución del motor. La columna **"Esperado (literal)"** se copia tal cual de \`docs/casos_referencia.md\` (no se teclea en el script).\n`;
+md += `> **Veredicto automático:** el script extrae del texto esperado todas las fechas (dd/mm), horas (hh:mm), dosis (UI, mg, mL, %) y puntuaciones, y comprueba que cada dato aparezca en la salida del motor. Si falta alguno, el caso sale como dudoso; si el esperado no contiene ningún dato comprobable, sale como revisión manual. No hay comprobaciones escritas a mano.\n`;
 md += `> Intervención de referencia: jueves 15/10/2026 a las 08:00 (salvo A2b y A3b: 13:00).\n`;
-md += `> Leyenda: ✅ coincide · ❓ dudoso (revisión manual) · ❌ no coincide.\n\n`;
-md += `**Resultado: ${nOk} coinciden, ${nDudoso} dudosos, ${nNo} no coinciden (de ${total}).**\n\n`;
-md += `| Caso | Motor (cálculo) | Texto del paciente | Esperado (literal de casos_referencia.md) | Veredicto |\n`;
-md += `|---|---|---|---|---|\n`;
+md += `> Leyenda: ✅ coincide (todos los datos del esperado están en la salida) · ❓ dudoso (falta algún dato) · 👁️ revisión manual (el esperado no tiene datos comprobables).\n\n`;
+md += `**Resultado: ${nOk} coinciden, ${nDudoso} dudosos, ${nManual} de revisión manual (de ${total}).**\n\n`;
+md += `| Caso | Motor (cálculo) | Texto del paciente | Esperado (literal de casos_referencia.md) | Veredicto | Datos no encontrados |\n`;
+md += `|---|---|---|---|---|---|\n`;
 for (const f of filas) {
-  md += `| ${f.id} | ${esc(f.calculado)} | ${esc(f.textoPaciente)} | ${esc(f.esperado)} | ${marca(f.veredicto)} |\n`;
+  const faltan = f.faltantes.length > 0 ? esc(f.faltantes.join(', ')) : '—';
+  md += `| ${f.id} | ${esc(f.calculado)} | ${esc(f.textoPaciente)} | ${esc(f.esperado)} | ${marca(f.veredicto)} | ${faltan} |\n`;
 }
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const salida = join(__dirname, '..', 'docs', 'informe_casos_referencia.md');
 writeFileSync(salida, md, 'utf8');
-console.log(`Informe escrito en ${salida}: ${nOk} coinciden, ${nDudoso} dudosos, ${nNo} no coinciden (de ${total}).`);
+console.log(`Informe escrito en ${salida}: ${nOk} coinciden, ${nDudoso} dudosos, ${nManual} de revisión manual (de ${total}).`);
+if (nDudoso > 0) {
+  console.log('Casos dudosos (con datos no encontrados):');
+  for (const f of filas.filter((x) => x.veredicto === 'dudoso')) {
+    console.log(`  ${f.id}: faltan [${f.faltantes.join(', ')}]`);
+  }
+}

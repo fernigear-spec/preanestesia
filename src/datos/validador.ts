@@ -38,6 +38,7 @@ const COLUMNAS_FARMACOS = [
 
 const PAUTAS = new Set(['diaria', 'dos_veces_dia', 'semanal', 'mensual', 'ciclica']);
 const SI_NO = new Set(['si', 'no']);
+const VIAS = new Set(['oral', 'no_oral']);
 
 const COLUMNAS_PROCEDIMIENTOS = [
   'id',
@@ -84,6 +85,10 @@ export function validarFarmacos(
     }
     if (!SI_NO.has(v.verificado_cima ?? '')) {
       errores.push({ fichero, fila: fila.numeroFila, columna: 'verificado_cima', mensaje: `valor fuera de lista (si/no): "${v.verificado_cima}"` });
+    }
+    // via es opcional (por defecto "oral"); si viene, debe ser oral/no_oral.
+    if (v.via !== undefined && v.via !== '' && !VIAS.has(v.via)) {
+      errores.push({ fichero, fila: fila.numeroFila, columna: 'via', mensaje: `valor fuera de lista (oral/no_oral): "${v.via}"` });
     }
     // id_regla: una por principio activo, separadas por '+'. Todas deben existir.
     const idsRegla = (v.id_regla ?? '').split('+').map((s) => s.trim()).filter(Boolean);

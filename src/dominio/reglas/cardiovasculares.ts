@@ -75,11 +75,18 @@ export function reglaIecaAra2(e: EntradaIecaAra2, ctx: ContextoReglas): Resultad
   }
 
   const ultima = ultimaTomaDiaPrevio(ctx);
+  // El paréntesis de la toma nocturna solo tiene sentido si el paciente tiene una
+  // toma por la noche (hora ≥ 18:00) el día previo.
+  const tieneTomaNocturna = (ctx.pautaFarmaco?.horas ?? []).some((h) => {
+    const hh = parseInt((h.split(':')[0] ?? '0'), 10);
+    return hh >= 18;
+  });
+  const coletilla = tieneTomaNocturna ? ' (la toma de la noche anterior sí)' : '';
   return {
     ...base,
     accion: 'suspender',
     fechaHoraUltimaToma: ultima,
-    textoPaciente: `No lo tome el día de la intervención (la toma de la noche anterior sí). Su última toma será el ${fechaLarga(ultima)} a las ${horaReloj(ultima)}.`,
+    textoPaciente: `No lo tome el día de la intervención${coletilla}. Su última toma será el ${fechaLarga(ultima)} a las ${horaReloj(ultima)}.`,
     reglaAplicada: 'IECA/ARA-II: no tomar el día de la intervención',
     requiereConfirmacion: false,
   };

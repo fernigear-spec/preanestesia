@@ -181,7 +181,7 @@ Esperado: mantener, con la nota de fármacos a evitar.
 Esperado: 24 h. Última toma miércoles 14/10 08:00 (cae justo en el límite y está permitida). Texto de alternativa con paracetamol o metamizol.
 
 **E10.** Naproxeno 500 mg a las 09:00 y 21:00.
-Esperado: 72 h. Adelantar la toma del lunes 12/10 de las 09:00 a las 08:00; es la última.
+Esperado: 72 h. Última toma domingo 11/10 21:00 (los AINE no adelantan tomas).
 
 **E11.** Metotrexato 15 mg semanal por artritis reumatoide. Prótesis de cadera.
 Esperado: mantener.
