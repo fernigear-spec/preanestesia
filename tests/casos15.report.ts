@@ -64,10 +64,10 @@ const add = (caso: string, esperado: string, obtenido: string, ok: boolean) =>
 {
   const sem = reglaGlp1Semanal({ idFarmaco: 'semaglutida', nombreComercial: 'Ozempic', principio: 'semaglutida', proximaDosis: new Date(2026, 9, 12, 9, 0) }, ctx());
   const emp = reglaSglt2({ idFarmaco: 'empagliflozina', nombreComercial: 'Jardiance', principio: 'empagliflozina' }, ctx());
-  const met = reglaMetformina({ idFarmaco: 'metformina', nombreComercial: 'Dianben' });
-  const ok = sem.accion === 'suspender' && D(emp.fechaHoraUltimaToma) === 3 && met.accion === 'ajustar';
+  const met = reglaMetformina({ idFarmaco: 'metformina', nombreComercial: 'Dianben' }, ctx());
+  const ok = sem.accion === 'suspender' && D(emp.fechaHoraUltimaToma) === 3 && met.accion === 'suspender';
   add('4 · semaglutida sem + empagliflozina + metformina', 'omitir semaglutida (+dieta líquida), empagliflozina 3 d, metformina no el día IQ',
-    `semaglutida=${sem.accion}, empagliflozina=${D(emp.fechaHoraUltimaToma)} d, metformina=${met.accion}`, ok);
+    `semaglutida=${sem.accion} (${sem.textoPaciente}), empagliflozina=${D(emp.fechaHoraUltimaToma)} d, metformina=${met.accion} (${met.textoPaciente})`, ok);
 }
 // Caso 5
 {

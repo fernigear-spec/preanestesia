@@ -1,0 +1,38 @@
+name: CI desarrollo (motor de dominio)
+
+# Solo en pushes a la rama de desarrollo. Sin despliegue.
+# En este tramo no hay acceso a npm en el sandbox, así que la CI valida el motor
+# de dominio con las herramientas nativas de Node 22:
+#   - typecheck con tsc (instalado puntualmente sin dependencias del proyecto)
+#   - pruebas con node:test (--experimental-strip-types)
+# PENDIENTE (fase de interfaz): cuando haya package-lock y acceso a npm, este
+# workflow instalará dependencias y ejecutará Vitest y Playwright. El despliegue
+# a GitHub Pages se configurará al final desde main.
+on:
+  push:
+    branches: [desarrollo]
+
+jobs:
+  motor-dominio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Typecheck del dominio (tsc)
+        run: |
+          npm install -g typescript@5.6.3
+          tsc --noEmit --strict --exactOptionalPropertyTypes \
+            --noUncheckedIndexedAccess --module esnext --moduleResolution bundler \
+            --allowImportingTsExtensions --target ES2022 --lib ES2022 \
+            $(find src -name '*.ts')
+
+      - name: Pruebas (node:test)
+        run: node --experimental-strip-types --test "tests/unit/**/*.test.ts"
+
+      - name: Informe de casos §15 (obtenido vs esperado)
+        run: node --experimental-strip-types tests/casos15.report.ts

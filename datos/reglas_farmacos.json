@@ -152,6 +152,16 @@
       "horas": 24,
       "fuente": "docs/documento_fuente.md §8.10 (ESC 2022)"
     },
+    "sacubitrilo_valsartan": {
+      "tipo": "requiere_confirmacion",
+      "texto_anestesiologo": "Sacubitrilo/valsartán: requiere confirmación del anestesiólogo.",
+      "fuente": "docs/documento_fuente.md §8.10"
+    },
+    "corticoide_sistemico": {
+      "tipo": "mantener",
+      "nota_dosis_estres": true,
+      "fuente": "docs/documento_fuente.md §8.11 / §5.3"
+    },
     "diuretico": { "tipo": "no_manana_iq", "fuente": "docs/documento_fuente.md §8.10" },
     "mantener_generico": { "tipo": "mantener", "fuente": "docs/documento_fuente.md §8" },
     "no_catalogado": {

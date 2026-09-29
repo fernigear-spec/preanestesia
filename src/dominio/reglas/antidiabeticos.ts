@@ -17,7 +17,8 @@ export interface EntradaMetformina {
   contrasteYodadoPrevisto?: boolean;
 }
 
-export function reglaMetformina(e: EntradaMetformina): ResultadoFarmaco {
+export function reglaMetformina(e: EntradaMetformina, ctx: ContextoReglas): ResultadoFarmaco {
+  const intervencion = ctx.fechaHoraIntervencion;
   const base = {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,
@@ -33,10 +34,14 @@ export function reglaMetformina(e: EntradaMetformina): ResultadoFarmaco {
       reglaAplicada: 'Metformina con contraste yodado: suspender 24-48 h antes',
     };
   }
+  // "No tomar el día de la intervención": la última toma permitida es el día previo.
+  const ultima = new Date(intervencion);
+  ultima.setDate(ultima.getDate() - 1);
   return {
     ...base,
-    accion: 'ajustar',
-    textoPaciente: 'No la tome el día de la intervención. Los días previos, como siempre.',
+    accion: 'suspender',
+    fechaHoraUltimaToma: ultima,
+    textoPaciente: 'No la tome el día de la intervención. Los días previos, tómela como siempre.',
     reglaAplicada: 'Metformina: no tomar el día de la intervención',
   };
 }

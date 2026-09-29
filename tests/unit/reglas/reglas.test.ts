@@ -11,6 +11,7 @@ import { reglaAvk } from '../../../src/dominio/reglas/antivitaminaK.ts';
 import { reglaLitio } from '../../../src/dominio/reglas/psicofarmacos.ts';
 import { reglaAine } from '../../../src/dominio/reglas/aine.ts';
 import { reglaMetformina, reglaSglt2, reglaGlp1Semanal, reglaGlp1Diario, reglaBombaInsulina } from '../../../src/dominio/reglas/antidiabeticos.ts';
+import { reglaSacubitriloValsartan, reglaIecaAra2 } from '../../../src/dominio/reglas/cardiovasculares.ts';
 import { reglaNoCatalogado, aplicarPlazoNoAlcanzable } from '../../../src/dominio/reglas/otros.ts';
 import { fechaHoraLimite } from '../../../src/dominio/fechas/plazos.ts';
 
@@ -211,10 +212,12 @@ describe('AINE (§8.6)', () => {
 });
 
 describe('Antidiabéticos (§8.5)', () => {
-  it('caso 4 §15: metformina → no el día de la IQ', () => {
-    const r = reglaMetformina({ idFarmaco: 'metformina', nombreComercial: 'Dianben' });
-    expect(r.accion).toBe('ajustar');
+  it('caso 4 §15: metformina → no tomar el día de la IQ (suspender, última toma el día previo)', () => {
+    const r = reglaMetformina({ idFarmaco: 'metformina', nombreComercial: 'Dianben' }, ctx());
+    expect(r.accion).toBe('suspender');
     expect(r.textoPaciente).toContain('No la tome el día');
+    // Última toma el día previo (miércoles 14).
+    expect((r.fechaHoraUltimaToma as Date).getDate()).toBe(14);
   });
 
   it('caso 4 §15: empagliflozina (SGLT2) → 3 días', () => {
@@ -268,6 +271,36 @@ describe('Antidiabéticos (§8.5)', () => {
 
   it('bomba de insulina: ingreso → requiere confirmación', () => {
     const r = reglaBombaInsulina({ idFarmaco: 'bomba', nombreComercial: 'Bomba' }, ctx({ regimen: 'ingreso', riesgoCardiovascular: 'bajo' }));
+    expect(r.requiereConfirmacion).toBeTrue();
+  });
+});
+
+describe('Cardiovasculares (§8.10)', () => {
+  it('sacubitrilo/valsartán → requiere confirmación', () => {
+    const r = reglaSacubitriloValsartan({ idFarmaco: 'sacubitrilo_valsartan', nombreComercial: 'Entresto' });
+    expect(r.accion).toBe('consultar');
+    expect(r.requiereConfirmacion).toBeTrue();
+  });
+  it('IECA sin IC con disfunción sistólica (todas las excepciones false) → suspender 24 h', () => {
+    const r = reglaIecaAra2(
+      { idFarmaco: 'enalapril', nombreComercial: 'Renitec', principio: 'enalapril', icDisfuncionSistolica: false, infartoReciente: false, proteinuriaONefropatia: false },
+      ctx(),
+    );
+    expect(r.accion).toBe('suspender');
+    expect(horasAntes(r.fechaHoraUltimaToma as Date)).toBe(24);
+  });
+  it('IECA con IC con disfunción sistólica → mantener', () => {
+    const r = reglaIecaAra2(
+      { idFarmaco: 'enalapril', nombreComercial: 'Renitec', principio: 'enalapril', icDisfuncionSistolica: true, infartoReciente: false, proteinuriaONefropatia: false },
+      ctx(),
+    );
+    expect(r.accion).toBe('mantener');
+  });
+  it('IECA con información incompleta → requiere confirmación', () => {
+    const r = reglaIecaAra2(
+      { idFarmaco: 'enalapril', nombreComercial: 'Renitec', principio: 'enalapril' },
+      ctx(),
+    );
     expect(r.requiereConfirmacion).toBeTrue();
   });
 });

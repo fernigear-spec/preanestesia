@@ -73,6 +73,26 @@ export function reglaIecaAra2(e: EntradaIecaAra2, ctx: ContextoReglas): Resultad
   };
 }
 
+export interface EntradaSacubitriloValsartan {
+  idFarmaco: string;
+  nombreComercial: string;
+}
+
+/** Sacubitrilo/valsartán (§8.10): requiere confirmación del anestesiólogo. */
+export function reglaSacubitriloValsartan(e: EntradaSacubitriloValsartan): ResultadoFarmaco {
+  return {
+    idFarmaco: e.idFarmaco,
+    nombreComercial: e.nombreComercial,
+    principiosActivos: ['sacubitrilo', 'valsartan'],
+    accion: 'consultar',
+    textoPaciente:
+      'Sobre este medicamento, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta.',
+    reglaAplicada: 'Sacubitrilo/valsartán: requiere confirmación',
+    fuente: FUENTE,
+    requiereConfirmacion: true,
+  };
+}
+
 export interface EntradaDiuretico {
   idFarmaco: string;
   nombreComercial: string;

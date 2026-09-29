@@ -25,6 +25,34 @@ describe('Parser CSV', () => {
     expect(r.filas[0]?.numeroFila).toBe(2);
     expect(r.filas[1]?.valores.b).toBe('4');
   });
+
+  it('campo entrecomillado con ; interno no rompe columnas', () => {
+    const r = parseCsv('a;b;c\n1;"tiene; punto y coma";3');
+    expect(r.filas[0]?.valores.b).toBe('tiene; punto y coma');
+    expect(r.filas[0]?.valores.c).toBe('3');
+  });
+
+  it('campo entrecomillado con salto de línea interno', () => {
+    const r = parseCsv('a;b\n1;"línea 1\nlínea 2"\n2;x');
+    expect(r.filas).toHaveLength(2);
+    expect(r.filas[0]?.valores.b).toBe('línea 1\nlínea 2');
+    expect(r.filas[1]?.valores.a).toBe('2');
+    // La numeración lógica cuenta registros, no '\n' físicos.
+    expect(r.filas[1]?.numeroFila).toBe(3);
+  });
+
+  it('comillas escapadas ("") dentro de campo', () => {
+    const r = parseCsv('a;b\n1;"dijo ""hola"""');
+    expect(r.filas[0]?.valores.b).toBe('dijo "hola"');
+  });
+
+  it('farmacos.csv se parsea sin desplazar columnas (textos con ; entrecomillados)', () => {
+    const { filas } = parseCsv(leer('datos/farmacos.csv'));
+    const bupren = filas.find((f) => f.valores.id === 'buprenorfina');
+    expect(bupren?.valores.requiere_confirmacion).toBe('no');
+    expect(bupren?.valores.verificado_cima).toBe('no');
+    expect(bupren?.valores.texto_paciente).toContain('planificar analgesia');
+  });
 });
 
 describe('Validador de datos iniciales', () => {

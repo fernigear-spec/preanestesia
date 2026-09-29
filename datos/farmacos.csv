@@ -39,7 +39,7 @@ enalapril;enalapril;Renitec|Eupressin;cardiovascular;ieca;diaria;ieca_ara2;;;no;
 ramipril;ramipril;Acovil;cardiovascular;ieca;diaria;ieca_ara2;;;no;hipertension|insuficiencia_cardiaca|cardiopatia_isquemica;docs/documento_fuente.md §8.10;2026-09-29;no
 losartan;losartan;Cozaar;cardiovascular;ara2;diaria;ieca_ara2;;;no;hipertension|insuficiencia_cardiaca|nefropatia_proteinuria;docs/documento_fuente.md §8.10;2026-09-29;no
 valsartan;valsartan;Diovan;cardiovascular;ara2;diaria;ieca_ara2;;;no;hipertension|insuficiencia_cardiaca;docs/documento_fuente.md §8.10;2026-09-29;no
-sacubitrilo_valsartan;sacubitrilo+valsartan;Entresto;cardiovascular;arni;dos_veces_dia;mantener_generico;;Sacubitrilo/valsartan requiere confirmacion (§8.10).;si;insuficiencia_cardiaca;docs/documento_fuente.md §8.10;2026-09-29;no
+sacubitrilo_valsartan;sacubitrilo+valsartan;Entresto;cardiovascular;arni;dos_veces_dia;sacubitrilo_valsartan;;"Sacubitrilo/valsartan: requiere confirmacion (§8.10).";si;insuficiencia_cardiaca;docs/documento_fuente.md §8.10;2026-09-29;no
 bisoprolol;bisoprolol;Emconcor;cardiovascular;betabloqueante;diaria;mantener_generico;;;no;hipertension|insuficiencia_cardiaca|cardiopatia_isquemica|arritmia;docs/documento_fuente.md §8.10;2026-09-29;no
 amlodipino;amlodipino;Norvas;cardiovascular;calcioantagonista;diaria;mantener_generico;;;no;hipertension|cardiopatia_isquemica;docs/documento_fuente.md §8.10;2026-09-29;no
 furosemida;furosemida;Seguril;cardiovascular;diuretico;diaria;diuretico;;;no;insuficiencia_cardiaca|hipertension|edemas;docs/documento_fuente.md §8.10;2026-09-29;no
@@ -53,11 +53,11 @@ celecoxib;celecoxib;Celebrex;aine;coxib;diaria;aine_celecoxib;;;no;dolor_cronico
 morfina;morfina;MST Continus|Sevredol;opioides;opioide;dos_veces_dia;mantener_generico;;;no;dolor_cronico;docs/documento_fuente.md §5.7;2026-09-29;no
 tramadol;tramadol;Adolonta;opioides;opioide;dos_veces_dia;mantener_generico;;;no;dolor_cronico;docs/documento_fuente.md §5.7;2026-09-29;no
 oxicodona;oxicodona;Oxycontin|Oxynorm;opioides;opioide;dos_veces_dia;mantener_generico;;;no;dolor_cronico;docs/documento_fuente.md §5.7;2026-09-29;no
-buprenorfina;buprenorfina;Transtec|Feliben|Suboxone;opioides;opioide;semanal;mantener_generico;No suspender. Planificar analgesia con el anestesiologo.;Buprenorfina: no suspender. Planificar analgesia (§5.7).;no;dolor_cronico;docs/documento_fuente.md §5.7;2026-09-29;no
-metadona;metadona;;opioides;opioide;diaria;mantener_generico;No suspender. Planificar analgesia con el anestesiologo.;Metadona: no suspender. Planificar analgesia (§5.7).;no;dolor_cronico;docs/documento_fuente.md §5.7;2026-09-29;no
+buprenorfina;buprenorfina;Transtec|Feliben|Suboxone;opioides;opioide;semanal;mantener_generico;"No suspender; planificar analgesia con el anestesiologo.";"Buprenorfina: no suspender; planificar analgesia (§5.7).";no;dolor_cronico;docs/documento_fuente.md §5.7;2026-09-29;no
+metadona;metadona;;opioides;opioide;diaria;mantener_generico;"No suspender; planificar analgesia con el anestesiologo.";"Metadona: no suspender; planificar analgesia (§5.7).";no;dolor_cronico;docs/documento_fuente.md §5.7;2026-09-29;no
 litio;litio;Plenur;psicofarmacos;litio;diaria;litio;;;no;trastorno_bipolar;docs/documento_fuente.md §8.7;2026-09-29;no
 levotiroxina;levotiroxina;Eutirox|Levothroid;hormonas;tiroidea;diaria;mantener_generico;;;no;hipotiroidismo|tiroidectomia;docs/documento_fuente.md §8.11;2026-09-29;no
-prednisona;prednisona;Dacortin;hormonas;corticoide;diaria;mantener_generico;;Corticoide: mantener. Valorar dosis de estres (§5.3).;no;trasplante|artritis_reumatoide|lupus|asma_epoc|insuficiencia_suprarrenal;docs/documento_fuente.md §8.11;2026-09-29;no
+prednisona;prednisona;Dacortin;hormonas;corticoide;diaria;corticoide_sistemico;;"Corticoide: mantener; valorar dosis de estres (§5.3).";no;trasplante|artritis_reumatoide|lupus|asma_epoc|insuficiencia_suprarrenal;docs/documento_fuente.md §8.11;2026-09-29;no
 omeprazol;omeprazol;;hormonas;ibp;diaria;mantener_generico;;;no;reflujo;docs/documento_fuente.md §8.11;2026-09-29;no
 alopurinol;alopurinol;Zyloric;hormonas;otros;diaria;mantener_generico;;;no;gota;docs/documento_fuente.md §8.11;2026-09-29;no
 candesartan_hidroclorotiazida;candesartan+hidroclorotiazida;Atacand Plus|Parapres Plus;cardiovascular;combinacion_htaa;diaria;ieca_ara2+diuretico;;;no;hipertension;docs/documento_fuente.md §8.10 (Anexo A v3);2026-09-29;no
