@@ -1,0 +1,120 @@
+:root {
+  --color-principal: #0027c2;
+  --color-principal-claro: #e6ebff;
+  --color-texto: #1a1a1a;
+  --color-fondo: #f5f6fa;
+  --color-banda: #b00020;
+  --radio: 10px;
+  --sombra: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--color-texto);
+  background: var(--color-fondo);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+/* Banda fija de vista previa: visible en todas las pantallas. */
+.banda-prueba {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--color-banda);
+  color: #fff;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 8px 12px;
+}
+
+.cabecera {
+  background: var(--color-principal);
+  color: #fff;
+  padding: 16px 20px;
+}
+.cabecera h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+.subtitulo {
+  margin: 4px 0 0;
+  opacity: 0.9;
+  font-size: 0.95rem;
+}
+
+.contenido {
+  max-width: 720px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.tarjeta {
+  background: #fff;
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 24px;
+}
+
+.grupo-botones {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+
+/* Botones grandes, diseño táctil. */
+.boton-grande {
+  flex: 1 1 160px;
+  min-height: 64px;
+  font-size: 1.1rem;
+  border: 2px solid var(--color-principal);
+  background: #fff;
+  color: var(--color-principal);
+  border-radius: var(--radio);
+  cursor: pointer;
+}
+.boton-grande.seleccionado {
+  background: var(--color-principal);
+  color: #fff;
+}
+
+.boton-primario {
+  min-height: 56px;
+  width: 100%;
+  font-size: 1.1rem;
+  background: var(--color-principal);
+  color: #fff;
+  border: none;
+  border-radius: var(--radio);
+  cursor: pointer;
+}
+.boton-primario:disabled {
+  background: #b8bedb;
+  cursor: not-allowed;
+}
+
+.boton-secundario {
+  min-height: 48px;
+  padding: 0 20px;
+  font-size: 1rem;
+  background: #fff;
+  color: var(--color-principal);
+  border: 2px solid var(--color-principal);
+  border-radius: var(--radio);
+  cursor: pointer;
+}
+
+.pie {
+  max-width: 720px;
+  margin: 24px auto;
+  padding: 0 16px;
+  color: #555;
+  font-size: 0.85rem;
+}

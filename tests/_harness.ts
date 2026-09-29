@@ -1,18 +1,14 @@
 /**
  * Harness de pruebas portable.
  *
- * En este tramo (sin acceso a npm) las pruebas se ejecutan con el runner nativo
- * `node:test` (Node 22, `--experimental-strip-types`). Este fichero reexporta
- * `describe`/`it` de `node:test` y expone un `expect(...)` con un subconjunto de
- * matchers al estilo de Vitest.
+ * Este fichero es el que importan los tests: `import { describe, it, expect } from '../_harness.ts'`.
  *
- * PENDIENTE: sustituir por Vitest. Para migrar, basta con reemplazar los imports
- * de las pruebas:
- *     import { describe, it, expect } from './_harness.ts';
- *   por:
- *     import { describe, it, expect } from 'vitest';
- * Los tests están escritos con `describe`/`it`/`expect(...).toBe(...)` para que la
- * migración no requiera reescribir aserciones.
+ * - En el sandbox SIN npm, se ejecuta con el runner nativo `node:test`
+ *   (`npm run test:node`), y este fichero reexporta de node:test (implementación
+ *   por defecto de abajo).
+ * - En CI (GitHub Actions) con Vitest, `vitest.config.ts` REDIRIGE este módulo a
+ *   `tests/_harness.vitest.ts` mediante un alias, de modo que los mismos tests
+ *   corren sobre Vitest sin tocar sus imports.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';

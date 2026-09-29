@@ -20,11 +20,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
 
-    // PENDIENTE: añadir "types": ["node"] cuando se pueda instalar @types/node
-    // (proxy npm bloqueado en este tramo). El motor de dominio no usa APIs de Node;
-    // solo el harness de pruebas importa node:test/node:assert.
+    "types": ["node"]
   },
-  "include": ["src", "tests"]
+  "include": ["src", "tests", "scripts", "vite.config.ts", "vitest.config.ts"]
 }

@@ -1,19 +1,25 @@
-name: CI desarrollo (motor de dominio)
+name: CI desarrollo + vista previa en Pages
 
-# Solo en pushes a la rama de desarrollo. Sin despliegue.
-# En este tramo no hay acceso a npm en el sandbox, así que la CI valida el motor
-# de dominio con las herramientas nativas de Node 22:
-#   - typecheck con tsc (instalado puntualmente sin dependencias del proyecto)
-#   - pruebas con node:test (--experimental-strip-types)
-# PENDIENTE (fase de interfaz): cuando haya package-lock y acceso a npm, este
-# workflow instalará dependencias y ejecutará Vitest y Playwright. El despliegue
-# a GitHub Pages se configurará al final desde main.
+# En cada push a la rama de desarrollo: instala dependencias, typecheck, pruebas
+# (Vitest) y build; si todo está en verde, publica dist/ en GitHub Pages como
+# vista previa (con la banda "VERSIÓN DE PRUEBA · NO USAR CON PACIENTES").
 on:
   push:
     branches: [desarrollo]
 
+# Permisos necesarios para desplegar en GitHub Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Evita despliegues solapados.
+concurrency:
+  group: pages-desarrollo
+  cancel-in-progress: true
+
 jobs:
-  motor-dominio:
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,16 +29,37 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Typecheck del dominio (tsc)
+      - name: Instalar dependencias
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Pruebas (Vitest)
+        run: npx vitest run
+
+      - name: Pruebas E2E (Playwright)
         run: |
-          npm install -g typescript@5.6.3
-          tsc --noEmit --strict --exactOptionalPropertyTypes \
-            --noUncheckedIndexedAccess --module esnext --moduleResolution bundler \
-            --allowImportingTsExtensions --target ES2022 --lib ES2022,DOM \
-            $(find src -name '*.ts')
+          npx playwright install --with-deps chromium
+          npx playwright test
+        # Si aún no hay pruebas E2E, este paso no falla (Playwright sale 0 sin tests).
+        continue-on-error: false
 
-      - name: Pruebas (node:test)
-        run: node --experimental-strip-types --test "tests/unit/**/*.test.ts"
+      - name: Build (vista previa)
+        run: npm run build
 
-      - name: Informe de casos §15 (obtenido vs esperado)
-        run: node --experimental-strip-types tests/casos15.report.ts
+      - name: Subir artefacto de Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build-test
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Desplegar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
