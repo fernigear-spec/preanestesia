@@ -1,0 +1,362 @@
+# design.md — AnesHealth · Entrevista Preanestésica de Enfermería
+
+> **Estado:** revisado con las decisiones del servicio. Pendiente del visto bueno final antes de escribir código.
+> Versión 0.2 · 29/09/2026
+> Repositorio destino: **fernigear-spec/preanestesia** (público).
+
+---
+
+## Stack aprobado
+
+El servicio ha aprobado el stack (Decisión 12) y ha indicado **no usar PreHabilítame como referencia**:
+
+> **Vite + React + TypeScript estricto + Vitest + Playwright**, con el **motor de dominio aislado de la UI** y **despliegue en GitHub Pages con GitHub Actions**.
+
+El diseño mantiene la separación entre el **motor de dominio** (cálculos y reglas, funciones puras sin dependencias de UI) y la **capa de presentación**, de modo que la lógica clínica es verificable de forma aislada y reutilizable.
+
+---
+
+## Visión general de la arquitectura
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Navegador (cliente)                       │
+│                                                               │
+│  ┌────────────┐   ┌──────────────┐   ┌────────────────────┐  │
+│  │  Capa UI   │──▶│  Estado en   │──▶│  Motor de dominio  │  │
+│  │  (React)   │   │   memoria    │   │  (TS puro, sin UI) │  │
+│  │            │◀──│  (store)     │◀──│                    │  │
+│  └────────────┘   └──────────────┘   └────────────────────┘  │
+│         │                                      │              │
+│         │              ┌───────────────────────┘              │
+│         ▼              ▼                                       │
+│  ┌────────────┐   ┌──────────────┐   ┌────────────────────┐  │
+│  │ Salidas    │   │ Cargador de  │   │  QR / enlaces      │  │
+│  │ (SAP, PDF, │   │ datos +      │   │  (compresión +     │  │
+│  │  hoja, QR) │   │ validador    │   │   base64url)       │  │
+│  └────────────┘   └──────────────┘   └────────────────────┘  │
+│                          │                                    │
+└──────────────────────────┼────────────────────────────────────┘
+                           ▼
+              datos/ (JSON + CSV empaquetados)
+                           │
+                    Service Worker
+              (caché de app y datos, nunca del paciente)
+```
+
+**Principio rector:** separación estricta entre **motor de dominio** (funciones puras y deterministas, sin dependencias de UI ni de red) y **capa de presentación**. Todo el contenido clínico se carga desde `datos/` y ningún número clínico está codificado en el motor.
+
+---
+
+## Decisiones de stack y su justificación
+
+| Área | Elección | Justificación |
+|---|---|---|
+| Lenguaje | **TypeScript** con `strict: true` | Exigido por el documento fuente (§2). Tipado estricto obligatorio para seguridad clínica. |
+| Build / bundler | **Vite** | Estándar de facto para SPA estáticas modernas; genera artefactos estáticos ideales para GitHub Pages; empaqueta todas las dependencias localmente (requisito R1.3). |
+| UI | **React 18** + componentes funcionales | Aprobado (Decisión 12). Ecosistema maduro, buen soporte táctil, fácil de aislar de la lógica de dominio. |
+| Estilos | **CSS Modules + variables CSS** | Sin dependencias remotas. Color principal `#0027c2` como variable de tema. Diseño táctil con utilidades propias. |
+| Estado | **Zustand** (store ligero en memoria) | Store pequeño, sin persistencia por defecto (clave para R1.2). Fácil de resetear con «Nuevo paciente». |
+| Tests | **Vitest** + **@testing-library/react** + **Playwright** (E2E) | Vitest integra nativamente con Vite. Playwright para los casos E2E y la verificación de privacidad (R15). |
+| PDF | **pdf-make** o **jsPDF** (empaquetado) | Generación de PDF en el navegador sin servidor (R1.1). Se elegirá el de menor peso que soporte tablas y tipografías embebidas. |
+| QR | **qrcode** (generación) | Librería sin dependencias de red. La lectura la hace la cámara del móvil del paciente/anestesiólogo. |
+| Compresión de payload | **lz-string** (base64url) o `CompressionStream` (deflate) nativo | Requisito R11. `lz-string` como opción portable; se evaluará `CompressionStream` si el soporte de navegadores objetivo es suficiente. |
+| Búsqueda difusa | **Fuse.js** (empaquetado) | Autocompletado tolerante a tildes/errores para fármacos y procedimientos (R3.2.23). |
+| CSV | Parser propio ligero o **PapaParse** (empaquetado) | Separador `;`, UTF-8. |
+| Despliegue | **GitHub Actions → GitHub Pages** | Aprobado (Decisión 12). Workflow que construye y publica el `dist/` en `fernigear-spec/preanestesia`. |
+| i18n | Diccionarios JSON propios en `datos/textos/` | Sin librería pesada; el contenido del paciente ya vive en ficheros de datos. |
+
+> Todas las librerías se instalan como dependencias empaquetadas por Vite; **ninguna se carga desde CDN**. El `Content-Security-Policy` en `<meta>` prohíbe `connect-src`, `font-src`, `img-src` y `script-src` externos (`default-src 'self'`).
+
+---
+
+## Organización del repositorio
+
+```
+preanestesia/
+├── .github/workflows/deploy.yml     # build + publicación en GitHub Pages
+├── index.html                        # con la meta CSP
+├── package.json
+├── tsconfig.json                     # strict: true
+├── vite.config.ts                    # base path para Pages, PWA/SW
+├── public/
+│   ├── manifest.webmanifest
+│   └── sw.js                          # (o generado por vite-plugin-pwa)
+├── datos/                             # CONTENIDO CLÍNICO EDITABLE
+│   ├── config.json
+│   ├── farmacos.csv
+│   ├── procedimientos.csv
+│   ├── reglas_farmacos.json
+│   ├── opioides.json
+│   ├── coherencia.json
+│   ├── plantillas_sap.json
+│   ├── modulos/
+│   │   ├── cardiovascular.json
+│   │   ├── respiratorio.json
+│   │   └── ...  (uno por patología de R5)
+│   ├── textos/
+│   │   ├── es/*.json
+│   │   └── ca/*.json                  # marcados "PENDENT DE REVISIÓ"
+│   └── casos_entrenamiento/*.json
+├── src/
+│   ├── dominio/                       # MOTOR: TS puro, sin React
+│   │   ├── escalas/                   # una carpeta/fichero por escala
+│   │   │   ├── asa.ts
+│   │   │   ├── egri.ts
+│   │   │   ├── langeron.ts
+│   │   │   ├── stopBang.ts
+│   │   │   ├── stbur.ts
+│   │   │   ├── apfel.ts
+│   │   │   ├── povoc.ts
+│   │   │   ├── cha2ds2va.ts
+│   │   │   ├── dasi.ts
+│   │   │   ├── cockcroftGault.ts
+│   │   │   ├── morfinaEquivalente.ts
+│   │   │   ├── auditC.ts
+│   │   │   ├── cfs.ts
+│   │   │   └── cuatroAT.ts            # 4AT (sustituye a Mini-Cog, Decisión 7)
+│   │   ├── reglas/                    # motor de reglas de medicación
+│   │   │   ├── motor.ts               # evaluador genérico basado en params
+│   │   │   ├── antivitaminaK.ts
+│   │   │   ├── acod.ts
+│   │   │   ├── antiagregantes.ts
+│   │   │   ├── heparinas.ts
+│   │   │   ├── antidiabeticos.ts
+│   │   │   ├── aine.ts
+│   │   │   ├── psicofarmacos.ts
+│   │   │   ├── inmunosupresores.ts
+│   │   │   ├── oncologicos.ts
+│   │   │   ├── cardiovasculares.ts
+│   │   │   └── otros.ts
+│   │   ├── pruebas/                    # tabla de decisión de pruebas (R7)
+│   │   ├── ayuno/                      # cálculo de ayuno (R8.14)
+│   │   ├── coherencia/                 # asistente de coherencia (R4)
+│   │   ├── fechas/                     # utilidades de fecha/hora y traducción
+│   │   ├── riesgo/                     # clase de riesgo del paciente (R7.2)
+│   │   └── tipos.ts                    # tipos de dominio compartidos
+│   ├── datos/                          # carga y validación de datos
+│   │   ├── cargador.ts
+│   │   ├── validador.ts                # valida CSV/JSON, reporta fila/columna
+│   │   └── esquemas.ts                 # esquemas (zod) de cada fichero
+│   ├── salidas/
+│   │   ├── sap.ts                      # generador por plantillas (R10.1)
+│   │   ├── hojaPaciente.ts
+│   │   ├── resumenAnestesiologo.ts
+│   │   ├── pdf.ts
+│   │   └── qr/
+│   │       ├── serializar.ts           # payload compacto + compresión
+│   │       ├── deserializar.ts
+│   │       └── caducidad.ts
+│   ├── estado/                          # store en memoria (Zustand)
+│   │   └── store.ts
+│   ├── ui/                              # componentes React
+│   │   ├── pasos/                       # un componente por paso (R3.2)
+│   │   ├── paneles/                     # panel lateral, alertas, resumen
+│   │   ├── modulos/                     # render de módulos desde JSON
+│   │   ├── admin/                       # panel de administración (R14.1)
+│   │   ├── entrenamiento/               # modo entrenamiento (R14.2)
+│   │   ├── uso/                         # cuadro de mando (R14.3)
+│   │   ├── vistaQR/                     # vista de solo lectura del QR
+│   │   └── comunes/                     # botones grandes, ilustración Mallampati, etc.
+│   ├── i18n/
+│   └── main.tsx
+├── tests/
+│   ├── unit/                            # espejo de dominio/
+│   └── e2e/                             # 23 casos + privacidad + tamaño QR
+├── scripts/
+│   └── generar-contenido-clinico.ts     # genera CONTENIDO_CLINICO.md
+├── README.md
+└── CONTENIDO_CLINICO.md                 # autogenerado
+```
+
+---
+
+## Modelo de datos de dominio (tipos principales)
+
+```typescript
+// Estado completo de una entrevista, solo en memoria.
+interface Entrevista {
+  modalidad: 'presencial' | 'telefonica';
+  intervencion: DatosIntervencion;
+  paciente: DatosBasicos;
+  antecedentes: Antecedentes;
+  mtnd4: RespuestasMtND4;
+  alergias: Alergias;
+  habitos: Habitos;
+  modulosActivos: Record<IdModulo, RespuestasModulo>;
+  medicacion: FarmacoTomado[];
+  viaAerea: DatosViaAerea;
+  consentimiento: EstadoConsentimiento;
+  identificacionImpresa?: string;   // solo para PDF/impresión; nunca al QR
+}
+
+interface ResultadoCalculado {
+  asaSugerido: { clase: 1|2|3|4|5; sufijoE: boolean; determinantes: string[]; modificadoManualmente: boolean };
+  escalas: Record<string, ResultadoEscala>;      // egri, stopBang, apfel, ...
+  claseRiesgoPaciente: 'bajo'|'bajo-moderado'|'moderado'|'alto';
+  pruebas: PruebaSolicitada[];
+  planMedicacion: ResultadoFarmaco[];
+  ayuno: PlanAyuno;
+  alertas: Alerta[];                              // ordenadas por gravedad
+  puntosPendientes: PuntoConfirmacion[];
+  prehabilitacion: boolean;
+}
+
+interface ResultadoFarmaco {
+  idFarmaco: string;
+  nombreComercial: string;
+  principiosActivos: string[];
+  accion: 'mantener'|'suspender'|'ajustar'|'consultar';
+  fechaHoraUltimaToma?: Date;
+  textoPaciente: string;
+  textoAnestesiologo?: string;
+  reglaAplicada: string;
+  fuente: string;
+  requiereConfirmacion: boolean;
+  confirmadoPor?: string;              // nombre del anestesiólogo
+}
+
+interface Alerta {
+  gravedad: 'roja'|'amarilla'|'informativa';
+  mensaje: string;
+  origen: string;                      // módulo/escala/regla que la generó
+  soloAnestesiologo: boolean;          // no aparece en la hoja del paciente
+}
+```
+
+Todos los cálculos son **funciones puras**: reciben `Entrevista` + datos de `datos/` y devuelven `ResultadoCalculado`, sin efectos secundarios. Esto hace las pruebas unitarias triviales y el resultado reproducible (clave para los casos de entrenamiento y los QR).
+
+---
+
+## Motor de reglas de medicación
+
+El punto más delicado del diseño. Estrategia:
+
+1. **Parámetros en `reglas_farmacos.json`**: cada regla tiene un `id` y un objeto de parámetros (horas, condiciones por riesgo hemorrágico, técnica, aclaramiento, indicación, listas de bloqueos profundos, tablas SETH). *Los números siempre salen del JSON.*
+2. **Lógica en código**: cada familia de regla (`antivitaminaK.ts`, `acod.ts`, ...) contiene la lógica condicional que no cabe en parámetros, pero lee todos los umbrales del JSON.
+3. **Contexto de evaluación**: cada regla recibe un `ContextoReglas` con: riesgo hemorrágico del procedimiento, técnica anestésica efectiva (con la resolución de «no se sabe» → neuroaxial si aplica), aclaramiento de creatinina (o su ausencia), fecha/hora de intervención, indicación del fármaco, y factores del paciente (peso, trombofilia, stent, etc.).
+4. **Salida uniforme**: toda regla devuelve un `ResultadoFarmaco`. Si falta un dato crítico (p. ej. aclaramiento para dabigatrán), la regla marca `requiereConfirmacion = true` e incluye qué dato falta (R12.5).
+5. **Resolución de la más restrictiva**: en combinaciones (`principios_activos` separados por `+`) se evalúa cada componente y se toma el plazo mayor / la acción más conservadora.
+6. **Traducción a lenguaje del paciente**: el módulo `fechas/` convierte la fecha/hora límite en frases con día de la semana, según la pauta y hora habitual del fármaco.
+
+Ejemplo de flujo (ACOD, caso 1 del documento):
+```
+apixabán (anti-Xa), riesgo hemorrágico alto (prótesis rodilla) + raquídea + aclaramiento 45
+ → regla acod: base neuroaxial = 72 h; anti-Xa con neuroaxial suma +24 h solo si CrCl < 30,
+   pero 45 ≥ 30 ⇒ sin ajuste extra ⇒ 72 h  ✓ (coincide con el resultado esperado)
+```
+
+### Precisiones de las decisiones del servicio (v0.2)
+
+- **Bloqueos (Decisión 9):** el `ContextoReglas` distingue `bloqueoPeriferico` y `bloqueoProfundo`. La lista de qué bloqueos son profundos vive en `reglas_farmacos.json` (por defecto: paravertebral, plexo lumbar/psoas, plexo cervical profundo, intercostal). Los planos fasciales (TAP, erector, PENG, serrato) son periféricos y **no** disparan los plazos de bloqueo profundo.
+- **ACOD + neuroaxial + aclaramiento (Decisión 1):** los ajustes por aclaramiento **se suman** al plazo de neuroaxial. Dabigatrán con neuroaxial: 72/96/120 h según CrCl > 80 / 50-80 / < 50. Anti-Xa con neuroaxial y CrCl < 30: 96 h. Todos los tramos son casos de prueba unitaria.
+- **Combinaciones fijas (Decisión 5):** el motor agrupa por medicamento comercial; una combinación fija emite **una** instrucción con el plazo más restrictivo. Si la combinación fuerza a retirar la metformina antes de su plazo propio, se añade la nota «vigilar glucemia en los días sin tratamiento» a las notas del anestesiólogo.
+- **GLP-1 (Decisión 8):** diarios → última dosis 4 días antes (omitir 3 días previos + día de la IQ). Semanales → el módulo `fechas/` localiza la dosis programada que cae en la ventana de 7 días previos y la marca como omitida, mostrando su fecha exacta.
+- **Bomba de insulina (Decisión 6):** el `ContextoReglas` incluye régimen (CMA/ingreso) y riesgo quirúrgico; la regla decide `requiereConfirmacion` en función de ellos.
+- **Sugammadex (Decisión 11):** regla condicional que, para mujer con anticonceptivo hormonal y posible AG, añade el texto correspondiente (oral vs. no oral) a la hoja del paciente y el recordatorio al alta a las notas del anestesiólogo.
+- **4AT (Decisión 7):** `cuatroAT.ts` calcula el total y la categoría (0 / 1-3 / ≥ 4). Se ejecuta en presencial y telefónica; el resumen registra la modalidad.
+
+---
+
+## Cargador y validador de datos
+
+- Al arrancar, `cargador.ts` lee todos los ficheros de `datos/` (empaquetados como assets estáticos).
+- `validador.ts` aplica esquemas **zod** a cada fichero:
+  - CSV: comprueba columnas presentes, tipos, valores dentro de listas cerradas (p. ej. riesgo ∈ {bajo, intermedio, alto}), y que cada `id_regla` de `farmacos.csv` exista en `reglas_farmacos.json`.
+  - JSON de módulos: comprueba estructura de preguntas, tipos de respuesta, referencias.
+- Si hay error, se muestra una pantalla de bloqueo con **fichero, fila y columna** exactos y **no se puede iniciar** ninguna entrevista (R2.3, caso de prueba 21).
+
+---
+
+## Estado y privacidad
+
+- El store (Zustand) vive solo en memoria. **No se configura ningún middleware de persistencia.**
+- «Nuevo paciente» ejecuta `store.reset()`.
+- `beforeunload` activo mientras haya una entrevista con datos.
+- Temporizador de inactividad (valor de `config.json`) que, al expirar, avisa y luego resetea.
+- Únicos usos permitidos de `localStorage`:
+  - preferencia de modo guiado (booleano),
+  - cuadro de mando de uso (R14.3): registros sin datos clínicos ni identificadores.
+- El service worker (via `vite-plugin-pwa` en modo `injectManifest` o `generateSW`) cachea **solo** los assets de la app y `datos/`, nunca respuestas con datos del paciente (que no existen, al no haber red).
+- **Prueba automática (caso 23)**: tras una entrevista E2E completa, un test de Playwright inspecciona `localStorage`, `sessionStorage`, `IndexedDB`, `cookies` y `caches` y verifica que no hay ningún dato clínico.
+
+---
+
+## QR y enlaces sin servidor
+
+- Payload serializado con claves cortas y catálogos referenciados por `id` (no por texto) para el QR del anestesiólogo (R11.3, R11.8).
+- Compresión (`lz-string`/deflate) → base64url → se coloca tras `#` en la URL.
+- La app lee el fragmento al cargar; si detecta un payload, entra en modo «vista QR».
+- **Caducidad**: comparación de fechas al abrir; si caducó, se muestra el mensaje sin renderizar datos (regla de visualización, documentada como tal en el README — R11.9).
+- Dos tipos de payload:
+  - **paciente**: hoja ya calculada (textos finales), solo lectura, conmutador es/ca, botón guardar PDF.
+  - **anestesiólogo**: entrevista completa + versión de contenido; permite confirmar pendientes y regenerar el QR del paciente.
+- **Prueba de tamaño (caso 19)**: round-trip codificar/decodificar de los casos más complejos, verificando que caben en ~2,9 KB; si no, aviso + copiar enlace.
+
+---
+
+## Generador de texto SAP
+
+- Motor de plantillas dirigido por `plantillas_sap.json`: orden de bloques, plantillas de frase por respuesta con marcadores `{farmaco}`, `{dosis}`, `{fecha}`.
+- Utilidades gramaticales: enumeración con «y» final, singular/plural, concordancia de género, omisión de bloques vacíos, fechas cortas.
+- Política de abreviaturas y de negativos configurable.
+- Modo «solo ASCII» (transliteración de tildes/símbolos).
+- Aviso si se supera el límite de caracteres de `config.json`.
+- Vista previa sobre los casos de entrenamiento en el panel de administración.
+
+---
+
+## Salidas y su separación de audiencias
+
+- **Hoja del paciente**: nunca contiene notas técnicas ni alertas «solo anestesiólogo». Los puntos que requieren confirmación aparecen como «el anestesiólogo le llamará…».
+- **Resumen del anestesiólogo**: incluye todo, con un apartado plegable «Notas técnicas».
+- Una sola vista de la aplicación para todos los usuarios; la separación es de **salida**, no de rol.
+- Pie común en todas las salidas con versión y fecha de revisión (R12.4).
+- **Prehabilitación (Decisión 13):** el apartado de prehabilitación se renderiza **solo si** `config.prehabilitacion_activa === true`. Con el interruptor apagado no aparece ni en la hoja del paciente ni en las notas del anestesiólogo, aunque se cumplan los criterios clínicos. La URL de PreHabilítame es un valor configurable en `config.json`.
+- **Stent reciente + neuroaxial (Decisión 3):** el ordenador de alertas coloca la alerta del stent primero y en rojo; el generador de la hoja del paciente suprime toda pauta de antiagregantes mientras el punto esté pendiente de confirmación.
+
+---
+
+## Ilustraciones propias (sin derechos de autor)
+
+La ilustración esquemática de Mallampati (R6.2.1) se dibuja como **SVG propio** dentro del repositorio, sin usar imágenes con copyright.
+
+---
+
+## Despliegue
+
+- Repositorio: **fernigear-spec/preanestesia** (público).
+- `deploy.yml`: en push a `main`, `npm ci` → `npm run build` → `npm test` (los tests deben pasar) → publicación de `dist/` en GitHub Pages.
+- `vite.config.ts` con `base: '/preanestesia/'` para las rutas de Pages.
+- El PWA/service worker se genera en el build.
+
+---
+
+## Generación de `CONTENIDO_CLINICO.md`
+
+- `scripts/generar-contenido-clinico.ts` lee todos los ficheros de `datos/` y emite un Markdown legible con cada regla, cada escala, cada texto y su **fuente**, para revisión y firma del servicio (R16 / §16 del documento).
+- Se ejecuta en el build y/o mediante `npm run contenido`.
+
+---
+
+## Estrategia de pruebas
+
+| Nivel | Herramienta | Alcance |
+|---|---|---|
+| Unitario | Vitest | Cada escala y cada regla, con tablas de casos (incluidos los umbrales límite). |
+| Integración | Vitest | Cargador+validador, generador SAP, serialización QR. |
+| E2E | Playwright | Los 23 casos del documento (con los ajustes de R15.2) como flujos completos; verificación de privacidad; tamaño de QR; enlace caducado; aviso de versión distinta. |
+| Datos | Vitest | Validación de que los ficheros iniciales de `datos/` son coherentes (toda `id_regla` existe, etc.). |
+
+Los 23 casos (y los añadidos de R15.2: GLP-1 diario/semanal, tramos de dabigatrán/anti-Xa con neuroaxial, stent + neuroaxial, bomba de insulina CMA vs. ingreso, sugammadex oral/no oral) se codifican **una sola vez** en `datos/casos_entrenamiento/` y se reutilizan tanto en el modo entrenamiento (R14.2) como en las pruebas E2E. El caso 17 usa **4AT** en lugar de Mini-Cog.
+
+---
+
+## Riesgos técnicos y mitigaciones
+
+| Riesgo | Mitigación |
+|---|---|
+| Payload del anestesiólogo no cabe en un QR | Claves cortas + catálogos por id + compresión; aviso + enlace alternativo. |
+| Números clínicos codificados por error en el motor | Regla de diseño: todo umbral vive en `datos/`; revisión en PR y `CONTENIDO_CLINICO.md` autogenerado. |
+| Fuga de datos por persistencia accidental | Prueba automática de privacidad en cada CI (caso 23). |
+| Contenido clínico corrupto en producción | Validación bloqueante al arrancar (caso 21). |
