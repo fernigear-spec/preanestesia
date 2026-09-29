@@ -29,6 +29,8 @@ import { calcularEgri } from '../../src/dominio/escalas/egri.ts';
 import { calcularLangeron } from '../../src/dominio/escalas/langeron.ts';
 import { calcularMorfinaEquivalente } from '../../src/dominio/escalas/morfinaEquivalente.ts';
 import { calcularAuditC } from '../../src/dominio/escalas/auditC.ts';
+import { calcularHemstop } from '../../src/dominio/escalas/hemstop.ts';
+import { reglaInsulinaBasal, reglaInsulinaNph, reglaInsulinaPremezclada } from '../../src/dominio/reglas/insulinas.ts';
 import { decidirPruebas, pruebaVigente, type FactoresPruebas } from '../../src/dominio/pruebas/tablaPruebas.ts';
 import { calcularAyuno } from '../../src/dominio/ayuno/ayuno.ts';
 import { evaluarMtnd4 } from '../../src/dominio/mtnd4/mtnd4.ts';
@@ -227,6 +229,22 @@ describe('Casos D · antidiabéticos', () => {
     const r = reglaGlp1Diario({ idFarmaco: 'r', nombreComercial: 'Rybelsus', principio: 'semaglutida' }, ctx({ pautaFarmaco: P('08:00') }));
     expect(esFecha(r.fechaHoraUltimaToma, 2026, 9, 11, 8, 0)).toBeTrue();
   });
+  it('D7 Tresiba 30 UI: completa la noche previa no; 70-80 % → mañana 21-24 UI (75 %: 22)', () => {
+    const r = reglaInsulinaBasal({ idFarmaco: 't', nombreComercial: 'Tresiba', principio: 'insulina_degludec', dosisNocheUi: 30, dosisMananaUi: 30 });
+    const manana = r.ajustes.find((a) => a.momento === 'manana_intervencion');
+    expect(manana?.dosisUi).toBeGreaterThanOrEqual(21);
+    expect(manana?.dosisUi as number).toBeLessThan(25);
+    expect(manana?.dosisUi).toBe(22); // 75 % de 30 = 22,5 → 22 (unidad inferior)
+  });
+  it('D8 Insulatard NPH 20 mañana / 10 noche: noche 10 completa, mañana 10 (50 % de 20)', () => {
+    const r = reglaInsulinaNph({ idFarmaco: 'n', nombreComercial: 'Insulatard', dosisNocheUi: 10, dosisMananaUi: 20 });
+    expect(r.ajustes.find((a) => a.momento === 'noche_previa')?.dosisUi).toBe(10);
+    expect(r.ajustes.find((a) => a.momento === 'manana_intervencion')?.dosisUi).toBe(10);
+  });
+  it('D9 NovoMix 30, 20 UI mañana: 10 UI (50 %) la mañana', () => {
+    const r = reglaInsulinaPremezclada({ idFarmaco: 'nm', nombreComercial: 'NovoMix 30', dosisMananaUi: 20 });
+    expect(r.ajustes.find((a) => a.momento === 'manana_intervencion')?.dosisUi).toBe(10);
+  });
   it('D10 bomba CMA riesgo bajo: sin confirmación', () => {
     expect(reglaBombaInsulina({ idFarmaco: 'b', nombreComercial: 'Bomba' }, ctx({ regimen: 'cma', riesgoCardiovascular: 'bajo' })).requiereConfirmacion).toBeFalse();
   });
@@ -375,6 +393,24 @@ describe('Casos F · escalas', () => {
     const r = calcularAuditC({ frecuenciaConsumo: 1, cantidadTipica: 1, frecuenciaAtracon: 1, sexo: 'mujer' });
     expect(r.positivo).toBeTrue();
     expect(r.riesgoAbstinencia).toBeFalse();
+  });
+  it('F13 HEMSTOP 2 positivas: positivo → pedir coagulación + alerta', () => {
+    const r = calcularHemstop({
+      hematomasSinTrauma: true, sangradoProlongadoHeridas: true, menstruacionAbundante: false,
+      sangradoTrasCirugia: false, sangradoTrasDental: false, sangradoEnParto: false, familiaresTrastornoCoagulacion: false,
+    });
+    expect(r.puntuacion).toBe(2);
+    expect(r.positivo).toBeTrue();
+    expect(r.pedirCoagulacion).toBeTrue();
+    expect(r.alerta?.gravedad).toBe('amarilla');
+  });
+  it('F13b HEMSTOP 1 positiva: negativo', () => {
+    const r = calcularHemstop({
+      hematomasSinTrauma: true, sangradoProlongadoHeridas: false, menstruacionAbundante: false,
+      sangradoTrasCirugia: false, sangradoTrasDental: false, sangradoEnParto: false, familiaresTrastornoCoagulacion: false,
+    });
+    expect(r.positivo).toBeFalse();
+    expect(r.pedirCoagulacion).toBeFalse();
   });
 });
 
