@@ -1,12 +1,28 @@
 import { useState } from 'react';
 import { BandaPrueba } from './BandaPrueba.tsx';
-import type { Modalidad } from '../dominio/tipos.ts';
+import { PasoIntervencion } from './pasos/PasoIntervencion.tsx';
+import type { Modalidad, DatosIntervencion } from '../dominio/tipos.ts';
+import type { Procedimiento } from '../datos/procedimientos.ts';
 
-type Pantalla = 'inicio' | 'entrevista';
+type Pantalla = 'inicio' | 'paso1' | 'resumen';
+
+const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+function fechaLegible(d: Date): string {
+  return `${DIAS[d.getDay()]} ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} a las ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
 
 export function App() {
   const [pantalla, setPantalla] = useState<Pantalla>('inicio');
   const [modalidad, setModalidad] = useState<Modalidad | null>(null);
+  const [intervencion, setIntervencion] = useState<DatosIntervencion | null>(null);
+  const [procedimiento, setProcedimiento] = useState<Procedimiento | null>(null);
+
+  function nuevoPaciente() {
+    setModalidad(null);
+    setIntervencion(null);
+    setProcedimiento(null);
+    setPantalla('inicio');
+  }
 
   return (
     <div className="app">
@@ -43,23 +59,48 @@ export function App() {
               type="button"
               className="boton-primario"
               disabled={modalidad === null}
-              onClick={() => setPantalla('entrevista')}
+              onClick={() => setPantalla('paso1')}
             >
               Comenzar
             </button>
           </section>
         )}
 
-        {pantalla === 'entrevista' && (
-          <section className="tarjeta" aria-labelledby="entrevista-tit">
-            <h2 id="entrevista-tit">Entrevista {modalidad}</h2>
+        {pantalla === 'paso1' && (
+          <PasoIntervencion
+            onVolver={() => setPantalla('inicio')}
+            onContinuar={(datos, proc) => {
+              setIntervencion(datos);
+              setProcedimiento(proc);
+              setPantalla('resumen');
+            }}
+          />
+        )}
+
+        {pantalla === 'resumen' && intervencion && procedimiento && (
+          <section className="tarjeta" aria-labelledby="resumen-tit">
+            <h2 id="resumen-tit">Datos de la intervención guardados</h2>
             <p>
-              El flujo de la entrevista se irá construyendo por pasos (datos de la intervención,
-              datos básicos, antecedentes, etc.). Esta es la vista previa inicial.
+              Entrevista <strong>{modalidad}</strong>. Estos son los datos del paso 1; los siguientes
+              pasos (datos básicos, antecedentes, medicación…) se irán añadiendo.
             </p>
-            <button type="button" className="boton-secundario" onClick={() => setPantalla('inicio')}>
-              Nuevo paciente
-            </button>
+            <ul className="resumen-lista">
+              <li><strong>Procedimiento:</strong> {procedimiento.nombre} ({procedimiento.especialidad.replace(/_/g, ' ')})</li>
+              <li><strong>Fecha y hora:</strong> {fechaLegible(intervencion.fechaHora)}{intervencion.horaAsumida ? ' (hora asumida)' : ''}</li>
+              <li><strong>Régimen:</strong> {intervencion.regimen}</li>
+              <li><strong>Carácter:</strong> {intervencion.caracter.replace(/_/g, ' ')}</li>
+              <li><strong>Técnica:</strong> {intervencion.tecnica.replace(/_/g, ' ')}</li>
+              <li><strong>Riesgo cardiovascular:</strong> {intervencion.riesgoCardiovascular}</li>
+              <li><strong>Riesgo hemorrágico:</strong> {intervencion.riesgoHemorragico}</li>
+            </ul>
+            <div className="acciones">
+              <button type="button" className="boton-secundario" onClick={() => setPantalla('paso1')}>
+                Editar paso 1
+              </button>
+              <button type="button" className="boton-secundario" onClick={nuevoPaciente}>
+                Nuevo paciente
+              </button>
+            </div>
           </section>
         )}
       </main>
