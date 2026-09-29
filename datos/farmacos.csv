@@ -1,0 +1,69 @@
+id;principios_activos;nombres_comerciales;grupo;subgrupo;pauta_tipica;id_regla;texto_paciente;texto_anestesiologo;requiere_confirmacion;indicaciones_posibles;fuente;fecha_revision;verificado_cima
+acenocumarol;acenocumarol;Sintrom;anticoagulantes;avk;diaria;avk_acenocumarol;;;no;fibrilacion_auricular|protesis_valvular|tromboembolismo_venoso|trombofilia;docs/documento_fuente.md §8.1;2026-09-29;no
+warfarina;warfarina;Aldocumar;anticoagulantes;avk;diaria;avk_warfarina;;;no;fibrilacion_auricular|protesis_valvular|tromboembolismo_venoso|trombofilia;docs/documento_fuente.md §8.1;2026-09-29;no
+dabigatran;dabigatran;Pradaxa;anticoagulantes;acod;dos_veces_dia;acod_dabigatran;;;no;fibrilacion_auricular|tromboembolismo_venoso;docs/documento_fuente.md §8.2;2026-09-29;no
+rivaroxaban;rivaroxaban;Xarelto;anticoagulantes;acod;diaria;acod_antixa;;;no;fibrilacion_auricular|tromboembolismo_venoso;docs/documento_fuente.md §8.2;2026-09-29;no
+apixaban;apixaban;Eliquis;anticoagulantes;acod;dos_veces_dia;acod_antixa;;;no;fibrilacion_auricular|tromboembolismo_venoso;docs/documento_fuente.md §8.2;2026-09-29;no
+edoxaban;edoxaban;Lixiana;anticoagulantes;acod;diaria;acod_antixa;;;no;fibrilacion_auricular|tromboembolismo_venoso;docs/documento_fuente.md §8.2;2026-09-29;no
+enoxaparina;enoxaparina;Clexane|Inhixa;anticoagulantes;hbpm;diaria;mantener_generico;;;no;tromboembolismo_venoso;docs/documento_fuente.md §8.4;2026-09-29;no
+bemiparina;bemiparina;Hibor;anticoagulantes;hbpm;diaria;mantener_generico;;;no;tromboembolismo_venoso;docs/documento_fuente.md §8.4;2026-09-29;no
+tinzaparina;tinzaparina;Innohep;anticoagulantes;hbpm;diaria;mantener_generico;;;no;tromboembolismo_venoso;docs/documento_fuente.md §8.4;2026-09-29;no
+dalteparina;dalteparina;Fragmin;anticoagulantes;hbpm;diaria;mantener_generico;;;no;tromboembolismo_venoso;docs/documento_fuente.md §8.4;2026-09-29;no
+nadroparina;nadroparina;Fraxiparina;anticoagulantes;hbpm;diaria;mantener_generico;;;no;tromboembolismo_venoso;docs/documento_fuente.md §8.4;2026-09-29;no
+fondaparinux;fondaparinux;Arixtra;anticoagulantes;fondaparinux;diaria;mantener_generico;;;no;tromboembolismo_venoso;docs/documento_fuente.md §8.4;2026-09-29;no
+aas;acido_acetilsalicilico;Adiro|Tromalyt;antiagregantes;aas;diaria;aas;;;no;stent_coronario|infarto|ictus_ait|arteriopatia_periferica|prevencion_primaria;docs/documento_fuente.md §8.3;2026-09-29;no
+clopidogrel;clopidogrel;Plavix|Iscover;antiagregantes;p2y12;diaria;p2y12_clopidogrel;;;no;stent_coronario|infarto|ictus_ait|arteriopatia_periferica;docs/documento_fuente.md §8.3;2026-09-29;no
+prasugrel;prasugrel;Efient;antiagregantes;p2y12;diaria;p2y12_prasugrel;;;no;stent_coronario|infarto;docs/documento_fuente.md §8.3;2026-09-29;no
+ticagrelor;ticagrelor;Brilique;antiagregantes;p2y12;dos_veces_dia;p2y12_ticagrelor;;;no;stent_coronario|infarto;docs/documento_fuente.md §8.3;2026-09-29;no
+triflusal;triflusal;Disgren;antiagregantes;otros;diaria;triflusal;;;no;prevencion_primaria;docs/documento_fuente.md §8.3;2026-09-29;no
+dipiridamol;dipiridamol;Persantin;antiagregantes;otros;dos_veces_dia;dipiridamol;;;no;ictus_ait;docs/documento_fuente.md §8.3;2026-09-29;no
+cilostazol;cilostazol;Pletal;antiagregantes;otros;dos_veces_dia;cilostazol;;;no;arteriopatia_periferica;docs/documento_fuente.md §8.3;2026-09-29;no
+sulodexida;sulodexida;Aterina;glucosaminoglucanos;glucosaminoglucano;dos_veces_dia;sulodexida;;;no;arteriopatia_periferica;docs/documento_fuente.md §8.3;2026-09-29;no
+metformina;metformina;Dianben;antidiabeticos;biguanida;dos_veces_dia;metformina;;;no;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+sitagliptina;sitagliptina;Januvia|Tesavel|Xelevia;antidiabeticos;dpp4;diaria;dpp4;;;no;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+gliclazida;gliclazida;Diamicron;antidiabeticos;sulfonilurea;diaria;sulfonilurea;;;no;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+repaglinida;repaglinida;Novonorm;antidiabeticos;glinida;dos_veces_dia;glinida;;;no;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+pioglitazona;pioglitazona;Actos;antidiabeticos;glitazona;diaria;pioglitazona;;;no;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+empagliflozina;empagliflozina;Jardiance;antidiabeticos;sglt2;diaria;sglt2;;;no;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+dapagliflozina;dapagliflozina;Forxiga;antidiabeticos;sglt2;diaria;sglt2;;;no;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+ertugliflozina;ertugliflozina;Steglatro;antidiabeticos;sglt2;diaria;sglt2;;;no;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+empagliflozina_metformina;empagliflozina+metformina;Synjardy;antidiabeticos;combinacion_oral;dos_veces_dia;sglt2+metformina;;;no;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+semaglutida_sem;semaglutida;Ozempic|Wegovy;glp1;glp1_semanal;semanal;glp1_semanal;;;no;diabetes|obesidad;docs/documento_fuente.md §8.5;2026-09-29;no
+semaglutida_oral;semaglutida;Rybelsus;glp1;glp1_diario;diaria;glp1_diario;;;no;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+liraglutida;liraglutida;Victoza|Saxenda;glp1;glp1_diario;diaria;glp1_diario;;;no;diabetes|obesidad;docs/documento_fuente.md §8.5;2026-09-29;no
+dulaglutida;dulaglutida;Trulicity;glp1;glp1_semanal;semanal;glp1_semanal;;;no;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+tirzepatida;tirzepatida;Mounjaro;glp1;glp1_semanal;semanal;glp1_semanal;;;no;diabetes|obesidad;docs/documento_fuente.md §8.5;2026-09-29;no
+insulina_degludec_liraglutida;insulina_degludec+liraglutida;Xultophy;insulinas;insulina_glp1;diaria;insulina_glp1_fija;;;si;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+insulina_glargina;insulina_glargina;Lantus|Abasaglar|Toujeo;insulinas;basal;diaria;mantener_generico;;;no;diabetes;docs/documento_fuente.md §8.5;2026-09-29;no
+enalapril;enalapril;Renitec|Eupressin;cardiovascular;ieca;diaria;ieca_ara2;;;no;hipertension|insuficiencia_cardiaca|nefropatia_proteinuria;docs/documento_fuente.md §8.10;2026-09-29;no
+ramipril;ramipril;Acovil;cardiovascular;ieca;diaria;ieca_ara2;;;no;hipertension|insuficiencia_cardiaca|cardiopatia_isquemica;docs/documento_fuente.md §8.10;2026-09-29;no
+losartan;losartan;Cozaar;cardiovascular;ara2;diaria;ieca_ara2;;;no;hipertension|insuficiencia_cardiaca|nefropatia_proteinuria;docs/documento_fuente.md §8.10;2026-09-29;no
+valsartan;valsartan;Diovan;cardiovascular;ara2;diaria;ieca_ara2;;;no;hipertension|insuficiencia_cardiaca;docs/documento_fuente.md §8.10;2026-09-29;no
+sacubitrilo_valsartan;sacubitrilo+valsartan;Entresto;cardiovascular;arni;dos_veces_dia;mantener_generico;;Sacubitrilo/valsartan requiere confirmacion (§8.10).;si;insuficiencia_cardiaca;docs/documento_fuente.md §8.10;2026-09-29;no
+bisoprolol;bisoprolol;Emconcor;cardiovascular;betabloqueante;diaria;mantener_generico;;;no;hipertension|insuficiencia_cardiaca|cardiopatia_isquemica|arritmia;docs/documento_fuente.md §8.10;2026-09-29;no
+amlodipino;amlodipino;Norvas;cardiovascular;calcioantagonista;diaria;mantener_generico;;;no;hipertension|cardiopatia_isquemica;docs/documento_fuente.md §8.10;2026-09-29;no
+furosemida;furosemida;Seguril;cardiovascular;diuretico;diaria;diuretico;;;no;insuficiencia_cardiaca|hipertension|edemas;docs/documento_fuente.md §8.10;2026-09-29;no
+hidroclorotiazida;hidroclorotiazida;Esidrex;cardiovascular;diuretico;diaria;diuretico;;;no;hipertension|edemas;docs/documento_fuente.md §8.10;2026-09-29;no
+amiodarona;amiodarona;Trangorex;cardiovascular;antiarritmico;diaria;mantener_generico;;;no;arritmia;docs/documento_fuente.md §8.10;2026-09-29;no
+atorvastatina;atorvastatina;Cardyl|Zarator;cardiovascular;estatina;diaria;mantener_generico;;;no;cardiopatia_isquemica;docs/documento_fuente.md §8.10;2026-09-29;no
+ibuprofeno;ibuprofeno;Espidifen|Dalsy|Neobrufen;aine;aine;dos_veces_dia;aine_ibuprofeno;;;no;dolor_cronico;docs/documento_fuente.md §8.6;2026-09-29;no
+naproxeno;naproxeno;Naprosyn|Antalgin;aine;aine;dos_veces_dia;aine_naproxeno;;;no;dolor_cronico;docs/documento_fuente.md §8.6;2026-09-29;no
+dexketoprofeno;dexketoprofeno;Enantyum;aine;aine;dos_veces_dia;aine_dexketoprofeno;;;no;dolor_cronico;docs/documento_fuente.md §8.6;2026-09-29;no
+celecoxib;celecoxib;Celebrex;aine;coxib;diaria;aine_celecoxib;;;no;dolor_cronico;docs/documento_fuente.md §8.6;2026-09-29;no
+morfina;morfina;MST Continus|Sevredol;opioides;opioide;dos_veces_dia;mantener_generico;;;no;dolor_cronico;docs/documento_fuente.md §5.7;2026-09-29;no
+tramadol;tramadol;Adolonta;opioides;opioide;dos_veces_dia;mantener_generico;;;no;dolor_cronico;docs/documento_fuente.md §5.7;2026-09-29;no
+oxicodona;oxicodona;Oxycontin|Oxynorm;opioides;opioide;dos_veces_dia;mantener_generico;;;no;dolor_cronico;docs/documento_fuente.md §5.7;2026-09-29;no
+buprenorfina;buprenorfina;Transtec|Feliben|Suboxone;opioides;opioide;semanal;mantener_generico;No suspender. Planificar analgesia con el anestesiologo.;Buprenorfina: no suspender. Planificar analgesia (§5.7).;no;dolor_cronico;docs/documento_fuente.md §5.7;2026-09-29;no
+metadona;metadona;;opioides;opioide;diaria;mantener_generico;No suspender. Planificar analgesia con el anestesiologo.;Metadona: no suspender. Planificar analgesia (§5.7).;no;dolor_cronico;docs/documento_fuente.md §5.7;2026-09-29;no
+litio;litio;Plenur;psicofarmacos;litio;diaria;litio;;;no;trastorno_bipolar;docs/documento_fuente.md §8.7;2026-09-29;no
+levotiroxina;levotiroxina;Eutirox|Levothroid;hormonas;tiroidea;diaria;mantener_generico;;;no;hipotiroidismo|tiroidectomia;docs/documento_fuente.md §8.11;2026-09-29;no
+prednisona;prednisona;Dacortin;hormonas;corticoide;diaria;mantener_generico;;Corticoide: mantener. Valorar dosis de estres (§5.3).;no;trasplante|artritis_reumatoide|lupus|asma_epoc|insuficiencia_suprarrenal;docs/documento_fuente.md §8.11;2026-09-29;no
+omeprazol;omeprazol;;hormonas;ibp;diaria;mantener_generico;;;no;reflujo;docs/documento_fuente.md §8.11;2026-09-29;no
+alopurinol;alopurinol;Zyloric;hormonas;otros;diaria;mantener_generico;;;no;gota;docs/documento_fuente.md §8.11;2026-09-29;no
+candesartan_hidroclorotiazida;candesartan+hidroclorotiazida;Atacand Plus|Parapres Plus;cardiovascular;combinacion_htaa;diaria;ieca_ara2+diuretico;;;no;hipertension;docs/documento_fuente.md §8.10 (Anexo A v3);2026-09-29;no
+perindopril_amlodipino;perindopril+amlodipino;Viacoram;cardiovascular;combinacion_htaa;diaria;ieca_ara2+mantener_generico;;;no;hipertension;docs/documento_fuente.md §8.10 (Anexo A v3);2026-09-29;no
+olmesartan_amlodipino;olmesartan+amlodipino;Sevikar;cardiovascular;combinacion_htaa;diaria;ieca_ara2+mantener_generico;;;no;hipertension;docs/documento_fuente.md §8.10 (Anexo A v3);2026-09-29;no
+dapagliflozina_saxagliptina;dapagliflozina+saxagliptina;Qtern;antidiabeticos;combinacion_oral;diaria;sglt2+dpp4;;;no;diabetes;docs/documento_fuente.md §8.5 (Anexo A v3);2026-09-29;no
+empagliflozina_metformina_linagliptina;empagliflozina+metformina+linagliptina;Trijardy;antidiabeticos;combinacion_oral;diaria;sglt2+metformina+dpp4;;;no;diabetes;docs/documento_fuente.md §8.5 (Anexo A v3);2026-09-29;no
+insulina_degludec_aspart;insulina_degludec+insulina_aspart;Ryzodeg;insulinas;premezclada;dos_veces_dia;mantener_generico;;;no;diabetes;docs/documento_fuente.md §8.5 (Anexo A v3);2026-09-29;no
+ginkgo;ginkgo;;fitoterapia;suplemento;diaria;mantener_generico;;Fitoterapia con efecto sobre coagulacion: suspender 14 dias (min 7) (§8.11).;no;otra;docs/documento_fuente.md §8.11;2026-09-29;no

@@ -1,0 +1,163 @@
+{
+  "_meta": {
+    "descripcion": "Parámetros de las reglas de medicación. Los números salen de aquí (docs/documento_fuente.md §8). La lógica que no cabe en parámetros va en src/dominio/reglas/.",
+    "version_contenido": "0.1.0",
+    "fecha_revision": "2026-09-29"
+  },
+  "bloqueos_profundos": [
+    "paravertebral",
+    "plexo_lumbar",
+    "compartimento_psoas",
+    "plexo_cervical_profundo",
+    "intercostal"
+  ],
+  "reglas": {
+    "avk_warfarina": {
+      "tipo": "antivitamina_k",
+      "farmaco": "warfarina",
+      "dias_suspension": 5,
+      "no_suspender_oftalmo_bajo": true,
+      "no_suspender_hemorragico_minimo": true,
+      "fuente": "docs/documento_fuente.md §8.1 (protocolo del servicio)"
+    },
+    "avk_acenocumarol": {
+      "tipo": "antivitamina_k",
+      "farmaco": "acenocumarol",
+      "dias_suspension": 3,
+      "no_suspender_oftalmo_bajo": true,
+      "no_suspender_hemorragico_minimo": true,
+      "fuente": "docs/documento_fuente.md §8.1 (protocolo del servicio)"
+    },
+    "acod_dabigatran": {
+      "tipo": "acod",
+      "subtipo": "dabigatran",
+      "horas_hemorragico_bajo": 48,
+      "horas_hemorragico_alto_o_neuroaxial": 72,
+      "ajuste_crcl_50_80_h": 24,
+      "ajuste_crcl_lt50_h": 48,
+      "neuroaxial_crcl_gt80_h": 72,
+      "neuroaxial_crcl_50_80_h": 96,
+      "neuroaxial_crcl_lt50_h": 120,
+      "no_suspender_oftalmo_bajo": true,
+      "fuente": "docs/documento_fuente.md §8.2 (protocolo del servicio; EHRA 2021)"
+    },
+    "acod_antixa": {
+      "tipo": "acod",
+      "subtipo": "antixa",
+      "horas_hemorragico_bajo": 48,
+      "horas_hemorragico_alto_o_neuroaxial": 72,
+      "ajuste_crcl_lt30_h": 24,
+      "neuroaxial_crcl_lt30_h": 96,
+      "no_suspender_oftalmo_bajo": true,
+      "fuente": "docs/documento_fuente.md §8.2 (protocolo del servicio; EHRA 2021)"
+    },
+    "aas": {
+      "tipo": "antiagregante_aas",
+      "dosis_mantener_max_mg": 200,
+      "dias_suspension_dosis_alta": 7,
+      "fuente": "docs/documento_fuente.md §8.3 (ESC 2022)"
+    },
+    "p2y12_clopidogrel": {
+      "tipo": "p2y12",
+      "dias_estandar": 5,
+      "dias_neuroaxial_o_profundo": 7,
+      "fuente": "docs/documento_fuente.md §8.3 (protocolo del servicio)"
+    },
+    "p2y12_ticagrelor": {
+      "tipo": "p2y12",
+      "dias_estandar": 5,
+      "dias_neuroaxial_o_profundo": 7,
+      "fuente": "docs/documento_fuente.md §8.3 (protocolo del servicio)"
+    },
+    "p2y12_prasugrel": {
+      "tipo": "p2y12",
+      "dias_estandar": 7,
+      "dias_neuroaxial_o_profundo": 10,
+      "fuente": "docs/documento_fuente.md §8.3 (protocolo del servicio)"
+    },
+    "triflusal": {
+      "tipo": "plazo_simple",
+      "dias_estandar": 7,
+      "dias_neuroaxial_o_profundo": 10,
+      "accion_si_no_aplica": "suspender",
+      "fuente": "docs/documento_fuente.md §8.3"
+    },
+    "dipiridamol": {
+      "tipo": "plazo_simple_horas",
+      "horas_estandar": 24,
+      "horas_neuroaxial_o_profundo": 48,
+      "fuente": "docs/documento_fuente.md §8.3"
+    },
+    "cilostazol": {
+      "tipo": "condicional_hemorragico",
+      "dias_si_alto_o_neuroaxial": 3,
+      "mantener_si_no": true,
+      "fuente": "docs/documento_fuente.md §8.3"
+    },
+    "sulodexida": {
+      "tipo": "condicional_hemorragico",
+      "horas_si_alto_o_neuroaxial": 48,
+      "mantener_si_no": true,
+      "no_interviene_en_pruebas": true,
+      "fuente": "docs/documento_fuente.md §8.3"
+    },
+    "aine_ibuprofeno": { "tipo": "aine", "horas": 24, "fuente": "docs/documento_fuente.md §8.6" },
+    "aine_naproxeno": { "tipo": "aine", "horas": 72, "fuente": "docs/documento_fuente.md §8.6" },
+    "aine_diclofenaco": { "tipo": "aine", "horas": 24, "fuente": "docs/documento_fuente.md §8.6" },
+    "aine_dexketoprofeno": { "tipo": "aine", "horas": 24, "fuente": "docs/documento_fuente.md §8.6" },
+    "aine_ketorolaco": { "tipo": "aine", "horas": 24, "fuente": "docs/documento_fuente.md §8.6" },
+    "aine_celecoxib": { "tipo": "aine_mantener", "fuente": "docs/documento_fuente.md §8.6" },
+    "aine_etoricoxib": { "tipo": "aine_mantener", "fuente": "docs/documento_fuente.md §8.6" },
+    "metformina": {
+      "tipo": "antidiabetico_no_dia_iq",
+      "contraste_suspender_h": 48,
+      "fuente": "docs/documento_fuente.md §8.5 (protocolo; CPOC)"
+    },
+    "sulfonilurea": { "tipo": "antidiabetico_no_dia_iq", "fuente": "docs/documento_fuente.md §8.5" },
+    "glinida": { "tipo": "antidiabetico_no_dia_iq", "fuente": "docs/documento_fuente.md §8.5" },
+    "dpp4": { "tipo": "antidiabetico_no_manana_iq", "fuente": "docs/documento_fuente.md §8.5" },
+    "pioglitazona": { "tipo": "antidiabetico_no_dia_iq", "fuente": "docs/documento_fuente.md §8.5" },
+    "sglt2": { "tipo": "sglt2", "dias": 3, "dias_ertugliflozina": 4, "fuente": "docs/documento_fuente.md §8.5" },
+    "glp1_semanal": {
+      "tipo": "glp1_semanal",
+      "ventana_dias": 7,
+      "dieta_liquidos_24h": true,
+      "fuente": "docs/documento_fuente.md §8.5 (Decisión 8)"
+    },
+    "glp1_diario": {
+      "tipo": "glp1_diario",
+      "dias_ultima_dosis_antes": 4,
+      "fuente": "docs/documento_fuente.md §8.5 (Decisión 8)"
+    },
+    "bomba_insulina": {
+      "tipo": "bomba_insulina",
+      "basal_pct_min": 70,
+      "basal_pct_max": 80,
+      "fuente": "docs/documento_fuente.md §8.5 (Decisión 6)"
+    },
+    "insulina_glp1_fija": {
+      "tipo": "requiere_confirmacion",
+      "texto_anestesiologo": "Combinación fija insulina basal + GLP-1: omitir el GLP-1 dejaría sin insulina basal.",
+      "fuente": "docs/documento_fuente.md §8.5"
+    },
+    "litio": {
+      "tipo": "litio",
+      "horas_riesgo_bajo": 24,
+      "horas_riesgo_intermedio": 48,
+      "horas_riesgo_alto": 72,
+      "fuente": "docs/documento_fuente.md §8.7"
+    },
+    "ieca_ara2": {
+      "tipo": "ieca_ara2",
+      "horas": 24,
+      "fuente": "docs/documento_fuente.md §8.10 (ESC 2022)"
+    },
+    "diuretico": { "tipo": "no_manana_iq", "fuente": "docs/documento_fuente.md §8.10" },
+    "mantener_generico": { "tipo": "mantener", "fuente": "docs/documento_fuente.md §8" },
+    "no_catalogado": {
+      "tipo": "no_catalogado",
+      "texto_paciente": "Siga tomándolo como siempre y consúltelo con el anestesiólogo.",
+      "fuente": "docs/documento_fuente.md §8.0"
+    }
+  }
+}

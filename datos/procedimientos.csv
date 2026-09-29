@@ -1,0 +1,17 @@
+id;procedimiento;especialidad;riesgo_cardiovascular;riesgo_hemorragico;grupo_oftalmologico;neuroaxial_o_bloqueo_profundo_probable;duracion_mayor_30min;riesgo_trombotico_alto
+protesis_rodilla;Artroplastia total de rodilla;traumatologia;intermedio;alto;no_aplica;si;si;si
+protesis_cadera;Artroplastia total de cadera;traumatologia;intermedio;alto;no_aplica;si;si;si
+fractura_cadera;Osteosintesis de fractura de cadera;traumatologia;intermedio;alto;no_aplica;si;si;si
+artroscopia_rodilla;Artroscopia de rodilla;traumatologia;bajo;bajo;no_aplica;si;si;no
+colecistectomia_lap;Colecistectomia laparoscopica;cirugia_general;intermedio;bajo;no_aplica;no;si;no
+hernioplastia_inguinal;Hernioplastia inguinal;cirugia_general;bajo;bajo;no_aplica;no;si;no
+tumorectomia_mama;Tumorectomia de mama;cirugia_general;bajo;bajo;no_aplica;no;si;no
+colectomia_oncologica;Colectomia oncologica;cirugia_general;alto;alto;no_aplica;no;si;si
+catarata_topica;Cirugia de catarata con anestesia topica;oftalmologia;bajo;minimo;riesgo_bajo;no;no;no
+vitrectomia;Vitrectomia;oftalmologia;bajo;minimo;riesgo_moderado_alto;no;si;no
+amigdalectomia;Amigdalectomia;orl;bajo;bajo;no_aplica;no;si;no
+rtu_prostata;Reseccion transuretral de prostata;urologia;intermedio;alto;no_aplica;si;si;no
+cesarea;Cesarea;obstetricia;intermedio;alto;no_aplica;si;si;no
+neurocirugia_intracraneal;Craneotomia;neurocirugia;alto;alto;no_aplica;no;si;si
+cirugia_aorta;Cirugia de aorta abdominal;vascular;alto;alto;no_aplica;no;si;si
+endoscopia_diagnostica;Endoscopia digestiva diagnostica;digestivo;bajo;minimo;no_aplica;no;no;no

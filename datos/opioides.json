@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "descripcion": "Factores de conversión a morfina oral equivalente (docs/documento_fuente.md §6.8).",
+    "fuente": "CDC 2022",
+    "version_contenido": "0.1.0",
+    "fecha_revision": "2026-09-29"
+  },
+  "factores": {
+    "morfina_oral": 1,
+    "codeina": 0.15,
+    "tramadol": 0.2,
+    "tapentadol": 0.4,
+    "oxicodona": 1.5,
+    "hidromorfona_oral": 5,
+    "fentanilo_transdermico": 2.4
+  },
+  "sin_conversion": ["buprenorfina", "metadona"]
+}
