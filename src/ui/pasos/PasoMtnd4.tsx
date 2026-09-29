@@ -47,6 +47,16 @@ export function PasoMtnd4({ inicial, onContinuar, onVolver }: Props) {
         (la línea paterna no cuenta para este cribado).
       </p>
 
+      {/* Guion para la enfermera (§9): cómo explicar la pregunta al paciente. */}
+      <div className="guion" role="note">
+        <p className="guion-titulo">Guion para explicar la pregunta al paciente:</p>
+        <p className="guion-texto">
+          «Hacemos esta pregunta a todos los pacientes porque se ha descrito una variante genética
+          heredada por vía materna, más frecuente en familias de origen venezolano, que puede influir
+          en cómo se elige la anestesia».
+        </p>
+      </div>
+
       <div className="grupo-checks">
         <label className={`radio-tarjeta ${venezolanaMaterna ? 'seleccionado' : ''}`}>
           <input type="checkbox" checked={venezolanaMaterna} onChange={() => setVenezolanaMaterna(!venezolanaMaterna)} />

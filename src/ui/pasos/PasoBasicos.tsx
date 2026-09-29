@@ -11,33 +11,49 @@ import config from '../../../datos/config.json';
 
 interface Props {
   inicial: DatosBasicosUi | null;
+  /** El procedimiento del paso 1 es obstétrico (embarazo asumido). */
+  obstetrico: boolean;
   onContinuar: (datos: DatosBasicosUi) => void;
   onVolver: () => void;
 }
 
+/** Semana de gestación a partir de la cual el ayuno es individualizado (§5.13). */
+const SEMANAS_AYUNO_INDIVIDUALIZADO = 20;
+
 const EDAD_PEDIATRICA_MAX = (config as { edad_pediatrica_maxima: number }).edad_pediatrica_maxima;
 
-export function PasoBasicos({ inicial, onContinuar, onVolver }: Props) {
+export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Props) {
   const [edad, setEdad] = useState(inicial ? String(inicial.edadAnios) : '');
-  const [sexo, setSexo] = useState<Sexo | ''>(inicial?.sexo ?? '');
+  const [meses, setMeses] = useState(inicial?.edadMeses !== undefined ? String(inicial.edadMeses) : '');
+  const [sexo, setSexo] = useState<Sexo | ''>(inicial?.sexo ?? (obstetrico ? 'mujer' : ''));
   const [peso, setPeso] = useState(inicial ? String(inicial.pesoKg) : '');
   const [talla, setTalla] = useState(inicial ? String(inicial.tallaCm) : '');
   const [posibleEmbarazo, setPosibleEmbarazo] = useState<boolean | undefined>(inicial?.posibleEmbarazo);
   const [fechaUltimaRegla, setFechaUltimaRegla] = useState(inicial?.fechaUltimaRegla ?? '');
+  const [semanas, setSemanas] = useState(inicial?.semanasGestacion !== undefined ? String(inicial.semanasGestacion) : '');
 
   const edadNum = Number(edad);
+  const mesesNum = Number(meses);
   const pesoNum = Number(peso);
   const tallaNum = Number(talla);
   const imc = calcularImc(pesoNum, tallaNum);
 
+  const semanasNum = Number(semanas);
   const esPediatrico = edad !== '' && edadNum <= EDAD_PEDIATRICA_MAX;
-  const preguntarEmbarazo = sexo === 'mujer' && edad !== '' && edadNum >= 12 && edadNum <= 55;
+  const menorDe2 = edad !== '' && edadNum < 2;
+  // En procedimiento obstétrico se da por hecho el embarazo: no se pregunta la
+  // posibilidad; se piden las semanas de gestación y se activa el módulo obstétrico.
+  const preguntarEmbarazo = !obstetrico && sexo === 'mujer' && edad !== '' && edadNum >= 12 && edadNum <= 55;
+  const ayunoIndividualizado = obstetrico && semanas !== '' && semanasNum >= SEMANAS_AYUNO_INDIVIDUALIZADO;
 
   // Validación mínima.
   const edadOk = edad !== '' && edadNum >= 0 && edadNum < 130;
+  // En menores de 2 años los meses son obligatorios (0-23) para el ayuno y la edad posconcepcional.
+  const mesesOk = !menorDe2 || (meses !== '' && mesesNum >= 0 && mesesNum <= 23);
+  const semanasOk = !obstetrico || (semanas !== '' && semanasNum >= 0 && semanasNum <= 45);
   const pesoOk = pesoNum > 0 && (!esPediatrico || peso !== ''); // en pediátrico el peso es obligatorio
   const tallaOk = tallaNum > 0;
-  const puedeContinuar = edadOk && sexo !== '' && pesoOk && tallaOk;
+  const puedeContinuar = edadOk && mesesOk && semanasOk && sexo !== '' && pesoOk && tallaOk;
 
   function continuar() {
     if (sexo === '') return;
@@ -47,9 +63,16 @@ export function PasoBasicos({ inicial, onContinuar, onVolver }: Props) {
       pesoKg: pesoNum,
       tallaCm: tallaNum,
     };
-    if (preguntarEmbarazo) {
+    // Edad en meses solo en menores de 2 años (§4, paso 2): el ayuno con fórmula
+    // es de 4 h en menores de 6 meses y la edad posconcepcional depende de ella.
+    if (menorDe2 && meses !== '') datos.edadMeses = mesesNum;
+    if (obstetrico) {
+      datos.moduloObstetrico = true;
+      if (semanas !== '') datos.semanasGestacion = semanasNum;
+    } else if (preguntarEmbarazo) {
       if (posibleEmbarazo !== undefined) datos.posibleEmbarazo = posibleEmbarazo;
       if (fechaUltimaRegla !== '') datos.fechaUltimaRegla = fechaUltimaRegla;
+      if (posibleEmbarazo === true) datos.moduloObstetrico = true;
     }
     onContinuar(datos);
   }
@@ -62,6 +85,16 @@ export function PasoBasicos({ inicial, onContinuar, onVolver }: Props) {
         <label htmlFor="edad">Edad (años)</label>
         <input id="edad" type="number" min={0} max={129} inputMode="numeric" value={edad} onChange={(e) => setEdad(e.target.value)} />
       </div>
+
+      {menorDe2 && (
+        <div className="campo">
+          <label htmlFor="meses">Edad en meses (menor de 2 años)</label>
+          <input id="meses" type="number" min={0} max={23} inputMode="numeric" value={meses} onChange={(e) => setMeses(e.target.value)} />
+          <p className="aviso aviso-info" role="note">
+            En menores de 6 meses, el ayuno con leche de fórmula es de 4 horas. Los meses también se usan para la edad posconcepcional.
+          </p>
+        </div>
+      )}
 
       <fieldset className="campo">
         <legend>Sexo</legend>
@@ -95,6 +128,24 @@ export function PasoBasicos({ inicial, onContinuar, onVolver }: Props) {
           Paciente pediátrico (≤ {EDAD_PEDIATRICA_MAX} años): se activará el módulo pediátrico. El peso es obligatorio y
           se usarán las escalas pediátricas (STBUR y POVOC) en lugar de STOP-Bang y Apfel.
         </p>
+      )}
+
+      {obstetrico && (
+        <fieldset className="campo">
+          <legend>Embarazo (procedimiento obstétrico)</legend>
+          <p className="aviso aviso-info" role="note">
+            Al ser un procedimiento obstétrico, se da por hecho el embarazo y se activa el <strong>módulo obstétrico</strong>.
+          </p>
+          <div className="campo">
+            <label htmlFor="semanas">Semanas de gestación</label>
+            <input id="semanas" type="number" min={0} max={45} inputMode="numeric" value={semanas} onChange={(e) => setSemanas(e.target.value)} />
+          </div>
+          {ayunoIndividualizado && (
+            <p className="aviso aviso-atencion" role="note">
+              Embarazo de {semanasNum} semanas (≥ {SEMANAS_AYUNO_INDIVIDUALIZADO}): <strong>ayuno individualizado</strong> y profilaxis de aspiración.
+            </p>
+          )}
+        </fieldset>
       )}
 
       {preguntarEmbarazo && (

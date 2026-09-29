@@ -336,3 +336,20 @@ body {
   color: #555;
   margin-top: 4px;
 }
+
+/* Guion para la enfermera (paso 4) */
+.guion {
+  background: #eef7ee;
+  border-left: 4px solid #2e7d32;
+  border-radius: var(--radio);
+  padding: 12px 14px;
+  margin: 12px 0 18px;
+}
+.guion-titulo {
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+.guion-texto {
+  margin: 0;
+  font-style: italic;
+}

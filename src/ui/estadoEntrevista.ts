@@ -12,6 +12,10 @@ export interface DatosBasicosUi extends DatosBasicos {
   posibleEmbarazo?: boolean;
   /** Fecha de la última regla (ISO yyyy-mm-dd), si aplica. */
   fechaUltimaRegla?: string;
+  /** Semanas de gestación (procedimiento obstétrico → embarazo asumido). */
+  semanasGestacion?: number;
+  /** Módulo obstétrico activo (procedimiento obstétrico o embarazo confirmado). */
+  moduloObstetrico?: boolean;
 }
 
 /** Una intervención previa (paso 3, R3.2.10). */

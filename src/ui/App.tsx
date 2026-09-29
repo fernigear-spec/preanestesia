@@ -4,8 +4,22 @@ import { PasoIntervencion } from './pasos/PasoIntervencion.tsx';
 import { PasoBasicos } from './pasos/PasoBasicos.tsx';
 import { PasoAntecedentes } from './pasos/PasoAntecedentes.tsx';
 import { PasoMtnd4 } from './pasos/PasoMtnd4.tsx';
-import { ESTADO_INICIAL, type EstadoEntrevista } from './estadoEntrevista.ts';
+import { ESTADO_INICIAL, INCIDENCIAS_ANESTESICAS, type EstadoEntrevista, type IntervencionPrevia } from './estadoEntrevista.ts';
 import type { Modalidad } from '../dominio/tipos.ts';
+
+const TIPO_ANESTESIA_ETIQUETA: Record<IntervencionPrevia['tipoAnestesia'], string> = {
+  general: 'general',
+  neuroaxial: 'neuroaxial',
+  sedacion: 'sedación',
+  local: 'local',
+  no_lo_sabe: 'no lo sabe',
+};
+function tipoAnestesiaLegible(t: IntervencionPrevia['tipoAnestesia']): string {
+  return TIPO_ANESTESIA_ETIQUETA[t];
+}
+function incidenciaLegible(id: string): string {
+  return INCIDENCIAS_ANESTESICAS.find((x) => x.id === id)?.etiqueta ?? id;
+}
 
 type Pantalla = 'inicio' | 'paso1' | 'paso2' | 'paso3' | 'paso4' | 'resumen';
 
@@ -82,6 +96,7 @@ export function App() {
         {pantalla === 'paso2' && (
           <PasoBasicos
             inicial={basicos}
+            obstetrico={procedimiento?.obstetrico ?? false}
             onVolver={() => setPantalla('paso1')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, basicos: datos }));
@@ -138,8 +153,22 @@ export function App() {
             </ul>
 
             <h3>Antecedentes</h3>
+            <p><strong>Intervenciones previas:</strong></p>
+            {antecedentes && antecedentes.intervencionesPrevias.length > 0 ? (
+              <ul className="resumen-lista">
+                {antecedentes.intervencionesPrevias.map((p, i) => (
+                  <li key={`${p.procedimiento}-${i}`}>
+                    {p.procedimiento}{p.anio ? ` (${p.anio})` : ''} · {tipoAnestesiaLegible(p.tipoAnestesia)}
+                    {p.incidencias.length > 0 && (
+                      <> · incidencias: {p.incidencias.map(incidenciaLegible).join(', ')}</>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>Ninguna.</p>
+            )}
             <ul className="resumen-lista">
-              <li><strong>Intervenciones previas:</strong> {antecedentes && antecedentes.intervencionesPrevias.length > 0 ? antecedentes.intervencionesPrevias.map((p) => p.procedimiento).join(', ') : 'ninguna'}</li>
               <li>
                 <strong>Antecedentes familiares:</strong>{' '}
                 {antecedentes && (antecedentes.familiaresHipertermiaMaligna || antecedentes.familiaresDeficitPseudocolinesterasa || antecedentes.familiaresComplicacionesGraves)
