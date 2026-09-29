@@ -1,8 +1,8 @@
 # tasks.md — AnesHealth · Entrevista Preanestésica de Enfermería
 
-> **Estado:** revisado con las decisiones del servicio. Pendiente del visto bueno final antes de escribir código.
-> Las 14 decisiones clínicas y no clínicas ya están incorporadas a `requirements.md` (sección «Decisiones registradas») y a `design.md`. Stack aprobado; repositorio destino **fernigear-spec/preanestesia**.
-> Versión 0.2 · 29/09/2026
+> **Estado:** alineado con el documento fuente v3 (29/09/2026). Pendiente del visto bueno final antes de escribir código.
+> Las 14 decisiones y las novedades de la v3 (QR estructurado, histórico de textos, catálogo ampliado) están incorporadas a `requirements.md` y `design.md`. Stack aprobado; repositorio destino **fernigear-spec/preanestesia**; documento fuente en `docs/documento_fuente.md`.
+> Versión 0.3 · 29/09/2026
 
 Cada tarea referencia los requisitos que satisface (`Rx.y`). Las tareas se ordenan para permitir desarrollo incremental: primero el andamiaje y el motor de dominio (con pruebas), después las salidas, la UI y las herramientas.
 
@@ -41,6 +41,9 @@ Cada tarea referencia los requisitos que satisface (`Rx.y`). Las tareas se orden
 - [ ] **3.8** Generar `modulos/*.json` — un fichero por cada módulo de R5.1 a R5.15, con preguntas, tipos, visibilidad, efecto ASA/riesgo, alertas, frase SAP y textos de modo guiado. _(R5, R4.5)_
 - [ ] **3.9** Generar `textos/es/*.json` (paciente, hojas anexas, guion de preguntas delicadas). _(R16.2)_
 - [ ] **3.10** Generar `textos/ca/*.json` traducidos, marcados «PENDENT DE REVISIÓ». _(R16.3)_
+- [ ] **3.11** Sembrar `textos/historico/<versión>/` con el snapshot de la versión inicial y definir el mecanismo de snapshot por publicación. _(R2.2.9, R11.5)_
+- [ ] **3.12** Incluir en `farmacos.csv` las combinaciones oficiales de la v3 (Atacand Plus/Parapres Plus, Viacoram, Sevikar, Qtern, Trijardy, Ryzodeg), `verificado_cima = no`. _(Anexo A v3)_
+- [ ] **3.13** Guardar el documento fuente v3 en `docs/documento_fuente.md`. _(§0 v3)_
 
 ---
 
@@ -151,7 +154,7 @@ Cada subtarea incluye su fichero en `src/dominio/escalas/` **y** sus pruebas uni
 
 - [ ] **12.1** Serialización compacta (claves cortas, catálogos por id) + compresión + base64url. _(R11.1, R11.8)_
 - [ ] **12.2** Deserialización y modo «vista QR» de solo lectura adaptada a móvil. _(R11.5)_
-- [ ] **12.3** QR del paciente (hoja calculada, es/ca, guardar PDF). _(R11.5)_
+- [ ] **12.3** QR del paciente: payload **estructurado** (códigos de acción, fechas, ids de anexos, versión de textos), renderizado con los textos de `textos/historico/<versión>/`; es/ca, guardar PDF. _(R11.5, R2.2.9)_
 - [ ] **12.4** QR del anestesiólogo (entrevista completa, confirmación de pendientes, regeneración del QR del paciente y SAP). _(R11.6, R12.2)_
 - [ ] **12.5** Caducidad como regla de visualización + mensaje sin datos. _(R11.4, R11.9)_
 - [ ] **12.6** Aviso de versión de contenido distinta. _(R11.7)_

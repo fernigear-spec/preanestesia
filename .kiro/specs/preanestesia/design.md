@@ -1,8 +1,8 @@
 # design.md — AnesHealth · Entrevista Preanestésica de Enfermería
 
-> **Estado:** revisado con las decisiones del servicio. Pendiente del visto bueno final antes de escribir código.
-> Versión 0.2 · 29/09/2026
-> Repositorio destino: **fernigear-spec/preanestesia** (público).
+> **Estado:** alineado con el documento fuente v3 (29/09/2026). Pendiente del visto bueno final antes de escribir código.
+> Versión 0.3 · 29/09/2026
+> Repositorio destino: **fernigear-spec/preanestesia** (público). Documento fuente: `docs/documento_fuente.md`.
 
 ---
 
@@ -96,8 +96,11 @@ preanestesia/
 │   │   └── ...  (uno por patología de R5)
 │   ├── textos/
 │   │   ├── es/*.json
-│   │   └── ca/*.json                  # marcados "PENDENT DE REVISIÓ"
+│   │   ├── ca/*.json                  # marcados "PENDENT DE REVISIÓ"
+│   │   └── historico/<versión>/       # snapshots de textos por versión (QR antiguos)
 │   └── casos_entrenamiento/*.json
+├── docs/
+│   └── documento_fuente.md            # documento clínico fuente (v3)
 ├── src/
 │   ├── dominio/                       # MOTOR: TS puro, sin React
 │   │   ├── escalas/                   # una carpeta/fichero por escala
@@ -289,7 +292,7 @@ apixabán (anti-Xa), riesgo hemorrágico alto (prótesis rodilla) + raquídea + 
 - La app lee el fragmento al cargar; si detecta un payload, entra en modo «vista QR».
 - **Caducidad**: comparación de fechas al abrir; si caducó, se muestra el mensaje sin renderizar datos (regla de visualización, documentada como tal en el README — R11.9).
 - Dos tipos de payload:
-  - **paciente**: hoja ya calculada (textos finales), solo lectura, conmutador es/ca, botón guardar PDF.
+  - **paciente**: hoja calculada **en forma estructurada** (nombre comercial, código de acción y fecha/hora por fármaco, horas de ayuno, ids de anexos, teléfono y **versión de textos**), **no** textos largos. La vista renderiza esa estructura con los textos de `datos/textos/historico/<versión>/`, de modo que un QR antiguo muestre siempre la misma hoja aunque se actualice el contenido. Solo lectura, conmutador es/ca, botón guardar PDF. Codificar por ids/códigos también ayuda a que la carga quepa en el QR (R11.8).
   - **anestesiólogo**: entrevista completa + versión de contenido; permite confirmar pendientes y regenerar el QR del paciente.
 - **Prueba de tamaño (caso 19)**: round-trip codificar/decodificar de los casos más complejos, verificando que caben en ~2,9 KB; si no, aviso + copiar enlace.
 
@@ -329,6 +332,14 @@ La ilustración esquemática de Mallampati (R6.2.1) se dibuja como **SVG propio*
 - `deploy.yml`: en push a `main`, `npm ci` → `npm run build` → `npm test` (los tests deben pasar) → publicación de `dist/` en GitHub Pages.
 - `vite.config.ts` con `base: '/preanestesia/'` para las rutas de Pages.
 - El PWA/service worker se genera en el build.
+
+---
+
+## Versionado de textos del paciente (histórico)
+
+- Cada publicación de contenido incrementa `config.version` y deja un snapshot de `datos/textos/{es,ca}/` en `datos/textos/historico/<versión>/`.
+- El QR del paciente guarda solo la **versión de textos** (no los textos). Al abrirlo, la vista carga el diccionario histórico correspondiente y renderiza la hoja; si esa versión no estuviera disponible (caso excepcional), cae a la versión actual y muestra el aviso de versión distinta (R11.7).
+- El build valida que exista una carpeta de histórico por cada versión referenciable y que los snapshots no se editen retroactivamente.
 
 ---
 

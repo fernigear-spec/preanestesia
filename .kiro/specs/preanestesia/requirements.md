@@ -1,8 +1,8 @@
 # requirements.md — AnesHealth · Entrevista Preanestésica de Enfermería
 
-> **Estado:** revisado con las decisiones clínicas y no clínicas del servicio (bloque de 14 decisiones). Pendiente del visto bueno final antes de escribir código.
-> Versión 0.2 · 29/09/2026
-> Repositorio destino: **fernigear-spec/preanestesia** (público).
+> **Estado:** alineado con el documento fuente v3 (29/09/2026), que integra las 14 decisiones del servicio y las correcciones de la revisión de v0.2. Pendiente del visto bueno final antes de escribir código.
+> Versión 0.3 · 29/09/2026
+> Repositorio destino: **fernigear-spec/preanestesia** (público). Documento fuente: `docs/documento_fuente.md`.
 
 ---
 
@@ -59,7 +59,7 @@ Todo el contenido clínico (preguntas, fármacos, reglas, procedimientos, planti
 - **R2.2.6** `datos/plantillas_sap.json` — orden de bloques, plantillas con marcadores, abreviaturas y política de negativos.
 - **R2.2.7** `datos/opioides.json` — factores de conversión a morfina oral equivalente (CDC 2022).
 - **R2.2.8** `datos/coherencia.json` — reglas del asistente de coherencia.
-- **R2.2.9** `datos/textos/es/*.json` y `datos/textos/ca/*.json` — textos del paciente en castellano y catalán.
+- **R2.2.9** `datos/textos/es/*.json` y `datos/textos/ca/*.json` — textos del paciente en castellano y catalán. Todas las versiones publicadas se conservan en `datos/textos/historico/<versión>/`, de modo que un QR antiguo pueda renderizarse siempre con los textos de la versión con que se generó (R11.5).
 - **R2.2.10** `datos/casos_entrenamiento/*.json` — casos clínicos para el modo entrenamiento y las pruebas automáticas.
 
 ### R2.3 Validación al inicio
@@ -394,7 +394,7 @@ Las notas del anestesiólogo recuerdan **informar a la paciente al alta si se ha
 - **R11.2** Cada carga útil incluye: tipo (paciente/anestesiólogo), versión del esquema, versión del contenido clínico, fecha de creación y fecha de caducidad.
 - **R11.3** Nunca incluyen nombre, número de historia ni campo de identificación.
 - **R11.4** Enlace caducado: muestra «Este enlace ha caducado. Llame al [teléfono]» sin mostrar datos.
-- **R11.5** QR del paciente: contiene la hoja ya calculada (textos finales, no las respuestas). Caducidad: 30 días después de la fecha de intervención (configurable). Vista de solo lectura adaptada a móvil con conmutador de idioma.
+- **R11.5** QR del paciente: contiene la hoja ya calculada **en forma estructurada** (nombre comercial, código de acción y fecha/hora de cada fármaco, horas de ayuno, ids de los anexos aplicables, teléfono y **versión de los textos**), **no** las respuestas de la entrevista ni textos largos. La vista del paciente renderiza esa estructura en castellano o catalán con los textos de la versión indicada, tomados de `datos/textos/historico/<versión>/`, de modo que la hoja no cambie aunque luego se actualice el catálogo o los textos. Caducidad: 30 días después de la fecha de intervención (configurable). Vista de solo lectura adaptada a móvil con conmutador de idioma, botón para guardar como PDF e indicación de cómo añadirla a la pantalla de inicio. No se genera mientras haya puntos pendientes sin resolver (R12).
 - **R11.6** QR del anestesiólogo: contiene la entrevista completa. Al abrirlo, el anestesiólogo puede confirmar puntos pendientes con su nombre; la aplicación genera el QR/enlace definitivo del paciente y el SAP actualizado. Caducidad: 60 días (configurable).
 - **R11.7** Si la versión del contenido del enlace difiere de la actual: aviso visible.
 - **R11.8** Si la carga supera la capacidad del QR (~2,9 KB con corrección media/baja), la aplicación avisa y ofrece copiar el enlace.
@@ -492,18 +492,23 @@ Las ambigüedades detectadas en la versión 0.1 quedaron resueltas por el servic
 13. **Prehabilitación** → derivación desactivada por defecto (`prehabilitacion_activa: false`), URL configurable; apagada no aparece en ninguna salida. *(R13.)*
 14. **Repositorio destino** → `fernigear-spec/preanestesia` (público). Todas las referencias a `holaaneshealth-eng` como organización del proyecto quedan corregidas; la URL de PreHabilítame se mantiene solo como valor por defecto configurable del enlace externo.
 
+### Novedades incorporadas del documento fuente v3
+
+- **QR del paciente estructurado + histórico de textos (R11.5, R2.2.9):** el QR del paciente lleva la hoja en forma estructurada (códigos de acción, fechas, ids de anexos, versión de textos), no textos largos; la vista los renderiza con los textos de la versión con que se generó, conservados en `datos/textos/historico/<versión>/`. Esto garantiza que un QR antiguo muestre siempre la misma hoja aunque se actualice el contenido.
+- **Catálogo del Anexo A ampliado:** combinaciones antihipertensivas (Atacand Plus/Parapres Plus, Viacoram, Sevikar) y de antidiabéticos/insulina (Qtern, Trijardy, Ryzodeg) pasan de sugerencia a catálogo oficial (`verificado_cima = no`).
+- **Documento fuente versionado:** se conserva en `docs/documento_fuente.md` (v3).
+
 ---
 
-## Sugerencias de nombres comerciales adicionales para revisión
+## Nombres comerciales adicionales (ya integrados en el Anexo A v3)
 
-Los siguientes principios activos del catálogo inicial tienen nombres comerciales presentes en España (CIMA) que no figuran en el anexo A del documento. Se proponen para consideración del equipo clínico; todas las filas llevarán `verificado_cima = no` hasta su revisión explícita:
+Las sugerencias que se propusieron en la v0.2 han sido aceptadas por el servicio e incorporadas oficialmente al catálogo del Anexo A del documento fuente v3 (con `verificado_cima = no`, pendientes de validación en CIMA antes del uso clínico):
 
-- **Candesartán + hidroclorotiazida**: Atacand Plus, Parapres Plus — combinación fija frecuente.
-- **Perindopril + amlodipino**: Viacoram — combinación fija frecuente en HTA.
-- **Olmesartán + amlodipino**: Sevikar — combinación fija frecuente.
-- **Dapagliflozina + saxagliptina**: Qtern — combinación presente en España.
-- **Empagliflozina + metformina + linagliptina**: Trijardy — triple combinación.
-- **Insulina degludec + aspart**: Ryzodeg — combinación premezclada frecuente.
-- **Tirzepatida (obesidad)**: posible nombre adicional Zepbound (verificar disponibilidad en España en CIMA).
+- **Candesartán + hidroclorotiazida**: Atacand Plus, Parapres Plus.
+- **Perindopril + amlodipino**: Viacoram.
+- **Olmesartán + amlodipino**: Sevikar.
+- **Dapagliflozina + saxagliptina**: Qtern.
+- **Empagliflozina + metformina + linagliptina**: Trijardy.
+- **Insulina degludec + aspart**: Ryzodeg.
 
-Nota: el equipo médico debe validar todos los nombres comerciales en CIMA (https://cima.aemps.es) antes del uso clínico.
+Nota: **Zepbound** (tirzepatida para obesidad) queda como sugerencia pendiente de verificar disponibilidad en España; no se ha añadido al Anexo A. El equipo médico debe validar todos los nombres comerciales en CIMA (https://cima.aemps.es) antes del uso clínico.
