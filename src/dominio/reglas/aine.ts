@@ -4,7 +4,7 @@
  * celecoxib/etoricoxib: mantener. Texto al paciente sobre alternativas.
  */
 import type { ContextoReglas, ResultadoFarmaco } from '../tipos.ts';
-import { plazoDesdeHoras, TEXTO_MANTENER } from './motor.ts';
+import { plazoDesdeHoras, faltaHora, resultadoFaltaHora, TEXTO_MANTENER } from './motor.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.6';
 
@@ -46,6 +46,7 @@ export function reglaAine(e: EntradaAine, ctx: ContextoReglas): ResultadoFarmaco
   }
 
   const p = plazoDesdeHoras(ctx, plazo);
+  if (faltaHora(p)) return resultadoFaltaHora(base);
   return {
     ...base,
     accion: 'suspender',

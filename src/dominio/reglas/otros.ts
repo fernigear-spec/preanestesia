@@ -8,7 +8,7 @@
 import type { ContextoReglas, ResultadoFarmaco, Alerta } from '../tipos.ts';
 import { TEXTO_MANTENER } from './motor.ts';
 import { plazoNoAlcanzable } from '../fechas/plazos.ts';
-import { plazoDesdeDias } from './motor.ts';
+import { plazoDesdeDias, faltaHora, resultadoFaltaHora } from './motor.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.0';
 
@@ -54,6 +54,8 @@ export interface EntradaFitoterapia {
 /** Fitoterapia/suplementos con efecto sobre coagulación/metabolismo: suspender 14 días (mínimo 7). */
 export function reglaFitoterapia(e: EntradaFitoterapia, ctx: ContextoReglas): ResultadoFarmaco {
   const plazo = plazoDesdeDias(ctx, 14); // no tomar 14 días previos ni el día de la IQ
+  const base = { idFarmaco: e.idFarmaco, nombreComercial: e.nombreComercial, principiosActivos: [e.principio], fuente: 'docs/documento_fuente.md §8.11' };
+  if (faltaHora(plazo)) return resultadoFaltaHora(base);
   return {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,

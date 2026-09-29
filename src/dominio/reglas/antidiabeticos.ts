@@ -7,7 +7,7 @@
 import type { ContextoReglas, ResultadoFarmaco } from '../tipos.ts';
 import { startOfDay, endOfDay } from '../fechas/plazos.ts';
 import { fechaLarga, horaReloj } from '../fechas/ultimaToma.ts';
-import { plazoDesdeDias } from './motor.ts';
+import { plazoDesdeDias, faltaHora, resultadoFaltaHora } from './motor.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.5 (protocolo de preanestesia en diabéticos; CPOC)';
 
@@ -62,6 +62,8 @@ export interface EntradaSglt2 {
 export function reglaSglt2(e: EntradaSglt2, ctx: ContextoReglas): ResultadoFarmaco {
   const dias = e.principio === 'ertugliflozina' ? 4 : 3;
   const plazo = plazoDesdeDias(ctx, dias); // no tomar N días previos ni el día de la IQ
+  const base = { idFarmaco: e.idFarmaco, nombreComercial: e.nombreComercial, principiosActivos: [e.principio], fuente: FUENTE };
+  if (faltaHora(plazo)) return resultadoFaltaHora(base);
   return {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,
@@ -139,6 +141,8 @@ export interface EntradaGlp1Diario {
 export function reglaGlp1Diario(e: EntradaGlp1Diario, ctx: ContextoReglas): ResultadoFarmaco {
   // Omitir los 3 días previos y el día de la intervención → última dosis el día 4 previo.
   const plazo = plazoDesdeDias(ctx, 3);
+  const base = { idFarmaco: e.idFarmaco, nombreComercial: e.nombreComercial, principiosActivos: [e.principio], fuente: FUENTE };
+  if (faltaHora(plazo)) return resultadoFaltaHora(base);
   return {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,

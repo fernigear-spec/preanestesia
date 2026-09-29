@@ -7,7 +7,7 @@
  *   Siempre requiere confirmación.
  */
 import type { ContextoReglas, ResultadoFarmaco } from '../tipos.ts';
-import { plazoDesdeDias } from './motor.ts';
+import { plazoDesdeDias, faltaHora, resultadoFaltaHora } from './motor.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.1 (protocolo del servicio; ESC 2022)';
 
@@ -58,6 +58,7 @@ export function reglaAvk(e: EntradaAvk, ctx: ContextoReglas): ResultadoAvk {
 
   const dias = DIAS_AVK[e.principio];
   const plazo = plazoDesdeDias(ctx, dias);
+  if (faltaHora(plazo)) return { farmaco: resultadoFaltaHora(base) };
 
   // Terapia puente con alto riesgo tromboembólico → siempre requiere confirmación.
   if (e.altoRiesgoTromboembolico) {

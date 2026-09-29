@@ -10,7 +10,7 @@
  * - Biológicos: planificación por ciclo; requiere confirmación.
  */
 import type { ContextoReglas, ResultadoFarmaco } from '../tipos.ts';
-import { plazoDesdeDias, TEXTO_MANTENER } from './motor.ts';
+import { plazoDesdeDias, faltaHora, resultadoFaltaHora, TEXTO_MANTENER } from './motor.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.8 (ACR 2022)';
 
@@ -107,6 +107,8 @@ export function reglaFameMantener(e: EntradaSimpleReuma): ResultadoFarmaco {
 /** Inhibidores JAK (tofacitinib, baricitinib, upadacitinib): suspender 3 días. */
 export function reglaJak(e: EntradaSimpleReuma, ctx: ContextoReglas): ResultadoFarmaco {
   const plazo = plazoDesdeDias(ctx, 3);
+  const base = { idFarmaco: e.idFarmaco, nombreComercial: e.nombreComercial, principiosActivos: [e.principio], fuente: FUENTE };
+  if (faltaHora(plazo)) return resultadoFaltaHora(base);
   return {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,

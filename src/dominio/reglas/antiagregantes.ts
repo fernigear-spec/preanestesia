@@ -6,7 +6,7 @@
  * reglas_farmacos.json.
  */
 import type { ContextoReglas, ResultadoFarmaco, Alerta } from '../tipos.ts';
-import { neuroaxialOProfundo, plazoDesdeDias, TEXTO_MANTENER } from './motor.ts';
+import { neuroaxialOProfundo, plazoDesdeDias, plazoDesdeHoras, faltaHora, resultadoFaltaHora, TEXTO_MANTENER } from './motor.ts';
 import { fechaHoraLimite } from '../fechas/plazos.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.3 (ESC 2022; protocolo del servicio)';
@@ -52,20 +52,29 @@ export function reglaAas(e: EntradaAas, ctx: ContextoReglas): ResultadoFarmaco {
   }
 
   // AAS > 200 mg: suspender 7 días; indicación cardiovascular → confirmación.
+  // Indicación cardiovascular: requiere confirmación con la sugerencia de bajar a
+  // 100 mg/día. Esto prima sobre el cálculo del plazo (va a consultar igualmente).
+  if (e.indicacionCardiovascular) {
+    return {
+      ...base,
+      accion: 'consultar',
+      textoPaciente:
+        'Sobre este medicamento, el anestesiólogo le confirmará qué hacer. No lo cambie por su cuenta.',
+      reglaAplicada: 'AAS > 200 mg/día con indicación cardiovascular: requiere confirmación',
+      requiereConfirmacion: true,
+      textoAnestesiologo: 'Valorar pasar a 100 mg/día.',
+    };
+  }
   const plazo = plazoDesdeDias(ctx, 7);
-  const res: ResultadoFarmaco = {
+  if (faltaHora(plazo)) return resultadoFaltaHora(base);
+  return {
     ...base,
     accion: 'suspender',
     fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
     textoPaciente: plazo.textoPaciente,
     reglaAplicada: 'AAS > 200 mg/día: suspender 7 días',
-    requiereConfirmacion: e.indicacionCardiovascular === true,
+    requiereConfirmacion: false,
   };
-  if (e.indicacionCardiovascular) {
-    res.textoAnestesiologo = 'Valorar pasar a 100 mg/día.';
-    res.accion = 'consultar';
-  }
-  return res;
 }
 
 // ————————————— P2Y12 —————————————
@@ -91,16 +100,15 @@ export function reglaP2y12(e: EntradaP2y12, ctx: ContextoReglas): ResultadoFarma
     ? DIAS_P2Y12[e.principio].neuroaxial
     : DIAS_P2Y12[e.principio].estandar;
   const plazo = plazoDesdeDias(ctx, dias);
+  const baseP2y12 = { idFarmaco: e.idFarmaco, nombreComercial: e.nombreComercial, principiosActivos: [e.principio], fuente: FUENTE };
+  if (faltaHora(plazo)) return resultadoFaltaHora(baseP2y12);
 
   const res: ResultadoFarmaco = {
-    idFarmaco: e.idFarmaco,
-    nombreComercial: e.nombreComercial,
-    principiosActivos: [e.principio],
+    ...baseP2y12,
     accion: 'suspender',
     fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
     textoPaciente: plazo.textoPaciente,
     reglaAplicada: `${e.principio}: suspender ${dias} días${neuroaxialOProfundo(ctx) ? ' (neuroaxial/bloqueo profundo)' : ''}`,
-    fuente: FUENTE,
     requiereConfirmacion: e.monoterapia,
   };
   if (e.monoterapia) {
@@ -173,12 +181,11 @@ export function evaluarStent(e: EntradaStent, ctx: ContextoReglas): ResultadoSte
 
 // ————————————— Otros antiagregantes (§8.3) —————————————
 
-import { plazoDesdeHoras } from './motor.ts';
-
 /** Triflusal: 7 días; 10 días con neuroaxial o bloqueo profundo. */
 export function reglaTriflusal(idFarmaco: string, nombreComercial: string, ctx: ContextoReglas): ResultadoFarmaco {
   const dias = neuroaxialOProfundo(ctx) ? 10 : 7;
   const plazo = plazoDesdeDias(ctx, dias);
+  if (faltaHora(plazo)) return resultadoFaltaHora({ idFarmaco, nombreComercial, principiosActivos: ['triflusal'], fuente: FUENTE });
   return {
     idFarmaco, nombreComercial, principiosActivos: ['triflusal'],
     accion: 'suspender', fechaHoraUltimaToma: plazo.fechaHoraUltimaToma, textoPaciente: plazo.textoPaciente,
@@ -191,6 +198,7 @@ export function reglaTriflusal(idFarmaco: string, nombreComercial: string, ctx: 
 export function reglaDipiridamol(idFarmaco: string, nombreComercial: string, ctx: ContextoReglas): ResultadoFarmaco {
   const horas = neuroaxialOProfundo(ctx) ? 48 : 24;
   const plazo = plazoDesdeHoras(ctx, horas);
+  if (faltaHora(plazo)) return resultadoFaltaHora({ idFarmaco, nombreComercial, principiosActivos: ['dipiridamol'], fuente: FUENTE });
   return {
     idFarmaco, nombreComercial, principiosActivos: ['dipiridamol'],
     accion: 'suspender', fechaHoraUltimaToma: plazo.fechaHoraUltimaToma, textoPaciente: plazo.textoPaciente,
@@ -211,6 +219,7 @@ export function reglaCilostazol(idFarmaco: string, nombreComercial: string, ctx:
     };
   }
   const plazo = plazoDesdeDias(ctx, 3);
+  if (faltaHora(plazo)) return resultadoFaltaHora({ idFarmaco, nombreComercial, principiosActivos: ['cilostazol'], fuente: FUENTE });
   return {
     idFarmaco, nombreComercial, principiosActivos: ['cilostazol'],
     accion: 'suspender', fechaHoraUltimaToma: plazo.fechaHoraUltimaToma, textoPaciente: plazo.textoPaciente,
@@ -231,6 +240,7 @@ export function reglaSulodexida(idFarmaco: string, nombreComercial: string, ctx:
     };
   }
   const plazo = plazoDesdeHoras(ctx, 48);
+  if (faltaHora(plazo)) return resultadoFaltaHora({ idFarmaco, nombreComercial, principiosActivos: ['sulodexida'], fuente: 'docs/documento_fuente.md §8.3' });
   return {
     idFarmaco, nombreComercial, principiosActivos: ['sulodexida'],
     accion: 'suspender', fechaHoraUltimaToma: plazo.fechaHoraUltimaToma, textoPaciente: plazo.textoPaciente,
@@ -271,10 +281,10 @@ export function reglaGpIibIiia(idFarmaco: string, nombreComercial: string, princ
 export function reglaP2y12Oftalmo(e: EntradaP2y12, ctx: ContextoReglas): ResultadoFarmaco {
   const dias = DIAS_P2Y12[e.principio].estandar; // plazos del protocolo (no neuroaxial en oftalmo)
   const plazo = plazoDesdeDias(ctx, dias);
+  const baseOft = { idFarmaco: e.idFarmaco, nombreComercial: e.nombreComercial, principiosActivos: [e.principio], fuente: FUENTE };
+  if (faltaHora(plazo)) return resultadoFaltaHora(baseOft);
   return {
-    idFarmaco: e.idFarmaco,
-    nombreComercial: e.nombreComercial,
-    principiosActivos: [e.principio],
+    ...baseOft,
     accion: 'suspender',
     fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
     textoPaciente: `${plazo.textoPaciente} Su médico puede sustituirlo por AAS 100 mg/día durante ese tiempo.`,

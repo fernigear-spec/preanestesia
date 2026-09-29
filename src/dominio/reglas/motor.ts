@@ -64,26 +64,54 @@ export interface PlazoCalculado {
   textoPaciente: string;
 }
 
-/** Pauta por defecto si la enfermera no registró horas: una toma a las 09:00. */
-const PAUTA_DEFECTO: PautaHoraria = { horas: ['09:00'] };
+/** Señal de que falta la hora de la toma del fármaco (§8.0 v4: nunca se asume). */
+export const FALTA_HORA_TOMA = 'hora de la toma';
+
+/** Resultado de un cálculo de plazo: o bien la fecha, o bien que falta la hora. */
+export type PlazoResultado = PlazoCalculado | { faltaHora: true };
+
+export function faltaHora(p: PlazoResultado): p is { faltaHora: true } {
+  return 'faltaHora' in p;
+}
+
+/** ResultadoFarmaco cuando falta la hora de la toma para calcular el plazo. */
+export function resultadoFaltaHora(base: {
+  idFarmaco: string;
+  nombreComercial: string;
+  principiosActivos: string[];
+  fuente: string;
+}): ResultadoFarmaco {
+  return {
+    ...base,
+    accion: 'consultar',
+    textoPaciente:
+      'Sobre este medicamento, el anestesiólogo le confirmará qué hacer. No lo cambie por su cuenta.',
+    reglaAplicada: 'Falta la hora de la toma habitual para calcular el plazo',
+    requiereConfirmacion: true,
+    datoQueFalta: FALTA_HORA_TOMA,
+  };
+}
 
 /**
- * Plazo en HORAS (§8.0 v4). Usa la pauta horaria del paciente.
+ * Plazo en HORAS (§8.0 v4). Requiere la pauta horaria del paciente; si no hay
+ * horas registradas, devuelve { faltaHora: true } (nunca asume una hora).
  * @param permitirAdelanto true solo para anticoagulantes (ACOD/heparinas/fondaparinux).
  */
 export function plazoDesdeHoras(
   ctx: ContextoReglas,
   horas: number,
   opts: { permitirAdelanto?: boolean } = {},
-): PlazoCalculado {
-  const pauta = ctx.pautaFarmaco ?? PAUTA_DEFECTO;
+): PlazoResultado {
+  const pauta = ctx.pautaFarmaco;
+  if (!pauta || pauta.horas.length === 0) return { faltaHora: true };
   const r = ultimaTomaPorHoras(ctx.fechaHoraIntervencion, horas, pauta, opts.permitirAdelanto === true);
   return { horas, fechaHoraUltimaToma: r.ultimaToma, textoPaciente: textoUltimaToma(r) };
 }
 
 /** Plazo en DÍAS (§8.0 v4): no tomar los N días previos ni el día de la intervención. */
-export function plazoDesdeDias(ctx: ContextoReglas, dias: number): PlazoCalculado {
-  const pauta = ctx.pautaFarmaco ?? PAUTA_DEFECTO;
+export function plazoDesdeDias(ctx: ContextoReglas, dias: number): PlazoResultado {
+  const pauta = ctx.pautaFarmaco;
+  if (!pauta || pauta.horas.length === 0) return { faltaHora: true };
   const ultima = ultimaTomaPorDias(ctx.fechaHoraIntervencion, dias, pauta);
   return { horas: diasAHoras(dias), fechaHoraUltimaToma: ultima, textoPaciente: textoUltimaTomaDias(ultima) };
 }

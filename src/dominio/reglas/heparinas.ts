@@ -11,7 +11,7 @@
  *   riesgo hemorrágico/CrCl < 50).
  */
 import type { ContextoReglas, ResultadoFarmaco, Alerta } from '../tipos.ts';
-import { neuroaxialOProfundo, plazoDesdeHoras } from './motor.ts';
+import { neuroaxialOProfundo, plazoDesdeHoras, faltaHora, resultadoFaltaHora } from './motor.ts';
 import { fechaHoraLimite } from '../fechas/plazos.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.4 (SETH; ASRA 2018; protocolo del servicio)';
@@ -70,6 +70,7 @@ export function reglaHbpm(e: EntradaHbpm, ctx: ContextoReglas): ResultadoFarmaco
 
   const horas = e.tipo === 'profilactica' ? 12 : 24;
   const plazo = plazoDesdeHoras(ctx, horas, { permitirAdelanto: true });
+  if (faltaHora(plazo)) return resultadoFaltaHora(base);
   const res: ResultadoFarmaco = {
     ...base,
     accion: 'suspender',
@@ -150,6 +151,7 @@ export function reglaFondaparinux(e: EntradaFondaparinux, ctx: ContextoReglas): 
     }
     const horas = neuroaxialOProfundo(ctx) || altoRiesgoHemo ? 48 : 36;
     const plazo = plazoDesdeHoras(ctx, horas, { permitirAdelanto: true });
+    if (faltaHora(plazo)) return { farmaco: resultadoFaltaHora(base) };
     return {
       farmaco: {
         ...base,
@@ -166,6 +168,7 @@ export function reglaFondaparinux(e: EntradaFondaparinux, ctx: ContextoReglas): 
   const alarga = neuroaxialOProfundo(ctx) || altoRiesgoHemo || (crcl !== null && crcl < 50);
   const horas = alarga ? 72 : 48;
   const plazo = plazoDesdeHoras(ctx, horas, { permitirAdelanto: true });
+  if (faltaHora(plazo)) return { farmaco: resultadoFaltaHora(base) };
   return {
     farmaco: {
       ...base,

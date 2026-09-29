@@ -4,7 +4,7 @@
  * alto 72 h). IMAO y demás se añadirán con sus notas de anestesia segura.
  */
 import type { ContextoReglas, ResultadoFarmaco, RiesgoCardiovascular } from '../tipos.ts';
-import { plazoDesdeHoras } from './motor.ts';
+import { plazoDesdeHoras, faltaHora, resultadoFaltaHora } from './motor.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.7 (protocolo del servicio)';
 
@@ -46,6 +46,8 @@ export function reglaImaoIrreversible(e: EntradaImao): ResultadoFarmaco {
 /** Moclobemida (IMAO-A reversible): suspender 24 h + misma nota. */
 export function reglaMoclobemida(e: EntradaImao, ctx: ContextoReglas): ResultadoFarmaco {
   const plazo = plazoDesdeHoras(ctx, 24);
+  const base = { idFarmaco: e.idFarmaco, nombreComercial: e.nombreComercial, principiosActivos: ['moclobemida'], fuente: 'docs/documento_fuente.md §8.7' };
+  if (faltaHora(plazo)) return resultadoFaltaHora(base);
   return {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,
@@ -83,6 +85,8 @@ export interface EntradaLitio {
 export function reglaLitio(e: EntradaLitio, ctx: ContextoReglas): ResultadoFarmaco {
   const horas = HORAS_LITIO[ctx.riesgoCardiovascular];
   const plazo = plazoDesdeHoras(ctx, horas);
+  const base = { idFarmaco: e.idFarmaco, nombreComercial: e.nombreComercial, principiosActivos: ['litio'], fuente: FUENTE };
+  if (faltaHora(plazo)) return resultadoFaltaHora(base);
   return {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,

@@ -50,6 +50,13 @@ function diasAntes(ultima: Date): number {
   return Math.round((IV.getTime() - ultima.getTime()) / 86_400_000);
 }
 
+/** Contexto SIN pauta horaria (para probar el caso "falta la hora de la toma"). */
+function ctxSinPauta(parcial: Partial<ContextoReglas> = {}): ContextoReglas {
+  const base = ctx(parcial);
+  const { pautaFarmaco: _omit, ...resto } = base;
+  return resto;
+}
+
 describe('ACOD (§8.2)', () => {
   it('caso 1 §15: apixabán (anti-Xa), prótesis rodilla (hemorrágico alto) + raquídea, CrCl 45 → 72 h', () => {
     const r = reglaAcod(
@@ -311,6 +318,28 @@ describe('Cardiovasculares (§8.10)', () => {
       ctx(),
     );
     expect(r.requiereConfirmacion).toBeTrue();
+  });
+});
+
+describe('Hora de la toma obligatoria (§8.0 v4)', () => {
+  it('ACOD sin pauta horaria → requiere dato "hora de la toma" y NO genera fecha', () => {
+    const r = reglaAcod(
+      { idFarmaco: 'apixaban', nombreComercial: 'Eliquis', principioActivo: 'apixaban', subtipo: 'antixa' },
+      ctxSinPauta({ riesgoHemorragico: 'bajo', aclaramiento: 70 }),
+    );
+    expect(r.requiereConfirmacion).toBeTrue();
+    expect(r.datoQueFalta).toBe('hora de la toma');
+    expect(r.fechaHoraUltimaToma).toBeUndefined();
+  });
+  it('AINE sin pauta → requiere dato "hora de la toma", sin fecha', () => {
+    const r = reglaAine({ idFarmaco: 'ibu', nombreComercial: 'Neobrufen', principio: 'ibuprofeno' }, ctxSinPauta());
+    expect(r.datoQueFalta).toBe('hora de la toma');
+    expect(r.fechaHoraUltimaToma).toBeUndefined();
+  });
+  it('litio sin pauta → requiere dato, sin fecha', () => {
+    const r = reglaLitio({ idFarmaco: 'li', nombreComercial: 'Plenur' }, ctxSinPauta({ riesgoCardiovascular: 'alto' }));
+    expect(r.datoQueFalta).toBe('hora de la toma');
+    expect(r.fechaHoraUltimaToma).toBeUndefined();
   });
 });
 

@@ -10,7 +10,7 @@
  * - Sin aclaramiento: requiere confirmación indicando qué dato falta (R12.5).
  */
 import type { ContextoReglas, ResultadoFarmaco } from '../tipos.ts';
-import { neuroaxialOProfundo, plazoDesdeHoras, TEXTO_MANTENER } from './motor.ts';
+import { neuroaxialOProfundo, plazoDesdeHoras, faltaHora, resultadoFaltaHora, TEXTO_MANTENER } from './motor.ts';
 
 export type SubtipoAcod = 'dabigatran' | 'antixa';
 
@@ -126,6 +126,7 @@ export function reglaAcod(e: EntradaAcod, ctx: ContextoReglas): ResultadoFarmaco
   }
 
   const plazo = plazoDesdeHoras(ctx, horas, { permitirAdelanto: true });
+  if (faltaHora(plazo)) return resultadoFaltaHora(base);
 
   const resultado: ResultadoFarmaco = {
     ...base,
