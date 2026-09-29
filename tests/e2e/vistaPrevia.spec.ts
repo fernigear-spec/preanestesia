@@ -30,9 +30,45 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await expect(page.getByText(/Riesgos del procedimiento/)).toBeVisible();
 
-    // Continuar al resumen.
+    // Continuar al paso 2.
     await page.getByRole('button', { name: 'Continuar' }).click();
-    await expect(page.getByRole('heading', { name: /Datos de la intervención guardados/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Paso 2 · Datos básicos/ })).toBeVisible();
+  });
+
+  test('recorre pasos 2-4 hasta el resumen', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    // Paso 1.
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 2 — datos básicos. Edad de mujer 12-55 → aparece la pregunta de embarazo.
+    await expect(page.getByRole('heading', { name: /Paso 2 · Datos básicos/ })).toBeVisible();
+    await page.locator('#edad').fill('40');
+    await page.getByRole('radio', { name: 'Mujer' }).check();
+    await page.locator('#peso').fill('65');
+    await page.locator('#talla').fill('165');
+    await expect(page.getByText(/IMC:/)).toBeVisible();
+    await expect(page.getByText(/Posibilidad de embarazo/)).toBeVisible();
+    await page.getByRole('radio', { name: /No hay posibilidad/ }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 3 — antecedentes.
+    await expect(page.getByRole('heading', { name: /Paso 3 · Antecedentes/ })).toBeVisible();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 4 — mtND4. Marcar factor materno y ver la alerta roja.
+    await expect(page.getByRole('heading', { name: /Paso 4 · Origen materno/ })).toBeVisible();
+    await page.getByRole('checkbox', { name: /Ascendencia venezolana por línea materna/ }).check();
+    await expect(page.getByText(/Alerta roja/)).toBeVisible();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Resumen.
+    await expect(page.getByRole('heading', { name: /Resumen de la entrevista/ })).toBeVisible();
     await expect(page.getByText(/Hernioplastia inguinal abierta/)).toBeVisible();
   });
 

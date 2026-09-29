@@ -284,3 +284,55 @@ body {
 .acciones .boton-secundario {
   flex: 0 0 auto;
 }
+
+/* ————————————— Pasos 2-4 ————————————— */
+.tarjeta h3 {
+  margin: 22px 0 8px;
+  font-size: 1.1rem;
+  border-top: 1px solid #eef0f6;
+  padding-top: 16px;
+}
+.tarjeta h3:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.grupo-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.grupo-checks input[type='checkbox'] {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+}
+
+/* Bloque "añadir intervención previa" con fondo tenue */
+.bloque-anadir {
+  background: #f7f8fc;
+  border: 1px solid #e2e5f0;
+  border-radius: var(--radio);
+  padding: 14px 16px;
+}
+
+.lista-previas {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+}
+.previa {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e2e5f0;
+  border-radius: var(--radio);
+  margin-bottom: 8px;
+}
+.previa-incid {
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 4px;
+}
