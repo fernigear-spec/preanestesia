@@ -11,7 +11,7 @@ import { reglaAcod } from './acod.ts';
 import { reglaAvk } from './antivitaminaK.ts';
 import { reglaAas, reglaP2y12, reglaTriflusal, reglaCilostazol } from './antiagregantes.ts';
 import { reglaHbpm, reglaFondaparinux, type TipoHbpm } from './heparinas.ts';
-import { reglaMetformina, reglaSglt2, reglaGlp1Semanal, reglaGlp1Diario, reglaBombaInsulina } from './antidiabeticos.ts';
+import { reglaMetformina, reglaSglt2, reglaGlp1Semanal, reglaGlp1Diario } from './antidiabeticos.ts';
 import { reglaInsulinaBasal, reglaInsulinaNph, reglaInsulinaPremezclada, reglaInsulinaRapida } from './insulinas.ts';
 import { reglaIecaAra2, reglaDiuretico, reglaSacubitriloValsartan } from './cardiovasculares.ts';
 import { reglaLitio, reglaMoclobemida, reglaImaoIrreversible, reglaImaoB } from './psicofarmacos.ts';
