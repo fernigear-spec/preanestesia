@@ -1,0 +1,38 @@
+{
+  "idioma": "ca",
+  "_nota": "PENDENT DE REVISIÓ — traducció automàtica al català.",
+  "titulo": "Recomanacions per a la seva intervenció",
+  "intervencion_titulo": "Dia i hora de la intervenció",
+  "sin_fecha_aviso": "Encara no té data assignada. Quan l'hi donin, torni a obrir aquest codi i introdueixi-la per veure les instruccions amb dates concretes.",
+  "hora_asumida_aviso": "No es coneixia l'hora; les instruccions s'han calculat per a les 08:00. Si li confirmen una altra hora, torni a obrir aquest codi.",
+  "medicamentos_titulo": "Què fer amb cada medicament",
+  "col_medicamento": "Medicament",
+  "col_que_hacer": "Què fer",
+  "sin_medicamentos": "No s'ha registrat cap medicació.",
+  "ayuno_titulo": "Dejuni abans de la intervenció",
+  "que_traer_titulo": "Què ha de portar",
+  "que_traer_items": [
+    "La llista de la seva medicació habitual",
+    "Els informes mèdics que tingui",
+    "Les seves ulleres i audiòfons si en fa servir"
+  ],
+  "que_traer_cpap": "El seu aparell de CPAP",
+  "que_traer_inhaladores": "Els seus inhaladors",
+  "consentimiento_titulo": "Consentiment",
+  "cuando_llamar_titulo": "Quan ha de trucar",
+  "cuando_llamar_items": [
+    "Si té febre o un refredat els dies previs",
+    "Si li canvien algun medicament",
+    "Si li canvien la data o l'hora de la intervenció"
+  ],
+  "telefono_titulo": "Telèfon de contacte",
+  "aviso_cambio_fecha": "Si li canvien la data o l'hora de la intervenció, torni a obrir aquest codi i introdueixi la nova data.",
+  "boton_cambiar_fecha": "M'han donat la data o me l'han canviat",
+  "nueva_fecha_label": "Data de la intervenció",
+  "nueva_hora_label": "Hora (si la coneix)",
+  "recalcular": "Recalcular",
+  "idioma_es": "Castellano",
+  "idioma_ca": "Català",
+  "pie": "Recomanacions generades segons els protocols del Servei d'Anestesiologia. Validació final per l'anestesiòleg.",
+  "medicacion_pendiente_traduccion": "(Les instruccions de cada medicament es mostren en castellà, pendents de revisió en català.)"
+}

@@ -165,6 +165,45 @@ test.describe('Vista previa', () => {
     await expect(page.getByText(/No alergias conocidas/)).toBeVisible();
   });
 
+  test('genera la hoja del paciente con su QR desde el resumen', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    // Paso 1.
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 2.
+    await page.locator('#edad').fill('60');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('80');
+    await page.locator('#talla').fill('175');
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Pasos 3-7.
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
+    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+
+    // Paso 8: añadir Adiro y continuar.
+    await page.locator('#med').fill('Adiro');
+    await page.getByRole('button', { name: /Adiro/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Resumen: generar la hoja del paciente y ver el QR.
+    await expect(page.getByRole('heading', { name: /Resumen de la entrevista/ })).toBeVisible();
+    await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
+    await expect(page.getByRole('img', { name: /Código QR/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Copiar enlace para el paciente/ })).toBeVisible();
+  });
+
   test('privacidad (caso 23): sin datos clínicos en localStorage/sessionStorage/cookies', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Presencial' }).click();

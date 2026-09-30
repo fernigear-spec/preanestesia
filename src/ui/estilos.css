@@ -475,3 +475,46 @@ body {
   padding: 6px 10px;
   border-radius: 6px;
 }
+
+/* Hoja y vista del paciente (QR) */
+.tabla-medicacion {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 16px;
+}
+.tabla-medicacion th,
+.tabla-medicacion td {
+  border: 1px solid var(--color-borde, #d0d5dd);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.95rem;
+}
+.tabla-medicacion th {
+  background: var(--color-principal-claro);
+}
+.tabla-medicacion .fila-alerta td {
+  background: #fff4e5;
+}
+.qr-img {
+  display: block;
+  margin: 8px 0;
+  border: 1px solid var(--color-borde, #d0d5dd);
+  border-radius: 8px;
+}
+.idioma-selector {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+.vista-paciente h1 {
+  color: var(--color-principal);
+  font-size: 1.4rem;
+}
+.cambio-fecha {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--color-borde, #d0d5dd);
+  border-radius: 8px;
+}

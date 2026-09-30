@@ -1,0 +1,37 @@
+{
+  "idioma": "es",
+  "titulo": "Recomendaciones para su intervención",
+  "intervencion_titulo": "Día y hora de la intervención",
+  "sin_fecha_aviso": "Todavía no tiene fecha asignada. Cuando se la den, abra de nuevo este código e introdúzcala para ver las instrucciones con fechas concretas.",
+  "hora_asumida_aviso": "No se conocía la hora, se han calculado las instrucciones para las 08:00. Si le confirman otra hora, vuelva a abrir este código.",
+  "medicamentos_titulo": "Qué hacer con cada medicamento",
+  "col_medicamento": "Medicamento",
+  "col_que_hacer": "Qué hacer",
+  "sin_medicamentos": "No se ha registrado medicación.",
+  "ayuno_titulo": "Ayuno antes de la intervención",
+  "que_traer_titulo": "Qué debe traer",
+  "que_traer_items": [
+    "La lista de su medicación habitual",
+    "Los informes médicos que tenga",
+    "Sus gafas y audífonos si los usa"
+  ],
+  "que_traer_cpap": "Su aparato de CPAP",
+  "que_traer_inhaladores": "Sus inhaladores",
+  "consentimiento_titulo": "Consentimiento",
+  "cuando_llamar_titulo": "Cuándo debe llamar",
+  "cuando_llamar_items": [
+    "Si tiene fiebre o un catarro en los días previos",
+    "Si le cambian algún medicamento",
+    "Si le cambian la fecha o la hora de la intervención"
+  ],
+  "telefono_titulo": "Teléfono de contacto",
+  "aviso_cambio_fecha": "Si le cambian la fecha o la hora de la intervención, abra de nuevo este código e introduzca la nueva fecha.",
+  "boton_cambiar_fecha": "Me han dado la fecha o me la han cambiado",
+  "nueva_fecha_label": "Fecha de la intervención",
+  "nueva_hora_label": "Hora (si la conoce)",
+  "recalcular": "Recalcular",
+  "idioma_es": "Castellano",
+  "idioma_ca": "Català",
+  "pie": "Recomendaciones generadas según los protocolos del Servicio de Anestesiología. Validación final por el anestesiólogo.",
+  "medicacion_pendiente_traduccion": ""
+}
