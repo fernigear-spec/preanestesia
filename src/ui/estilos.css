@@ -632,3 +632,22 @@ body {
 .mando-barra-etq { min-width: 90px; }
 .mando-barra { display: inline-block; height: 14px; background: var(--color-principal); border-radius: 3px; min-width: 2px; }
 .mando-barra-num { min-width: 24px; text-align: right; }
+
+/* Modo entrenamiento (§14.2) */
+.banda-entrenamiento {
+  background: #6b3fa0;
+  color: #fff;
+  text-align: center;
+  padding: 6px 10px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+}
+.entrenamiento-esperado {
+  background: #f3eefb;
+  border-left: 4px solid #6b3fa0;
+  border-radius: var(--radio);
+  padding: 12px 14px;
+  margin: 12px 0;
+}
+.lista-casos { list-style: none; padding-left: 0; display: grid; gap: 12px; }

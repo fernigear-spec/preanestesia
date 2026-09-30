@@ -494,6 +494,16 @@ test.describe('Vista previa', () => {
     await expect(page.getByText(/7 días/)).toBeVisible();
   });
 
+  test('§14.2 modo entrenamiento: carga un caso y muestra la comparación con lo esperado', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Modo entrenamiento' }).click();
+    await expect(page.getByRole('heading', { name: 'Modo entrenamiento' })).toBeVisible();
+    await page.getByRole('button', { name: 'Abrir este caso' }).first().click();
+    await expect(page.getByText(/MODO ENTRENAMIENTO/)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Resultado esperado/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
+  });
+
   test('§14.4 guía imprimible: se genera desde los módulos con casillas en blanco', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Guía imprimible' }).click();

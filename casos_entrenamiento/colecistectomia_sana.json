@@ -1,0 +1,36 @@
+{
+  "id": "colecistectomia_sana",
+  "titulo": "Mujer sana · colecistectomía laparoscópica",
+  "descripcion": "Mujer de 40 años, sin enfermedades ni medicación. Riesgo quirúrgico intermedio.",
+  "modalidad": "presencial",
+  "esperado": [
+    "Clase de riesgo del paciente: bajo-moderado.",
+    "Pruebas: hemograma y coagulación.",
+    "Sin bioquímica, sin ECG y sin radiografía de tórax.",
+    "ASA sugerido I o II.",
+    "Sin alertas."
+  ],
+  "intervencion": {
+    "procedimientoId": "cgd_colecistectomia_lap",
+    "fecha": "2026-11-05",
+    "hora": "08:00",
+    "regimen": "cma",
+    "caracter": "programada",
+    "tecnica": "general",
+    "contrasteYodado": "no"
+  },
+  "basicos": {
+    "edadAnios": 40,
+    "sexo": "mujer",
+    "pesoKg": 65,
+    "tallaCm": 165,
+    "embarazada": false
+  },
+  "cribado": {
+    "ningunaConocida": true,
+    "enfermedades": [],
+    "respuestasModulos": {}
+  },
+  "medicacion": [],
+  "consentimiento": { "estado": "pendiente_entregar" }
+}

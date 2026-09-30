@@ -5,6 +5,8 @@ import { useInactividad, useAvisoSalida } from './privacidad.ts';
 import { registrarUso, type TipoPaciente } from './herramientas/registroUso.ts';
 import { GuiaImprimible } from './herramientas/GuiaImprimible.tsx';
 import { CuadroMando } from './herramientas/CuadroMando.tsx';
+import { ModoEntrenamiento } from './entrenamiento/ModoEntrenamiento.tsx';
+import type { CasoEntrenamiento } from './entrenamiento/casos.ts';
 import { PasoIntervencion } from './pasos/PasoIntervencion.tsx';
 import { PasoBasicos } from './pasos/PasoBasicos.tsx';
 import { PasoAntecedentes } from './pasos/PasoAntecedentes.tsx';
@@ -52,17 +54,34 @@ export function App() {
     const h = typeof window !== 'undefined' ? window.location.hash : '';
     return h.startsWith('#p=') ? h.slice(3) : null;
   });
-  type Herramienta = 'admin' | 'guia' | 'uso' | null;
+  type Herramienta = 'admin' | 'guia' | 'uso' | 'entrenamiento' | null;
   const [herramienta, setHerramienta] = useState<Herramienta>(() => {
     const h = typeof window !== 'undefined' ? window.location.hash : '';
     if (h === '#admin') return 'admin';
     if (h === '#guia') return 'guia';
     if (h === '#uso') return 'uso';
+    if (h === '#entrenamiento') return 'entrenamiento';
     return null;
   });
+  // Modo entrenamiento (§14.2): banda ENTRENAMIENTO y resultados esperados.
+  const [entrenamiento, setEntrenamiento] = useState(false);
+  const [esperado, setEsperado] = useState<string[]>([]);
   // Contador de uso (§14.3): inicio de la entrevista y marca de "ya registrada".
   const inicioRef = useRef<number | null>(null);
   const registradoRef = useRef(false);
+
+  // Carga un caso de entrenamiento: rellena la entrevista y salta al resumen.
+  const cargarEntrenamiento = useCallback((caso: CasoEntrenamiento) => {
+    setModalidad(caso.modalidad);
+    setEntrevista(caso.entrevista);
+    setEsperado(caso.esperado);
+    setEntrenamiento(true);
+    setHerramienta(null);
+    setPantalla('resumen');
+    if (typeof window !== 'undefined' && window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }, []);
 
   // Reinicia la entrevista (borra todo de la memoria y vuelve al inicio).
   const nuevoPaciente = useCallback(() => {
@@ -71,6 +90,8 @@ export function App() {
     setPantalla('inicio');
     inicioRef.current = null;
     registradoRef.current = false;
+    setEntrenamiento(false);
+    setEsperado([]);
   }, []);
 
   // Privacidad (§2): temporizador de inactividad y aviso al salir. Solo cuando hay
@@ -101,6 +122,7 @@ export function App() {
         {herramienta === 'admin' && <PanelAdmin onSalir={salir} />}
         {herramienta === 'guia' && <GuiaImprimible onSalir={salir} />}
         {herramienta === 'uso' && <CuadroMando onSalir={salir} />}
+        {herramienta === 'entrenamiento' && <ModoEntrenamiento onCargar={cargarEntrenamiento} onSalir={salir} />}
       </div>
     );
   }
@@ -109,6 +131,7 @@ export function App() {
 
   /** Registra la entrevista en el contador de uso (§14.3), una sola vez y sin datos clínicos. */
   function registrarUsoSiProcede() {
+    if (entrenamiento) return; // las entrevistas de entrenamiento no cuentan (§14.3)
     if (registradoRef.current || inicioRef.current === null || !basicos || !intervencion) return;
     const tipoPaciente: TipoPaciente =
       basicos.moduloObstetrico || basicos.embarazada ? 'obstetrica'
@@ -129,6 +152,7 @@ export function App() {
   return (
     <div className="app">
       <BandaPrueba />
+      {entrenamiento && <div className="banda-entrenamiento" role="status">MODO ENTRENAMIENTO · datos de práctica, no usar con pacientes</div>}
       <header className="cabecera">
         <h1>AnesHealth · Entrevista preanestésica</h1>
         <p className="subtitulo">Servicio de Anestesiología · Hospital Vithas Barcelona</p>
@@ -457,6 +481,16 @@ export function App() {
               />
             )}
 
+            {entrenamiento && esperado.length > 0 && (
+              <div className="entrenamiento-esperado">
+                <h3>Resultado esperado (modo entrenamiento)</h3>
+                <p>Compare lo que ha calculado la aplicación (abajo) con lo esperado para este caso:</p>
+                <ul className="resumen-lista">
+                  {esperado.map((e, i) => <li key={i}>{e}</li>)}
+                </ul>
+              </div>
+            )}
+
             <Salidas entrevista={entrevista} modalidad={modalidad ?? 'presencial'} />
 
             <div className="acciones">
@@ -478,6 +512,8 @@ export function App() {
           <button type="button" className="boton-enlace" onClick={() => setHerramienta('guia')}>Guía imprimible</button>
           {' · '}
           <button type="button" className="boton-enlace" onClick={() => setHerramienta('uso')}>Cuadro de mando de uso</button>
+          {' · '}
+          <button type="button" className="boton-enlace" onClick={() => setHerramienta('entrenamiento')}>Modo entrenamiento</button>
         </p>
       </footer>
     </div>
