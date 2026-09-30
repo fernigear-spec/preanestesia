@@ -321,7 +321,10 @@ export function App() {
             enfermedades={cribado?.enfermedades ?? []}
             respuestasModulos={cribado?.respuestasModulos ?? {}}
             basicos={{ edadAnios: basicos.edadAnios, pesoKg: basicos.pesoKg, sexo: basicos.sexo }}
-            onVolver={() => setPantalla('tecnica')}
+            onVolver={(datos) => {
+              setEntrevista((e) => ({ ...e, medicacion: datos }));
+              setPantalla('tecnica');
+            }}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, medicacion: datos }));
               setPantalla('viaAerea');

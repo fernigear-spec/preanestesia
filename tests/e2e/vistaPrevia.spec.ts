@@ -519,8 +519,8 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Cirugia de catarata con anestesia topica/i }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Paso 2.
-    await page.locator('#edad').fill('75');
+    // Paso 2 (edad < 65 para no exigir los campos de fragilidad en el paso 5).
+    await page.locator('#edad').fill('60');
     await page.getByRole('radio', { name: 'Hombre' }).check();
     await page.locator('#peso').fill('80');
     await page.locator('#talla').fill('170');

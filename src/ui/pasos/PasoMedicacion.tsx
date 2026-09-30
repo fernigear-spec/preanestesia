@@ -37,7 +37,8 @@ interface Props {
   /** Datos básicos del paso 2 (para el aclaramiento y el peso del contexto). */
   basicos: { edadAnios: number; pesoKg: number; sexo: Sexo };
   onContinuar: (medicacion: FarmacoTomadoUi[]) => void;
-  onVolver: () => void;
+  /** Al volver se conserva la medicación introducida (para recalcular tras cambiar la técnica). */
+  onVolver: (medicacion: FarmacoTomadoUi[]) => void;
 }
 
 const DIAS_SEMANA = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -151,7 +152,7 @@ export function PasoMedicacion({ inicial, intervencion, enfermedades, respuestas
       )}
 
       <div className="acciones">
-        <button type="button" className="boton-secundario" onClick={onVolver}>Volver</button>
+        <button type="button" className="boton-secundario" onClick={() => onVolver(medicacion)}>Volver</button>
         <button type="button" className="boton-primario" onClick={() => onContinuar(medicacion)}>Continuar</button>
       </div>
     </section>
