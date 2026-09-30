@@ -16,10 +16,11 @@ export type TecnicaAnestesica =
   | 'bloqueo_periferico'
   | 'bloqueo_profundo'
   | 'local'
+  | 'topica'
+  | 'retrobulbar_peribulbar'
   | 'no_se_sabe';
 
 export type Regimen = 'cma' | 'ingreso' | 'uci_prevista';
-export type Caracter = 'programada' | 'urgencia_diferida';
 
 export type RiesgoCardiovascular = 'bajo' | 'intermedio' | 'alto';
 export type RiesgoHemorragico = 'minimo' | 'bajo' | 'alto';
@@ -67,7 +68,7 @@ export interface DatosIntervencion {
   /** ¿Se prevé administrar contraste yodado? (afecta a la metformina, §8.5). */
   contrasteYodado: 'si' | 'no' | 'no_se_sabe';
   regimen: Regimen;
-  caracter: Caracter;
+  /** Técnica anestésica prevista (se elige en el paso 7). */
   tecnica: TecnicaAnestesica;
 }
 

@@ -5,7 +5,7 @@
  * Los casos NO cuentan en el cuadro de mando de uso (§14.3).
  */
 import { cargarProcedimientos } from '../../datos/procedimientos.ts';
-import { HEMSTOP_VACIO } from '../estadoEntrevista.ts';
+import { HEMSTOP_VACIO, CONDICIONES_ESPECIALES_VACIO } from '../estadoEntrevista.ts';
 import type { EstadoEntrevista, FarmacoTomadoUi } from '../estadoEntrevista.ts';
 import type { DatosIntervencion, Modalidad } from '../../dominio/tipos.ts';
 import type { RespuestasModulos } from '../../datos/modulos.ts';
@@ -21,7 +21,6 @@ interface CasoJson {
     fecha?: string;
     hora?: string;
     regimen: DatosIntervencion['regimen'];
-    caracter: DatosIntervencion['caracter'];
     tecnica: DatosIntervencion['tecnica'];
     contrasteYodado: DatosIntervencion['contrasteYodado'];
   };
@@ -64,7 +63,6 @@ function hidratar(c: CasoJson): CasoEntrenamiento {
         retina: procedimiento.retina,
         contrasteYodado: c.intervencion.contrasteYodado,
         regimen: c.intervencion.regimen,
-        caracter: c.intervencion.caracter,
         tecnica: c.intervencion.tecnica,
       }
     : null;
@@ -82,6 +80,7 @@ function hidratar(c: CasoJson): CasoEntrenamiento {
       enfermedades: c.cribado?.enfermedades ?? [],
       respuestasModulos: c.cribado?.respuestasModulos ?? {},
       hemstop: { ...HEMSTOP_VACIO },
+      condicionesEspeciales: { ...CONDICIONES_ESPECIALES_VACIO },
     },
     medicacion: c.medicacion ?? [],
     viaAerea: null,

@@ -41,7 +41,7 @@ export function PasoMtnd4({ inicial, onContinuar, onVolver }: Props) {
 
   return (
     <section className="tarjeta" aria-labelledby="paso4-tit">
-      <h2 id="paso4-tit">Paso 4 · Origen materno (cribado mtND4)</h2>
+      <h2 id="paso4-tit">Paso 11 · Origen materno (cribado mtND4)</h2>
       <p>
         Este cribado es obligatorio en todos los pacientes. Pregunte por la línea <strong>materna</strong>
         (la línea paterna no cuenta para este cribado).

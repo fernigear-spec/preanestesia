@@ -1,9 +1,10 @@
 /**
- * Paso 3 — Antecedentes anestésicos y quirúrgicos (R3.2.10–R3.2.12).
+ * Paso 4 — Antecedentes anestésicos y quirúrgicos (R3.2.10–R3.2.12).
  * Lista añadible de intervenciones previas (procedimiento, año, tipo de anestesia,
- * incidencias), incidencias explícitas por intervención, y antecedentes familiares
- * de anestesia (hipertermia maligna, déficit de pseudocolinesterasa, complicaciones
- * graves o muertes inesperadas tras anestesia).
+ * incidencias) e incidencias explícitas por intervención.
+ * La hipertermia maligna y el déficit de pseudocolinesterasa (personales o
+ * familiares) se recogen ahora como «condiciones especiales» en el paso de
+ * enfermedades (§5.15), no aquí.
  */
 import { useState } from 'react';
 import {
@@ -28,9 +29,6 @@ const TIPOS_ANESTESIA: Array<{ valor: IntervencionPrevia['tipoAnestesia']; etiqu
 
 export function PasoAntecedentes({ inicial, onContinuar, onVolver }: Props) {
   const [previas, setPrevias] = useState<IntervencionPrevia[]>(inicial?.intervencionesPrevias ?? []);
-  const [hm, setHm] = useState(inicial?.familiaresHipertermiaMaligna ?? false);
-  const [pseudo, setPseudo] = useState(inicial?.familiaresDeficitPseudocolinesterasa ?? false);
-  const [graves, setGraves] = useState(inicial?.familiaresComplicacionesGraves ?? false);
 
   // Formulario para añadir una intervención previa.
   const [proc, setProc] = useState('');
@@ -69,9 +67,6 @@ export function PasoAntecedentes({ inicial, onContinuar, onVolver }: Props) {
   function continuar() {
     onContinuar({
       intervencionesPrevias: previas,
-      familiaresHipertermiaMaligna: hm,
-      familiaresDeficitPseudocolinesterasa: pseudo,
-      familiaresComplicacionesGraves: graves,
     });
   }
 
@@ -79,7 +74,7 @@ export function PasoAntecedentes({ inicial, onContinuar, onVolver }: Props) {
 
   return (
     <section className="tarjeta" aria-labelledby="paso3-tit">
-      <h2 id="paso3-tit">Paso 3 · Antecedentes anestésicos y quirúrgicos</h2>
+      <h2 id="paso3-tit">Paso 4 · Antecedentes anestésicos y quirúrgicos</h2>
 
       <h3>Intervenciones previas</h3>
       {previas.length === 0 ? (
@@ -136,22 +131,6 @@ export function PasoAntecedentes({ inicial, onContinuar, onVolver }: Props) {
           Añadir a la lista
         </button>
       </fieldset>
-
-      <h3>Antecedentes familiares de anestesia</h3>
-      <div className="grupo-checks">
-        <label className={`radio-tarjeta ${hm ? 'seleccionado' : ''}`}>
-          <input type="checkbox" checked={hm} onChange={() => setHm(!hm)} />
-          Hipertermia maligna
-        </label>
-        <label className={`radio-tarjeta ${pseudo ? 'seleccionado' : ''}`}>
-          <input type="checkbox" checked={pseudo} onChange={() => setPseudo(!pseudo)} />
-          Déficit de pseudocolinesterasa
-        </label>
-        <label className={`radio-tarjeta ${graves ? 'seleccionado' : ''}`}>
-          <input type="checkbox" checked={graves} onChange={() => setGraves(!graves)} />
-          Complicaciones graves o muertes inesperadas tras anestesia
-        </label>
-      </div>
 
       <div className="acciones">
         <button type="button" className="boton-secundario" onClick={onVolver}>Volver</button>

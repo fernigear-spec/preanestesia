@@ -88,7 +88,7 @@ export function PasoAlergias({ inicial, onContinuar, onVolver }: Props) {
 
   return (
     <section className="tarjeta" aria-labelledby="paso5-tit">
-      <h2 id="paso5-tit">Paso 5 · Alergias</h2>
+      <h2 id="paso5-tit">Paso 3 · Alergias</h2>
 
       <label className={`radio-tarjeta ${ninguna && !hayAlguna ? 'seleccionado' : ''}`}>
         <input type="checkbox" checked={ninguna && !hayAlguna} onChange={() => (ninguna ? setNinguna(false) : marcarNinguna())} />

@@ -6,7 +6,7 @@
  * está a más de 60 días. Los riesgos se heredan del procedimiento elegido.
  */
 import { useMemo, useState } from 'react';
-import type { DatosIntervencion, Regimen, Caracter, TecnicaAnestesica, RiesgoCardiovascular, RiesgoHemorragico } from '../../dominio/tipos.ts';
+import type { DatosIntervencion, Regimen, RiesgoCardiovascular, RiesgoHemorragico } from '../../dominio/tipos.ts';
 import {
   cargarProcedimientos,
   buscarProcedimientos,
@@ -25,21 +25,6 @@ const REGIMENES: Array<{ valor: Regimen; etiqueta: string }> = [
   { valor: 'uci_prevista', etiqueta: 'UCI prevista' },
 ];
 
-const CARACTERES: Array<{ valor: Caracter; etiqueta: string }> = [
-  { valor: 'programada', etiqueta: 'Programada' },
-  { valor: 'urgencia_diferida', etiqueta: 'Urgencia diferida' },
-];
-
-const TECNICAS: Array<{ valor: TecnicaAnestesica; etiqueta: string }> = [
-  { valor: 'general', etiqueta: 'General' },
-  { valor: 'sedacion', etiqueta: 'Sedación' },
-  { valor: 'neuroaxial', etiqueta: 'Neuroaxial (raquídea/epidural)' },
-  { valor: 'bloqueo_periferico', etiqueta: 'Bloqueo periférico' },
-  { valor: 'bloqueo_profundo', etiqueta: 'Bloqueo profundo' },
-  { valor: 'local', etiqueta: 'Anestesia local' },
-  { valor: 'no_se_sabe', etiqueta: 'No se sabe todavía' },
-];
-
 const MS_DIA = 86_400_000;
 
 export function PasoIntervencion({ onContinuar, onVolver }: Props) {
@@ -52,8 +37,6 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
   const [elegido, setElegido] = useState<Procedimiento | null>(null);
   const [lateralidad, setLateralidad] = useState<'no_aplica' | 'derecha' | 'izquierda' | 'bilateral'>('no_aplica');
   const [regimen, setRegimen] = useState<Regimen>('cma');
-  const [caracter, setCaracter] = useState<Caracter>('programada');
-  const [tecnica, setTecnica] = useState<TecnicaAnestesica>('general');
   const [contrasteYodado, setContrasteYodado] = useState<'si' | 'no' | 'no_se_sabe'>('no');
   // «Otro procedimiento» (no listado): la enfermera fija los riesgos a mano (§7.1).
   const [otro, setOtro] = useState(false);
@@ -113,8 +96,7 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
       retina: proc.retina,
       contrasteYodado,
       regimen,
-      caracter,
-      tecnica,
+      tecnica: 'no_se_sabe',
     };
     onContinuar(datos, proc);
   }
@@ -280,36 +262,7 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
         </div>
       </fieldset>
 
-      {/* Carácter */}
-      <fieldset className="campo">
-        <legend>Carácter</legend>
-        <div className="grupo-radios">
-          {CARACTERES.map((c) => (
-            <label key={c.valor} className={`radio-tarjeta ${caracter === c.valor ? 'seleccionado' : ''}`}>
-              <input type="radio" name="caracter" value={c.valor} checked={caracter === c.valor} onChange={() => setCaracter(c.valor)} />
-              {c.etiqueta}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      {/* Técnica anestésica */}
-      <fieldset className="campo">
-        <legend>Técnica anestésica prevista</legend>
-        <div className="grupo-radios">
-          {TECNICAS.map((t) => (
-            <label key={t.valor} className={`radio-tarjeta ${tecnica === t.valor ? 'seleccionado' : ''}`}>
-              <input type="radio" name="tecnica" value={t.valor} checked={tecnica === t.valor} onChange={() => setTecnica(t.valor)} />
-              {t.etiqueta}
-            </label>
-          ))}
-        </div>
-        {tecnica === 'no_se_sabe' && elegido?.neuroaxialProbable && (
-          <p className="aviso aviso-info" role="note">
-            Como el procedimiento suele hacerse con técnica neuroaxial, se usarán los plazos de neuroaxial y se indicará en la hoja.
-          </p>
-        )}
-      </fieldset>
+      {/* La técnica anestésica se elige en el paso 7. */}
 
       {/* Contraste yodado (afecta a la metformina, §8.5) */}
       <fieldset className="campo">

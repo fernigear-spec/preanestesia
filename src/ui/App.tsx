@@ -17,6 +17,7 @@ import { PasoCribado } from './pasos/PasoCribado.tsx';
 import { PasoMedicacion } from './pasos/PasoMedicacion.tsx';
 import { PasoViaAerea } from './pasos/PasoViaAerea.tsx';
 import { PasoConsentimiento } from './pasos/PasoConsentimiento.tsx';
+import { PasoTecnica } from './pasos/PasoTecnica.tsx';
 import { ESTADO_INICIAL, INCIDENCIAS_ANESTESICAS, type EstadoEntrevista, type IntervencionPrevia } from './estadoEntrevista.ts';
 import type { Modalidad } from '../dominio/tipos.ts';
 import { VistaPaciente } from './paciente/VistaPaciente.tsx';
@@ -38,7 +39,20 @@ function incidenciaLegible(id: string): string {
   return INCIDENCIAS_ANESTESICAS.find((x) => x.id === id)?.etiqueta ?? id;
 }
 
-type Pantalla = 'inicio' | 'paso1' | 'paso2' | 'paso3' | 'paso4' | 'paso5' | 'paso6' | 'paso7' | 'paso8' | 'paso9' | 'paso10' | 'resumen';
+type Pantalla =
+  | 'inicio'
+  | 'intervencion'
+  | 'basicos'
+  | 'alergias'
+  | 'antecedentes'
+  | 'habitos'
+  | 'enfermedades'
+  | 'tecnica'
+  | 'medicacion'
+  | 'viaAerea'
+  | 'consentimiento'
+  | 'mtnd4'
+  | 'resumen';
 
 const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 function fechaLegible(d: Date): string {
@@ -202,128 +216,153 @@ export function App() {
               type="button"
               className="boton-primario"
               disabled={modalidad === null}
-              onClick={() => { inicioRef.current = Date.now(); registradoRef.current = false; setPantalla('paso1'); }}
+              onClick={() => { inicioRef.current = Date.now(); registradoRef.current = false; setPantalla('intervencion'); }}
             >
               Comenzar
             </button>
           </section>
         )}
 
-        {pantalla === 'paso1' && (
+        {/* 1 · Intervención */}
+        {pantalla === 'intervencion' && (
           <PasoIntervencion
             onVolver={() => setPantalla('inicio')}
             onContinuar={(datos, proc) => {
               setEntrevista((e) => ({ ...e, intervencion: datos, procedimiento: proc }));
-              setPantalla('paso2');
+              setPantalla('basicos');
             }}
           />
         )}
 
-        {pantalla === 'paso2' && (
+        {/* 2 · Datos básicos */}
+        {pantalla === 'basicos' && (
           <PasoBasicos
             inicial={basicos}
             obstetrico={procedimiento?.obstetrico ?? false}
-            onVolver={() => setPantalla('paso1')}
+            onVolver={() => setPantalla('intervencion')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, basicos: datos }));
-              setPantalla('paso3');
+              setPantalla('alergias');
             }}
           />
         )}
 
-        {pantalla === 'paso3' && (
-          <PasoAntecedentes
-            inicial={antecedentes}
-            onVolver={() => setPantalla('paso2')}
-            onContinuar={(datos) => {
-              setEntrevista((e) => ({ ...e, antecedentes: datos }));
-              setPantalla('paso4');
-            }}
-          />
-        )}
-
-        {pantalla === 'paso4' && (
-          <PasoMtnd4
-            inicial={mtnd4}
-            onVolver={() => setPantalla('paso3')}
-            onContinuar={(datos) => {
-              setEntrevista((e) => ({ ...e, mtnd4: datos }));
-              setPantalla('paso5');
-            }}
-          />
-        )}
-
-        {pantalla === 'paso5' && (
+        {/* 3 · Alergias */}
+        {pantalla === 'alergias' && (
           <PasoAlergias
             inicial={alergias}
-            onVolver={() => setPantalla('paso4')}
+            onVolver={() => setPantalla('basicos')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, alergias: datos }));
-              setPantalla('paso6');
+              setPantalla('antecedentes');
             }}
           />
         )}
 
-        {pantalla === 'paso6' && basicos && (
+        {/* 4 · Antecedentes anestésicos y quirúrgicos */}
+        {pantalla === 'antecedentes' && (
+          <PasoAntecedentes
+            inicial={antecedentes}
+            onVolver={() => setPantalla('alergias')}
+            onContinuar={(datos) => {
+              setEntrevista((e) => ({ ...e, antecedentes: datos }));
+              setPantalla('habitos');
+            }}
+          />
+        )}
+
+        {/* 5 · Hábitos, capacidad funcional y fragilidad */}
+        {pantalla === 'habitos' && basicos && (
           <PasoHabitos
             inicial={habitos}
             edadAnios={basicos.edadAnios}
             sexo={basicos.sexo}
-            onVolver={() => setPantalla('paso5')}
+            onVolver={() => setPantalla('antecedentes')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, habitos: datos }));
-              setPantalla('paso7');
+              setPantalla('enfermedades');
             }}
           />
         )}
 
-        {pantalla === 'paso7' && (
+        {/* 6 · Enfermedades y hemostasia */}
+        {pantalla === 'enfermedades' && (
           <PasoCribado
             inicial={cribado}
             pediatrico={basicos ? basicos.edadAnios <= config.edad_pediatrica_maxima : false}
-            onVolver={() => setPantalla('paso6')}
+            onVolver={() => setPantalla('habitos')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, cribado: datos }));
-              setPantalla('paso8');
+              setPantalla('tecnica');
             }}
           />
         )}
 
-        {pantalla === 'paso8' && intervencion && basicos && (
+        {/* 7 · Técnica anestésica prevista */}
+        {pantalla === 'tecnica' && (
+          <PasoTecnica
+            inicial={intervencion?.tecnica ?? 'no_se_sabe'}
+            procedimiento={procedimiento}
+            onVolver={() => setPantalla('enfermedades')}
+            onContinuar={(tecnica, grupoOft) => {
+              setEntrevista((e) => (e.intervencion
+                ? { ...e, intervencion: { ...e.intervencion, tecnica, ...(grupoOft ? { grupoOftalmologico: grupoOft } : {}) } }
+                : e));
+              setPantalla('medicacion');
+            }}
+          />
+        )}
+
+        {/* 8 · Medicación */}
+        {pantalla === 'medicacion' && intervencion && basicos && (
           <PasoMedicacion
             inicial={medicacion}
             intervencion={intervencion}
             enfermedades={cribado?.enfermedades ?? []}
             respuestasModulos={cribado?.respuestasModulos ?? {}}
             basicos={{ edadAnios: basicos.edadAnios, pesoKg: basicos.pesoKg, sexo: basicos.sexo }}
-            onVolver={() => setPantalla('paso7')}
+            onVolver={() => setPantalla('tecnica')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, medicacion: datos }));
-              setPantalla('paso9');
+              setPantalla('viaAerea');
             }}
           />
         )}
 
-        {pantalla === 'paso9' && basicos && (
+        {/* 9 · Vía aérea */}
+        {pantalla === 'viaAerea' && basicos && (
           <PasoViaAerea
             inicial={viaAerea}
             telefonica={modalidad === 'telefonica'}
             basicos={{ edadAnios: basicos.edadAnios, pesoKg: basicos.pesoKg, tallaCm: basicos.tallaCm, sexo: basicos.sexo }}
-            onVolver={() => setPantalla('paso8')}
+            onVolver={() => setPantalla('medicacion')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, viaAerea: datos }));
-              setPantalla('paso10');
+              setPantalla('consentimiento');
             }}
           />
         )}
 
-        {pantalla === 'paso10' && (
+        {/* 10 · Consentimiento */}
+        {pantalla === 'consentimiento' && (
           <PasoConsentimiento
             inicial={consentimiento}
             telefonica={modalidad === 'telefonica'}
-            onVolver={() => setPantalla('paso9')}
+            onVolver={() => setPantalla('viaAerea')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, consentimiento: datos }));
+              setPantalla('mtnd4');
+            }}
+          />
+        )}
+
+        {/* 11 · Cribado mtND4 */}
+        {pantalla === 'mtnd4' && (
+          <PasoMtnd4
+            inicial={mtnd4}
+            onVolver={() => setPantalla('consentimiento')}
+            onContinuar={(datos) => {
+              setEntrevista((e) => ({ ...e, mtnd4: datos }));
               registrarUsoSiProcede();
               setPantalla('resumen');
             }}
@@ -339,7 +378,7 @@ export function App() {
             <ul className="resumen-lista">
               <li><strong>Procedimiento:</strong> {procedimiento.nombre} ({procedimiento.especialidad.replace(/_/g, ' ')})</li>
               <li><strong>Fecha y hora:</strong> {intervencion.fechaHora ? `${fechaLegible(intervencion.fechaHora)}${intervencion.horaAsumida ? ' (hora asumida)' : ''}` : 'aún no conocida (las instrucciones se darán como margen)'}</li>
-              <li><strong>Régimen:</strong> {intervencion.regimen} · <strong>Carácter:</strong> {intervencion.caracter.replace(/_/g, ' ')} · <strong>Técnica:</strong> {intervencion.tecnica.replace(/_/g, ' ')}</li>
+              <li><strong>Régimen:</strong> {intervencion.regimen} · <strong>Técnica:</strong> {intervencion.tecnica.replace(/_/g, ' ')}</li>
               <li><strong>Riesgos:</strong> cardiovascular {intervencion.riesgoCardiovascular}, hemorrágico {intervencion.riesgoHemorragico}</li>
             </ul>
 
@@ -370,12 +409,13 @@ export function App() {
             )}
             <ul className="resumen-lista">
               <li>
-                <strong>Antecedentes familiares:</strong>{' '}
-                {antecedentes && (antecedentes.familiaresHipertermiaMaligna || antecedentes.familiaresDeficitPseudocolinesterasa || antecedentes.familiaresComplicacionesGraves)
+                <strong>Condiciones especiales:</strong>{' '}
+                {cribado && (cribado.condicionesEspeciales.hipertermiaMalignaPersonal || cribado.condicionesEspeciales.hipertermiaMalignaFamiliar || cribado.condicionesEspeciales.pseudocolinesterasaPersonal || cribado.condicionesEspeciales.pseudocolinesterasaFamiliar)
                   ? [
-                      antecedentes.familiaresHipertermiaMaligna ? 'hipertermia maligna' : null,
-                      antecedentes.familiaresDeficitPseudocolinesterasa ? 'déficit de pseudocolinesterasa' : null,
-                      antecedentes.familiaresComplicacionesGraves ? 'complicaciones graves' : null,
+                      cribado.condicionesEspeciales.hipertermiaMalignaPersonal ? 'hipertermia maligna (personal)' : null,
+                      cribado.condicionesEspeciales.hipertermiaMalignaFamiliar ? 'hipertermia maligna (familiar)' : null,
+                      cribado.condicionesEspeciales.pseudocolinesterasaPersonal ? 'déficit de pseudocolinesterasa (personal)' : null,
+                      cribado.condicionesEspeciales.pseudocolinesterasaFamiliar ? 'déficit de pseudocolinesterasa (familiar)' : null,
                     ].filter(Boolean).join(', ')
                   : 'sin antecedentes reseñables'}
               </li>
@@ -494,7 +534,7 @@ export function App() {
             <Salidas entrevista={entrevista} modalidad={modalidad ?? 'presencial'} />
 
             <div className="acciones">
-              <button type="button" className="boton-secundario" onClick={() => setPantalla('paso1')}>Editar desde el paso 1</button>
+              <button type="button" className="boton-secundario" onClick={() => setPantalla('intervencion')}>Editar desde el paso 1</button>
               <button type="button" className="boton-secundario" onClick={nuevoPaciente}>Nuevo paciente</button>
             </div>
           </section>

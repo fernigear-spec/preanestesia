@@ -39,7 +39,7 @@ describe('§10.1 · texto de SAP (solo antecedentes patológicos y quirúrgicos)
 });
 
 function entradaAsa(p: Partial<EntradaAsa> = {}): EntradaAsa {
-  return { edadAnios: 50, imc: 24, embarazada: false, tabacoActivo: false, abusoAlcohol: false, enfermedades: new Set(), respuestas: {}, urgencia: false, ...p };
+  return { edadAnios: 50, imc: 24, embarazada: false, tabacoActivo: false, abusoAlcohol: false, enfermedades: new Set(), respuestas: {}, ...p };
 }
 
 describe('§6.1 · ASA sugerido', () => {
@@ -53,10 +53,9 @@ describe('§6.1 · ASA sugerido', () => {
     const r = derivarAsa(entradaAsa({ enfermedades: new Set(['asma_epoc']), respuestas: { asma_epoc: { enfermedad: 'epoc' } } }));
     expect(r.clase).toBe(3);
   });
-  it('insuficiencia cardiaca NYHA IV → ASA IV; urgencia añade sufijo E', () => {
-    const r = derivarAsa(entradaAsa({ enfermedades: new Set(['insuficiencia_cardiaca']), respuestas: { insuficiencia_cardiaca: { nyha: 'IV' } }, urgencia: true }));
+  it('insuficiencia cardiaca NYHA IV → ASA IV', () => {
+    const r = derivarAsa(entradaAsa({ enfermedades: new Set(['insuficiencia_cardiaca']), respuestas: { insuficiencia_cardiaca: { nyha: 'IV' } } }));
     expect(r.clase).toBe(4);
-    expect(r.sufijoE).toBeTrue();
   });
   it('override manual', () => {
     expect(derivarAsa(entradaAsa({ claseManual: 3 })).clase).toBe(3);

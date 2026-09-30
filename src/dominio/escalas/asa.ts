@@ -19,14 +19,12 @@ export interface DeterminanteAsa {
 
 export interface ResultadoAsa extends ResultadoEscala {
   clase: ClaseAsa;
-  sufijoE: boolean;
   modificadoManualmente: boolean;
   /** Determinantes que fijaron la clase máxima. */
   determinantes: string[];
 }
 
 export interface OpcionesAsa {
-  urgencia?: boolean;
   /** Override manual del anestesiólogo/enfermera. */
   claseManual?: ClaseAsa;
 }
@@ -48,14 +46,12 @@ export function calcularAsa(
     .filter((d) => d.clase === claseCalculada)
     .map((d) => d.motivo);
 
-  const sufijoE = opciones.urgencia === true;
   const ROMANO: Record<ClaseAsa, string> = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' };
-  const categoria = `ASA ${ROMANO[clase]}${sufijoE ? 'E' : ''}`;
+  const categoria = `ASA ${ROMANO[clase]}`;
 
   return {
     puntuacion: clase,
     clase,
-    sufijoE,
     modificadoManualmente,
     determinantes: motivosDeMax,
     categoria,

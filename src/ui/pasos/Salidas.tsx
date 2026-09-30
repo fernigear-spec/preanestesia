@@ -93,7 +93,7 @@ export function Salidas({ entrevista, modalidad }: Props) {
     const asa = derivarAsa({
       edadAnios: basicos.edadAnios, imc, embarazada: basicos.moduloObstetrico === true || basicos.embarazada === true,
       tabacoActivo: habitos?.tabaco === 'activo', abusoAlcohol: audit?.riesgoAbstinencia ?? false,
-      enfermedades, respuestas, urgencia: intervencion.caracter === 'urgencia_diferida', ...(asaManual !== '' ? { claseManual: asaManual } : {}),
+      enfermedades, respuestas, ...(asaManual !== '' ? { claseManual: asaManual } : {}),
     });
 
     // Escalas.
@@ -251,7 +251,7 @@ export function Salidas({ entrevista, modalidad }: Props) {
       )}
 
       <div className="campo">
-        <label htmlFor="asa-manual"><strong>ASA sugerido: {'I'.repeat(salida.asa.clase)}{salida.asa.sufijoE ? 'E' : ''}</strong> (puede modificarlo)</label>
+        <label htmlFor="asa-manual"><strong>ASA sugerido: {'I'.repeat(salida.asa.clase)}</strong> (puede modificarlo)</label>
         <select id="asa-manual" value={asaManual} onChange={(e) => setAsaManual(e.target.value === '' ? '' : Number(e.target.value) as ClaseAsa)}>
           <option value="">Sugerido ({salida.asa.determinantes.join(', ') || 'sano'})</option>
           {[1, 2, 3, 4, 5].map((c) => <option key={c} value={c}>ASA {'I'.repeat(c)}</option>)}

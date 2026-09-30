@@ -70,14 +70,14 @@ test.describe('Vista previa', () => {
     await page.locator('#talla').fill('175');
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Pasos 3-7 sin datos extra.
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
+    // Pasos 3-7 sin datos extra (nuevo orden: alergias, antecedentes, hábitos, enfermedades, técnica).
     await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
     await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
 
     // Paso 8: añadir fármacos con distintos tipos de plazo.
     await expect(page.getByRole('heading', { name: /Paso 8 · Medicación/ })).toBeVisible();
@@ -104,7 +104,7 @@ test.describe('Vista previa', () => {
     expect(errores).toHaveLength(0);
   });
 
-  test('recorre pasos 2-4 hasta el resumen', async ({ page }) => {
+  test('recorre pasos 2-11 hasta el resumen', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Presencial' }).click();
     await page.getByRole('button', { name: 'Comenzar' }).click();
@@ -126,33 +126,30 @@ test.describe('Vista previa', () => {
     await page.getByRole('radio', { name: /No hay posibilidad/ }).check();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Paso 3 — antecedentes.
-    await expect(page.getByRole('heading', { name: /Paso 3 · Antecedentes/ })).toBeVisible();
-    await page.getByRole('button', { name: 'Continuar' }).click();
-
-    // Paso 4 — mtND4. Marcar factor materno y ver la alerta roja.
-    await expect(page.getByRole('heading', { name: /Paso 4 · Origen materno/ })).toBeVisible();
-    await expect(page.getByText(/Guion para explicar la pregunta/)).toBeVisible();
-    await page.getByRole('checkbox', { name: /Ascendencia venezolana por línea materna/ }).check();
-    await expect(page.getByText(/Alerta roja/)).toBeVisible();
-    await page.getByRole('button', { name: 'Continuar' }).click();
-
-    // Paso 5 — alergias. Marcar "No alergias conocidas".
-    await expect(page.getByRole('heading', { name: /Paso 5 · Alergias/ })).toBeVisible();
+    // Paso 3 — alergias. Marcar "No alergias conocidas".
+    await expect(page.getByRole('heading', { name: /Paso 3 · Alergias/ })).toBeVisible();
     await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Paso 6 — hábitos. AUDIT-C alto para ver la alerta de abstinencia.
-    await expect(page.getByRole('heading', { name: /Paso 6 · Hábitos/ })).toBeVisible();
+    // Paso 4 — antecedentes.
+    await expect(page.getByRole('heading', { name: /Paso 4 · Antecedentes/ })).toBeVisible();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 5 — hábitos. AUDIT-C alto para ver la alerta de abstinencia.
+    await expect(page.getByRole('heading', { name: /Paso 5 · Hábitos/ })).toBeVisible();
     await page.locator('#a1').selectOption('4');
     await page.locator('#a2').selectOption('4');
     await page.locator('#a3').selectOption('4');
     await expect(page.getByText(/síndrome de abstinencia/)).toBeVisible();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Paso 7 — cribado. Ninguna enfermedad conocida.
-    await expect(page.getByRole('heading', { name: /Paso 7 · Enfermedades/ })).toBeVisible();
+    // Paso 6 — cribado. Ninguna enfermedad conocida.
+    await expect(page.getByRole('heading', { name: /Paso 6 · Enfermedades/ })).toBeVisible();
     await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 7 — técnica anestésica prevista.
+    await expect(page.getByRole('heading', { name: /Paso 7 · Técnica anestésica prevista/ })).toBeVisible();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
     // Paso 8 — medicación. Sin fármacos, continuar.
@@ -165,12 +162,19 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('heading', { name: /Paso 10 · Consentimiento/ })).toBeVisible();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
+    // Paso 11 — mtND4. Marcar factor materno y ver la alerta roja.
+    await expect(page.getByRole('heading', { name: /Paso 11 · Origen materno/ })).toBeVisible();
+    await expect(page.getByText(/Guion para explicar la pregunta/)).toBeVisible();
+    await page.getByRole('checkbox', { name: /Ascendencia venezolana por línea materna/ }).check();
+    await expect(page.getByText(/Alerta roja/)).toBeVisible();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
     // Resumen.
     await expect(page.getByRole('heading', { name: /Resumen de la entrevista/ })).toBeVisible();
     await expect(page.getByText(/Hernioplastia inguinal abierta/)).toBeVisible();
     await expect(page.getByText(/No alergias conocidas/)).toBeVisible();
 
-    // Salidas del paso 11: resumen del anestesiólogo, ASA sugerido y texto para SAP.
+    // Salidas del resumen: resumen del anestesiólogo, ASA sugerido y texto para SAP.
     await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
     await expect(page.locator('label[for="asa-manual"]')).toContainText('ASA sugerido');
     await expect(page.getByRole('heading', { name: /Escalas/ })).toBeVisible();
@@ -195,15 +199,15 @@ test.describe('Vista previa', () => {
     await page.locator('#talla').fill('175');
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
     await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
 
-    // Paso 7: marcar cardiopatía isquémica (stent).
+    // Paso 6: marcar cardiopatía isquémica (stent).
     await page.getByRole('checkbox', { name: 'Cardiopatía isquémica / infarto' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
 
     // Paso 8: Plavix sin Adiro (monoterapia → requiere confirmación).
     await page.locator('#med').fill('Plavix');
@@ -211,9 +215,10 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: '09:00', exact: true }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Pasos 9 y 10.
+    // Pasos 9, 10 y 11.
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 vía aérea
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
 
     // Resumen: hay pendiente → no se puede generar.
     await expect(page.getByText(/pendientes de confirmar/)).toBeVisible();
@@ -246,22 +251,23 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: 'Continuar' }).click();
 
     // Pasos 3-7.
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
     await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
     await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
 
     // Paso 8: añadir Adiro y continuar.
     await page.locator('#med').fill('Adiro');
     await page.getByRole('button', { name: /Adiro/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Pasos 9 y 10.
+    // Pasos 9, 10 y 11.
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 vía aérea
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
 
     // Resumen: generar la hoja del paciente y ver el QR.
     await expect(page.getByRole('heading', { name: /Resumen de la entrevista/ })).toBeVisible();
@@ -297,16 +303,17 @@ test.describe('Vista previa', () => {
     await page.locator('#peso').fill('80');
     await page.locator('#talla').fill('175');
     await page.getByRole('button', { name: 'Continuar' }).click();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
     await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
     await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
     await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> resumen
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
     await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
     await expect(page.getByRole('img', { name: /Código QR/ })).toBeVisible();
 
@@ -346,23 +353,24 @@ test.describe('Vista previa', () => {
     await page.locator('#talla').fill('177');
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
     await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
 
-    // Paso 7: HTA + apnea del sueño (sin diagnóstico), con las preguntas del STOP-Bang.
+    // Paso 6: HTA + apnea del sueño (sin diagnóstico), con las preguntas del STOP-Bang.
     await page.getByRole('checkbox', { name: 'Hipertensión' }).check();
     await page.getByRole('checkbox', { name: 'Apnea del sueño (SAOS)' }).check();
     await page.getByRole('group', { name: /diagnóstico confirmado de apnea/ }).getByRole('button', { name: 'No' }).click();
     await page.getByRole('group', { name: /Ronca fuerte/ }).getByRole('button', { name: 'Sí' }).click();
     await page.locator('#saos-perimetro_cuello').fill('42');
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades -> 7 técnica
 
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
     await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> resumen
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
 
     const stopBang = page.getByRole('listitem').filter({ hasText: 'STOP-Bang' });
     await expect(stopBang).toContainText('6');
@@ -388,23 +396,24 @@ test.describe('Vista previa', () => {
     await page.getByRole('radio', { name: /No hay posibilidad/ }).check();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
     await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
 
-    // Paso 7: apnea del sueño (sin diagnóstico); ronca y cansancio, sin apneas; cuello 36.
+    // Paso 6: apnea del sueño (sin diagnóstico); ronca y cansancio, sin apneas; cuello 36.
     await page.getByRole('checkbox', { name: 'Apnea del sueño (SAOS)' }).check();
     await page.getByRole('group', { name: /diagnóstico confirmado de apnea/ }).getByRole('button', { name: 'No' }).click();
     await page.getByRole('group', { name: /Ronca fuerte/ }).getByRole('button', { name: 'Sí' }).click();
     await page.getByRole('group', { name: /cansado o somnoliento durante el día/ }).getByRole('button', { name: 'Sí' }).click();
     await page.locator('#saos-perimetro_cuello').fill('36');
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades -> 7 técnica
 
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
     await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> resumen
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
 
     const stopBang = page.getByRole('listitem').filter({ hasText: 'STOP-Bang' });
     await expect(stopBang).toContainText('2');
@@ -427,13 +436,13 @@ test.describe('Vista previa', () => {
     await page.locator('#talla').fill('175');
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
     await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
     await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
 
     // Paso 8: fentanilo transdérmico (parche, µg/h) y tapentadol (mg × tomas/día).
     await page.locator('#med').fill('Durogesic');
@@ -447,7 +456,8 @@ test.describe('Vista previa', () => {
 
     await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> resumen
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
 
     const morfina = page.getByRole('listitem').filter({ hasText: 'Morfina equivalente' });
     await expect(morfina).toContainText('140');
@@ -473,25 +483,81 @@ test.describe('Vista previa', () => {
     await page.getByRole('radio', { name: /No hay posibilidad/ }).check();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
     await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
     await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
 
     // Paso 8: buscar y añadir el implante anticonceptivo (no pide hora de toma).
     await page.locator('#med').fill('implante');
     await page.getByRole('button', { name: /implante anticonceptivo/i }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> resumen
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
 
     // La nota del sugammadex (§8.15) para vía no oral: método de barrera 7 días.
     await page.getByRole('button', { name: /Notas técnicas/ }).click();
     await expect(page.getByText(/método de barrera/)).toBeVisible();
     await expect(page.getByText(/7 días/)).toBeVisible();
+  });
+
+  test('C-oft: catarata + apixabán — tópica no suspende; al pasar a peribulbar el paso 8 se recalcula', async ({ page }) => {
+    const MANTENER = 'Siga tomándolo como siempre';
+    const RECALCULADO = 'el anestesiólogo le llamará';
+
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    // Paso 1: catarata (fecha concreta → el motor usa el grupo oftalmológico de la técnica).
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('catarata');
+    await page.getByRole('button', { name: /Cirugia de catarata con anestesia topica/i }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 2.
+    await page.locator('#edad').fill('75');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('80');
+    await page.locator('#talla').fill('170');
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Pasos 3-6 sin datos extra.
+    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades -> 7 técnica
+
+    // Paso 7: técnica tópica → catarata de riesgo bajo (no se suspenden anticoagulantes).
+    await expect(page.getByRole('heading', { name: /Paso 7 · Técnica anestésica prevista/ })).toBeVisible();
+    await page.getByRole('radio', { name: 'Tópica' }).check();
+    await expect(page.getByText(/no se suspenden/i)).toBeVisible();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+
+    // Paso 8: apixabán con técnica tópica → mantener.
+    await page.locator('#med').fill('Eliquis');
+    await page.getByRole('button', { name: /Eliquis/ }).first().click();
+    await page.getByRole('button', { name: '09:00', exact: true }).first().click();
+    await expect(page.getByText(MANTENER, { exact: false })).toBeVisible();
+
+    // Volver al paso 7 y cambiar a retrobulbar/peribulbar → riesgo moderado-alto.
+    await page.getByRole('button', { name: 'Volver' }).click(); // 8 -> 7 técnica
+    await expect(page.getByRole('heading', { name: /Paso 7 · Técnica anestésica prevista/ })).toBeVisible();
+    await page.getByRole('radio', { name: 'Retrobulbar o peribulbar' }).check();
+    await expect(page.getByText(/moderado-alto/)).toBeVisible();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+
+    // Paso 8 recalculado: el apixabán ya NO se mantiene (oftalmología moderada-alta
+    // = riesgo hemorrágico alto), sino que pasa a requerir suspensión/confirmación.
+    await expect(page.getByRole('heading', { name: /Paso 8 · Medicación/ })).toBeVisible();
+    await expect(page.getByText(MANTENER, { exact: false })).toHaveCount(0);
+    await expect(page.getByText(RECALCULADO, { exact: false })).toBeVisible();
   });
 
   test('paso 1: "otro procedimiento" exige marcar los riesgos a mano (§7.1)', async ({ page }) => {

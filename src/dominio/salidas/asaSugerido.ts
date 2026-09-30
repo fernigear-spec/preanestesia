@@ -16,7 +16,6 @@ export interface EntradaAsa {
   abusoAlcohol: boolean; // AUDIT-C ≥ 8
   enfermedades: Set<string>;
   respuestas: Resp;
-  urgencia: boolean;
   claseManual?: ClaseAsa;
 }
 
@@ -78,5 +77,5 @@ export function derivarAsa(e: EntradaAsa): ResultadoAsa {
   }
   if (e.enfermedades.has('enfermedad_hepatica')) d.push({ clase: 3, motivo: 'hepatopatía' });
 
-  return calcularAsa(d, { urgencia: e.urgencia, ...(e.claseManual !== undefined ? { claseManual: e.claseManual } : {}) });
+  return calcularAsa(d, { ...(e.claseManual !== undefined ? { claseManual: e.claseManual } : {}) });
 }

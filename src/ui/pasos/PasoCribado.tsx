@@ -6,7 +6,16 @@
  */
 import { useState } from 'react';
 import { calcularHemstop, type EntradaHemstop } from '../../dominio/escalas/hemstop.ts';
-import { APARATOS, PREGUNTAS_HEMSTOP, HEMSTOP_VACIO, moduloDeEnfermedad, type CribadoUi } from '../estadoEntrevista.ts';
+import {
+  APARATOS,
+  PREGUNTAS_HEMSTOP,
+  HEMSTOP_VACIO,
+  moduloDeEnfermedad,
+  PREGUNTAS_CONDICIONES_ESPECIALES,
+  CONDICIONES_ESPECIALES_VACIO,
+  type CribadoUi,
+  type CondicionesEspeciales,
+} from '../estadoEntrevista.ts';
 import { MODULO_POR_ID } from '../../datos/modulosDatos.ts';
 import { RenderizadorModulo } from '../modulos/RenderizadorModulo.tsx';
 import type { RespuestasModulos, ValorRespuesta } from '../../datos/modulos.ts';
@@ -24,6 +33,9 @@ export function PasoCribado({ inicial, pediatrico = false, onContinuar, onVolver
   const [enfermedades, setEnfermedades] = useState<Set<string>>(new Set(inicial?.enfermedades ?? []));
   const [respuestasModulos, setRespuestasModulos] = useState<RespuestasModulos>(inicial?.respuestasModulos ?? {});
   const [hemstop, setHemstop] = useState<EntradaHemstop>(inicial?.hemstop ?? { ...HEMSTOP_VACIO });
+  const [condiciones, setCondiciones] = useState<CondicionesEspeciales>(
+    inicial?.condicionesEspeciales ?? { ...CONDICIONES_ESPECIALES_VACIO },
+  );
 
   const resHemstop = calcularHemstop(hemstop);
 
@@ -60,6 +72,9 @@ export function PasoCribado({ inicial, pediatrico = false, onContinuar, onVolver
   function alternarHemstop(id: keyof EntradaHemstop) {
     setHemstop((h) => ({ ...h, [id]: !h[id] }));
   }
+  function alternarCondicion(id: keyof CondicionesEspeciales) {
+    setCondiciones((c) => ({ ...c, [id]: !c[id] }));
+  }
 
   // Se puede continuar siempre (el HEMSTOP se recoge aquí y el cribado admite «ninguna»).
   function continuar() {
@@ -74,12 +89,13 @@ export function PasoCribado({ inicial, pediatrico = false, onContinuar, onVolver
       enfermedades: [...enfermedades],
       respuestasModulos: respuestasFiltradas,
       hemstop,
+      condicionesEspeciales: condiciones,
     });
   }
 
   return (
     <section className="tarjeta" aria-labelledby="paso7-tit">
-      <h2 id="paso7-tit">Paso 7 · Enfermedades y hemostasia</h2>
+      <h2 id="paso7-tit">Paso 6 · Enfermedades y hemostasia</h2>
 
       <p>Marque las enfermedades conocidas. Cada una activará su módulo de preguntas específicas.</p>
       <label className={`radio-tarjeta ${ninguna && enfermedades.size === 0 ? 'seleccionado' : ''}`}>
@@ -114,6 +130,17 @@ export function PasoCribado({ inicial, pediatrico = false, onContinuar, onVolver
           ))}
         </div>
       )}
+
+      <h3>Condiciones especiales</h3>
+      <p>Antecedentes personales o familiares relevantes para la anestesia (§5.15).</p>
+      <div className="grupo-checks">
+        {PREGUNTAS_CONDICIONES_ESPECIALES.map((p) => (
+          <label key={p.id} className={`radio-tarjeta ${condiciones[p.id] ? 'seleccionado' : ''}`}>
+            <input type="checkbox" checked={condiciones[p.id]} onChange={() => alternarCondicion(p.id)} />
+            {p.etiqueta}
+          </label>
+        ))}
+      </div>
 
       <h3>Cuestionario de sangrado (HEMSTOP)</h3>
       <p>Se hace a todos los pacientes, marque o no marque enfermedades de la sangre.</p>

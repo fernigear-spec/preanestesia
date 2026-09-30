@@ -29,11 +29,29 @@ export interface IntervencionPrevia {
 /** Antecedentes del paso 3 (R3.2.10–R3.2.12). */
 export interface AntecedentesUi {
   intervencionesPrevias: IntervencionPrevia[];
-  /** Antecedentes familiares de anestesia (R3.2.12). */
-  familiaresHipertermiaMaligna: boolean;
-  familiaresDeficitPseudocolinesterasa: boolean;
-  familiaresComplicacionesGraves: boolean;
 }
+
+/** Condiciones especiales del paso de enfermedades (§5.15): personal o familiar. */
+export interface CondicionesEspeciales {
+  hipertermiaMalignaPersonal: boolean;
+  hipertermiaMalignaFamiliar: boolean;
+  pseudocolinesterasaPersonal: boolean;
+  pseudocolinesterasaFamiliar: boolean;
+}
+
+export const CONDICIONES_ESPECIALES_VACIO: CondicionesEspeciales = {
+  hipertermiaMalignaPersonal: false,
+  hipertermiaMalignaFamiliar: false,
+  pseudocolinesterasaPersonal: false,
+  pseudocolinesterasaFamiliar: false,
+};
+
+export const PREGUNTAS_CONDICIONES_ESPECIALES: Array<{ id: keyof CondicionesEspeciales; etiqueta: string }> = [
+  { id: 'hipertermiaMalignaPersonal', etiqueta: 'Hipertermia maligna (personal)' },
+  { id: 'hipertermiaMalignaFamiliar', etiqueta: 'Hipertermia maligna (familiar)' },
+  { id: 'pseudocolinesterasaPersonal', etiqueta: 'Déficit de pseudocolinesterasa (personal)' },
+  { id: 'pseudocolinesterasaFamiliar', etiqueta: 'Déficit de pseudocolinesterasa (familiar)' },
+];
 
 /** Una alergia a medicamento con su reacción (paso 5, R3.2.14). */
 export interface AlergiaMedicamento {
@@ -91,6 +109,8 @@ export interface CribadoUi {
   respuestasModulos: RespuestasModulos;
   /** HEMSTOP, que se hace siempre (R3.2.23). */
   hemstop: EntradaHemstop;
+  /** Condiciones especiales (§5.15): hipertermia maligna y pseudocolinesterasa. */
+  condicionesEspeciales: CondicionesEspeciales;
 }
 
 /** Un fármaco que el paciente toma, recogido en el paso 8. */

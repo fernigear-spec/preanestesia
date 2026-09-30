@@ -102,7 +102,7 @@ export function PasoHabitos({ inicial, edadAnios, sexo, onContinuar, onVolver }:
 
   return (
     <section className="tarjeta" aria-labelledby="paso6-tit">
-      <h2 id="paso6-tit">Paso 6 · Hábitos y capacidad funcional</h2>
+      <h2 id="paso6-tit">Paso 5 · Hábitos, capacidad funcional y fragilidad</h2>
 
       <h3>Tabaco</h3>
       <div className="grupo-radios">

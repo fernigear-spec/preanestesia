@@ -243,10 +243,9 @@ describe('ASA sugerido', () => {
     expect(r.categoria).toBe('ASA III');
     expect(r.determinantes).toContain('stent > 3 meses');
   });
-  it('urgencia añade sufijo E', () => {
-    const r = calcularAsa([{ clase: 2, motivo: 'x' }], { urgencia: true });
-    expect(r.categoria).toBe('ASA IIE');
-    expect(r.sufijoE).toBeTrue();
+  it('sin sufijo E (se eliminó el carácter urgente)', () => {
+    const r = calcularAsa([{ clase: 2, motivo: 'x' }]);
+    expect(r.categoria).toBe('ASA II');
   });
   it('override manual marca modificado', () => {
     const r = calcularAsa([{ clase: 2, motivo: 'x' }], { claseManual: 4 });
