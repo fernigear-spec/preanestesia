@@ -87,6 +87,25 @@ p();
 ].forEach((s) => p(`- ${s}`));
 p();
 
+// —————————————————————————————— Decisiones del servicio ——————————————————————————————
+p('## Decisiones del servicio (30/09/2026)');
+p();
+p('_Cambios acordados por el servicio en esta revisión, ya aplicados en el contenido y el comportamiento._');
+p();
+[
+  '**Orden de la entrevista (12 pasos):** intervención, datos básicos, alergias, antecedentes, hábitos, enfermedades y hemostasia, técnica anestésica prevista, medicación, vía aérea, consentimiento, origen materno (mtND4) y resultados.',
+  '**Técnica anestésica en un paso propio (paso 7):** si se cambia, las reglas de medicación y las salidas se recalculan; la medicación introducida se conserva al volver.',
+  '**Oftalmología:** la técnica decide el grupo de la catarata (tópica = riesgo bajo; retrobulbar o peribulbar = moderado-alto; sin técnica, moderado-alto y se indica). La oftalmología de riesgo moderado-alto se trata como riesgo hemorrágico alto para los anticoagulantes (§8.1-8.3).',
+  '**Se retira el «carácter» de la intervención y el sufijo «E» del ASA** (ya no se recoge la urgencia).',
+  '**Condiciones especiales (§5.15):** la hipertermia maligna y el déficit de pseudocolinesterasa (personales y familiares) se recogen en el paso de enfermedades, no en antecedentes.',
+  '**Riesgo quirúrgico según la ESC 2022** (sustituye a la clasificación previa de §7.1).',
+  '**AAS (§8.2):** se mantiene salvo espacio cerrado, cirugía de retina o técnica neuroaxial (suspender 5 días); en prevención cardiovascular se confirma y se mantienen 100 mg.',
+  '**HBPM (§8.4):** clasificación profiláctica/terapéutica con dosis, pauta, peso y aclaramiento (tablas SETH por heparina; márgenes ±20 %).',
+  '**Texto para SAP (§10.1):** solo antecedentes patológicos y quirúrgicos, sin límite de caracteres; el resto se rellena con los desplegables del SAP.',
+  '**Codificación del efecto por respuesta (§5.16):** cada respuesta que genera un efecto lo declara en el campo `genera` de su pregunta (véase §16), validado y protegido por un test de cobertura.',
+].forEach((s) => p(`- ${s}`));
+p();
+
 // —————————————————————————————— 1. Configuración ——————————————————————————————
 p('## 1. Parámetros de configuración');
 p();
@@ -123,11 +142,36 @@ p('La HBPM se clasifica en profiláctica o terapéutica con **dosis, pauta, peso
 p();
 p('| Heparina | Profilaxis | Tratamiento |');
 p('| --- | --- | --- |');
+function profilaxisSeth(t: Record<string, unknown>): string {
+  const u = String(t.unidad ?? '');
+  if (t.profilaxis_max_por_kg_dia !== undefined) return `≤ ${t.profilaxis_max_por_kg_dia} ${u}/kg/día`;
+  if (t.profilaxis_dia_bandas !== undefined) {
+    const b = t.profilaxis_dia_bandas as { umbral_kg: number; hasta: number; desde: number };
+    return `≤ ${b.hasta} ${u}/día (< ${b.umbral_kg} kg) · ≤ ${b.desde} ${u}/día (≥ ${b.umbral_kg} kg)`;
+  }
+  if (t.profilaxis_dia !== undefined) {
+    const base = `≤ ${t.profilaxis_dia} ${u}/día`;
+    return t.profilaxis_crcl_lt30_dia !== undefined ? `${base} (≤ ${t.profilaxis_crcl_lt30_dia} con aclaramiento < 30)` : base;
+  }
+  return '—';
+}
+function tratamientoSeth(t: Record<string, unknown>): string {
+  const u = String(t.unidad ?? '');
+  if (t.tratamiento_min_por_kg_dia !== undefined) {
+    return `≥ ${t.tratamiento_min_por_kg_dia} ${u}/kg/día (≥ ${t.tratamiento_min_por_kg_dia_crcl_lt30} con aclaramiento < 30)`;
+  }
+  if (t.tratamiento_por_kg_dia !== undefined) {
+    let s = `${t.tratamiento_por_kg_dia} ${u}/kg/día`;
+    if (t.tratamiento_por_kg_dia_crcl_lt30 !== undefined) s += ` (${t.tratamiento_por_kg_dia_crcl_lt30} con aclaramiento < 30)`;
+    if (t.tratamiento_crcl_lt30_contraindicado) s += ' · contraindicado con aclaramiento < 30';
+    if (t.tratamiento_crcl_lt30_confirmar) s += ' · confirmar con aclaramiento < 30';
+    return s;
+  }
+  return '—';
+}
 for (const [nombre, t] of Object.entries(rf.tablas_seth)) {
   if (nombre.startsWith('_')) continue;
-  const prof = t.profilaxis_max_por_kg_dia !== undefined ? `≤ ${t.profilaxis_max_por_kg_dia} ${t.unidad}/kg/día` : `≤ ${t.profilaxis_max_dia} ${t.unidad}/día`;
-  const trat = t.tratamiento_min_por_kg_dia !== undefined ? `≥ ${t.tratamiento_min_por_kg_dia} ${t.unidad}/kg/día (≥ ${t.tratamiento_min_por_kg_dia_crcl_lt30} con aclaramiento < 30)` : `≥ ${t.tratamiento_min_dia} ${t.unidad}/día`;
-  p(`| ${nombre} | ${prof} | ${trat} |`);
+  p(`| ${nombre} | ${profilaxisSeth(t)} | ${tratamientoSeth(t)} |`);
 }
 p();
 p('### 3.2. Reglas por fármaco o grupo');
@@ -333,11 +377,11 @@ for (const fila of procedimientos.filas) {
 for (const e of [...porEsp.keys()].sort()) {
   p(`### ${e.replace(/_/g, ' ')}`);
   p();
-  p('| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |');
-  p('| --- | --- | --- | --- | --- | --- | --- | --- |');
+  p('| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |');
+  p('| --- | --- | --- | --- | --- | --- | --- | --- | --- |');
   for (const fila of porEsp.get(e)!) {
     const v = fila.valores;
-    p(`| ${ovacio(v.procedimiento)} | ${ovacio(v.riesgo_cardiovascular)} | ${ovacio(v.riesgo_hemorragico)} | ${ovacio(v.neuroaxial_o_bloqueo_profundo_probable)} | ${ovacio(v.grupo_oftalmologico)} | ${ovacio(v.obstetrico)} | ${ovacio(v.riesgo_trombotico_alto)} | ${ovacio(v.espacio_cerrado)} |`);
+    p(`| ${ovacio(v.procedimiento)} | ${ovacio(v.riesgo_cardiovascular)} | ${ovacio(v.riesgo_hemorragico)} | ${ovacio(v.neuroaxial_o_bloqueo_profundo_probable)} | ${ovacio(v.grupo_oftalmologico)} | ${ovacio(v.obstetrico)} | ${ovacio(v.riesgo_trombotico_alto)} | ${ovacio(v.espacio_cerrado)} | ${ovacio(v.retina)} |`);
   }
   p();
 }

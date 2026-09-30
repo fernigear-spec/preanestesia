@@ -27,13 +27,27 @@
 - 16. Módulos de enfermedad
 - 17. Pendiente de revisión por el servicio
 
+## Decisiones del servicio (30/09/2026)
+
+_Cambios acordados por el servicio en esta revisión, ya aplicados en el contenido y el comportamiento._
+
+- **Orden de la entrevista (12 pasos):** intervención, datos básicos, alergias, antecedentes, hábitos, enfermedades y hemostasia, técnica anestésica prevista, medicación, vía aérea, consentimiento, origen materno (mtND4) y resultados.
+- **Técnica anestésica en un paso propio (paso 7):** si se cambia, las reglas de medicación y las salidas se recalculan; la medicación introducida se conserva al volver.
+- **Oftalmología:** la técnica decide el grupo de la catarata (tópica = riesgo bajo; retrobulbar o peribulbar = moderado-alto; sin técnica, moderado-alto y se indica). La oftalmología de riesgo moderado-alto se trata como riesgo hemorrágico alto para los anticoagulantes (§8.1-8.3).
+- **Se retira el «carácter» de la intervención y el sufijo «E» del ASA** (ya no se recoge la urgencia).
+- **Condiciones especiales (§5.15):** la hipertermia maligna y el déficit de pseudocolinesterasa (personales y familiares) se recogen en el paso de enfermedades, no en antecedentes.
+- **Riesgo quirúrgico según la ESC 2022** (sustituye a la clasificación previa de §7.1).
+- **AAS (§8.2):** se mantiene salvo espacio cerrado, cirugía de retina o técnica neuroaxial (suspender 5 días); en prevención cardiovascular se confirma y se mantienen 100 mg.
+- **HBPM (§8.4):** clasificación profiláctica/terapéutica con dosis, pauta, peso y aclaramiento (tablas SETH por heparina; márgenes ±20 %).
+- **Texto para SAP (§10.1):** solo antecedentes patológicos y quirúrgicos, sin límite de caracteres; el resto se rellena con los desplegables del SAP.
+- **Codificación del efecto por respuesta (§5.16):** cada respuesta que genera un efecto lo declara en el campo `genera` de su pregunta (véase §16), validado y protegido por un test de cobertura.
+
 ## 1. Parámetros de configuración
 
 | Parámetro | Valor |
 | --- | --- |
 | Borrado por inactividad | 30 min |
 | Edad pediátrica máxima | 17 años |
-| Límite de caracteres del texto SAP | 2000 |
 | Validez del QR del paciente (con/sin fecha) | 30 / 90 días |
 
 ## 2. Convenciones del motor (fechas y adelanto de anticoagulantes) — §8.0
@@ -58,10 +72,10 @@ La HBPM se clasifica en profiláctica o terapéutica con **dosis, pauta, peso y 
 | Heparina | Profilaxis | Tratamiento |
 | --- | --- | --- |
 | enoxaparina | ≤ 1 mg/kg/día | ≥ 1.5 mg/kg/día (≥ 1 con aclaramiento < 30) |
-| bemiparina | ≤ 3500 UI/día | ≥ 5000 UI/día |
-| tinzaparina | ≤ 4500 UI/día | ≥ 10000 UI/día |
-| nadroparina | ≤ 3800 UI/día | ≥ 5700 UI/día |
-| dalteparina | ≤ 5000 UI/día | ≥ 10000 UI/día |
+| tinzaparina | ≤ 3500 UI/día (< 60 kg) · ≤ 4500 UI/día (≥ 60 kg) | 175 UI/kg/día |
+| bemiparina | ≤ 3500 UI/día (≤ 2500 con aclaramiento < 30) | 115 UI/kg/día (85 con aclaramiento < 30) |
+| nadroparina | ≤ 2850 UI/día | 172 UI/kg/día · contraindicado con aclaramiento < 30 |
+| dalteparina | ≤ 5000 UI/día | 200 UI/kg/día · confirmar con aclaramiento < 30 |
 
 ### 3.2. Reglas por fármaco o grupo
 
@@ -470,7 +484,7 @@ Las horas se calculan desde la hora prevista de inducción y se muestran como ho
 
 ## 10. ASA sugerido — §6.1
 
-Cada respuesta de los módulos lleva una clase ASA mínima (ejemplos ASA 2020). El ASA sugerido es el máximo y se muestran las respuestas que lo determinan. Se puede modificar a mano; las salidas indican el valor final y si se ha modificado. Sufijo **E** en urgencias.
+Cada respuesta de los módulos lleva una clase ASA mínima (ejemplos ASA 2020). El ASA sugerido es el máximo y se muestran las respuestas que lo determinan. Se puede modificar a mano; las salidas indican el valor final y si se ha modificado. El sufijo **E** de urgencia se ha retirado (decisión del servicio, 30/09/2026).
 
 - ASA I: sano, no fumador, alcohol mínimo o nulo.
 - ASA II: fumador activo, bebedor social, embarazo, IMC 30 a < 40, diabetes o HTA bien controladas, enfermedad pulmonar leve.
@@ -935,304 +949,305 @@ _`datos/procedimientos.csv`. Riesgo cardiovascular según §7.1 (el alto se rese
 
 ### cardiaca
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Bypass coronario | alto | alto | no | no_aplica | no | si | no |
-| Recambio valvular | alto | alto | no | no_aplica | no | si | no |
-| Reparacion valvular | alto | alto | no | no_aplica | no | si | no |
-| Cirugia de aorta ascendente | alto | alto | no | no_aplica | no | si | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Bypass coronario | alto | alto | no | no_aplica | no | si | no | no |
+| Recambio valvular | alto | alto | no | no_aplica | no | si | no | no |
+| Reparacion valvular | alto | alto | no | no_aplica | no | si | no | no |
+| Cirugia de aorta ascendente | alto | alto | no | no_aplica | no | si | no | no |
 
 ### cardiologia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Implante de marcapasos o DAI | intermedio | bajo | no | no_aplica | no | no | no |
-| Ablacion cardiaca | intermedio | bajo | no | no_aplica | no | no | no |
-| Estudio electrofisiologico | intermedio | bajo | no | no_aplica | no | no | no |
-| Cateterismo coronario diagnostico | intermedio | bajo | no | no_aplica | no | no | no |
-| Angioplastia coronaria con stent | alto | alto | no | no_aplica | no | si | no |
-| Valvuloplastia percutanea | alto | alto | no | no_aplica | no | si | no |
-| Implante valvular aortico transcateter (TAVI) | alto | alto | no | no_aplica | no | si | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Implante de marcapasos o DAI | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Ablacion cardiaca | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Estudio electrofisiologico | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Cateterismo coronario diagnostico | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Angioplastia coronaria con stent | alto | alto | no | no_aplica | no | si | no | no |
+| Valvuloplastia percutanea | alto | alto | no | no_aplica | no | si | no | no |
+| Implante valvular aortico transcateter (TAVI) | alto | alto | no | no_aplica | no | si | no | no |
 
 ### cirugia general
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Hernioplastia inguinal abierta | bajo | bajo | no | no_aplica | no | no | no |
-| Hernioplastia inguinal laparoscopica | intermedio | bajo | no | no_aplica | no | no | no |
-| Hernioplastia umbilical | bajo | bajo | no | no_aplica | no | no | no |
-| Eventroplastia de pared abdominal | intermedio | alto | no | no_aplica | no | no | no |
-| Colecistectomia laparoscopica | intermedio | bajo | no | no_aplica | no | no | no |
-| Colecistectomia abierta | intermedio | alto | no | no_aplica | no | no | no |
-| Apendicectomia | intermedio | bajo | no | no_aplica | no | no | no |
-| Colectomia no oncologica | intermedio | alto | no | no_aplica | no | no | no |
-| Colectomia oncologica | intermedio | alto | no | no_aplica | no | si | no |
-| Hemicolectomia | intermedio | alto | no | no_aplica | no | si | no |
-| Reseccion anterior de recto | intermedio | alto | si | no_aplica | no | si | no |
-| Amputacion abdominoperineal | intermedio | alto | si | no_aplica | no | si | no |
-| Gastrectomia | intermedio | alto | no | no_aplica | no | si | no |
-| Esofagectomia | alto | alto | no | no_aplica | no | si | no |
-| Bypass gastrico | intermedio | alto | no | no_aplica | no | si | no |
-| Gastrectomia vertical | intermedio | alto | no | no_aplica | no | si | no |
-| Tiroidectomia | intermedio | bajo | no | no_aplica | no | no | no |
-| Paratiroidectomia | intermedio | bajo | no | no_aplica | no | no | no |
-| Suprarrenalectomia laparoscopica | alto | alto | no | no_aplica | no | si | no |
-| Esplenectomia | intermedio | alto | no | no_aplica | no | si | no |
-| Mastectomia | bajo | bajo | no | no_aplica | no | no | no |
-| Tumorectomia de mama | bajo | bajo | no | no_aplica | no | no | no |
-| Biopsia de ganglio centinela | bajo | bajo | no | no_aplica | no | no | no |
-| Exeresis cutanea pequena | bajo | minimo | no | no_aplica | no | no | no |
-| Drenaje de absceso | bajo | minimo | no | no_aplica | no | no | no |
-| Cirugia de fistula anal | bajo | bajo | si | no_aplica | no | no | no |
-| Hemorroidectomia | bajo | bajo | si | no_aplica | no | no | no |
-| Exeresis de sinus pilonidal | bajo | bajo | no | no_aplica | no | no | no |
-| Cirugia perineal o proctologica | bajo | bajo | si | no_aplica | no | no | no |
-| Colocacion de reservorio subcutaneo | bajo | bajo | no | no_aplica | no | no | no |
-| Otro procedimiento | intermedio | bajo | no | no_aplica | no | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Hernioplastia inguinal abierta | bajo | bajo | no | no_aplica | no | no | no | no |
+| Hernioplastia inguinal laparoscopica | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Hernioplastia umbilical | bajo | bajo | no | no_aplica | no | no | no | no |
+| Eventroplastia de pared abdominal | intermedio | alto | no | no_aplica | no | no | no | no |
+| Colecistectomia laparoscopica | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Colecistectomia abierta | intermedio | alto | no | no_aplica | no | no | no | no |
+| Apendicectomia | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Colectomia no oncologica | intermedio | alto | no | no_aplica | no | no | no | no |
+| Colectomia oncologica | intermedio | alto | no | no_aplica | no | si | no | no |
+| Hemicolectomia | intermedio | alto | no | no_aplica | no | si | no | no |
+| Reseccion anterior de recto | intermedio | alto | si | no_aplica | no | si | no | no |
+| Amputacion abdominoperineal | intermedio | alto | si | no_aplica | no | si | no | no |
+| Gastrectomia | intermedio | alto | no | no_aplica | no | si | no | no |
+| Esofagectomia | alto | alto | no | no_aplica | no | si | no | no |
+| Bypass gastrico | intermedio | alto | no | no_aplica | no | si | no | no |
+| Gastrectomia vertical | intermedio | alto | no | no_aplica | no | si | no | no |
+| Tiroidectomia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Paratiroidectomia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Suprarrenalectomia laparoscopica | alto | alto | no | no_aplica | no | si | no | no |
+| Esplenectomia | intermedio | alto | no | no_aplica | no | si | no | no |
+| Mastectomia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Tumorectomia de mama | bajo | bajo | no | no_aplica | no | no | no | no |
+| Biopsia de ganglio centinela | bajo | bajo | no | no_aplica | no | no | no | no |
+| Exeresis cutanea pequena | bajo | minimo | no | no_aplica | no | no | no | no |
+| Drenaje de absceso | bajo | minimo | no | no_aplica | no | no | no | no |
+| Cirugia de fistula anal | bajo | bajo | si | no_aplica | no | no | no | no |
+| Hemorroidectomia | bajo | bajo | si | no_aplica | no | no | no | no |
+| Exeresis de sinus pilonidal | bajo | bajo | no | no_aplica | no | no | no | no |
+| Cirugia perineal o proctologica | bajo | bajo | si | no_aplica | no | no | no | no |
+| Colocacion de reservorio subcutaneo | bajo | bajo | no | no_aplica | no | no | no | no |
+| Otro procedimiento | intermedio | bajo | no | no_aplica | no | no | no | no |
 
 ### dermatologia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Exeresis de tumor cutaneo | bajo | minimo | no | no_aplica | no | no | no |
-| Cirugia de Mohs | bajo | bajo | no | no_aplica | no | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Exeresis de tumor cutaneo | bajo | minimo | no | no_aplica | no | no | no | no |
+| Cirugia de Mohs | bajo | bajo | no | no_aplica | no | no | no | no |
 
 ### digestivo
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Endoscopia digestiva alta diagnostica | bajo | minimo | no | no_aplica | no | no | no |
-| Colonoscopia diagnostica | bajo | minimo | no | no_aplica | no | no | no |
-| Endoscopia con biopsia | bajo | bajo | no | no_aplica | no | no | no |
-| Colonoscopia con polipectomia | intermedio | alto | no | no_aplica | no | no | no |
-| CPRE con esfinterotomia | intermedio | alto | no | no_aplica | no | no | no |
-| Mucosectomia endoscopica | intermedio | alto | no | no_aplica | no | no | no |
-| Gastrostomia endoscopica percutanea | intermedio | bajo | no | no_aplica | no | no | no |
-| Ligadura endoscopica de varices esofagicas | intermedio | alto | no | no_aplica | no | no | no |
-| Biopsia hepatica | intermedio | alto | no | no_aplica | no | no | no |
-| Manometria esofagica | bajo | minimo | no | no_aplica | no | no | no |
-| Gastroscopia terapeutica | intermedio | alto | no | no_aplica | no | no | no |
-| Dilatacion esofagica endoscopica | intermedio | bajo | no | no_aplica | no | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Endoscopia digestiva alta diagnostica | bajo | minimo | no | no_aplica | no | no | no | no |
+| Colonoscopia diagnostica | bajo | minimo | no | no_aplica | no | no | no | no |
+| Endoscopia con biopsia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Colonoscopia con polipectomia | intermedio | alto | no | no_aplica | no | no | no | no |
+| CPRE con esfinterotomia | intermedio | alto | no | no_aplica | no | no | no | no |
+| Mucosectomia endoscopica | intermedio | alto | no | no_aplica | no | no | no | no |
+| Gastrostomia endoscopica percutanea | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Ligadura endoscopica de varices esofagicas | intermedio | alto | no | no_aplica | no | no | no | no |
+| Biopsia hepatica | intermedio | alto | no | no_aplica | no | no | no | no |
+| Manometria esofagica | bajo | minimo | no | no_aplica | no | no | no | no |
+| Gastroscopia terapeutica | intermedio | alto | no | no_aplica | no | no | no | no |
+| Dilatacion esofagica endoscopica | intermedio | bajo | no | no_aplica | no | no | no | no |
 
 ### ginecologia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Histerectomia | intermedio | alto | no | no_aplica | no | no | no |
-| Histerectomia laparoscopica | intermedio | alto | no | no_aplica | no | no | no |
-| Anexectomia | intermedio | alto | no | no_aplica | no | no | no |
-| Laparoscopia ginecologica diagnostica | bajo | bajo | no | no_aplica | no | no | no |
-| Legrado uterino | bajo | bajo | no | no_aplica | no | no | no |
-| Conizacion cervical | bajo | bajo | no | no_aplica | no | no | no |
-| Histeroscopia | bajo | bajo | no | no_aplica | no | no | no |
-| Cirugia de prolapso genital | intermedio | alto | si | no_aplica | no | no | no |
-| Cabestrillo suburetral | bajo | bajo | si | no_aplica | no | no | no |
-| Miomectomia | intermedio | alto | no | no_aplica | no | no | no |
-| Cirugia oncologica ovarica | alto | alto | no | no_aplica | no | si | no |
-| Biopsia endometrial | bajo | minimo | no | no_aplica | no | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Histerectomia | intermedio | alto | no | no_aplica | no | no | no | no |
+| Histerectomia laparoscopica | intermedio | alto | no | no_aplica | no | no | no | no |
+| Anexectomia | intermedio | alto | no | no_aplica | no | no | no | no |
+| Laparoscopia ginecologica diagnostica | bajo | bajo | no | no_aplica | no | no | no | no |
+| Legrado uterino | bajo | bajo | no | no_aplica | no | no | no | no |
+| Conizacion cervical | bajo | bajo | no | no_aplica | no | no | no | no |
+| Histeroscopia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Cirugia de prolapso genital | intermedio | alto | si | no_aplica | no | no | no | no |
+| Cabestrillo suburetral | bajo | bajo | si | no_aplica | no | no | no | no |
+| Miomectomia | intermedio | alto | no | no_aplica | no | no | no | no |
+| Cirugia oncologica ovarica | intermedio | alto | no | no_aplica | no | si | no | no |
+| Biopsia endometrial | bajo | minimo | no | no_aplica | no | no | no | no |
 
 ### maxilofacial
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Cirugia ortognatica | intermedio | alto | no | no_aplica | no | no | no |
-| Extraccion de terceros molares | bajo | bajo | no | no_aplica | no | no | no |
-| Extraccion de 1 a 3 piezas dentarias | bajo | minimo | no | no_aplica | no | no | no |
-| Implante dental simple | bajo | minimo | no | no_aplica | no | no | no |
-| Implante dental complejo con injerto | bajo | bajo | no | no_aplica | no | no | no |
-| Cirugia periodontal | bajo | minimo | no | no_aplica | no | no | no |
-| Osteosintesis de fractura mandibular | intermedio | bajo | no | no_aplica | no | no | no |
-| Cirugia de tumor de cavidad oral | intermedio | alto | no | no_aplica | no | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Cirugia ortognatica | intermedio | alto | no | no_aplica | no | no | no | no |
+| Extraccion de terceros molares | bajo | bajo | no | no_aplica | no | no | no | no |
+| Extraccion de 1 a 3 piezas dentarias | bajo | minimo | no | no_aplica | no | no | no | no |
+| Implante dental simple | bajo | minimo | no | no_aplica | no | no | no | no |
+| Implante dental complejo con injerto | bajo | bajo | no | no_aplica | no | no | no | no |
+| Cirugia periodontal | bajo | minimo | no | no_aplica | no | no | no | no |
+| Osteosintesis de fractura mandibular | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Cirugia de tumor de cavidad oral | intermedio | alto | no | no_aplica | no | no | no | no |
 
 ### neurocirugia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Craneotomia por tumor | intermedio | alto | no | no_aplica | no | si | si |
-| Craneotomia por aneurisma | intermedio | alto | no | no_aplica | no | si | si |
-| Evacuacion de hematoma subdural | intermedio | alto | no | no_aplica | no | si | si |
-| Derivacion ventriculoperitoneal | intermedio | alto | no | no_aplica | no | no | si |
-| Cirugia transesfenoidal de hipofisis | intermedio | alto | no | no_aplica | no | si | si |
-| Cirugia del canal medular | intermedio | alto | si | no_aplica | no | si | si |
-| Implante de estimulador medular | intermedio | alto | si | no_aplica | no | no | si |
-| Puncion lumbar | bajo | alto | si | no_aplica | no | no | si |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Craneotomia por tumor | intermedio | alto | no | no_aplica | no | si | si | no |
+| Craneotomia por aneurisma | intermedio | alto | no | no_aplica | no | si | si | no |
+| Evacuacion de hematoma subdural | intermedio | alto | no | no_aplica | no | si | si | no |
+| Derivacion ventriculoperitoneal | intermedio | alto | no | no_aplica | no | no | si | no |
+| Cirugia transesfenoidal de hipofisis | intermedio | alto | no | no_aplica | no | si | si | no |
+| Cirugia del canal medular | intermedio | alto | si | no_aplica | no | si | si | no |
+| Implante de estimulador medular | intermedio | alto | si | no_aplica | no | no | si | no |
+| Puncion lumbar | bajo | alto | si | no_aplica | no | no | si | no |
 
 ### obstetricia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Cesarea | intermedio | alto | si | no_aplica | si | no | no |
-| Parto instrumental | intermedio | alto | si | no_aplica | si | no | no |
-| Legrado obstetrico | bajo | bajo | no | no_aplica | si | no | no |
-| Cerclaje cervical | bajo | bajo | si | no_aplica | si | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Cesarea | intermedio | alto | si | no_aplica | si | no | no | no |
+| Parto instrumental | intermedio | alto | si | no_aplica | si | no | no | no |
+| Legrado obstetrico | bajo | bajo | no | no_aplica | si | no | no | no |
+| Cerclaje cervical | bajo | bajo | si | no_aplica | si | no | no | no |
 
 ### oftalmologia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Cirugia de catarata con anestesia topica | bajo | minimo | no | riesgo_bajo | no | no | no |
-| Cirugia de chalazion | bajo | minimo | no | riesgo_bajo | no | no | no |
-| Cirugia de pterigion | bajo | minimo | no | riesgo_bajo | no | no | no |
-| Cirugia de catarata con bloqueo retrobulbar | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Cirugia palpebral | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Dacriocistorrinostomia | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Dacriocistectomia | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Queratoplastia | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Evisceracion ocular | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Enucleacion ocular | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Cirugia de glaucoma | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Cerclaje escleral | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Vitrectomia | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Cirugia de desprendimiento de retina | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Cirugia de estrabismo | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Descompresion orbitaria | intermedio | alto | no | riesgo_moderado_alto | no | no | no |
-| Cirugia tumoral ocular | intermedio | alto | no | riesgo_moderado_alto | no | no | no |
-| Inyeccion intravitrea | bajo | minimo | no | riesgo_bajo | no | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Cirugia de catarata con anestesia topica | bajo | minimo | no | riesgo_bajo | no | no | no | no |
+| Cirugia de chalazion | bajo | minimo | no | riesgo_bajo | no | no | no | no |
+| Cirugia de pterigion | bajo | minimo | no | riesgo_bajo | no | no | no | no |
+| Cirugia de catarata con bloqueo retrobulbar o peribulbar | bajo | bajo | no | riesgo_moderado_alto | no | no | no | no |
+| Cirugia palpebral | bajo | bajo | no | riesgo_moderado_alto | no | no | no | no |
+| Dacriocistorrinostomia | bajo | bajo | no | riesgo_moderado_alto | no | no | no | no |
+| Dacriocistectomia | bajo | bajo | no | riesgo_moderado_alto | no | no | no | no |
+| Queratoplastia | bajo | bajo | no | riesgo_moderado_alto | no | no | no | no |
+| Evisceracion ocular | bajo | bajo | no | riesgo_moderado_alto | no | no | no | no |
+| Enucleacion ocular | bajo | bajo | no | riesgo_moderado_alto | no | no | no | no |
+| Cirugia de glaucoma | bajo | bajo | no | riesgo_moderado_alto | no | no | no | no |
+| Cerclaje escleral | bajo | bajo | no | riesgo_moderado_alto | no | no | no | si |
+| Vitrectomia | bajo | bajo | no | riesgo_moderado_alto | no | no | no | si |
+| Cirugia de desprendimiento de retina | bajo | bajo | no | riesgo_moderado_alto | no | no | no | si |
+| Cirugia de estrabismo | bajo | bajo | no | riesgo_moderado_alto | no | no | no | no |
+| Descompresion orbitaria | bajo | alto | no | riesgo_moderado_alto | no | no | no | no |
+| Cirugia tumoral ocular | bajo | alto | no | riesgo_moderado_alto | no | no | no | no |
+| Inyeccion intravitrea | bajo | minimo | no | riesgo_bajo | no | no | no | no |
 
 ### orl
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Amigdalectomia | bajo | bajo | no | no_aplica | no | no | no |
-| Adenoidectomia | bajo | bajo | no | no_aplica | no | no | no |
-| Septoplastia | bajo | bajo | no | no_aplica | no | no | no |
-| Rinoseptoplastia | bajo | bajo | no | no_aplica | no | no | no |
-| Cirugia endoscopica nasosinusal | bajo | bajo | no | no_aplica | no | no | no |
-| Timpanoplastia | bajo | bajo | no | no_aplica | no | no | no |
-| Mastoidectomia | bajo | bajo | no | no_aplica | no | no | no |
-| Tiroidectomia | intermedio | bajo | no | no_aplica | no | no | no |
-| Parotidectomia | intermedio | bajo | no | no_aplica | no | no | no |
-| Laringectomia | intermedio | alto | no | no_aplica | no | no | no |
-| Vaciamiento cervical ganglionar | intermedio | alto | no | no_aplica | no | no | no |
-| Microcirugia de laringe | bajo | bajo | no | no_aplica | no | no | no |
-| Traqueotomia | intermedio | bajo | no | no_aplica | no | no | no |
-| Septorrinoplastia de revision | bajo | bajo | no | no_aplica | no | no | no |
-| Uvulopalatofaringoplastia | intermedio | bajo | no | no_aplica | no | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Amigdalectomia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Adenoidectomia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Septoplastia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Rinoseptoplastia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Cirugia endoscopica nasosinusal | bajo | bajo | no | no_aplica | no | no | no | no |
+| Timpanoplastia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Mastoidectomia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Tiroidectomia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Parotidectomia | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Laringectomia | intermedio | alto | no | no_aplica | no | no | no | no |
+| Vaciamiento cervical ganglionar | intermedio | alto | no | no_aplica | no | no | no | no |
+| Microcirugia de laringe | bajo | bajo | no | no_aplica | no | no | no | no |
+| Traqueotomia | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Septorrinoplastia de revision | bajo | bajo | no | no_aplica | no | no | no | no |
+| Uvulopalatofaringoplastia | intermedio | bajo | no | no_aplica | no | no | no | no |
 
 ### pediatria
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Amigdalectomia pediatrica | bajo | bajo | no | no_aplica | no | no | no |
-| Adenoidectomia pediatrica | bajo | bajo | no | no_aplica | no | no | no |
-| Drenajes timpanicos | bajo | minimo | no | no_aplica | no | no | no |
-| Circuncision | bajo | minimo | no | no_aplica | no | no | no |
-| Herniorrafia inguinal pediatrica | bajo | bajo | si | no_aplica | no | no | no |
-| Orquidopexia | bajo | bajo | si | no_aplica | no | no | no |
-| Cirugia de fimosis | bajo | minimo | no | no_aplica | no | no | no |
-| Frenulectomia | bajo | minimo | no | no_aplica | no | no | no |
-| Correccion de hipospadias | bajo | bajo | si | no_aplica | no | no | no |
-| Apendicectomia pediatrica | intermedio | bajo | no | no_aplica | no | no | no |
-| Cirugia de estrabismo pediatrica | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
-| Cirugia de cardiopatia congenita | alto | alto | no | no_aplica | no | si | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Amigdalectomia pediatrica | bajo | bajo | no | no_aplica | no | no | no | no |
+| Adenoidectomia pediatrica | bajo | bajo | no | no_aplica | no | no | no | no |
+| Drenajes timpanicos | bajo | minimo | no | no_aplica | no | no | no | no |
+| Circuncision | bajo | minimo | no | no_aplica | no | no | no | no |
+| Herniorrafia inguinal pediatrica | bajo | bajo | si | no_aplica | no | no | no | no |
+| Orquidopexia | bajo | bajo | si | no_aplica | no | no | no | no |
+| Cirugia de fimosis | bajo | minimo | no | no_aplica | no | no | no | no |
+| Frenulectomia | bajo | minimo | no | no_aplica | no | no | no | no |
+| Correccion de hipospadias | bajo | bajo | si | no_aplica | no | no | no | no |
+| Apendicectomia pediatrica | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Cirugia de estrabismo pediatrica | bajo | bajo | no | riesgo_moderado_alto | no | no | no | no |
+| Cirugia de cardiopatia congenita | alto | alto | no | no_aplica | no | si | no | no |
 
 ### plastica
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Rinoplastia | bajo | bajo | no | no_aplica | no | no | no |
-| Abdominoplastia | intermedio | bajo | no | no_aplica | no | no | no |
-| Mamoplastia de aumento | bajo | bajo | no | no_aplica | no | no | no |
-| Mamoplastia de reduccion | bajo | bajo | no | no_aplica | no | no | no |
-| Reconstruccion mamaria con colgajo | intermedio | alto | no | no_aplica | no | si | no |
-| Lipectomia | bajo | bajo | no | no_aplica | no | no | no |
-| Injerto de piel | bajo | bajo | no | no_aplica | no | no | no |
-| Cirugia de colgajo | intermedio | alto | no | no_aplica | no | no | no |
-| Dermolipectomia | intermedio | bajo | no | no_aplica | no | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Rinoplastia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Abdominoplastia | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Mamoplastia de aumento | bajo | bajo | no | no_aplica | no | no | no | no |
+| Mamoplastia de reduccion | bajo | bajo | no | no_aplica | no | no | no | no |
+| Reconstruccion mamaria con colgajo | intermedio | alto | no | no_aplica | no | si | no | no |
+| Lipectomia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Injerto de piel | bajo | bajo | no | no_aplica | no | no | no | no |
+| Cirugia de colgajo | intermedio | alto | no | no_aplica | no | no | no | no |
+| Dermolipectomia | intermedio | bajo | no | no_aplica | no | no | no | no |
 
 ### radiologia intervencionista
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Angiografia no coronaria | intermedio | bajo | no | no_aplica | no | no | no |
-| Embolizacion arterial | intermedio | alto | no | no_aplica | no | no | no |
-| Drenaje percutaneo guiado | bajo | bajo | no | no_aplica | no | no | no |
-| Biopsia percutanea guiada por imagen | bajo | bajo | no | no_aplica | no | no | no |
-| Nefrostomia percutanea | intermedio | alto | no | no_aplica | no | no | no |
-| Quimioembolizacion hepatica | alto | alto | no | no_aplica | no | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Angiografia no coronaria | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Embolizacion arterial | intermedio | alto | no | no_aplica | no | no | no | no |
+| Drenaje percutaneo guiado | bajo | bajo | no | no_aplica | no | no | no | no |
+| Biopsia percutanea guiada por imagen | bajo | bajo | no | no_aplica | no | no | no | no |
+| Nefrostomia percutanea | intermedio | alto | no | no_aplica | no | no | no | no |
+| Quimioembolizacion hepatica | intermedio | alto | no | no_aplica | no | no | no | no |
 
 ### toracica
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Neumonectomia | alto | alto | no | no_aplica | no | si | no |
-| Lobectomia pulmonar | alto | alto | no | no_aplica | no | si | no |
-| Segmentectomia pulmonar | alto | alto | no | no_aplica | no | si | no |
-| Videotoracoscopia (VATS) | alto | alto | si | no_aplica | no | si | no |
-| Mediastinoscopia | intermedio | bajo | no | no_aplica | no | no | no |
-| Biopsia pleural | intermedio | bajo | no | no_aplica | no | no | no |
-| Pleurodesis | intermedio | bajo | no | no_aplica | no | no | no |
-| Timectomia | alto | alto | no | no_aplica | no | si | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Neumonectomia | alto | alto | no | no_aplica | no | si | no | no |
+| Lobectomia pulmonar | intermedio | alto | no | no_aplica | no | si | no | no |
+| Segmentectomia pulmonar | intermedio | alto | no | no_aplica | no | si | no | no |
+| Videotoracoscopia (VATS) | bajo | alto | si | no_aplica | no | si | no | no |
+| Mediastinoscopia | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Biopsia pleural | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Pleurodesis | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Timectomia | intermedio | alto | no | no_aplica | no | si | no | no |
 
 ### traumatologia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Artroplastia total de rodilla | intermedio | alto | si | no_aplica | no | si | no |
-| Artroplastia total de cadera | intermedio | alto | si | no_aplica | no | si | no |
-| Artroplastia de hombro | intermedio | alto | si | no_aplica | no | no | no |
-| Osteosintesis de fractura de cadera | intermedio | alto | si | no_aplica | no | si | no |
-| Osteosintesis de femur | intermedio | alto | si | no_aplica | no | si | no |
-| Osteosintesis de tibia | intermedio | alto | si | no_aplica | no | no | no |
-| Osteosintesis de humero | intermedio | bajo | si | no_aplica | no | no | no |
-| Osteosintesis de muneca | bajo | bajo | si | no_aplica | no | no | no |
-| Artroscopia de rodilla | bajo | bajo | si | no_aplica | no | no | no |
-| Artroscopia de hombro | bajo | bajo | si | no_aplica | no | no | no |
-| Ligamentoplastia de rodilla | bajo | bajo | si | no_aplica | no | no | no |
-| Meniscectomia artroscopica | bajo | bajo | si | no_aplica | no | no | no |
-| Artrodesis lumbar | intermedio | alto | si | no_aplica | no | si | si |
-| Discectomia lumbar | intermedio | alto | si | no_aplica | no | no | si |
-| Laminectomia | intermedio | alto | si | no_aplica | no | si | si |
-| Cirugia de mano | bajo | bajo | si | no_aplica | no | no | no |
-| Liberacion del tunel carpiano | bajo | minimo | no | no_aplica | no | no | no |
-| Cirugia de Dupuytren | bajo | bajo | si | no_aplica | no | no | no |
-| Cirugia de hallux valgus | bajo | bajo | si | no_aplica | no | no | no |
-| Artroscopia de tobillo | bajo | bajo | si | no_aplica | no | no | no |
-| Retirada de material de osteosintesis | bajo | bajo | si | no_aplica | no | no | no |
-| Amputacion de miembro inferior | alto | alto | si | no_aplica | no | si | no |
-| Infiltracion articular | bajo | minimo | no | no_aplica | no | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Artroplastia total de rodilla | intermedio | alto | si | no_aplica | no | si | no | no |
+| Artroplastia total de cadera | intermedio | alto | si | no_aplica | no | si | no | no |
+| Artroplastia de hombro | intermedio | alto | si | no_aplica | no | no | no | no |
+| Osteosintesis de fractura de cadera | intermedio | alto | si | no_aplica | no | si | no | no |
+| Osteosintesis de femur | intermedio | alto | si | no_aplica | no | si | no | no |
+| Osteosintesis de tibia | intermedio | alto | si | no_aplica | no | no | no | no |
+| Osteosintesis de humero | intermedio | bajo | si | no_aplica | no | no | no | no |
+| Osteosintesis de muneca | bajo | bajo | si | no_aplica | no | no | no | no |
+| Artroscopia de rodilla | bajo | bajo | si | no_aplica | no | no | no | no |
+| Artroscopia de hombro | bajo | bajo | si | no_aplica | no | no | no | no |
+| Ligamentoplastia de rodilla | bajo | bajo | si | no_aplica | no | no | no | no |
+| Meniscectomia artroscopica | bajo | bajo | si | no_aplica | no | no | no | no |
+| Artrodesis lumbar | intermedio | alto | si | no_aplica | no | si | si | no |
+| Discectomia lumbar | intermedio | alto | si | no_aplica | no | no | si | no |
+| Laminectomia | intermedio | alto | si | no_aplica | no | si | si | no |
+| Cirugia de mano | bajo | bajo | si | no_aplica | no | no | no | no |
+| Liberacion del tunel carpiano | bajo | minimo | no | no_aplica | no | no | no | no |
+| Cirugia de Dupuytren | bajo | bajo | si | no_aplica | no | no | no | no |
+| Cirugia de hallux valgus | bajo | bajo | si | no_aplica | no | no | no | no |
+| Artroscopia de tobillo | bajo | bajo | si | no_aplica | no | no | no | no |
+| Retirada de material de osteosintesis | bajo | bajo | si | no_aplica | no | no | no | no |
+| Amputacion de miembro inferior (traumatica) | intermedio | alto | si | no_aplica | no | si | no | no |
+| Infiltracion articular | bajo | minimo | no | no_aplica | no | no | no | no |
 
 ### urologia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| RTU de prostata | intermedio | alto | si | no_aplica | no | no | no |
-| RTU de tumor vesical | intermedio | alto | si | no_aplica | no | no | no |
-| Nefrolitotomia percutanea | intermedio | alto | no | no_aplica | no | no | no |
-| Ureteroscopia | bajo | bajo | si | no_aplica | no | no | no |
-| Litotricia extracorporea | intermedio | alto | no | no_aplica | no | no | no |
-| Prostatectomia radical | intermedio | alto | si | no_aplica | no | no | no |
-| Nefrectomia | intermedio | alto | no | no_aplica | no | si | no |
-| Nefrectomia parcial | intermedio | alto | no | no_aplica | no | si | no |
-| Cistectomia radical | intermedio | alto | no | no_aplica | no | si | no |
-| Biopsia de prostata | bajo | bajo | no | no_aplica | no | no | no |
-| Biopsia renal | intermedio | alto | no | no_aplica | no | no | no |
-| Vasectomia | bajo | minimo | no | no_aplica | no | no | no |
-| Orquiectomia | bajo | bajo | no | no_aplica | no | no | no |
-| Cirugia de hidrocele | bajo | bajo | si | no_aplica | no | no | no |
-| Colocacion de cateter doble J | bajo | bajo | si | no_aplica | no | no | no |
-| Cistoscopia diagnostica | bajo | minimo | no | no_aplica | no | no | no |
-| Circuncision en adulto | bajo | minimo | no | no_aplica | no | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RTU de prostata | intermedio | alto | si | no_aplica | no | no | no | no |
+| RTU de tumor vesical | intermedio | alto | si | no_aplica | no | no | no | no |
+| Nefrolitotomia percutanea | intermedio | alto | no | no_aplica | no | no | no | no |
+| Ureteroscopia | bajo | bajo | si | no_aplica | no | no | no | no |
+| Litotricia extracorporea | intermedio | alto | no | no_aplica | no | no | no | no |
+| Prostatectomia radical | intermedio | alto | si | no_aplica | no | no | no | no |
+| Nefrectomia | intermedio | alto | no | no_aplica | no | si | no | no |
+| Nefrectomia parcial | intermedio | alto | no | no_aplica | no | si | no | no |
+| Cistectomia radical | alto | alto | no | no_aplica | no | si | no | no |
+| Biopsia de prostata | bajo | bajo | no | no_aplica | no | no | no | no |
+| Biopsia renal | intermedio | alto | no | no_aplica | no | no | no | no |
+| Vasectomia | bajo | minimo | no | no_aplica | no | no | no | no |
+| Orquiectomia | bajo | bajo | no | no_aplica | no | no | no | no |
+| Cirugia de hidrocele | bajo | bajo | si | no_aplica | no | no | no | no |
+| Colocacion de cateter doble J | bajo | bajo | si | no_aplica | no | no | no | no |
+| Cistoscopia diagnostica | bajo | minimo | no | no_aplica | no | no | no | no |
+| Circuncision en adulto | bajo | minimo | no | no_aplica | no | no | no | no |
 
 ### vascular
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Cirugia de aorta abdominal | alto | alto | no | no_aplica | no | si | no |
-| Reparacion endovascular de aneurisma (EVAR) | alto | alto | no | no_aplica | no | si | no |
-| Revascularizacion arterial periferica | alto | alto | no | no_aplica | no | si | no |
-| Bypass femoropopliteo | alto | alto | si | no_aplica | no | si | no |
-| Endarterectomia carotidea | alto | alto | no | no_aplica | no | si | no |
-| Amputacion por isquemia | alto | alto | si | no_aplica | no | si | no |
-| Fistula arteriovenosa para dialisis | intermedio | bajo | no | no_aplica | no | no | no |
-| Safenectomia por varices | bajo | bajo | si | no_aplica | no | no | no |
-| Escleroterapia de varices | bajo | minimo | no | no_aplica | no | no | no |
-| Ligadura de varices | bajo | minimo | no | no_aplica | no | no | no |
-| Colocacion de reservorio venoso | bajo | bajo | no | no_aplica | no | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado | Retina |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Cirugia de aorta abdominal | alto | alto | no | no_aplica | no | si | no | no |
+| Reparacion endovascular de aneurisma (EVAR) | intermedio | alto | no | no_aplica | no | si | no | no |
+| Revascularizacion arterial periferica | alto | alto | no | no_aplica | no | si | no | no |
+| Bypass femoropopliteo | alto | alto | si | no_aplica | no | si | no | no |
+| Endarterectomia carotidea sintomatica | alto | alto | no | no_aplica | no | si | no | no |
+| Endarterectomia carotidea asintomatica | intermedio | alto | no | no_aplica | no | si | no | no |
+| Amputacion por isquemia | alto | alto | si | no_aplica | no | si | no | no |
+| Fistula arteriovenosa para dialisis | intermedio | bajo | no | no_aplica | no | no | no | no |
+| Safenectomia por varices | bajo | bajo | si | no_aplica | no | no | no | no |
+| Escleroterapia de varices | bajo | minimo | no | no_aplica | no | no | no | no |
+| Ligadura de varices | bajo | minimo | no | no_aplica | no | no | no | no |
+| Colocacion de reservorio venoso | bajo | bajo | no | no_aplica | no | no | no | no |
 
 ## 16. Módulos de enfermedad (anamnesis dirigida, §5.16)
 
-_Preguntas que se abren al marcar cada enfermedad. Las alertas que generan las respuestas se describen en las secciones de escalas (§11), reglas de medicación (§3) y ayuno (§7); por ejemplo, HbA1c > 8,5 % (diabetes), bocio grande (vía aérea), IMC ≥ 40 (obesidad) o radioterapia cervical (vía aérea) generan sus avisos._
+_Preguntas que se abren al marcar cada enfermedad. Junto a cada pregunta se indica, cuando procede, qué genera cada respuesta (alerta, nota, prueba, clase de riesgo, ASA, regla o dato clínico), codificado en el propio módulo (§5.16, decisión del servicio). El motor sigue calculando el efecto en su capa; esto es la traza legible._
 
 ### Anemia
 
@@ -1242,6 +1257,7 @@ _Fuente: docs/documento_fuente.md §5.5_
 - **Tratamiento actual** — _opcion_: Hierro oral / Hierro intravenoso / Vitamina B12 / Eritropoyetina / Ninguno
 - **Última hemoglobina** (g/dL) — _numero_
   - Por qué: Una Hb < 13 g/dL antes de cirugía con sangrado previsible aconseja optimizar la anemia y pedir ferritina.
+  - Genera → 🧪 prueba: si < 13 g/dL → apoya pedir hemograma y ferritina; valorar optimizar la anemia. _(§7.3)_
 - **Fecha de esa hemoglobina** — _fecha_
 - **¿Ferropenia (falta de hierro) conocida?** — _boolean_
 - **¿Sangrado reciente?** — _boolean_
@@ -1261,14 +1277,18 @@ _Fuente: docs/documento_fuente.md §5.8, §5.16.13_
 
 - **¿Dolor, rigidez o limitación para mover el cuello?** — _boolean_
   - Por qué: En la artritis reumatoide puede haber inestabilidad de las vértebras del cuello: hay que evitar movimientos bruscos al dormir al paciente.
+  - Genera → 🔔 alerta roja: si = sí → inestabilidad atloaxoidea (cuello). _(§5.16.13)_
 - **¿Dificultad para abrir la boca o problemas de la mandíbula?** — _boolean_
   - Por qué: Limita el acceso a la vía aérea para la intubación.
+  - Genera → 🔔 alerta amarilla: si = sí → posible vía aérea difícil. _(§5.16.13)_
 - **¿Ronquera crónica o falta de aire?** — _boolean_
   - Por qué: Puede indicar afectación de las articulaciones de la laringe (cricoaritenoidea).
+  - Genera → 🔔 alerta amarilla: si = sí → posible afectación cricoaritenoidea. _(§5.16.13)_
 - **Si toma inmunosupresores, ¿por qué motivo?** — _opcion_: Enfermedad autoinmune / Enfermedad sistémica grave / Trasplante
   - Por qué: La suspensión de los inmunosupresores clásicos depende de la indicación.
 - **¿Ha tomado corticoides (cortisona) en los últimos 3 meses?** — _boolean_
   - Por qué: Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).
+  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_
 - **¿Cuál?** — _opcion_: Prednisona / Prednisolona / Metilprednisolona / Deflazacort / Dexametasona / Hidrocortisona
 - **Dosis diaria** (mg) — _numero_
 - **Duración** (semanas) — _numero_
@@ -1278,24 +1298,33 @@ _Fuente: docs/documento_fuente.md §5.8, §5.16.13_
 _Fuente: docs/documento_fuente.md §5.2, §5.16.3, §5.16.4_
 
 - **¿Qué enfermedad respiratoria tiene?** — _opcion_: Asma / EPOC / Ambas
+  - Genera → 📊 clase de riesgo: si = EPOC o ambas → sube la clase de riesgo del paciente a moderada. _(§5.2)_
+  - Genera → 🅰 ASA: si = EPOC o ambas → ASA mínimo 3. _(§5.2)_
 - **Fecha de la última crisis** — _fecha_
 - **¿Crisis o agudización en el último mes?** — _boolean_
   - Por qué: Una agudización reciente puede aconsejar posponer la cirugía programada; la intubación puede desencadenar broncoespasmo si no está controlada.
+  - Genera → 🔔 alerta amarilla: si = sí → asma no controlada. _(§5.16.3)_
 - **Visitas a urgencias o ingresos por asma/EPOC en el último año** — _numero_
 - **¿Corticoides orales en el último año?** — _boolean_
 - **¿Ingresos en el último año?** — _boolean_
+  - Genera → 🔔 alerta amarilla: si = sí → asma no controlada. _(§5.16.3)_
 - **Uso del inhalador de rescate (veces por semana)** — _numero_
   - Por qué: Usar el rescate más de 2 veces por semana indica que el asma no está bien controlada.
+  - Genera → 🔔 alerta amarilla: si > 2 veces/semana → asma no controlada. _(§5.16.3)_
 - **Desencadenantes de las crisis** — _opcion_multiple_: Infecciones / Frío / Estrés / Alergias / Ejercicio / AINE o aspirina / Otros
   - Por qué: Si los AINE o la aspirina desencadenan crisis, deben evitarse en el perioperatorio (alerta).
+  - Genera → 🔔 alerta roja: si incluye AINE/aspirina → asma inducida por AINE: evitar AINE perioperatorios. _(§5.16.3)_
 - **Disnea (escala mMRC), si es EPOC** — _opcion_: 0 — solo con ejercicio intenso / 1 — al andar deprisa o subir cuesta / 2 — anda más despacio que otros de su edad / 3 — para a los 100 m o pocos minutos / 4 — no sale de casa / al vestirse
 - **¿Usa oxígeno en casa?** — _boolean_
   - Por qué: La oxigenoterapia domiciliaria sube la clase de riesgo del paciente.
+  - Genera → 📊 clase de riesgo: si = sí → sube la clase de riesgo del paciente a alta. _(§5.2)_
 - **Tipo de oxígeno domiciliario** — _opcion_: Nocturno / Continuo
 - **¿Usa CPAP o BiPAP?** — _boolean_
 - **¿Tos con expectoración habitual?** — _boolean_
 - **¿Cambio reciente en el color o la cantidad del esputo, o síntomas respiratorios nuevos?** — _boolean_
   - Por qué: Un cambio reciente puede indicar infección activa y es uno de los supuestos que indican pedir radiografía de tórax.
+  - Genera → 🔔 alerta amarilla: si = sí → posible infección respiratoria activa: valorar posponer la cirugía programada. _(§5.16.4)_
+  - Genera → 🧪 prueba: si = sí → radiografía de tórax. _(§7.3)_
 
 ### Cáncer en tratamiento
 
@@ -1321,13 +1350,17 @@ _Fuente: docs/documento_fuente.md §5.1_
 - **¿La revascularización fue completa o incompleta?** — _opcion_: Completa / Incompleta / No lo sabe
 - **¿Le pusieron un stent (muelle) en las arterias del corazón?** — _boolean_
   - Por qué: El tipo de stent y el tiempo desde su colocación determinan si se puede suspender la antiagregación.
+  - Genera → ℹ dato: si = sí → stent coronario: condiciona la antiagregación y puede obligar a diferir la cirugía (§8). _(§5.1)_
 - **Fecha del stent** — _fecha_
 - **Tipo de stent** — _opcion_: Farmacoactivo (liberador de fármaco) / Convencional (metálico) / Desconocido
 - **Motivo del stent** — _opcion_: Programado (procedimiento electivo) / Por síndrome coronario agudo (infarto/angina inestable)
 - **¿Tiene angina (dolor u opresión en el pecho al esforzarse) actualmente?** — _boolean_
 - **¿Con qué esfuerzo le aparece la angina?** — _opcion_: Solo con grandes esfuerzos / Con esfuerzos moderados / Con mínimos esfuerzos / En reposo
+  - Genera → 📊 clase de riesgo: si = mínimos esfuerzos o reposo → sube la clase de riesgo del paciente a alta (angina activa). _(§5.1)_
+  - Genera → 🅰 ASA: si = mínimos esfuerzos o reposo → ASA mínimo 4 (angina activa). _(§5.1)_
 - **¿La angina ha cambiado (más frecuente o más intensa) en las últimas semanas?** — _boolean_
   - Por qué: Una angina que cambia recientemente puede indicar isquemia inestable: es una señal de alerta.
+  - Genera → 🔔 alerta roja: si = sí → posible isquemia inestable. _(§5.1)_
 - **Última prueba de esfuerzo o de detección de isquemia** — _opcion_: No se ha hecho / Negativa / Positiva / No concluyente
 - **Fecha de la prueba de isquemia** — _fecha_
 - **Fecha del último ecocardiograma** — _fecha_
@@ -1348,12 +1381,16 @@ _Fuente: docs/documento_fuente.md §5.8, §5.16.13_
 
 - **¿Debilidad en el cuello o dificultad para tragar?** — _boolean_
   - Por qué: Aumenta el riesgo de aspiración durante la anestesia.
+  - Genera → 🔔 alerta amarilla: si = sí → riesgo de aspiración. _(§5.16.13)_
 - **¿Falta de aire o fatiga inusual al caminar?** — _boolean_
   - Por qué: Puede indicar afectación de los músculos respiratorios o del pulmón.
+  - Genera → 🔔 alerta amarilla: si = sí → posible afectación respiratoria. _(§5.16.13)_
 - **¿Problemas de corazón conocidos?** — _boolean_
   - Por qué: Estas enfermedades pueden inflamar el corazón (miocarditis).
+  - Genera → 🔔 alerta amarilla: si = sí → posible miocarditis. _(§5.16.13)_
 - **¿Ha tomado corticoides (cortisona) en los últimos 3 meses?** — _boolean_
   - Por qué: Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).
+  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_
 - **¿Cuál?** — _opcion_: Prednisona / Prednisolona / Metilprednisolona / Deflazacort / Dexametasona / Hidrocortisona
 - **Dosis diaria** (mg) — _numero_
 - **Duración** (semanas) — _numero_
@@ -1366,27 +1403,35 @@ _Fuente: docs/documento_fuente.md §5.6, §5.16.5_
 - **Representante legal** — _texto_
 - **¿Puede otorgar el consentimiento?** — _opcion_: Sí / No / Dudosa
   - Por qué: Si no puede consentir, el consentimiento lo firma su representante legal.
+  - Genera → 🔔 alerta amarilla: si = no o dudosa → consentimiento por representante legal. _(§5.16.5)_
 - **Nivel de dependencia** — _opcion_: Independiente / Dependencia parcial / Dependencia total
 - **¿Episodios previos de agitación, delirio o desorientación nocturna?** — _boolean_
   - Por qué: Son un factor de riesgo importante de delirium después de la operación.
+  - Genera → 🔔 alerta amarilla: si = sí → alto riesgo de delirium postoperatorio. _(§5.16.5)_
 
 ### Diabetes
 
-_Fuente: docs/documento_fuente.md §5.3, §8.5_
+_Fuente: docs/documento_fuente.md §5.3, §5.16.2, §8.5_
 
 - **Tipo de diabetes** — _opcion_: Tipo 1 / Tipo 2 / Otra / no lo sabe
 - **Años de evolución** — _numero_
 - **HbA1c más reciente** (%) — _numero_
   - Por qué: Una HbA1c > 8,5 % indica mal control y puede aconsejar optimizar antes de una cirugía programada.
+  - Genera → 📊 clase de riesgo: si > 8,5 % → sube la clase de riesgo del paciente a moderada. _(§5.3)_
+  - Genera → 🅰 ASA: si > 8,5 % → ASA mínimo 3; en otro caso, mínimo 2. _(§5.3)_
 - **Fecha de la HbA1c** — _fecha_
 - **Tratamiento** — _opcion_: Solo dieta / Pastillas / Insulina / Pastillas e insulina
 - **Frecuencia de hipoglucemias (bajadas de azúcar)** — _opcion_: Nunca / Alguna al mes / Alguna a la semana / A diario
   - Por qué: El ayuno y los ajustes de insulina aumentan el riesgo de hipoglucemia; conviene conocer su frecuencia.
+  - Genera → 🔔 alerta amarilla: si = semanal o diaria → hipoglucemias frecuentes o inadvertidas. _(§5.16.2)_
 - **¿Nota cuándo le baja el azúcar?** — _boolean_
   - Por qué: Las hipoglucemias inadvertidas son especialmente peligrosas en el ayuno perioperatorio.
+  - Genera → 🔔 alerta amarilla: si = no (no las detecta) → hipoglucemias frecuentes o inadvertidas. _(§5.16.2)_
 - **Complicaciones crónicas** — _opcion_multiple_: Cardiopatía isquémica / Nefropatía / Pie diabético / Vasculopatía de extremidades / Retinopatía
+  - Genera → 🧪 prueba: si incluye nefropatía → cuenta como proteinuria/nefropatía: apoya pedir bioquímica renal. _(§7.3)_
 - **¿Síntomas de gastroparesia (náuseas/vómitos de comida sin digerir, saciedad precoz, distensión, glucemias erráticas)?** — _boolean_
   - Por qué: La gastroparesia alarga el ayuno de sólidos y aconseja premedicación con metoclopramida.
+  - Genera → 📝 nota: si = sí → alarga el ayuno de sólidos; valorar premedicación con metoclopramida. _(§5.3)_
 - **¿Hipoglucemias frecuentes?** — _boolean_
 - **¿Lleva bomba de insulina o sensor de glucosa?** — _opcion_: No / Bomba de insulina / Sensor / Bomba y sensor
 
@@ -1395,12 +1440,16 @@ _Fuente: docs/documento_fuente.md §5.3, §8.5_
 _Fuente: docs/documento_fuente.md §5.6, §5.16.11_
 
 - **Tipo** — _opcion_: Distrofia de Duchenne / Distrofia de Becker / Distrofia miotónica / Miastenia gravis / Otra
+  - Genera → 📝 nota: si = Duchenne o Becker → evitar succinilcolina y valorar evitar halogenados. _(§5.16.11)_
 - **¿Le cuesta respirar tumbado o usa ventilación nocturna (BiPAP)?** — _boolean_
   - Por qué: La debilidad de los músculos respiratorios aumenta el riesgo de insuficiencia respiratoria tras la anestesia.
+  - Genera → 🔔 alerta roja: si = sí → riesgo de insuficiencia respiratoria postoperatoria. _(§5.16.11)_
 - **Fecha del último ecocardiograma** — _fecha_
   - Por qué: Muchas distrofias afectan al corazón; sin ecocardiograma en los últimos 12 meses conviene valorarlo.
+  - Genera → 📝 nota: si sin ecocardiograma en 12 meses → valorar ecocardiograma. _(§5.16.11)_
 - **¿Fiebre muy alta o complicaciones graves en una anestesia, en usted o su familia?** — _boolean_
   - Por qué: Puede indicar susceptibilidad a hipertermia maligna o a reacciones musculares graves.
+  - Genera → 🔔 alerta roja: si = sí → sospecha de hipertermia maligna o reacción muscular grave. _(§5.16.11)_
 
 ### Dolor crónico
 
@@ -1434,6 +1483,7 @@ _Fuente: docs/documento_fuente.md §5b, §5.16.14, §8.8_
   - Por qué: La suspensión de los inmunosupresores clásicos depende de la indicación.
 - **¿Ha tomado corticoides (cortisona) en los últimos 3 meses?** — _boolean_
   - Por qué: Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).
+  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_
 - **¿Cuál?** — _opcion_: Prednisona / Prednisolona / Metilprednisolona / Deflazacort / Dexametasona / Hidrocortisona
 - **Dosis diaria** (mg) — _numero_
 - **Duración** (semanas) — _numero_
@@ -1443,6 +1493,8 @@ _Fuente: docs/documento_fuente.md §5b, §5.16.14, §8.8_
 _Fuente: docs/documento_fuente.md §5.4, §6.7_
 
 - **Estadio o filtrado conocido** — _opcion_: No lo sabe / Leve (filtrado > 60) / Moderada (filtrado 30-60) / Grave (filtrado 15-30) / Terminal (filtrado < 15)
+  - Genera → 📊 clase de riesgo: si = terminal → sube la clase de riesgo del paciente a alta. _(§5.4)_
+  - Genera → 🅰 ASA: si = terminal → ASA mínimo 4 (moderada/grave: mínimo 3). _(§5.4)_
 - **Creatinina más reciente** (mg/dL) — _numero_
   - Por qué: La creatinina permite calcular el aclaramiento, del que dependen los plazos de varios anticoagulantes.
 - **Fecha de esa creatinina** — _fecha_
@@ -1451,6 +1503,7 @@ _Fuente: docs/documento_fuente.md §5.4, §6.7_
 - **¿Tiene un trasplante renal?** — _boolean_
 - **¿Tiene proteinuria o nefropatía conocida?** — _boolean_
   - Por qué: La proteinuria/nefropatía hace que los IECA/ARA-II se mantengan el día de la cirugía.
+  - Genera → 💊 regla: si = sí → los IECA/ARA-II se mantienen el día de la cirugía. _(§8)_
 
 ### Epilepsia
 
@@ -1458,12 +1511,14 @@ _Fuente: docs/documento_fuente.md §5.6, §5.16.9_
 
 - **Fecha aproximada de la última crisis** — _fecha_
   - Por qué: Una crisis en el último mes indica epilepsia no bien controlada.
+  - Genera → 🔔 alerta amarilla: si crisis en el último mes → epilepsia no controlada. _(§5.16.9)_
 - **Frecuencia de las crisis** — _opcion_: Diaria / Semanal / Mensual / Anual / Menos de una al año
 - **Tipo de crisis** — _opcion_: Generalizada tónico-clónica / Focal con pérdida de conciencia / Focal sin pérdida de conciencia / Ausencias / Desconocido
 - **¿Tiene aura o pródromos antes de la crisis?** — _boolean_
 - **Desencadenantes** — _opcion_multiple_: Falta de sueño / Estrés / Fiebre / Luces parpadeantes / Alcohol / Olvido de la medicación / Otros
 - **¿Ha tenido un estatus epiléptico (crisis muy prolongada)?** — _boolean_
   - Por qué: Un estatus previo o crisis recientes indican epilepsia no controlada: no debe omitirse la medicación.
+  - Genera → 🔔 alerta amarilla: si = sí → epilepsia no controlada. _(§5.16.9)_
 
 ### Esclerosis múltiple
 
@@ -1471,14 +1526,17 @@ _Fuente: docs/documento_fuente.md §5.6, §5.16.12_
 
 - **Fecha del último brote** — _fecha_
   - Por qué: Un brote en los últimos 3 meses es una señal de alerta.
+  - Genera → 🔔 alerta amarilla: si brote en los últimos 3 meses → brote reciente de esclerosis múltiple. _(§5.16.12)_
 - **Síntomas del último brote** — _texto_
 - **Movilidad habitual** — _opcion_: Camina sin ayuda / Camina con ayuda / Silla de ruedas / Encamado
   - Por qué: La movilidad y la debilidad basales deben quedar documentadas para comparar tras la anestesia.
 - **Debilidad basal (descripción)** — _texto_
 - **¿Empeora con el calor (fenómeno de Uhthoff)?** — _boolean_
   - Por qué: Si empeora con el calor, conviene mantener una normotermia estricta durante la cirugía.
+  - Genera → 📝 nota: si = sí → mantener normotermia estricta. _(§5.16.12)_
 - **¿Ha tomado corticoides (cortisona) en los últimos 3 meses?** — _boolean_
   - Por qué: Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).
+  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_
 - **¿Cuál?** — _opcion_: Prednisona / Prednisolona / Metilprednisolona / Deflazacort / Dexametasona / Hidrocortisona
 - **Dosis diaria** (mg) — _numero_
 - **Duración** (semanas) — _numero_
@@ -1508,8 +1566,10 @@ _Fuente: docs/documento_fuente.md §5.1, §5.16.1_
 - **Años de evolución** — _numero_
 - **Cifras habituales en casa (p. ej. 130/80)** — _texto_
 - **¿Está bien controlada?** — _opcion_: Bien controlada / Mal controlada / No lo sabe
+  - Genera → 🅰 ASA: si = mal → ASA mínimo 3 (HTA mal controlada); en otro caso, mínimo 2. _(§5.16.1)_
 - **Síntomas de mal control** — _opcion_multiple_: Cefalea frecuente / Acúfenos (pitidos en los oídos) / Visión borrosa
   - Por qué: Cefalea, acúfenos o visión borrosa pueden indicar que la tensión no está bien controlada.
+  - Genera → 🔔 alerta amarilla: si alguno marcado → posible HTA mal controlada. _(§5.16.1)_
 
 ### Ictus/AIT y trombosis venosa (TVP/TEP)
 
@@ -1529,6 +1589,7 @@ _Fuente: docs/documento_fuente.md §5.2, §5.12, §5.16.8_
 
 - **Síntomas actuales** — _opcion_multiple_: Fiebre / Dolor de garganta / Malestar general / Mucosidad abundante / Tos productiva
   - Por qué: Una infección respiratoria activa aumenta el riesgo de complicaciones y puede aconsejar posponer la cirugía programada.
+  - Genera → 🔔 alerta amarilla: si fiebre o tos productiva (infección activa) → infección respiratoria activa: valorar posponer la cirugía programada (§5.2, §5.12). _(§5.16.8)_
 - **Días de evolución** — _numero_
 
 ### Insuficiencia cardiaca
@@ -1537,9 +1598,13 @@ _Fuente: docs/documento_fuente.md §5.1_
 
 - **Clase funcional (NYHA)** — _opcion_: I — sin síntomas con la actividad normal / II — síntomas con esfuerzos moderados / III — síntomas con pequeños esfuerzos / IV — síntomas en reposo
   - Por qué: La clase NYHA describe cuánto le limita el corazón y sube la clase de riesgo del paciente.
+  - Genera → 📊 clase de riesgo: si = III o IV → sube la clase de riesgo del paciente a alta. _(§5.1)_
+  - Genera → 🅰 ASA: si = III o IV → ASA mínimo 4. _(§5.1)_
 - **Fracción de eyección (FEVI), si se conoce** (%) — _numero_
   - Por qué: Una FEVI reducida (≤ 40 %) hace que los IECA/ARA-II se mantengan el día de la cirugía.
+  - Genera → 💊 regla: si ≤ 40 % → los IECA/ARA-II se mantienen el día de la cirugía. _(§8)_
 - **¿Le han dicho que tiene el corazón «débil» o con la función disminuida (disfunción sistólica)?** — _boolean_
+  - Genera → 💊 regla: si = sí → los IECA/ARA-II se mantienen el día de la cirugía. _(§8)_
 - **Fecha del último ingreso por insuficiencia cardiaca** — _fecha_
 - **¿Necesita dormir incorporado o con varias almohadas (ortopnea)?** — _boolean_
 - **¿Tiene hinchazón de piernas (edemas)?** — _boolean_
@@ -1551,12 +1616,17 @@ _Fuente: docs/documento_fuente.md §5.8, §5.16.13_
 
 - **Órganos afectados** — _opcion_multiple_: Riñón / Corazón / Pulmón / Sistema nervioso / Hematológico / Piel y articulaciones
   - Por qué: La afectación de riñón, corazón o pulmón cambia las pruebas y el riesgo.
+  - Genera → 📝 nota: si incluye riñón → valorar creatinina y sedimento urinario. _(§5.16.13)_
 - **¿Trombosis previa o síndrome antifosfolípido?** — _boolean_
   - Por qué: El síndrome antifosfolípido es criterio de alto riesgo trombótico; márquelo también en el módulo de trombofilia.
+  - Genera → ℹ dato: si = sí → criterio de alto riesgo trombótico (enlaza con trombofilia §8.1). _(§5.16.13)_
 - **¿Anemia o plaquetas bajas recientes?** — _boolean_
   - Por qué: Motiva hemograma y coagulación aunque la tabla no los pida.
+  - Genera → 🔔 alerta amarilla: si = sí → anemia o plaquetopenia recientes. _(§5.16.13)_
+  - Genera → 🧪 prueba: si = sí → hemograma y coagulación. _(§5.16.13)_
 - **¿Ha tomado corticoides (cortisona) en los últimos 3 meses?** — _boolean_
   - Por qué: Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).
+  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_
 - **¿Cuál?** — _opcion_: Prednisona / Prednisolona / Metilprednisolona / Deflazacort / Dexametasona / Hidrocortisona
 - **Dosis diaria** (mg) — _numero_
 - **Duración** (semanas) — _numero_
@@ -1587,8 +1657,10 @@ _Fuente: docs/documento_fuente.md §5.6, §5.16.10_
   - Por qué: La levodopa no se suspende; conviene conocer su horario para no interrumpirla.
 - **¿Dificultad para tragar o mal manejo de la saliva?** — _boolean_
   - Por qué: Aumenta el riesgo de aspiración durante la anestesia.
+  - Genera → 🔔 alerta amarilla: si = sí → riesgo de aspiración. _(§5.16.10)_
 - **¿Mareo intenso al ponerse de pie?** — _boolean_
   - Por qué: Indica disfunción autonómica, con riesgo de bajadas graves de tensión durante la anestesia.
+  - Genera → 🔔 alerta amarilla: si = sí → disfunción autonómica (riesgo de hipotensión). _(§5.16.10)_
 
 ### Pediatría
 
@@ -1642,20 +1714,26 @@ _Fuente: docs/documento_fuente.md §5.2, §6.3_
 - **Presión de la CPAP (si la sabe)** — _texto_
 - **¿Ronca fuerte (se oye a través de la puerta o molesta a quien duerme al lado)?** — _boolean_
   - Por qué: Es uno de los cuatro componentes principales del STOP-Bang (§6.3).
+  - Genera → ℹ dato: si = sí → suma un punto en el STOP-Bang; STOP-Bang ≥ 5 genera alerta de riesgo alto. _(§6.3)_
 - **¿Se siente cansado o somnoliento durante el día?** — _boolean_
   - Por qué: Componente STOP-Bang: somnolencia diurna (§6.3).
 - **¿Alguien le ha visto dejar de respirar mientras duerme?** — _boolean_
   - Por qué: Componente STOP-Bang: apneas observadas (§6.3).
 - **Perímetro del cuello** (cm) — _numero_
   - Por qué: Un cuello > 40 cm suma en el STOP-Bang (§6.3).
+  - Genera → ℹ dato: si > 40 cm → suma un punto en el STOP-Bang; STOP-Bang ≥ 5 genera alerta de riesgo alto. _(§6.3)_
 
 ### Trasplante de órgano
 
 _Fuente: docs/documento_fuente.md §5.10, §5.16.15, §8.8_
 
 - **Órgano trasplantado** — _opcion_: Riñón / Hígado / Corazón / Pulmón / Páncreas / Médula ósea / Otro
+  - Genera → 📝 nota: si = corazón → corazón denervado. _(§5.16.15)_
+  - Genera → 🔔 alerta amarilla: si = riñón → evitar AINE. _(§5.16.15)_
+  - Genera → 📝 nota: si = pulmón → reflejo tusígeno abolido. _(§5.16.15)_
 - **Fecha del trasplante** — _fecha_
   - Por qué: Un trasplante de menos de 6 meses implica inmunosupresión intensa.
+  - Genera → 🔔 alerta amarilla: si < 6 meses → trasplante reciente. _(§5.16.15)_
 - **Fecha de la última analítica del injerto** — _fecha_
 - **Creatinina más reciente (si es trasplante renal)** (mg/dL) — _numero_
   - Por qué: En el trasplante renal, la creatinina permite calcular el aclaramiento.
@@ -1665,8 +1743,10 @@ _Fuente: docs/documento_fuente.md §5.10, §5.16.15, §8.8_
 - **¿Aporta informe del equipo de trasplante?** — _boolean_
 - **¿Los niveles de los inmunosupresores están en rango?** — _opcion_: Sí / No / No lo sabe
   - Por qué: Niveles fuera de rango pueden requerir ajuste antes de la cirugía.
+  - Genera → 🔔 alerta amarilla: si = no (fuera de rango) → niveles de inmunosupresores fuera de rango. _(§5.16.15)_
 - **¿Fiebre, infección reciente o antibiótico/antifúngico actual?** — _boolean_
   - Por qué: Una infección activa en un paciente inmunodeprimido puede aconsejar posponer la cirugía programada.
+  - Genera → 🔔 alerta amarilla: si = sí → infección activa en inmunodeprimido: valorar posponer. _(§5.16.15)_
 - **Profilaxis antiinfecciosa (cotrimoxazol, antivirales…)** — _texto_
 - **Según el órgano: fatiga o falta de aire (corazón/pulmón), tos (pulmón), medicamentos sin receta (riñón)** — _texto_
   - Por qué: El corazón trasplantado puede tener isquemia indolora; en el riñón hay que evitar AINE; en el pulmón hay riesgo de retención de secreciones.
@@ -1685,12 +1765,16 @@ _Fuente: docs/documento_fuente.md §5.1_
 
 - **¿Qué válvula está afectada?** — _opcion_: Aórtica / Mitral / Tricúspide / Pulmonar / Varias
 - **Gravedad** — _opcion_: Leve / Moderada / Grave / No lo sabe
+  - Genera → 📊 clase de riesgo: si = moderada o grave → sube la clase de riesgo del paciente a alta. _(§5.1)_
+  - Genera → 🅰 ASA: si = grave → ASA mínimo 4 (moderada: mínimo 3). _(§5.1)_
 - **¿Lleva prótesis (válvula artificial)?** — _opcion_: No / Sí, mecánica / Sí, biológica
   - Por qué: Una prótesis mecánica obliga a coordinar la anticoagulación y puede requerir terapia puente.
+  - Genera → ℹ dato: si = mecánica → criterio de alto riesgo trombótico: coordinar anticoagulación y valorar terapia puente (§8.1). _(§5.1)_
 - **Posición de la prótesis** — _opcion_: Aórtica / Mitral / Tricúspide
 - **Fecha del último ecocardiograma** — _fecha_
   - Por qué: Si no hay ecocardiograma en los últimos 12 meses o hay síntomas nuevos, se solicita uno.
 - **¿Síntomas nuevos (más disnea, síncope o angina)?** — _boolean_
+  - Genera → 🧪 prueba: si = sí → ecocardiograma. _(§7.3)_
 
 ## 17. Pendiente de revisión por el servicio
 
