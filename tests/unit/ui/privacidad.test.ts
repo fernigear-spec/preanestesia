@@ -1,5 +1,7 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert/strict';
+/**
+ * Privacidad (§2): fase del temporizador de inactividad.
+ */
+import { describe, it, expect } from '../../_harness.ts';
 import { faseInactividad } from '../../../src/ui/privacidad.ts';
 
 describe('Privacidad · fase de inactividad (§2)', () => {
@@ -7,21 +9,21 @@ describe('Privacidad · fase de inactividad (§2)', () => {
   const AVISO = 60_000; // 1 min antes
 
   it('sigue activa mientras haya actividad reciente', () => {
-    assert.equal(faseInactividad(0, LIMITE, AVISO), 'activo');
-    assert.equal(faseInactividad(10 * 60_000, LIMITE, AVISO), 'activo');
+    expect(faseInactividad(0, LIMITE, AVISO)).toBe('activo');
+    expect(faseInactividad(10 * 60_000, LIMITE, AVISO)).toBe('activo');
   });
 
   it('entra en aviso durante el último minuto antes del límite', () => {
-    assert.equal(faseInactividad(LIMITE - AVISO, LIMITE, AVISO), 'aviso');
-    assert.equal(faseInactividad(LIMITE - 1_000, LIMITE, AVISO), 'aviso');
+    expect(faseInactividad(LIMITE - AVISO, LIMITE, AVISO)).toBe('aviso');
+    expect(faseInactividad(LIMITE - 1_000, LIMITE, AVISO)).toBe('aviso');
   });
 
   it('un segundo antes del aviso todavía está activa', () => {
-    assert.equal(faseInactividad(LIMITE - AVISO - 1, LIMITE, AVISO), 'activo');
+    expect(faseInactividad(LIMITE - AVISO - 1, LIMITE, AVISO)).toBe('activo');
   });
 
   it('expira justo al alcanzar el límite y después', () => {
-    assert.equal(faseInactividad(LIMITE, LIMITE, AVISO), 'expirado');
-    assert.equal(faseInactividad(LIMITE + 5_000, LIMITE, AVISO), 'expirado');
+    expect(faseInactividad(LIMITE, LIMITE, AVISO)).toBe('expirado');
+    expect(faseInactividad(LIMITE + 5_000, LIMITE, AVISO)).toBe('expirado');
   });
 });
