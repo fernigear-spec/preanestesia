@@ -196,7 +196,7 @@ interface Entrevista {
 }
 
 interface ResultadoCalculado {
-  asaSugerido: { clase: 1|2|3|4|5; sufijoE: boolean; determinantes: string[]; modificadoManualmente: boolean };
+  asaSugerido: { clase: 1|2|3|4|5; determinantes: string[]; modificadoManualmente: boolean };  // sin sufijo E (decisión 30/09/2026)
   escalas: Record<string, ResultadoEscala>;      // egri, stopBang, apfel, ...
   claseRiesgoPaciente: 'bajo'|'bajo-moderado'|'moderado'|'alto';
   pruebas: PruebaSolicitada[];
@@ -268,7 +268,7 @@ apixabán (anti-Xa), riesgo hemorrágico alto (prótesis rodilla) + raquídea + 
 - Al arrancar, `cargador.ts` lee todos los ficheros de `datos/` (empaquetados como assets estáticos).
 - `validador.ts` aplica esquemas **zod** a cada fichero:
   - CSV: comprueba columnas presentes, tipos, valores dentro de listas cerradas (p. ej. riesgo ∈ {bajo, intermedio, alto}), y que cada `id_regla` de `farmacos.csv` exista en `reglas_farmacos.json`.
-  - JSON de módulos: comprueba estructura de preguntas, tipos de respuesta, referencias.
+  - JSON de módulos: comprueba estructura de preguntas, tipos de respuesta, referencias y, si existe, la forma del campo `genera` de cada pregunta (efectos por respuesta: `cuando`, `efecto`, `tipo` ∈ {alerta, nota, prueba, clase_riesgo, asa, regla, hecho}, `gravedad` obligatoria en las alertas). Un test de cobertura (`coberturaAlertas.test.ts`) exige que las respuestas de §5/§5.16 que generan un efecto conserven su `genera` (decisión 30/09/2026).
 - Si hay error, se muestra una pantalla de bloqueo con **fichero, fila y columna** exactos y **no se puede iniciar** ninguna entrevista (R2.3, caso de prueba 21).
 
 ---
@@ -307,7 +307,7 @@ apixabán (anti-Xa), riesgo hemorrágico alto (prótesis rodilla) + raquídea + 
 - Utilidades gramaticales: enumeración con «y» final, singular/plural, concordancia de género, omisión de bloques vacíos, fechas cortas.
 - Política de abreviaturas y de negativos configurable.
 - Modo «solo ASCII» (transliteración de tildes/símbolos).
-- Aviso si se supera el límite de caracteres de `config.json`.
+- Sin límite de caracteres: `construirSap` solo emite antecedentes patológicos y quirúrgicos; el resto del informe se rellena con los desplegables del SAP (decisión 30/09/2026).
 - Vista previa sobre los casos de entrenamiento en el panel de administración.
 
 ---

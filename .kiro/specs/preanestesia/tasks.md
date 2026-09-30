@@ -39,6 +39,7 @@ Cada tarea referencia los requisitos que satisface (`Rx.y`). Las tareas se orden
 - [ ] **3.6** Generar `coherencia.json` con las reglas de R4.2, R4.3 y R4.4. _(R4)_
 - [ ] **3.7** Generar `plantillas_sap.json` (bloques, plantillas, abreviaturas, negativos). _(R10.1)_
 - [ ] **3.8** Generar `modulos/*.json` — un fichero por cada módulo de R5.1 a R5.15, con preguntas, tipos, visibilidad, efecto ASA/riesgo, alertas, frase SAP y textos de modo guiado. _(R5, R4.5)_
+- [ ] **3.8b** Codificar el efecto de cada respuesta en el campo `genera` de las preguntas (§5.16); validarlo en el cargador, mostrarlo en `CONTENIDO_CLINICO.md` §16 y protegerlo con `coberturaAlertas.test.ts`. _(R5.16)_
 - [ ] **3.9** Generar `textos/es/*.json` (paciente, hojas anexas, guion de preguntas delicadas). _(R16.2)_
 - [ ] **3.10** Generar `textos/ca/*.json` traducidos, marcados «PENDENT DE REVISIÓ». _(R16.3)_
 - [ ] **3.11** Sembrar `textos/historico/<versión>/` con el snapshot de la versión inicial y definir el mecanismo de snapshot por publicación. _(R2.2.9, R11.5)_
@@ -51,7 +52,7 @@ Cada tarea referencia los requisitos que satisface (`Rx.y`). Las tareas se orden
 
 Cada subtarea incluye su fichero en `src/dominio/escalas/` **y** sus pruebas unitarias con casos límite.
 
-- [ ] **4.1** ASA sugerido (máximo de determinantes, modificable, sufijo E). _(R6.1)_
+- [ ] **4.1** ASA sugerido (máximo de determinantes, modificable; sin sufijo E, decisión 30/09/2026). _(R6.1)_
 - [ ] **4.2** EGRI (El-Ganzouri), con soporte para cálculo parcial en telefónica. _(R6.2.2, R6.2.5 — casos 10, 14)_
 - [ ] **4.3** Langeron (ventilación difícil con mascarilla). _(R6.2.3)_
 - [ ] **4.4** Alertas independientes de vía aérea. _(R6.2.4)_
@@ -140,7 +141,7 @@ Cada subtarea incluye su fichero en `src/dominio/escalas/` **y** sus pruebas uni
 
 ## 11. Salidas
 
-- [ ] **11.1** Generador de texto SAP por plantillas (gramática, abreviaturas, negativos, solo ASCII, límite de caracteres). _(R10.1)_
+- [ ] **11.1** Generador de texto SAP por plantillas (gramática, abreviaturas, negativos, solo ASCII; solo antecedentes patológicos y quirúrgicos, sin límite de caracteres). _(R10.1)_
 - [ ] **11.2** Hoja del paciente (secciones, es/ca, letra grande) — sin notas técnicas; prehabilitación solo si `prehabilitacion_activa`; advertencia condicional de sugammadex si aplica. _(R10.2, R8.15, R13, R16.4)_
 - [ ] **11.3** Resumen del anestesiólogo (alertas por gravedad, notas técnicas plegables). _(R10.3)_
 - [ ] **11.4** Exportación a PDF en el navegador (hoja del paciente y resumen). _(R10.2, R10.3)_
@@ -170,17 +171,18 @@ Cada subtarea incluye su fichero en `src/dominio/escalas/` **y** sus pruebas uni
 - [ ] **13.1** Navegación por pasos con barra de progreso e indicación de preguntas faltantes. _(R3.1)_
 - [ ] **13.2** Panel lateral/inferior con resumen, alertas y cálculos en tiempo real. _(R3.1.2)_
 - [ ] **13.3** Selector de modalidad (presencial/telefónica). _(R3.1.5)_
-- [ ] **13.4** Paso 1 — datos de intervención (buscador de procedimientos, avisos de fecha, selector con bloqueo periférico y profundo separados, casilla «fecha aún no conocida» §8.16a). _(R3.2.1–R3.2.6b)_
-- [ ] **13.5** Paso 2 — datos básicos (IMC, activación de módulos pediátrico/obstétrico). _(R3.2.6–R3.2.8)_
-- [ ] **13.6** Paso 3 — antecedentes anestésicos/quirúrgicos. _(R3.2.9–R3.2.11)_
-- [ ] **13.7** Paso 4 — mtND4 (usa tarea 9). _(R3.2.12)_
-- [ ] **13.8** Paso 5 — alergias. _(R3.2.13–R3.2.14)_
-- [ ] **13.9** Paso 6 — hábitos, capacidad funcional, fragilidad (CFS + 4AT en ≥ 65 años, presencial y telefónica). _(R3.2.16–R3.2.20)_
-- [ ] **13.10** Paso 7 — cribado por aparatos (render de módulos desde JSON, HEMSTOP siempre). _(R3.2.20–R3.2.22)_
-- [ ] **13.11** Paso 8 — medicación habitual (autocompletado difuso, no catalogado). _(R3.2.23–R3.2.26)_
-- [ ] **13.12** Paso 9 — vía aérea (con ilustración Mallampati SVG propia; parcial en telefónica). _(R3.2.27, R6.2)_
-- [ ] **13.13** Paso 10 — consentimiento. _(R3.2.28)_
-- [ ] **13.14** Paso 11 — resultados (integra todas las salidas). _(R3.2.29)_
+- [ ] **13.4** Paso 1 — datos de intervención (buscador de procedimientos, avisos de fecha, régimen y contraste; sin carácter; sin técnica —pasa al paso 7—; casilla «fecha aún no conocida» §8.16a). _(R3.2.1–R3.2.6b)_
+- [ ] **13.5** Paso 2 — datos básicos (IMC, activación de módulos pediátrico/obstétrico). _(R3.2.7–R3.2.9)_
+- [ ] **13.6** Paso 3 — alergias. _(R3.2.14–R3.2.15)_
+- [ ] **13.7** Paso 4 — antecedentes anestésicos/quirúrgicos (sin condiciones especiales, que pasan al paso 6). _(R3.2.10–R3.2.12)_
+- [ ] **13.8** Paso 5 — hábitos, capacidad funcional, fragilidad (CFS + 4AT en ≥ 65 años, presencial y telefónica). _(R3.2.16–R3.2.20)_
+- [ ] **13.9** Paso 6 — enfermedades y hemostasia (render de módulos desde JSON, HEMSTOP siempre, condiciones especiales §5.15). _(R3.2.21–R3.2.23b)_
+- [ ] **13.10** Paso 7 — técnica anestésica prevista (bloqueo periférico y profundo separados; oftalmología decide el grupo; recálculo si cambia). _(R3.2.1b, R3.2.3, R3.2.6, R3.2.6c)_
+- [ ] **13.11** Paso 8 — medicación habitual (autocompletado difuso, no catalogado; conserva la medicación al volver al paso 7). _(R3.2.24–R3.2.27)_
+- [ ] **13.12** Paso 9 — vía aérea (con ilustración Mallampati SVG propia; parcial en telefónica). _(R3.2.28, R6.2)_
+- [ ] **13.13** Paso 10 — consentimiento. _(R3.2.29)_
+- [ ] **13.14** Paso 11 — mtND4 (usa tarea 9); registra el uso al continuar. _(R3.2.13)_
+- [ ] **13.14b** Paso 12 — resultados (integra todas las salidas). _(R3.2.30)_
 - [ ] **13.15** Modo guiado: enlaces «¿Por qué preguntamos esto?» y formulaciones sugeridas; conmutador con preferencia local. _(R4.5)_
 - [ ] **13.16** Campo opcional «Identificación para la hoja impresa» (solo PDF/impresión). _(R1.2 nota de identificación)_
 

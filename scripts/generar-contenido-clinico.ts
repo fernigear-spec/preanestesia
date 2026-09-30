@@ -224,7 +224,7 @@ p();
 // —————————————————————————————— 10. ASA ——————————————————————————————
 p('## 10. ASA sugerido — §6.1');
 p();
-p('Cada respuesta de los módulos lleva una clase ASA mínima (ejemplos ASA 2020). El ASA sugerido es el máximo y se muestran las respuestas que lo determinan. Se puede modificar a mano; las salidas indican el valor final y si se ha modificado. Sufijo **E** en urgencias.');
+p('Cada respuesta de los módulos lleva una clase ASA mínima (ejemplos ASA 2020). El ASA sugerido es el máximo y se muestran las respuestas que lo determinan. Se puede modificar a mano; las salidas indican el valor final y si se ha modificado. El sufijo **E** de urgencia se ha retirado (decisión del servicio, 30/09/2026).');
 p();
 [
   'ASA I: sano, no fumador, alcohol mínimo o nulo.',

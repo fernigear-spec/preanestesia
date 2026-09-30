@@ -43,7 +43,7 @@ Hay una sola vista para todos los usuarios. Las notas técnicas dirigidas al ane
 
 Se cargan al abrir la aplicación. Al cargarlos, la aplicación los valida; si alguno tiene errores (columnas que faltan, valores fuera de lista, reglas inexistentes), muestra qué fichero, fila y columna fallan y no permite empezar entrevistas con datos corruptos.
 
-- `config.json`: nombre del centro, teléfono de contacto para el paciente, minutos de inactividad, edad pediátrica máxima (17 años por defecto), límite de caracteres del campo libre de SAP, días de validez de los QR, interruptor `prehabilitacion_activa` (por defecto `false`) y URL de PreHabilítame, versión del contenido y fecha de la última revisión clínica. La versión y la fecha aparecen en el pie de todas las salidas.
+- `config.json`: nombre del centro, teléfono de contacto para el paciente, minutos de inactividad, edad pediátrica máxima (17 años por defecto), días de validez de los QR, interruptor `prehabilitacion_activa` (por defecto `false`) y URL de PreHabilítame, versión del contenido y fecha de la última revisión clínica. La versión y la fecha aparecen en el pie de todas las salidas.
 - `farmacos.csv`, separador punto y coma, UTF-8. Columnas: `id`, `principios_activos` (separados por `+` en combinaciones), `nombres_comerciales` (separados por `|`), `grupo`, `subgrupo`, `pauta_tipica` (diaria, dos veces al día, semanal, mensual, cíclica), `id_regla` (una por principio activo separadas por `+` en combinaciones; se aplica la más restrictiva), `texto_paciente` y `texto_anestesiologo` (opcionales, sobrescriben el texto por defecto de la regla), `requiere_confirmacion` (sí/no), `indicaciones_posibles` (ids de indicación separados por `|`, ver 5b.1), `fuente`, `fecha_revision`, `verificado_cima` (sí/no).
 - `reglas_farmacos.json`: parámetros de cada regla (horas, condiciones por riesgo hemorrágico, técnica anestésica, aclaramiento, indicación, lista de bloqueos profundos, tablas de HBPM de la SETH). La lógica que no quepa en parámetros va en código, pero los números siempre salen del JSON.
 - `procedimientos.csv`: procedimiento, especialidad, riesgo quirúrgico cardiovascular (bajo, intermedio, alto), riesgo hemorrágico (mínimo, bajo, alto), grupo oftalmológico (no aplica, riesgo bajo, riesgo moderado-alto), técnica neuroaxial o bloqueo profundo probable (sí/no), duración habitual ≥ 30 min (sí/no, para POVOC), riesgo trombótico alto (sí/no, para la regla de anticonceptivos). Buscador con autocompletado. Opción «Otro procedimiento» que obliga a elegir los riesgos a mano.
@@ -60,35 +60,37 @@ Genera los ficheros iniciales con el contenido de este documento y de los anexos
 
 Navegación por pasos con barra de progreso y un panel lateral (inferior en tablet) que muestra en tiempo real el resumen, las alertas y los cálculos. Se puede volver a cualquier paso. Cada paso indica qué preguntas faltan. Al inicio se elige la modalidad: presencial o telefónica.
 
+> **Orden actualizado (decisión del servicio, 30/09/2026).** La entrevista tiene 12 pasos en este orden: 1) intervención, 2) datos básicos, 3) alergias, 4) antecedentes, 5) hábitos, 6) enfermedades y hemostasia, 7) técnica anestésica prevista, 8) medicación, 9) vía aérea, 10) consentimiento, 11) origen materno (mtND4) y 12) resultados. Se elimina el **carácter** de la intervención (programada/urgencia) y el sufijo **E** del ASA (ya no se recoge la urgencia). La técnica anestésica prevista pasa a un paso propio (paso 7); si se cambia, las reglas de medicación y las salidas se recalculan. La hipertermia maligna y el déficit de pseudocolinesterasa (personales o familiares) se recogen como **condiciones especiales** del paso de enfermedades (§5.15), no en antecedentes.
+
 ### Paso 1. Datos de la intervención
-Fecha y hora prevista (si no se conoce la hora, se asume 08:00 y la hoja del paciente lo avisa), procedimiento (desde `procedimientos.csv`), lateralidad si aplica, régimen (CMA, ingreso, UCI prevista), carácter (programada, urgencia diferida), técnica anestésica prevista si se conoce (general, sedación, neuroaxial, bloqueo periférico, bloqueo profundo, local) o «no se sabe». Si no se sabe y el procedimiento tiene marcada técnica neuroaxial probable, las reglas de fármacos usan los plazos de neuroaxial y lo indican.
+Fecha y hora prevista (si no se conoce la hora, se asume 08:00 y la hoja del paciente lo avisa), procedimiento (desde `procedimientos.csv`), lateralidad si aplica, régimen (CMA, ingreso, UCI prevista) y contraste yodado. La técnica anestésica no se pregunta aquí, sino en el paso 7.
 
 Avisos de fecha: si la intervención está a más de 60 días, aviso de que las suspensiones deben recalcularse si cambia la fecha. Si alguna fecha límite de suspensión calculada ya ha pasado o cae hoy, alerta por fármaco: «ya no se puede cumplir el plazo de suspensión; consultar con el anestesiólogo», y ese fármaco pasa a requerir confirmación.
 
 ### Paso 2. Datos básicos
 Edad (fecha de nacimiento o años; en menores de 2 años, meses), sexo, peso, talla, IMC calculado. En menores, peso obligatorio. Si la edad es ≤ la edad pediátrica máxima, se activa el módulo pediátrico y se sustituyen STOP-Bang por STBUR y Apfel por POVOC. En mujeres de 12 a 55 años, posibilidad de embarazo y fecha de la última regla; si está embarazada, se activa el módulo obstétrico.
 
-### Paso 3. Antecedentes anestésicos y quirúrgicos
-Intervenciones previas (lista añadible: procedimiento, año, tipo de anestesia, incidencias). Incidencias a preguntar de forma explícita: intubación o ventilación difícil conocida, náuseas y vómitos postoperatorios, despertar prolongado, reacción alérgica en quirófano, despertar intraoperatorio, dificultad con la epidural o la raquídea, transfusiones y reacción transfusional. Antecedentes familiares: hipertermia maligna, déficit de pseudocolinesterasa (apnea prolongada tras anestesia), complicaciones graves o muertes inesperadas tras anestesia.
-
-### Paso 4. Origen materno (cribado mtND4)
-Sección 9.
-
-### Paso 5. Alergias
+### Paso 3. Alergias
 Medicamentos (con tipo de reacción), látex, contrastes yodados, alimentos relevantes (huevo, soja, frutos secos, frutas tropicales si hay alergia al látex), clorhexidina, adhesivos. «No alergias conocidas» como opción explícita.
 
-### Paso 6. Hábitos, capacidad funcional y fragilidad
+### Paso 4. Antecedentes anestésicos y quirúrgicos
+Intervenciones previas (lista añadible: procedimiento, año, tipo de anestesia, incidencias). Incidencias a preguntar de forma explícita: intubación o ventilación difícil conocida, náuseas y vómitos postoperatorios, despertar prolongado, reacción alérgica en quirófano, despertar intraoperatorio, dificultad con la epidural o la raquídea, transfusiones y reacción transfusional. La hipertermia maligna y el déficit de pseudocolinesterasa (personales y familiares) ya no se recogen aquí: pasan a las condiciones especiales del paso 6 (§5.15).
+
+### Paso 5. Hábitos, capacidad funcional y fragilidad
 - Tabaco (activo, exfumador, nunca; paquetes-año; fecha de abandono).
 - Alcohol con AUDIT-C (sección 6.9).
 - Otras drogas (cannabis, cocaína con fecha del último consumo, otras). Consumo de cocaína en la última semana: alerta.
 - Capacidad funcional: pregunta directa «¿puede subir dos pisos de escaleras sin pararse?»; si la respuesta es no o dudosa, DASI completo (sección 6.6).
 - En pacientes de 65 años o más: Clinical Frailty Scale y 4AT, en presencial y en telefónica (sección 6.10).
 
-### Paso 7. Cribado por aparatos
-Lista de casillas agrupada por aparatos. Cada casilla marcada despliega su módulo (sección 5). Incluye la casilla «Ninguna enfermedad conocida». El cuestionario de hemostasia (sección 5.5) se hace siempre, tenga o no patología hematológica.
+### Paso 6. Enfermedades y hemostasia
+Lista de casillas agrupada por aparatos. Cada casilla marcada despliega su módulo (sección 5). Incluye la casilla «Ninguna enfermedad conocida». El cuestionario de hemostasia (sección 5.5) se hace siempre, tenga o no patología hematológica. Incluye las **condiciones especiales** (§5.15): hipertermia maligna y déficit de pseudocolinesterasa, personales o familiares.
+
+### Paso 7. Técnica anestésica prevista
+Técnica prevista (general, sedación, neuroaxial, bloqueo periférico, bloqueo profundo, local) o «no se sabe». Si no se sabe y el procedimiento tiene marcada técnica neuroaxial probable, las reglas de fármacos usan los plazos de neuroaxial y lo indican. En procedimientos oftalmológicos las opciones son tópica, retrobulbar o peribulbar, general y sedación; en la catarata la técnica decide el grupo oftalmológico (tópica = riesgo bajo; retrobulbar o peribulbar = moderado-alto; sin técnica, moderado-alto y se indica), §8.1-8.3. Si la técnica se cambia más tarde, las reglas de medicación y las salidas se recalculan.
 
 ### Paso 8. Medicación habitual
-Buscador por principio activo o nombre comercial con autocompletado sobre `farmacos.csv`, tolerante a tildes, mayúsculas y errores menores. Para cada fármaco: dosis, pauta y hora habitual. Si no está en el catálogo, se escribe a mano y queda marcado «no catalogado: mantener y consultar con el anestesiólogo». Al añadir cada fármaco actúa el asistente de coherencia (sección 5b).
+Buscador por principio activo o nombre comercial con autocompletado sobre `farmacos.csv`, tolerante a tildes, mayúsculas y errores menores. Para cada fármaco: dosis, pauta y hora habitual. Si no está en el catálogo, se escribe a mano y queda marcado «no catalogado: mantener y consultar con el anestesiólogo». Al añadir cada fármaco actúa el asistente de coherencia (sección 5b). Al volver al paso 7 para cambiar la técnica, la medicación introducida se conserva y se recalcula.
 
 ### Paso 9. Vía aérea
 Sección 6.2. En modalidad telefónica solo se recogen los datos de anamnesis; la exploración queda «pendiente de explorar el día de la intervención» y el cálculo es parcial.
@@ -96,7 +98,10 @@ Sección 6.2. En modalidad telefónica solo se recogen los datos de anamnesis; l
 ### Paso 10. Consentimiento informado de anestesia
 Tres estados: entregado y explicado (con fecha), pendiente de entregar (habitual en telefónica; la hoja del paciente dice «le entregaremos el consentimiento el día de la intervención») o no procede. Consta en el texto de SAP.
 
-### Paso 11. Resultados
+### Paso 11. Origen materno (cribado mtND4)
+Sección 9. Es el último paso antes de los resultados; al continuar se registra el uso (§14.3).
+
+### Paso 12. Resultados
 Cálculos, pruebas complementarias, plan de medicación, ayuno, alertas y salidas (sección 10).
 
 ## 5. Módulos por patología
@@ -197,14 +202,17 @@ Semana de gestación, embarazo múltiple, preeclampsia o HTA gestacional, diabet
 Posibilidad de embarazo (si la hay, alerta). Anticonceptivos hormonales combinados o THS: regla 8.11.
 
 ### 5.15 Condiciones especiales
+Se recogen en el paso 6 (enfermedades y hemostasia), no en antecedentes (decisión del servicio, 30/09/2026). La hipertermia maligna y el déficit de pseudocolinesterasa se preguntan por separado como **personal** y **familiar**.
 - Hipertermia maligna personal o familiar: alerta roja.
-- Déficit de pseudocolinesterasa: alerta.
+- Déficit de pseudocolinesterasa personal o familiar: alerta.
 - Porfiria: alerta con recordatorio de revisar la seguridad de los fármacos.
 - Alergia al látex: alerta de quirófano libre de látex.
 
 ## 5.16 Preguntas ampliadas por patología
 
 Decisión del servicio (30/09/2026). Amplía las preguntas de algunos módulos de §5. Reglas: solo preguntas y su motivo (las pautas de medicación salen siempre de §8); opciones cerradas cuando la respuesta genera alerta o alimenta una regla, texto libre corto cuando solo describe; cada pregunta lleva su «¿Por qué preguntamos esto?»; las respuestas relevantes se resumen en el texto de SAP y las alertas en el resumen del anestesiólogo; no se duplican preguntas ya existentes.
+
+**Codificación del efecto por respuesta (decisión del servicio, 30/09/2026).** Cada respuesta que genera un efecto clínico lo declara de forma explícita en el propio módulo (`datos/modulos/*.json`), en el campo `genera` de la pregunta: tipo de efecto (alerta, nota, prueba, clase de riesgo, ASA, regla o dato), gravedad de la alerta, condición que lo dispara y sección del documento fuente que lo respalda. Esta codificación se muestra por pregunta en `CONTENIDO_CLINICO.md` (§16) y la vigila un test de cobertura, que falla si una respuesta de §5/§5.16 que genera un efecto pierde su declaración. El motor sigue calculando el efecto en su capa; la codificación es la traza legible que mantiene sincronizados documento, contenido y comportamiento.
 
 - **5.16.1 Hipertensión:** cifras habituales en casa (texto); síntomas de mal control (cefalea frecuente, acúfenos, visión borrosa). Alguno marcado: alerta amarilla «posible HTA mal controlada».
 - **5.16.2 Diabetes:** tratamiento (orales, insulina, ambos, dieta); frecuencia de hipoglucemias (nunca, mensual, semanal, diaria); si las detecta. «No las detecta» o frecuencia semanal/diaria: alerta amarilla «hipoglucemias frecuentes o inadvertidas».
@@ -255,7 +263,7 @@ Cada respuesta de los módulos lleva una clase ASA mínima según los ejemplos d
 - ASA II: fumador activo, bebedor social, embarazo, IMC 30 a < 40, diabetes o HTA bien controladas, enfermedad pulmonar leve.
 - ASA III: diabetes o HTA mal controladas, EPOC, IMC ≥ 40, hepatitis activa, dependencia o abuso de alcohol, marcapasos, reducción moderada de la fracción de eyección, enfermedad renal terminal en diálisis periódica, infarto, ictus, AIT o stent coronario de más de 3 meses, lactante prematuro con edad posconcepcional < 60 semanas.
 - ASA IV: infarto, ictus, AIT o stent de menos de 3 meses, isquemia activa o disfunción valvular grave, reducción grave de la fracción de eyección, enfermedad renal terminal sin diálisis periódica.
-El ASA se puede modificar a mano; las salidas muestran el valor final y que ha sido modificado. Sufijo E en urgencias.
+El ASA se puede modificar a mano; las salidas muestran el valor final y que ha sido modificado. El sufijo **E** de urgencia se ha retirado (decisión del servicio, 30/09/2026): ya no se recoge el carácter urgente de la intervención.
 
 ### 6.2 Vía aérea
 Datos: Mallampati (I a IV, con ilustración esquemática propia, sin imágenes con derechos de autor), apertura bucal (≥ 4 cm o < 4 cm; referencia práctica de tres dedos), distancia tiromentoniana (> 6,5 cm, 6 a 6,5 cm, < 6 cm), movilidad cervical (> 90°, 80 a 90°, < 80°), protrusión mandibular (puede o no adelantar los incisivos inferiores por delante de los superiores), dentición (completa, piezas móviles, prótesis removible superior o inferior, prótesis fija, edéntulo), cuello corto o grueso, perímetro del cuello en cm, barba, antecedente de intubación difícil (no, dudoso, confirmado), radioterapia cervical, tumor de cabeza y cuello, limitación cervical reumatológica, ronquido.
@@ -547,7 +555,7 @@ Texto plano en bloque, listo para copiar con un botón. El generador redacta fra
 - Lista de abreviaturas permitidas (AP, IQ, tto, HTA, DM2, FA, AG, MP, AB, DTM, HM, NAMC y las que añadamos) y opción de escribirlas desarrolladas.
 - Qué negativos se escriben siempre (por ejemplo «NAMC», «niega HM», «niega antecedentes familiares anestésicos», «cribado mtND4 negativo») y cuáles se omiten.
 - Opción «solo ASCII» que sustituye tildes y símbolos si SAP da problemas.
-- Aviso si se supera el límite de caracteres de `config.json`.
+- Sin límite de caracteres: el texto recoge solo antecedentes patológicos y quirúrgicos; el resto del informe se rellena con los desplegables del propio SAP (decisión del servicio, §10.1).
 - Las plantillas se editan desde el panel de administración (14.1), con vista previa sobre los casos de entrenamiento.
 
 Ejemplo del estilo esperado:
