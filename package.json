@@ -13,6 +13,7 @@
     "test:node": "node --experimental-strip-types --test \"tests/**/*.test.ts\"",
     "informe:casos": "node --experimental-strip-types scripts/generar-informe-casos.ts",
     "contenido:clinico": "node --experimental-strip-types scripts/generar-contenido-clinico.ts",
+    "lista:nombres": "node --experimental-strip-types scripts/generar-lista-nombres.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx"
   },
