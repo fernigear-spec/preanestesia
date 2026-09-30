@@ -23,6 +23,11 @@ import { calcularDasi } from '../../dominio/escalas/dasi.ts';
 import { calcularAuditC } from '../../dominio/escalas/auditC.ts';
 import { calcular4AT } from '../../dominio/escalas/cuatroAT.ts';
 import { calcularHemstop } from '../../dominio/escalas/hemstop.ts';
+import { calcularStopBang } from '../../dominio/escalas/stopBang.ts';
+import { calcularStbur } from '../../dominio/escalas/stbur.ts';
+import { calcularPovoc } from '../../dominio/escalas/povoc.ts';
+import { derivarMorfina } from '../../dominio/salidas/dolorOpioides.ts';
+import opioidesData from '../../../datos/opioides.json';
 import { evaluarMtnd4 } from '../../dominio/mtnd4/mtnd4.ts';
 import { derivarAsa } from '../../dominio/salidas/asaSugerido.ts';
 import { construirSap, type EntradaSap } from '../../dominio/salidas/construirSap.ts';
@@ -43,7 +48,7 @@ function fechaCorta(d: Date): string {
 }
 
 export function Salidas({ entrevista, modalidad }: Props) {
-  const { intervencion, basicos, antecedentes, mtnd4, alergias, habitos, cribado, medicacion, viaAerea, consentimiento } = entrevista;
+  const { intervencion, procedimiento, basicos, antecedentes, mtnd4, alergias, habitos, cribado, medicacion, viaAerea, consentimiento } = entrevista;
   const [soloAscii, setSoloAscii] = useState(false);
   const [asaManual, setAsaManual] = useState<ClaseAsa | ''>('');
   const [notasAbiertas, setNotasAbiertas] = useState(false);
@@ -104,10 +109,64 @@ export function Salidas({ entrevista, modalidad }: Props) {
       const cha = calcularCha2ds2va({ insuficienciaCardiaca: enfermedades.has('insuficiencia_cardiaca'), hta: enfermedades.has('hta'), edadAnios: basicos.edadAnios, diabetes: enfermedades.has('diabetes'), ictusAitTromboembolismo: fa.ictus_ait_previo === true, enfermedadVascular: enfermedades.has('cardiopatia_isquemica') || enfermedades.has('stent_o_infarto') });
       escalas.push({ nombre: 'CHA2DS2-VA', valor: String(cha.puntuacion), componentes: cha.componentes });
     }
+    const nvpoAntecedente = (antecedentes?.intervencionesPrevias ?? []).some((iq) => iq.incidencias.includes('nvpo'));
+    const pediatriaResp = respuestas['pediatria'] ?? {};
     if (!extras.pediatrico) {
-      const nvpo = (antecedentes?.intervencionesPrevias ?? []).some((iq) => iq.incidencias.includes('nvpo'));
-      const apfel = calcularApfel({ mujer: basicos.sexo === 'mujer', noFumador: habitos?.tabaco === 'nunca', nvpoOCinetosisPrevias: nvpo, riesgoQuirurgico: intervencion.riesgoCardiovascular });
+      // NVPO adultos: Apfel.
+      const apfel = calcularApfel({ mujer: basicos.sexo === 'mujer', noFumador: habitos?.tabaco === 'nunca', nvpoOCinetosisPrevias: nvpoAntecedente, riesgoQuirurgico: intervencion.riesgoCardiovascular });
       escalas.push({ nombre: 'Apfel', valor: `${apfel.puntuacion} (${apfel.categoria})`, componentes: apfel.componentes });
+    } else {
+      // NVPO niños: POVOC (Eberhart).
+      const povoc = calcularPovoc({
+        cirugiaMayor30min: procedimiento?.duracionMayor30min ?? false,
+        edadMayorIgual3: basicos.edadAnios >= 3,
+        cirugiaEstrabismo: /estrabismo/.test(procedimiento?.id ?? ''),
+        nvpoNinioOFamiliares: nvpoAntecedente || pediatriaResp['nvpo_familiares'] === true,
+      });
+      escalas.push({ nombre: 'POVOC', valor: `${povoc.puntuacion} (${povoc.categoria})`, componentes: povoc.componentes });
+    }
+
+    // SAOS: STOP-Bang (adultos sin diagnóstico) o STBUR (niños).
+    let stopBang: ReturnType<typeof calcularStopBang> | null = null;
+    let stbur: ReturnType<typeof calcularStbur> | null = null;
+    if (extras.pediatrico) {
+      stbur = calcularStbur({
+        roncaMasMitadNoches: pediatriaResp['ronca_mitad_noches'] === true,
+        roncaFuerte: pediatriaResp['ronca_fuerte'] === true,
+        esfuerzoRespiratorioDormido: pediatriaResp['esfuerzo_respiratorio'] === true,
+        dejaDeRespirarDormido: pediatriaResp['deja_de_respirar'] === true,
+        cansadoOSomnolientoDia: pediatriaResp['cansado_dia'] === true,
+      });
+      escalas.push({ nombre: 'STBUR', valor: `${stbur.puntuacion} · ${stbur.categoria.replace(/_/g, ' ')}`, componentes: stbur.componentes });
+    } else {
+      const saosResp = respuestas['saos'] ?? {};
+      const saosDiagnosticado = saosResp['diagnosticado'] === true;
+      if (enfermedades.has('saos') && !saosDiagnosticado) {
+        const cuelloCm = typeof saosResp['perimetro_cuello'] === 'number'
+          ? (saosResp['perimetro_cuello'] as number)
+          : viaAerea?.perimetroCuello ?? 0;
+        stopBang = calcularStopBang({
+          ronquidoFuerte: saosResp['ronquido_fuerte'] === true,
+          cansancioDiurno: saosResp['cansancio_diurno'] === true,
+          apneasObservadas: saosResp['apneas_observadas'] === true,
+          htaEnTratamiento: enfermedades.has('hta'),
+          imcMayor35: imc !== null && imc > 35,
+          edadMayor50: basicos.edadAnios > 50,
+          cuelloMayor40: cuelloCm > 40,
+          varon: basicos.sexo === 'hombre',
+        });
+        escalas.push({ nombre: 'STOP-Bang', valor: `${stopBang.puntuacion} · riesgo ${stopBang.categoria}`, componentes: stopBang.componentes });
+      }
+    }
+
+    // Dolor crónico y opioides (§5.7, §6.8): dosis equivalente de morfina oral.
+    const opioidesTomados = (medicacion ?? [])
+      .filter((f) => f.grupo === 'opioides')
+      .map((f) => ({ idFarmaco: f.idFarmaco, via: f.via, ...(f.opioideDosis !== undefined ? { dosis: f.opioideDosis } : {}), ...(f.opioideTomasDia !== undefined ? { tomasDia: f.opioideTomasDia } : {}) }));
+    const morfina = opioidesTomados.length > 0 ? derivarMorfina(opioidesTomados, opioidesData.factores) : null;
+    if (morfina) {
+      const sc = morfina.sinConversion.length > 0 ? ` (sin conversión: ${morfina.sinConversion.join(', ')})` : '';
+      escalas.push({ nombre: 'Morfina equivalente', valor: `${morfina.mgDia} mg/día${sc}`, componentes: morfina.componentes });
     }
     if (habitos && habitos.subeDosPisos !== 'si' && habitos.itemsDasi.length > 0) {
       const dasi = calcularDasi(habitos.itemsDasi as never[]);
@@ -132,6 +191,16 @@ export function Salidas({ entrevista, modalidad }: Props) {
     if (habitos?.cfs !== undefined && habitos.cfs >= 5) alertas.push({ gravedad: 'amarilla', mensaje: 'Fragilidad (CFS ≥ 5).' });
     if (audit?.riesgoAbstinencia) alertas.push({ gravedad: 'amarilla', mensaje: 'AUDIT-C ≥ 8: riesgo de síndrome de abstinencia.' });
     if (enfermedades.has('marcapasos')) alertas.push({ gravedad: 'amarilla', mensaje: 'Marcapasos/DAI: revisar dispositivo.' });
+    if (stopBang?.alto) alertas.push({ gravedad: 'amarilla', mensaje: `STOP-Bang ${stopBang.puntuacion} (riesgo alto): posible SAOS no diagnosticado.` });
+    if (stbur && stbur.puntuacion >= 5) alertas.push({ gravedad: 'roja', mensaje: 'STBUR 5: riesgo alto de eventos respiratorios perioperatorios.' });
+    else if (stbur && stbur.puntuacion >= 3) alertas.push({ gravedad: 'amarilla', mensaje: `STBUR ${stbur.puntuacion}: riesgo aumentado de eventos respiratorios perioperatorios.` });
+    if (morfina && morfina.mgDia >= 90) alertas.push({ gravedad: 'roja', mensaje: `Dosis alta de opioides (${morfina.mgDia} mg/día de morfina equivalente): planificar analgesia y vigilancia.` });
+    else if (morfina && morfina.mgDia >= 50) alertas.push({ gravedad: 'amarilla', mensaje: `Opioides ≥ 50 mg/día de morfina equivalente (${morfina.mgDia}): planificar analgesia.` });
+    if (morfina && morfina.sinConversion.length > 0) alertas.push({ gravedad: 'amarilla', mensaje: `${morfina.sinConversion.join(' y ')}: no suspender; planificar la analgesia con el anestesiólogo.` });
+    const riesgoIntAlto = intervencion.riesgoCardiovascular === 'intermedio' || intervencion.riesgoCardiovascular === 'alto';
+    if ((morfina && morfina.mgDia >= 50) || (enfermedades.has('dolor_cronico') && riesgoIntAlto)) {
+      alertas.push({ gravedad: 'informativa', mensaje: 'Valorar inclusión en el circuito de dolor transicional de la Unidad Integral del Dolor.' });
+    }
     alertas.sort((a, b) => ORDEN_GRAVEDAD[a.gravedad] - ORDEN_GRAVEDAD[b.gravedad]);
 
     // Notas técnicas.

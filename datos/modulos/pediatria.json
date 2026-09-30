@@ -1,0 +1,110 @@
+{
+  "id": "pediatria",
+  "titulo": "Pediatría",
+  "fuente": "docs/documento_fuente.md §5.12, §6.3, §6.4",
+  "preguntas": [
+    {
+      "id": "prematuro",
+      "etiqueta": "¿Nació prematuro (antes de las 37 semanas)?",
+      "tipo": "boolean",
+      "porque": "En lactantes con edad posconcepcional < 60 semanas hay riesgo de apnea postoperatoria."
+    },
+    {
+      "id": "semanas_gestacion_nacer",
+      "etiqueta": "Semanas de gestación al nacer",
+      "tipo": "numero",
+      "unidad": "semanas",
+      "min": 22,
+      "max": 42,
+      "visibleSi": { "pregunta": "prematuro", "igual": true }
+    },
+    {
+      "id": "irva_reciente",
+      "etiqueta": "¿Ha tenido catarro, mocos o tos en las últimas 2 a 4 semanas?",
+      "tipo": "boolean",
+      "porque": "Una infección respiratoria de vías altas reciente puede aconsejar revalorar el día de la intervención (§5.12)."
+    },
+    {
+      "id": "irva_sintomas",
+      "etiqueta": "Síntomas actuales",
+      "tipo": "opcion_multiple",
+      "visibleSi": { "pregunta": "irva_reciente", "igual": true },
+      "opciones": [
+        { "valor": "fiebre", "etiqueta": "Fiebre" },
+        { "valor": "mocos_purulentos", "etiqueta": "Mocos espesos o amarillentos" },
+        { "valor": "tos_productiva", "etiqueta": "Tos con mucosidad" }
+      ]
+    },
+    {
+      "id": "ronca_mitad_noches",
+      "etiqueta": "¿Ronca más de la mitad de las noches?",
+      "tipo": "boolean",
+      "porque": "Componente del STBUR, escala de riesgo respiratorio en niños (§6.3)."
+    },
+    {
+      "id": "ronca_fuerte",
+      "etiqueta": "¿Ronca fuerte?",
+      "tipo": "boolean",
+      "porque": "Componente del STBUR (§6.3)."
+    },
+    {
+      "id": "esfuerzo_respiratorio",
+      "etiqueta": "¿Se le oye esforzarse para respirar mientras duerme?",
+      "tipo": "boolean",
+      "porque": "Componente del STBUR (§6.3)."
+    },
+    {
+      "id": "deja_de_respirar",
+      "etiqueta": "¿Le han visto dejar de respirar mientras duerme?",
+      "tipo": "boolean",
+      "porque": "Componente del STBUR (§6.3)."
+    },
+    {
+      "id": "cansado_dia",
+      "etiqueta": "¿Se levanta cansado o está somnoliento durante el día?",
+      "tipo": "boolean",
+      "porque": "Componente del STBUR (§6.3)."
+    },
+    {
+      "id": "nvpo_familiares",
+      "etiqueta": "¿Padres o hermanos con náuseas o vómitos importantes tras una anestesia?",
+      "tipo": "boolean",
+      "porque": "El antecedente familiar de NVPO suma en la escala POVOC del niño (§6.4)."
+    },
+    {
+      "id": "cardiopatia_congenita",
+      "etiqueta": "¿Tiene una cardiopatía congénita?",
+      "tipo": "boolean",
+      "porque": "Requiere valoración específica; se registra para el anestesiólogo (§5.12)."
+    },
+    {
+      "id": "cardiopatia_detalle",
+      "etiqueta": "Diagnóstico y si está corregida",
+      "tipo": "texto",
+      "visibleSi": { "pregunta": "cardiopatia_congenita", "igual": true }
+    },
+    {
+      "id": "sindrome",
+      "etiqueta": "¿Tiene algún síndrome (por ejemplo, síndrome de Down)?",
+      "tipo": "boolean",
+      "porque": "Algunos síndromes se asocian a vía aérea difícil o inestabilidad cervical (§5.12)."
+    },
+    {
+      "id": "sindrome_cual",
+      "etiqueta": "¿Cuál?",
+      "tipo": "texto",
+      "visibleSi": { "pregunta": "sindrome", "igual": true }
+    },
+    {
+      "id": "vacuna_ultima_semana",
+      "etiqueta": "¿Ha recibido alguna vacuna en la última semana?",
+      "tipo": "boolean"
+    },
+    {
+      "id": "ansiedad_premedicacion",
+      "etiqueta": "¿El niño o los padres están muy nerviosos o creen que necesitará premedicación?",
+      "tipo": "boolean",
+      "porque": "Se registra para que el anestesiólogo valore la premedicación (§5.12)."
+    }
+  ]
+}

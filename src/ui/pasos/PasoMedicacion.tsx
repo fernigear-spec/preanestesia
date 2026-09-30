@@ -178,6 +178,8 @@ function FichaFarmaco({
   const esInsulinaPremezclada = f.idRegla === 'insulina_premezclada';
   const esHbpm = f.idRegla === 'hbpm' || f.idRegla === 'fondaparinux';
   const necesitaDosis = f.idRegla === 'aas' || f.idRegla === 'metotrexato';
+  const esOpioide = f.grupo === 'opioides';
+  const esParche = esOpioide && f.via === 'no_oral';
 
   function alternarHora(h: string) {
     const horas = f.horas.includes(h) ? f.horas.filter((x) => x !== h) : [...f.horas, h].sort();
@@ -280,6 +282,19 @@ function FichaFarmaco({
         <div className="campo">
           <label htmlFor={`dosis-${f.idFarmaco}`}>Dosis {f.idRegla === 'metotrexato' ? '(mg/semana)' : '(mg/día)'}</label>
           <input id={`dosis-${f.idFarmaco}`} type="number" min={0} inputMode="numeric" value={f.dosisMg ?? ''} onChange={(e) => onCambio({ dosisMg: Number(e.target.value) })} />
+        </div>
+      )}
+
+      {esOpioide && (
+        <div className="campo">
+          <label htmlFor={`opdosis-${f.idFarmaco}`}>{esParche ? 'Dosis del parche (µg/h)' : 'Dosis por toma (mg)'}</label>
+          <input id={`opdosis-${f.idFarmaco}`} type="number" min={0} inputMode="decimal" value={f.opioideDosis ?? ''} onChange={(e) => onCambio({ opioideDosis: Number(e.target.value) })} />
+          {!esParche && (
+            <>
+              <label htmlFor={`optomas-${f.idFarmaco}`}>Tomas al día</label>
+              <input id={`optomas-${f.idFarmaco}`} type="number" min={0} inputMode="numeric" value={f.opioideTomasDia ?? ''} onChange={(e) => onCambio({ opioideTomasDia: Number(e.target.value) })} />
+            </>
+          )}
         </div>
       )}
 

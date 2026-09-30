@@ -26,6 +26,37 @@
       "etiqueta": "Presión de la CPAP (si la sabe)",
       "tipo": "texto",
       "visibleSi": { "pregunta": "cpap", "igual": true }
+    },
+    {
+      "id": "ronquido_fuerte",
+      "etiqueta": "¿Ronca fuerte (se oye a través de la puerta o molesta a quien duerme al lado)?",
+      "tipo": "boolean",
+      "visibleSi": { "pregunta": "diagnosticado", "igual": false },
+      "porque": "Es uno de los cuatro componentes principales del STOP-Bang (§6.3)."
+    },
+    {
+      "id": "cansancio_diurno",
+      "etiqueta": "¿Se siente cansado o somnoliento durante el día?",
+      "tipo": "boolean",
+      "visibleSi": { "pregunta": "diagnosticado", "igual": false },
+      "porque": "Componente STOP-Bang: somnolencia diurna (§6.3)."
+    },
+    {
+      "id": "apneas_observadas",
+      "etiqueta": "¿Alguien le ha visto dejar de respirar mientras duerme?",
+      "tipo": "boolean",
+      "visibleSi": { "pregunta": "diagnosticado", "igual": false },
+      "porque": "Componente STOP-Bang: apneas observadas (§6.3)."
+    },
+    {
+      "id": "perimetro_cuello",
+      "etiqueta": "Perímetro del cuello",
+      "tipo": "numero",
+      "unidad": "cm",
+      "min": 20,
+      "max": 70,
+      "visibleSi": { "pregunta": "diagnosticado", "igual": false },
+      "porque": "Un cuello > 40 cm suma en el STOP-Bang (§6.3)."
     }
   ]
 }

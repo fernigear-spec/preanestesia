@@ -203,6 +203,7 @@ export function App() {
         {pantalla === 'paso7' && (
           <PasoCribado
             inicial={cribado}
+            pediatrico={basicos ? basicos.edadAnios <= config.edad_pediatrica_maxima : false}
             onVolver={() => setPantalla('paso6')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, cribado: datos }));

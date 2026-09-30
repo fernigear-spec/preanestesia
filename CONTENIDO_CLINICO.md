@@ -1498,6 +1498,38 @@ _Fuente: docs/documento_fuente.md §5.6, §5.16.10_
 - **¿Mareo intenso al ponerse de pie?** — _boolean_
   - Por qué: Indica disfunción autonómica, con riesgo de bajadas graves de tensión durante la anestesia.
 
+### Pediatría
+
+_Fuente: docs/documento_fuente.md §5.12, §6.3, §6.4_
+
+- **¿Nació prematuro (antes de las 37 semanas)?** — _boolean_
+  - Por qué: En lactantes con edad posconcepcional < 60 semanas hay riesgo de apnea postoperatoria.
+- **Semanas de gestación al nacer** (semanas) — _numero_
+- **¿Ha tenido catarro, mocos o tos en las últimas 2 a 4 semanas?** — _boolean_
+  - Por qué: Una infección respiratoria de vías altas reciente puede aconsejar revalorar el día de la intervención (§5.12).
+- **Síntomas actuales** — _opcion_multiple_: Fiebre / Mocos espesos o amarillentos / Tos con mucosidad
+- **¿Ronca más de la mitad de las noches?** — _boolean_
+  - Por qué: Componente del STBUR, escala de riesgo respiratorio en niños (§6.3).
+- **¿Ronca fuerte?** — _boolean_
+  - Por qué: Componente del STBUR (§6.3).
+- **¿Se le oye esforzarse para respirar mientras duerme?** — _boolean_
+  - Por qué: Componente del STBUR (§6.3).
+- **¿Le han visto dejar de respirar mientras duerme?** — _boolean_
+  - Por qué: Componente del STBUR (§6.3).
+- **¿Se levanta cansado o está somnoliento durante el día?** — _boolean_
+  - Por qué: Componente del STBUR (§6.3).
+- **¿Padres o hermanos con náuseas o vómitos importantes tras una anestesia?** — _boolean_
+  - Por qué: El antecedente familiar de NVPO suma en la escala POVOC del niño (§6.4).
+- **¿Tiene una cardiopatía congénita?** — _boolean_
+  - Por qué: Requiere valoración específica; se registra para el anestesiólogo (§5.12).
+- **Diagnóstico y si está corregida** — _texto_
+- **¿Tiene algún síndrome (por ejemplo, síndrome de Down)?** — _boolean_
+  - Por qué: Algunos síndromes se asocian a vía aérea difícil o inestabilidad cervical (§5.12).
+- **¿Cuál?** — _texto_
+- **¿Ha recibido alguna vacuna en la última semana?** — _boolean_
+- **¿El niño o los padres están muy nerviosos o creen que necesitará premedicación?** — _boolean_
+  - Por qué: Se registra para que el anestesiólogo valore la premedicación (§5.12).
+
 ### Reflujo gastroesofágico
 
 _Fuente: docs/documento_fuente.md §5.9, §8.14_
@@ -1516,6 +1548,14 @@ _Fuente: docs/documento_fuente.md §5.2, §6.3_
 - **¿Usa CPAP o BiPAP?** — _boolean_
 - **¿La usa la mayoría de las noches?** — _boolean_
 - **Presión de la CPAP (si la sabe)** — _texto_
+- **¿Ronca fuerte (se oye a través de la puerta o molesta a quien duerme al lado)?** — _boolean_
+  - Por qué: Es uno de los cuatro componentes principales del STOP-Bang (§6.3).
+- **¿Se siente cansado o somnoliento durante el día?** — _boolean_
+  - Por qué: Componente STOP-Bang: somnolencia diurna (§6.3).
+- **¿Alguien le ha visto dejar de respirar mientras duerme?** — _boolean_
+  - Por qué: Componente STOP-Bang: apneas observadas (§6.3).
+- **Perímetro del cuello** (cm) — _numero_
+  - Por qué: Un cuello > 40 cm suma en el STOP-Bang (§6.3).
 
 ### Trasplante de órgano
 

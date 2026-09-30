@@ -13,11 +13,13 @@ import type { RespuestasModulos, ValorRespuesta } from '../../datos/modulos.ts';
 
 interface Props {
   inicial: CribadoUi | null;
+  /** El paciente es pediátrico (edad ≤ edad pediátrica máxima): activa el módulo de pediatría. */
+  pediatrico?: boolean;
   onContinuar: (datos: CribadoUi) => void;
   onVolver: () => void;
 }
 
-export function PasoCribado({ inicial, onContinuar, onVolver }: Props) {
+export function PasoCribado({ inicial, pediatrico = false, onContinuar, onVolver }: Props) {
   const [ninguna, setNinguna] = useState(inicial?.ningunaConocida ?? false);
   const [enfermedades, setEnfermedades] = useState<Set<string>>(new Set(inicial?.enfermedades ?? []));
   const [respuestasModulos, setRespuestasModulos] = useState<RespuestasModulos>(inicial?.respuestasModulos ?? {});
@@ -26,9 +28,14 @@ export function PasoCribado({ inicial, onContinuar, onVolver }: Props) {
   const resHemstop = calcularHemstop(hemstop);
 
   // Módulos a desplegar: uno por cada casilla marcada que tenga módulo (sin repetir).
-  const modulosActivos = [...new Set([...enfermedades].map(moduloDeEnfermedad))]
+  // El módulo de pediatría (§5.12) se activa por edad, no por casilla, y va el primero.
+  const modulosPorCasilla = [...new Set([...enfermedades].map(moduloDeEnfermedad))]
     .map((idModulo) => MODULO_POR_ID[idModulo])
     .filter((m): m is NonNullable<typeof m> => m !== undefined);
+  const moduloPediatria = pediatrico ? MODULO_POR_ID['pediatria'] : undefined;
+  const modulosActivos = moduloPediatria
+    ? [moduloPediatria, ...modulosPorCasilla.filter((m) => m.id !== 'pediatria')]
+    : modulosPorCasilla;
 
   function cambiarRespuesta(idModulo: string, idPregunta: string, valor: ValorRespuesta) {
     setRespuestasModulos((prev) => ({

@@ -328,4 +328,130 @@ test.describe('Vista previa', () => {
     expect(claveCache).not.toContain('#p=');
     expect(claveCache).not.toContain('paciente');
   });
+
+  test('F1: STOP-Bang alto (varón 56, ronca, HTA, IMC 36, cuello 42) → 6, riesgo alto y alerta', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 2: varón 56, IMC ≈ 36 (113 kg, 177 cm).
+    await page.locator('#edad').fill('56');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('113');
+    await page.locator('#talla').fill('177');
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
+    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+
+    // Paso 7: HTA + apnea del sueño (sin diagnóstico), con las preguntas del STOP-Bang.
+    await page.getByRole('checkbox', { name: 'Hipertensión' }).check();
+    await page.getByRole('checkbox', { name: 'Apnea del sueño (SAOS)' }).check();
+    await page.getByRole('group', { name: /diagnóstico confirmado de apnea/ }).getByRole('button', { name: 'No' }).click();
+    await page.getByRole('group', { name: /Ronca fuerte/ }).getByRole('button', { name: 'Sí' }).click();
+    await page.locator('#saos-perimetro_cuello').fill('42');
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> resumen
+
+    const stopBang = page.getByRole('listitem').filter({ hasText: 'STOP-Bang' });
+    await expect(stopBang).toContainText('6');
+    await expect(stopBang).toContainText('riesgo alto');
+    await expect(page.getByText(/STOP-Bang 6 \(riesgo alto\)/)).toBeVisible();
+  });
+
+  test('F2: STOP-Bang bajo (mujer 45, ronca y cansancio, IMC 30, cuello 36, sin HTA) → 2, riesgo bajo', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 2: mujer 45, IMC ≈ 30 (82 kg, 165 cm).
+    await page.locator('#edad').fill('45');
+    await page.getByRole('radio', { name: 'Mujer' }).check();
+    await page.locator('#peso').fill('82');
+    await page.locator('#talla').fill('165');
+    await page.getByRole('radio', { name: /No hay posibilidad/ }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
+    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+
+    // Paso 7: apnea del sueño (sin diagnóstico); ronca y cansancio, sin apneas; cuello 36.
+    await page.getByRole('checkbox', { name: 'Apnea del sueño (SAOS)' }).check();
+    await page.getByRole('group', { name: /diagnóstico confirmado de apnea/ }).getByRole('button', { name: 'No' }).click();
+    await page.getByRole('group', { name: /Ronca fuerte/ }).getByRole('button', { name: 'Sí' }).click();
+    await page.getByRole('group', { name: /cansado o somnoliento durante el día/ }).getByRole('button', { name: 'Sí' }).click();
+    await page.locator('#saos-perimetro_cuello').fill('36');
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> resumen
+
+    const stopBang = page.getByRole('listitem').filter({ hasText: 'STOP-Bang' });
+    await expect(stopBang).toContainText('2');
+    await expect(stopBang).toContainText('riesgo bajo');
+  });
+
+  test('F11: morfina equivalente (fentanilo 25 µg/h + tapentadol 100 mg/12 h) → 140 mg/día, alerta alta y dolor transicional', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    await page.locator('#edad').fill('60');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('80');
+    await page.locator('#talla').fill('175');
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
+    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+
+    // Paso 8: fentanilo transdérmico (parche, µg/h) y tapentadol (mg × tomas/día).
+    await page.locator('#med').fill('Durogesic');
+    await page.getByRole('button', { name: /Durogesic/ }).first().click();
+    await page.locator('#opdosis-fentanilo_transdermico').fill('25');
+
+    await page.locator('#med').fill('Palexia');
+    await page.getByRole('button', { name: /Palexia/ }).first().click();
+    await page.locator('#opdosis-tapentadol').fill('100');
+    await page.locator('#optomas-tapentadol').fill('2');
+
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> resumen
+
+    const morfina = page.getByRole('listitem').filter({ hasText: 'Morfina equivalente' });
+    await expect(morfina).toContainText('140');
+    await expect(page.getByText(/Dosis alta de opioides/)).toBeVisible();
+    await expect(page.getByText(/dolor transicional/)).toBeVisible();
+  });
 });
