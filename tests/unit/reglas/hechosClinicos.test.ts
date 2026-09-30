@@ -107,4 +107,35 @@ describe('Hechos clínicos · derivación desde módulos', () => {
     const r = evaluarFarmacoUi(farmaco('ieca_ara2', { nombreComercial: 'Renitec', principiosActivos: ['enalapril'] }), ctx(null), hechos);
     expect(r.accion).toBe('mantener');
   });
+
+  it('espacio cerrado (neurocirugía intracraneal/medular) → AAS requiere confirmación', () => {
+    const hechos = derivarHechosClinicos(entrada({ espacioCerrado: true }));
+    expect(hechos.neurocirugiaIntracranealOMedular).toBeTrue();
+    const r = evaluarFarmacoUi(farmaco('aas', { nombreComercial: 'Adiro', principiosActivos: ['acido_acetilsalicilico'], dosisMg: 100 }), ctx(90), hechos);
+    expect(r.requiereConfirmacion).toBeTrue();
+  });
+
+  it('contraste yodado "no se sabe" → metformina con nota al anestesiólogo', () => {
+    const hechos = derivarHechosClinicos(entrada({ contrasteYodado: 'no_se_sabe' }));
+    expect(hechos.contrasteYodadoDesconocido).toBeTrue();
+    const r = evaluarFarmacoUi(farmaco('metformina', { nombreComercial: 'Dianben', principiosActivos: ['metformina'] }), ctx(90), hechos);
+    expect(r.textoAnestesiologo ?? '').toContain('contraste yodado');
+  });
+
+  it('corticoterapia ≥ 5 mg prednisona > 3 semanas → dosis de estrés', () => {
+    const hechos = derivarHechosClinicos(entrada({
+      enfermedades: new Set(['artritis_reumatoide']),
+      respuestas: { artritis_reumatoide: { corticoides_3m: true, cortico_farmaco: 'prednisona', cortico_dosis_dia: 10, cortico_semanas: 8 } },
+    }));
+    expect(hechos.corticoideDosisEstres).toBeTrue();
+    const r = evaluarFarmacoUi(farmaco('corticoide_sistemico', { nombreComercial: 'Dacortin', principiosActivos: ['prednisona'] }), ctx(null), hechos);
+    expect(r.textoAnestesiologo ?? '').toContain('dosis de estrés');
+  });
+
+  it('corticoterapia con dexametasona 1 mg (equivale a > 5 mg prednisona) → dosis de estrés', () => {
+    const hechos = derivarHechosClinicos(entrada({
+      respuestas: { lupus: { corticoides_3m: true, cortico_farmaco: 'dexametasona', cortico_dosis_dia: 1, cortico_semanas: 4 } },
+    }));
+    expect(hechos.corticoideDosisEstres).toBeTrue();
+  });
 });

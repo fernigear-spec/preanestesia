@@ -40,6 +40,10 @@ export interface DatosIntervencion {
   neuroaxialProbable: boolean;
   duracionMayor30min: boolean;
   riesgoTromboticoAlto: boolean;
+  /** Cirugía en espacio cerrado: intracraneal o del canal medular (§8.3, AAS). */
+  espacioCerrado: boolean;
+  /** ¿Se prevé administrar contraste yodado? (afecta a la metformina, §8.5). */
+  contrasteYodado: 'si' | 'no' | 'no_se_sabe';
   regimen: Regimen;
   caracter: Caracter;
   tecnica: TecnicaAnestesica;

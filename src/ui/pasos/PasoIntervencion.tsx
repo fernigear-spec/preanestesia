@@ -54,6 +54,7 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
   const [regimen, setRegimen] = useState<Regimen>('cma');
   const [caracter, setCaracter] = useState<Caracter>('programada');
   const [tecnica, setTecnica] = useState<TecnicaAnestesica>('general');
+  const [contrasteYodado, setContrasteYodado] = useState<'si' | 'no' | 'no_se_sabe'>('no');
 
   const resultados = useMemo(
     () => (elegido ? [] : buscarProcedimientos(procedimientos, consulta)),
@@ -87,6 +88,8 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
       neuroaxialProbable: elegido.neuroaxialProbable,
       duracionMayor30min: elegido.duracionMayor30min,
       riesgoTromboticoAlto: elegido.riesgoTromboticoAlto,
+      espacioCerrado: elegido.espacioCerrado,
+      contrasteYodado,
       regimen,
       caracter,
       tecnica,
@@ -247,6 +250,19 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
             Como el procedimiento suele hacerse con técnica neuroaxial, se usarán los plazos de neuroaxial y se indicará en la hoja.
           </p>
         )}
+      </fieldset>
+
+      {/* Contraste yodado (afecta a la metformina, §8.5) */}
+      <fieldset className="campo">
+        <legend>¿Se prevé administrar contraste yodado?</legend>
+        <div className="grupo-radios">
+          {([['no', 'No'], ['si', 'Sí'], ['no_se_sabe', 'No se sabe']] as const).map(([v, et]) => (
+            <label key={v} className={`radio-tarjeta ${contrasteYodado === v ? 'seleccionado' : ''}`}>
+              <input type="radio" name="contraste" value={v} checked={contrasteYodado === v} onChange={() => setContrasteYodado(v)} />
+              {et}
+            </label>
+          ))}
+        </div>
       </fieldset>
 
       <div className="acciones">

@@ -1,7 +1,7 @@
 {
   "id": "asma_epoc",
   "titulo": "Asma o EPOC",
-  "fuente": "docs/documento_fuente.md §5.2",
+  "fuente": "docs/documento_fuente.md §5.2, §5.16.3, §5.16.4",
   "preguntas": [
     {
       "id": "enfermedad",
@@ -13,16 +13,31 @@
         { "valor": "ambas", "etiqueta": "Ambas" }
       ]
     },
+    { "id": "ultima_crisis_fecha", "etiqueta": "Fecha de la última crisis", "tipo": "fecha" },
     {
       "id": "crisis_ultimo_mes",
       "etiqueta": "¿Crisis o agudización en el último mes?",
       "tipo": "boolean",
-      "porque": "Una agudización reciente puede aconsejar posponer la cirugía programada."
+      "porque": "Una agudización reciente puede aconsejar posponer la cirugía programada; la intubación puede desencadenar broncoespasmo si no está controlada."
     },
+    { "id": "urgencias_anio", "etiqueta": "Visitas a urgencias o ingresos por asma/EPOC en el último año", "tipo": "numero", "min": 0, "max": 50 },
+    { "id": "corticoides_orales_anio", "etiqueta": "¿Corticoides orales en el último año?", "tipo": "boolean" },
+    { "id": "ingresos_ultimo_anio", "etiqueta": "¿Ingresos en el último año?", "tipo": "boolean" },
+    { "id": "rescate_semana", "etiqueta": "Uso del inhalador de rescate (veces por semana)", "tipo": "numero", "min": 0, "max": 100, "porque": "Usar el rescate más de 2 veces por semana indica que el asma no está bien controlada." },
     {
-      "id": "ingresos_ultimo_anio",
-      "etiqueta": "¿Ingresos o ciclos de corticoides orales en el último año?",
-      "tipo": "boolean"
+      "id": "desencadenantes",
+      "etiqueta": "Desencadenantes de las crisis",
+      "tipo": "opcion_multiple",
+      "porque": "Si los AINE o la aspirina desencadenan crisis, deben evitarse en el perioperatorio (alerta).",
+      "opciones": [
+        { "valor": "infecciones", "etiqueta": "Infecciones" },
+        { "valor": "frio", "etiqueta": "Frío" },
+        { "valor": "estres", "etiqueta": "Estrés" },
+        { "valor": "alergias", "etiqueta": "Alergias" },
+        { "valor": "ejercicio", "etiqueta": "Ejercicio" },
+        { "valor": "aine_aspirina", "etiqueta": "AINE o aspirina" },
+        { "valor": "otros", "etiqueta": "Otros" }
+      ]
     },
     {
       "id": "mmrc",
@@ -44,10 +59,22 @@
       "porque": "La oxigenoterapia domiciliaria sube la clase de riesgo del paciente."
     },
     {
+      "id": "oxigeno_tipo",
+      "etiqueta": "Tipo de oxígeno domiciliario",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "nocturno", "etiqueta": "Nocturno" },
+        { "valor": "continuo", "etiqueta": "Continuo" }
+      ],
+      "visibleSi": { "pregunta": "oxigeno_domiciliario", "igual": true }
+    },
+    { "id": "cpap_bipap", "etiqueta": "¿Usa CPAP o BiPAP?", "tipo": "boolean" },
+    { "id": "tos_expectoracion", "etiqueta": "¿Tos con expectoración habitual?", "tipo": "boolean" },
+    {
       "id": "sintomas_respiratorios_nuevos",
-      "etiqueta": "¿Síntomas respiratorios nuevos o empeoramiento reciente de los habituales?",
+      "etiqueta": "¿Cambio reciente en el color o la cantidad del esputo, o síntomas respiratorios nuevos?",
       "tipo": "boolean",
-      "porque": "Un cambio reciente es uno de los supuestos que indican pedir radiografía de tórax."
+      "porque": "Un cambio reciente puede indicar infección activa y es uno de los supuestos que indican pedir radiografía de tórax."
     }
   ]
 }

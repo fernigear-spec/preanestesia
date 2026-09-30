@@ -1,9 +1,10 @@
 {
   "id": "hta",
   "titulo": "Hipertensión arterial",
-  "fuente": "docs/documento_fuente.md §5.1",
+  "fuente": "docs/documento_fuente.md §5.1, §5.16.1",
   "preguntas": [
     { "id": "anios_evolucion", "etiqueta": "Años de evolución", "tipo": "numero", "min": 0, "max": 90 },
+    { "id": "cifras_habituales", "etiqueta": "Cifras habituales en casa (p. ej. 130/80)", "tipo": "texto" },
     {
       "id": "control",
       "etiqueta": "¿Está bien controlada?",
@@ -14,6 +15,16 @@
         { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
       ]
     },
-    { "id": "cifras_habituales", "etiqueta": "Cifras habituales (si las sabe)", "tipo": "texto" }
+    {
+      "id": "sintomas_mal_control",
+      "etiqueta": "Síntomas de mal control",
+      "tipo": "opcion_multiple",
+      "porque": "Cefalea, acúfenos o visión borrosa pueden indicar que la tensión no está bien controlada.",
+      "opciones": [
+        { "valor": "cefalea", "etiqueta": "Cefalea frecuente" },
+        { "valor": "acufenos", "etiqueta": "Acúfenos (pitidos en los oídos)" },
+        { "valor": "vision_borrosa", "etiqueta": "Visión borrosa" }
+      ]
+    }
   ]
 }

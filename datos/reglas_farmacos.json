@@ -193,6 +193,7 @@
     "fitoterapia": { "tipo": "fitoterapia", "dias": 14, "dias_min": 7, "fuente": "docs/documento_fuente.md §8.11" },
     "anticonceptivo_ths": { "tipo": "anticonceptivo_ths", "semanas_sugerencia": 6, "fuente": "docs/documento_fuente.md §8.11" },
     "mantener_generico": { "tipo": "mantener", "fuente": "docs/documento_fuente.md §8" },
+    "alfabloqueante_flacido": { "tipo": "mantener_condicional_oftalmo", "nota_oftalmo": "Riesgo de síndrome de iris flácido intraoperatorio: avisar al oftalmólogo.", "fuente": "docs/documento_fuente.md §8" },
     "no_catalogado": {
       "tipo": "no_catalogado",
       "texto_paciente": "Siga tomándolo como siempre y consúltelo con el anestesiólogo.",

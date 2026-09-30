@@ -66,6 +66,16 @@ export const ETIQUETAS_INDICACION: Record<string, string> = {
   psoriasis: 'psoriasis',
   gota: 'gota',
   reflujo: 'reflujo',
+  depresion: 'depresión',
+  ansiedad: 'ansiedad',
+  insomnio: 'insomnio',
+  psicosis: 'psicosis',
+  glaucoma: 'glaucoma',
+  hiperplasia_prostatica: 'hiperplasia benigna de próstata',
+  anemia: 'anemia',
+  deficit_vitamina_d: 'déficit de vitamina D',
+  osteoporosis: 'osteoporosis',
+  dolor: 'dolor',
   otra: 'otra',
 };
 

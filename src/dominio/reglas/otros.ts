@@ -115,6 +115,26 @@ export function reglaAnticonceptivoThs(e: EntradaAnticonceptivoThs, ctx: Context
   };
 }
 
+// ————————————— Alfabloqueantes urológicos (§8) —————————————
+
+/**
+ * Alfabloqueantes urológicos (tamsulosina, silodosina): mantener. Si el
+ * procedimiento es oftalmológico (catarata), nota al anestesiólogo por el riesgo
+ * de síndrome de iris flácido intraoperatorio.
+ */
+export function reglaAlfabloqueanteFlacido(
+  idFarmaco: string,
+  nombreComercial: string,
+  principio: string,
+  ctx: ContextoReglas,
+): ResultadoFarmaco {
+  const res = reglaMantener(idFarmaco, nombreComercial, [principio], 'Alfabloqueante urológico: mantener', 'oral');
+  if (ctx.grupoOftalmologico !== 'no_aplica') {
+    res.textoAnestesiologo = 'Riesgo de síndrome de iris flácido intraoperatorio: avisar al oftalmólogo.';
+  }
+  return res;
+}
+
 // ————————————— Corticoides sistémicos (§8.11 / §5.3) —————————————
 
 export interface EntradaCorticoide {

@@ -19,6 +19,8 @@ export interface Procedimiento {
   neuroaxialProbable: boolean;
   duracionMayor30min: boolean;
   riesgoTromboticoAlto: boolean;
+  /** Cirugía en espacio cerrado: intracraneal o del canal medular (§8.3). */
+  espacioCerrado: boolean;
   /** Procedimiento del embarazo (cesárea, cerclaje, legrado obstétrico…). */
   obstetrico: boolean;
 }
@@ -41,6 +43,7 @@ export function cargarProcedimientos(csvTexto: string = csvProcedimientos): Proc
       neuroaxialProbable: si(v.neuroaxial_o_bloqueo_profundo_probable),
       duracionMayor30min: si(v.duracion_mayor_30min),
       riesgoTromboticoAlto: si(v.riesgo_trombotico_alto),
+      espacioCerrado: si(v.espacio_cerrado),
       obstetrico: si(v.obstetrico),
     };
   });

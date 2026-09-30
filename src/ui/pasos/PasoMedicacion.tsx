@@ -55,6 +55,8 @@ export function PasoMedicacion({ inicial, intervencion, enfermedades, respuestas
       pesoKg: basicos.pesoKg,
       sexo: basicos.sexo,
       fechaIntervencion: intervencion.fechaHora,
+      espacioCerrado: intervencion.espacioCerrado,
+      contrasteYodado: intervencion.contrasteYodado,
     }),
     [respuestasModulos, enfermedades, medicacion, basicos, intervencion.fechaHora],
   );

@@ -1,36 +1,33 @@
 {
-  "id": "artritis_reumatoide",
-  "titulo": "Artritis reumatoide",
+  "id": "lupus",
+  "titulo": "Lupus u otra conectivopatía",
   "fuente": "docs/documento_fuente.md §5.8, §5.16.13",
   "preguntas": [
     {
-      "id": "afectacion_cervical",
-      "etiqueta": "¿Dolor, rigidez o limitación para mover el cuello?",
-      "tipo": "boolean",
-      "porque": "En la artritis reumatoide puede haber inestabilidad de las vértebras del cuello: hay que evitar movimientos bruscos al dormir al paciente."
-    },
-    {
-      "id": "apertura_bucal",
-      "etiqueta": "¿Dificultad para abrir la boca o problemas de la mandíbula?",
-      "tipo": "boolean",
-      "porque": "Limita el acceso a la vía aérea para la intubación."
-    },
-    {
-      "id": "ronquera_disnea",
-      "etiqueta": "¿Ronquera crónica o falta de aire?",
-      "tipo": "boolean",
-      "porque": "Puede indicar afectación de las articulaciones de la laringe (cricoaritenoidea)."
-    },
-    {
-      "id": "indicacion_inmunosupresor",
-      "etiqueta": "Si toma inmunosupresores, ¿por qué motivo?",
-      "tipo": "opcion",
-      "porque": "La suspensión de los inmunosupresores clásicos depende de la indicación.",
+      "id": "organos_afectados",
+      "etiqueta": "Órganos afectados",
+      "tipo": "opcion_multiple",
+      "porque": "La afectación de riñón, corazón o pulmón cambia las pruebas y el riesgo.",
       "opciones": [
-        { "valor": "autoinmune", "etiqueta": "Enfermedad autoinmune" },
-        { "valor": "enfermedad_sistemica_grave", "etiqueta": "Enfermedad sistémica grave" },
-        { "valor": "trasplante", "etiqueta": "Trasplante" }
+        { "valor": "rinon", "etiqueta": "Riñón" },
+        { "valor": "corazon", "etiqueta": "Corazón" },
+        { "valor": "pulmon", "etiqueta": "Pulmón" },
+        { "valor": "sistema_nervioso", "etiqueta": "Sistema nervioso" },
+        { "valor": "hematologico", "etiqueta": "Hematológico" },
+        { "valor": "piel_articulaciones", "etiqueta": "Piel y articulaciones" }
       ]
+    },
+    {
+      "id": "trombosis_o_saf",
+      "etiqueta": "¿Trombosis previa o síndrome antifosfolípido?",
+      "tipo": "boolean",
+      "porque": "El síndrome antifosfolípido es criterio de alto riesgo trombótico; márquelo también en el módulo de trombofilia."
+    },
+    {
+      "id": "anemia_plaquetas",
+      "etiqueta": "¿Anemia o plaquetas bajas recientes?",
+      "tipo": "boolean",
+      "porque": "Motiva hemograma y coagulación aunque la tabla no los pida."
     },
     { "id": "corticoides_3m", "etiqueta": "¿Ha tomado corticoides (cortisona) en los últimos 3 meses?", "tipo": "boolean", "porque": "Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3)." },
     { "id": "cortico_farmaco", "etiqueta": "¿Cuál?", "tipo": "opcion", "opciones": [ { "valor": "prednisona", "etiqueta": "Prednisona" }, { "valor": "prednisolona", "etiqueta": "Prednisolona" }, { "valor": "metilprednisolona", "etiqueta": "Metilprednisolona" }, { "valor": "deflazacort", "etiqueta": "Deflazacort" }, { "valor": "dexametasona", "etiqueta": "Dexametasona" }, { "valor": "hidrocortisona", "etiqueta": "Hidrocortisona" } ], "visibleSi": { "pregunta": "corticoides_3m", "igual": true } },

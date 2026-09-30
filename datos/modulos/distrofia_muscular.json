@@ -1,0 +1,37 @@
+{
+  "id": "distrofia_muscular",
+  "titulo": "Distrofia o enfermedad neuromuscular",
+  "fuente": "docs/documento_fuente.md §5.6, §5.16.11",
+  "preguntas": [
+    {
+      "id": "tipo",
+      "etiqueta": "Tipo",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "duchenne", "etiqueta": "Distrofia de Duchenne" },
+        { "valor": "becker", "etiqueta": "Distrofia de Becker" },
+        { "valor": "miotonica", "etiqueta": "Distrofia miotónica" },
+        { "valor": "miastenia", "etiqueta": "Miastenia gravis" },
+        { "valor": "otra", "etiqueta": "Otra" }
+      ]
+    },
+    {
+      "id": "insuficiencia_respiratoria",
+      "etiqueta": "¿Le cuesta respirar tumbado o usa ventilación nocturna (BiPAP)?",
+      "tipo": "boolean",
+      "porque": "La debilidad de los músculos respiratorios aumenta el riesgo de insuficiencia respiratoria tras la anestesia."
+    },
+    {
+      "id": "ecocardiograma_fecha",
+      "etiqueta": "Fecha del último ecocardiograma",
+      "tipo": "fecha",
+      "porque": "Muchas distrofias afectan al corazón; sin ecocardiograma en los últimos 12 meses conviene valorarlo."
+    },
+    {
+      "id": "antecedente_anestesia_grave",
+      "etiqueta": "¿Fiebre muy alta o complicaciones graves en una anestesia, en usted o su familia?",
+      "tipo": "boolean",
+      "porque": "Puede indicar susceptibilidad a hipertermia maligna o a reacciones musculares graves."
+    }
+  ]
+}

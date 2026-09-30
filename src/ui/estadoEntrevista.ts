@@ -222,6 +222,7 @@ export const APARATOS: Array<{ aparato: string; enfermedades: Array<{ id: string
     enfermedades: [
       { id: 'asma_epoc', etiqueta: 'Asma o EPOC' },
       { id: 'saos', etiqueta: 'Apnea del sueño (SAOS)' },
+      { id: 'infeccion_respiratoria', etiqueta: 'Infección respiratoria reciente' },
     ],
   },
   {
@@ -253,13 +254,19 @@ export const APARATOS: Array<{ aparato: string; enfermedades: Array<{ id: string
       { id: 'epilepsia', etiqueta: 'Epilepsia' },
       { id: 'ictus_o_tvp', etiqueta: 'Ictus o AIT' },
       { id: 'parkinson', etiqueta: 'Parkinson' },
+      { id: 'esclerosis_multiple', etiqueta: 'Esclerosis múltiple' },
+      { id: 'distrofia_muscular', etiqueta: 'Distrofia o enfermedad neuromuscular' },
+      { id: 'deterioro_cognitivo', etiqueta: 'Demencia o deterioro cognitivo' },
+      { id: 'dolor_cronico', etiqueta: 'Dolor crónico' },
       { id: 'depresion_ansiedad', etiqueta: 'Depresión o ansiedad' },
     ],
   },
   {
     aparato: 'Musculoesquelético y reumatológico',
     enfermedades: [
-      { id: 'artritis_reumatoide', etiqueta: 'Artritis reumatoide u otra enfermedad autoinmune' },
+      { id: 'artritis_reumatoide', etiqueta: 'Artritis reumatoide' },
+      { id: 'lupus', etiqueta: 'Lupus u otra conectivopatía' },
+      { id: 'dermatomiositis_polimiositis', etiqueta: 'Dermatomiositis o polimiositis' },
     ],
   },
   {

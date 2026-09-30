@@ -1,13 +1,25 @@
 {
   "id": "parkinson",
   "titulo": "Parkinson",
-  "fuente": "docs/documento_fuente.md §5.6",
+  "fuente": "docs/documento_fuente.md §5.6, §5.16.10",
   "preguntas": [
     {
       "id": "horario_levodopa",
       "etiqueta": "Horario de la levodopa (no debe omitirse)",
       "tipo": "texto",
       "porque": "La levodopa no se suspende; conviene conocer su horario para no interrumpirla."
+    },
+    {
+      "id": "disfagia_saliva",
+      "etiqueta": "¿Dificultad para tragar o mal manejo de la saliva?",
+      "tipo": "boolean",
+      "porque": "Aumenta el riesgo de aspiración durante la anestesia."
+    },
+    {
+      "id": "ortostatismo",
+      "etiqueta": "¿Mareo intenso al ponerse de pie?",
+      "tipo": "boolean",
+      "porque": "Indica disfunción autonómica, con riesgo de bajadas graves de tensión durante la anestesia."
     }
   ]
 }

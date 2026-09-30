@@ -1,0 +1,36 @@
+{
+  "id": "deterioro_cognitivo",
+  "titulo": "Demencia o deterioro cognitivo",
+  "fuente": "docs/documento_fuente.md §5.6, §5.16.5",
+  "preguntas": [
+    { "id": "cuidador", "etiqueta": "Cuidador principal", "tipo": "texto" },
+    { "id": "representante_legal", "etiqueta": "Representante legal", "tipo": "texto" },
+    {
+      "id": "capacidad_consentir",
+      "etiqueta": "¿Puede otorgar el consentimiento?",
+      "tipo": "opcion",
+      "porque": "Si no puede consentir, el consentimiento lo firma su representante legal.",
+      "opciones": [
+        { "valor": "si", "etiqueta": "Sí" },
+        { "valor": "no", "etiqueta": "No" },
+        { "valor": "dudosa", "etiqueta": "Dudosa" }
+      ]
+    },
+    {
+      "id": "dependencia",
+      "etiqueta": "Nivel de dependencia",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "independiente", "etiqueta": "Independiente" },
+        { "valor": "parcial", "etiqueta": "Dependencia parcial" },
+        { "valor": "total", "etiqueta": "Dependencia total" }
+      ]
+    },
+    {
+      "id": "episodios_delirio",
+      "etiqueta": "¿Episodios previos de agitación, delirio o desorientación nocturna?",
+      "tipo": "boolean",
+      "porque": "Son un factor de riesgo importante de delirium después de la operación."
+    }
+  ]
+}

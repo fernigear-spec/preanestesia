@@ -25,6 +25,35 @@
     },
     { "id": "hba1c_fecha", "etiqueta": "Fecha de la HbA1c", "tipo": "fecha" },
     {
+      "id": "tratamiento",
+      "etiqueta": "Tratamiento",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "dieta", "etiqueta": "Solo dieta" },
+        { "valor": "orales", "etiqueta": "Pastillas" },
+        { "valor": "insulina", "etiqueta": "Insulina" },
+        { "valor": "ambos", "etiqueta": "Pastillas e insulina" }
+      ]
+    },
+    {
+      "id": "frecuencia_hipoglucemias",
+      "etiqueta": "Frecuencia de hipoglucemias (bajadas de azúcar)",
+      "tipo": "opcion",
+      "porque": "El ayuno y los ajustes de insulina aumentan el riesgo de hipoglucemia; conviene conocer su frecuencia.",
+      "opciones": [
+        { "valor": "nunca", "etiqueta": "Nunca" },
+        { "valor": "mensual", "etiqueta": "Alguna al mes" },
+        { "valor": "semanal", "etiqueta": "Alguna a la semana" },
+        { "valor": "diaria", "etiqueta": "A diario" }
+      ]
+    },
+    {
+      "id": "detecta_hipoglucemias",
+      "etiqueta": "¿Nota cuándo le baja el azúcar?",
+      "tipo": "boolean",
+      "porque": "Las hipoglucemias inadvertidas son especialmente peligrosas en el ayuno perioperatorio."
+    },
+    {
       "id": "complicaciones",
       "etiqueta": "Complicaciones crónicas",
       "tipo": "opcion_multiple",

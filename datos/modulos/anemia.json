@@ -4,6 +4,31 @@
   "fuente": "docs/documento_fuente.md §5.5",
   "preguntas": [
     {
+      "id": "tipo",
+      "etiqueta": "Tipo de anemia (si se conoce)",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "ferropenica", "etiqueta": "Ferropénica (falta de hierro)" },
+        { "valor": "b12_folico", "etiqueta": "Por déficit de B12 o fólico" },
+        { "valor": "enfermedad_cronica", "etiqueta": "De enfermedad crónica" },
+        { "valor": "hemolitica", "etiqueta": "Hemolítica" },
+        { "valor": "talasemia", "etiqueta": "Talasemia" },
+        { "valor": "desconocida", "etiqueta": "Desconocida" }
+      ]
+    },
+    {
+      "id": "tratamiento_actual",
+      "etiqueta": "Tratamiento actual",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "hierro_oral", "etiqueta": "Hierro oral" },
+        { "valor": "hierro_iv", "etiqueta": "Hierro intravenoso" },
+        { "valor": "b12", "etiqueta": "Vitamina B12" },
+        { "valor": "eritropoyetina", "etiqueta": "Eritropoyetina" },
+        { "valor": "ninguno", "etiqueta": "Ninguno" }
+      ]
+    },
+    {
       "id": "hemoglobina",
       "etiqueta": "Última hemoglobina",
       "tipo": "numero",

@@ -1,26 +1,28 @@
 {
-  "id": "enfermedad_inflamatoria_intestinal",
-  "titulo": "Enfermedad inflamatoria intestinal",
-  "fuente": "docs/documento_fuente.md §5b, §5.16.14, §8.8",
+  "id": "esclerosis_multiple",
+  "titulo": "Esclerosis múltiple",
+  "fuente": "docs/documento_fuente.md §5.6, §5.16.12",
   "preguntas": [
+    { "id": "ultimo_brote_fecha", "etiqueta": "Fecha del último brote", "tipo": "fecha", "porque": "Un brote en los últimos 3 meses es una señal de alerta." },
+    { "id": "sintomas_brote", "etiqueta": "Síntomas del último brote", "tipo": "texto" },
     {
-      "id": "tipo",
-      "etiqueta": "Tipo",
+      "id": "movilidad_basal",
+      "etiqueta": "Movilidad habitual",
       "tipo": "opcion",
+      "porque": "La movilidad y la debilidad basales deben quedar documentadas para comparar tras la anestesia.",
       "opciones": [
-        { "valor": "crohn", "etiqueta": "Enfermedad de Crohn" },
-        { "valor": "colitis_ulcerosa", "etiqueta": "Colitis ulcerosa" }
+        { "valor": "sin_ayuda", "etiqueta": "Camina sin ayuda" },
+        { "valor": "con_ayuda", "etiqueta": "Camina con ayuda" },
+        { "valor": "silla", "etiqueta": "Silla de ruedas" },
+        { "valor": "encamado", "etiqueta": "Encamado" }
       ]
     },
+    { "id": "debilidad_basal", "etiqueta": "Debilidad basal (descripción)", "tipo": "texto" },
     {
-      "id": "indicacion_inmunosupresor",
-      "etiqueta": "Si toma inmunosupresores, ¿por qué motivo?",
-      "tipo": "opcion",
-      "porque": "La suspensión de los inmunosupresores clásicos depende de la indicación.",
-      "opciones": [
-        { "valor": "autoinmune", "etiqueta": "Enfermedad autoinmune" },
-        { "valor": "enfermedad_sistemica_grave", "etiqueta": "Enfermedad sistémica grave" }
-      ]
+      "id": "intolerancia_calor",
+      "etiqueta": "¿Empeora con el calor (fenómeno de Uhthoff)?",
+      "tipo": "boolean",
+      "porque": "Si empeora con el calor, conviene mantener una normotermia estricta durante la cirugía."
     },
     { "id": "corticoides_3m", "etiqueta": "¿Ha tomado corticoides (cortisona) en los últimos 3 meses?", "tipo": "boolean", "porque": "Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3)." },
     { "id": "cortico_farmaco", "etiqueta": "¿Cuál?", "tipo": "opcion", "opciones": [ { "valor": "prednisona", "etiqueta": "Prednisona" }, { "valor": "prednisolona", "etiqueta": "Prednisolona" }, { "valor": "metilprednisolona", "etiqueta": "Metilprednisolona" }, { "valor": "deflazacort", "etiqueta": "Deflazacort" }, { "valor": "dexametasona", "etiqueta": "Dexametasona" }, { "valor": "hidrocortisona", "etiqueta": "Hidrocortisona" } ], "visibleSi": { "pregunta": "corticoides_3m", "igual": true } },

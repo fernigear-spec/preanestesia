@@ -201,3 +201,76 @@ aclidinio_formoterol;aclidinio+formoterol;Duaklir;respiratorio;laba_lama;dos_vec
 fluticasona_furoato_umeclidinio_vilanterol;fluticasona_furoato+umeclidinio+vilanterol;Trelegy;respiratorio;triple;diaria;mantener_generico;Siga usándolo como siempre, también el día de la intervención, y tráigalo consigo;;no;asma_epoc;docs/documento_fuente.md §5.2;2026-09-29;no;no_oral
 beclometasona_formoterol_glicopirronio;beclometasona+formoterol+glicopirronio;Trimbow;respiratorio;triple;dos_veces_dia;mantener_generico;Siga usándolo como siempre, también el día de la intervención, y tráigalo consigo;;no;asma_epoc;docs/documento_fuente.md §5.2;2026-09-29;no;no_oral
 montelukast;montelukast;Singulair;respiratorio;antileucotrieno;diaria;mantener_generico;;;no;asma_epoc;docs/documento_fuente.md §8.11;2026-09-29;no;oral
+levetiracetam;levetiracetam;Keppra;neurologia;antiepileptico;dos_veces_dia;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+brivaracetam;brivaracetam;Briviact;neurologia;antiepileptico;dos_veces_dia;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+lamotrigina;lamotrigina;Lamictal|Labileno;neurologia;antiepileptico;dos_veces_dia;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia|trastorno_bipolar;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+acido_valproico;acido_valproico;Depakine;neurologia;antiepileptico;dos_veces_dia;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia|trastorno_bipolar|migrana;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+carbamazepina;carbamazepina;Tegretol;neurologia;antiepileptico;dos_veces_dia;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia|dolor_neuropatico|trastorno_bipolar;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+oxcarbazepina;oxcarbazepina;Trileptal;neurologia;antiepileptico;dos_veces_dia;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+lacosamida;lacosamida;Vimpat;neurologia;antiepileptico;dos_veces_dia;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+topiramato;topiramato;Topamax;neurologia;antiepileptico;dos_veces_dia;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia|migrana;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+zonisamida;zonisamida;Zonegran;neurologia;antiepileptico;diaria;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+fenitoina;fenitoina;Neosidantoina;neurologia;antiepileptico;dos_veces_dia;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+perampanel;perampanel;Fycompa;neurologia;antiepileptico;diaria;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+eslicarbazepina;eslicarbazepina;Zebinix;neurologia;antiepileptico;diaria;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+gabapentina;gabapentina;Neurontin;neurologia;antiepileptico;dos_veces_dia;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia|dolor_neuropatico|dolor_cronico;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+pregabalina;pregabalina;Lyrica;neurologia;antiepileptico;dos_veces_dia;mantener_generico;;No omitir: riesgo de crisis.;no;epilepsia|dolor_neuropatico|dolor_cronico;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+fluoxetina;fluoxetina;Prozac|Adofen;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|ansiedad;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+sertralina;sertralina;Besitran;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|ansiedad;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+paroxetina;paroxetina;Seroxat|Motivan;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|ansiedad;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+citalopram;citalopram;Seropram;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|ansiedad;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+escitalopram;escitalopram;Cipralex|Esertia;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|ansiedad;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+fluvoxamina;fluvoxamina;Dumirox;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|ansiedad;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+venlafaxina;venlafaxina;Vandral|Dobupal;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|ansiedad;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+desvenlafaxina;desvenlafaxina;Pristiq;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|ansiedad;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+duloxetina;duloxetina;Cymbalta|Xeristar;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|ansiedad|dolor_neuropatico;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+mirtazapina;mirtazapina;Rexer;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|insomnio;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+trazodona;trazodona;Deprax;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|insomnio;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+bupropion;bupropion;Elontril;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+vortioxetina;vortioxetina;Brintellix;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+amitriptilina;amitriptilina;Tryptizol;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|dolor_neuropatico;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+nortriptilina;nortriptilina;Paxtibi;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|dolor_neuropatico;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+clomipramina;clomipramina;Anafranil;psicofarmacos;antidepresivo;diaria;mantener_generico;;;no;depresion|dolor_neuropatico;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+diazepam;diazepam;Valium;psicofarmacos;benzodiacepina;dos_veces_dia;mantener_generico;;;no;ansiedad|insomnio;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+lorazepam;lorazepam;Orfidal|Idalprem;psicofarmacos;benzodiacepina;dos_veces_dia;mantener_generico;;;no;ansiedad|insomnio;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+alprazolam;alprazolam;Trankimazin;psicofarmacos;benzodiacepina;dos_veces_dia;mantener_generico;;;no;ansiedad;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+clonazepam;clonazepam;Rivotril;psicofarmacos;benzodiacepina;dos_veces_dia;mantener_generico;;;no;ansiedad|epilepsia;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+bromazepam;bromazepam;Lexatin;psicofarmacos;benzodiacepina;dos_veces_dia;mantener_generico;;;no;ansiedad;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+lormetazepam;lormetazepam;Noctamid;psicofarmacos;benzodiacepina;diaria;mantener_generico;;;no;insomnio;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+clorazepato;clorazepato;Tranxilium;psicofarmacos;benzodiacepina;dos_veces_dia;mantener_generico;;;no;ansiedad;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+zolpidem;zolpidem;Stilnox|Dalparan;psicofarmacos;hipnotico_z;diaria;mantener_generico;;;no;insomnio;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+zopiclona;zopiclona;Limovan;psicofarmacos;hipnotico_z;diaria;mantener_generico;;;no;insomnio;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+quetiapina;quetiapina;Seroquel;psicofarmacos;antipsicotico;dos_veces_dia;mantener_generico;;;no;psicosis|trastorno_bipolar;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+olanzapina;olanzapina;Zyprexa;psicofarmacos;antipsicotico;diaria;mantener_generico;;;no;psicosis|trastorno_bipolar;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+risperidona;risperidona;Risperdal;psicofarmacos;antipsicotico;dos_veces_dia;mantener_generico;;;no;psicosis;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+paliperidona_oral;paliperidona;Invega;psicofarmacos;antipsicotico;diaria;mantener_generico;;;no;psicosis;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+paliperidona_inyectable;paliperidona;Xeplion;psicofarmacos;antipsicotico;mensual;mantener_generico;No cambie nada: siga con su tratamiento como siempre.;;no;psicosis;docs/documento_fuente.md §8.7;2026-09-29;no;no_oral
+aripiprazol;aripiprazol;Abilify;psicofarmacos;antipsicotico;diaria;mantener_generico;;;no;psicosis|trastorno_bipolar;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+haloperidol;haloperidol;haloperidol;psicofarmacos;antipsicotico;dos_veces_dia;mantener_generico;;;no;psicosis;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+clozapina;clozapina;Leponex;psicofarmacos;antipsicotico;dos_veces_dia;mantener_generico;;;no;psicosis;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+clotiapina;clotiapina;Etumina;psicofarmacos;antipsicotico;diaria;mantener_generico;;;no;psicosis;docs/documento_fuente.md §8.7;2026-09-29;no;oral
+esomeprazol;esomeprazol;Nexium|Axiago;digestivo;ibp;diaria;mantener_generico;;;no;reflujo;docs/documento_fuente.md §8.11;2026-09-29;no;oral
+lansoprazol;lansoprazol;Opiren;digestivo;ibp;diaria;mantener_generico;;;no;reflujo;docs/documento_fuente.md §8.11;2026-09-29;no;oral
+rabeprazol;rabeprazol;Pariet;digestivo;ibp;diaria;mantener_generico;;;no;reflujo;docs/documento_fuente.md §8.11;2026-09-29;no;oral
+paracetamol;paracetamol;Gelocatil|Termalgin|Efferalgan;analgesicos;analgesico;dos_veces_dia;mantener_generico;;;no;dolor;docs/documento_fuente.md §8;2026-09-29;no;oral
+metamizol;metamizol;Nolotil;analgesicos;analgesico;dos_veces_dia;mantener_generico;;;no;dolor;docs/documento_fuente.md §8;2026-09-29;no;oral
+tamsulosina;tamsulosina;Omnic|Urolosin;urologia;alfabloqueante;diaria;alfabloqueante_flacido;;;no;hiperplasia_prostatica;docs/documento_fuente.md §8;2026-09-29;no;oral
+silodosina;silodosina;Silodyx|Urorec;urologia;alfabloqueante;diaria;alfabloqueante_flacido;;;no;hiperplasia_prostatica;docs/documento_fuente.md §8;2026-09-29;no;oral
+alfuzosina;alfuzosina;Benestan;urologia;alfabloqueante;diaria;mantener_generico;;;no;hiperplasia_prostatica;docs/documento_fuente.md §8;2026-09-29;no;oral
+doxazosina;doxazosina;Carduran;urologia;alfabloqueante;diaria;mantener_generico;;;no;hiperplasia_prostatica|hipertension;docs/documento_fuente.md §8;2026-09-29;no;oral
+terazosina;terazosina;terazosina;urologia;alfabloqueante;diaria;mantener_generico;;;no;hiperplasia_prostatica|hipertension;docs/documento_fuente.md §8;2026-09-29;no;oral
+timolol_colirio;timolol;Timoftol;oftalmologia;colirio_glaucoma;dos_veces_dia;mantener_generico;Siga aplicándolo como siempre, también el día de la intervención;;no;glaucoma;docs/documento_fuente.md §8;2026-09-29;no;no_oral
+brimonidina;brimonidina;Alphagan;oftalmologia;colirio_glaucoma;dos_veces_dia;mantener_generico;Siga aplicándolo como siempre, también el día de la intervención;;no;glaucoma;docs/documento_fuente.md §8;2026-09-29;no;no_oral
+dorzolamida;dorzolamida;Trusopt;oftalmologia;colirio_glaucoma;dos_veces_dia;mantener_generico;Siga aplicándolo como siempre, también el día de la intervención;;no;glaucoma;docs/documento_fuente.md §8;2026-09-29;no;no_oral
+brinzolamida;brinzolamida;Azopt;oftalmologia;colirio_glaucoma;dos_veces_dia;mantener_generico;Siga aplicándolo como siempre, también el día de la intervención;;no;glaucoma;docs/documento_fuente.md §8;2026-09-29;no;no_oral
+latanoprost;latanoprost;Xalatan;oftalmologia;colirio_glaucoma;diaria;mantener_generico;Siga aplicándolo como siempre, también el día de la intervención;;no;glaucoma;docs/documento_fuente.md §8;2026-09-29;no;no_oral
+bimatoprost;bimatoprost;Lumigan;oftalmologia;colirio_glaucoma;diaria;mantener_generico;Siga aplicándolo como siempre, también el día de la intervención;;no;glaucoma;docs/documento_fuente.md §8;2026-09-29;no;no_oral
+travoprost;travoprost;Travatan;oftalmologia;colirio_glaucoma;diaria;mantener_generico;Siga aplicándolo como siempre, también el día de la intervención;;no;glaucoma;docs/documento_fuente.md §8;2026-09-29;no;no_oral
+pilocarpina_colirio;pilocarpina;pilocarpina;oftalmologia;colirio_glaucoma;dos_veces_dia;mantener_generico;Siga aplicándolo como siempre, también el día de la intervención;;no;glaucoma;docs/documento_fuente.md §8;2026-09-29;no;no_oral
+acetazolamida;acetazolamida;Edemox;oftalmologia;glaucoma_oral;dos_veces_dia;mantener_generico;;;no;glaucoma;docs/documento_fuente.md §8;2026-09-29;no;oral
+sulfato_ferroso;sulfato_ferroso;Fero-Gradumet|Tardyferon;hematologia;hierro;diaria;mantener_generico;;;no;anemia;docs/documento_fuente.md §8;2026-09-29;no;oral
+ferroglicina_sulfato;ferroglicina_sulfato;Ferbisol;hematologia;hierro;diaria;mantener_generico;;;no;anemia;docs/documento_fuente.md §8;2026-09-29;no;oral
+hierro_carboximaltosa;hierro_carboximaltosa;Ferinject;hematologia;hierro_iv;mensual;mantener_generico;No cambie nada: siga con su tratamiento como siempre.;Administracion hospitalaria.;no;anemia;docs/documento_fuente.md §8;2026-09-29;no;no_oral
+hierro_sacarosa;hierro_sacarosa;Venofer;hematologia;hierro_iv;mensual;mantener_generico;No cambie nada: siga con su tratamiento como siempre.;Administracion hospitalaria.;no;anemia;docs/documento_fuente.md §8;2026-09-29;no;no_oral
+colecalciferol;colecalciferol;Deltius|Thorens;hormonas;vitamina_d;mensual;mantener_generico;;;no;deficit_vitamina_d|osteoporosis;docs/documento_fuente.md §8;2026-09-29;no;oral
+calcifediol;calcifediol;Hidroferol;hormonas;vitamina_d;mensual;mantener_generico;;;no;deficit_vitamina_d|osteoporosis;docs/documento_fuente.md §8;2026-09-29;no;oral

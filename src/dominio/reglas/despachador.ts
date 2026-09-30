@@ -21,7 +21,7 @@ import { reglaLitio, reglaMoclobemida, reglaImaoIrreversible, reglaImaoB } from 
 import { reglaAine } from './aine.ts';
 import { reglaMetotrexato, reglaBiologico, reglaInmunosupresorClasico, reglaFameMantener, reglaJak } from './inmunosupresores.ts';
 import { reglaAntiangiogenico, reglaTirosinaCinasa } from './oncologicos.ts';
-import { reglaFitoterapia, reglaAnticonceptivoThs, reglaCorticoide, reglaNoCatalogado, reglaMantener } from './otros.ts';
+import { reglaFitoterapia, reglaAnticonceptivoThs, reglaCorticoide, reglaNoCatalogado, reglaMantener, reglaAlfabloqueanteFlacido } from './otros.ts';
 
 /** Datos recogidos por la enfermera para un fármaco en el paso 8. */
 export interface DatosFarmacoUi {
@@ -183,8 +183,14 @@ function evaluarRegla(d: DatosFarmacoUi, ctxPauta: ContextoReglas, clin: DatosCl
     case 'heparina_sodica':
       return reglaHeparinaSodica(id, nc, ctxPauta);
 
-    case 'metformina':
-      return reglaMetformina({ idFarmaco: id, nombreComercial: nc, contrasteYodadoPrevisto: clin.contrasteYodadoPrevisto }, ctxPauta);
+    case 'metformina': {
+      const rMet = reglaMetformina({ idFarmaco: id, nombreComercial: nc, contrasteYodadoPrevisto: clin.contrasteYodadoPrevisto }, ctxPauta);
+      if (clin.contrasteYodadoDesconocido) {
+        const nota = 'No consta si se administrará contraste yodado: si finalmente se usa, suspender la metformina 24-48 h antes.';
+        rMet.textoAnestesiologo = rMet.textoAnestesiologo ? `${rMet.textoAnestesiologo} ${nota}` : nota;
+      }
+      return rMet;
+    }
     case 'sulfonilurea':
       return reglaAntidiabeticoNoDiaIq({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'sulfonilurea', grupo: 'sulfonilurea' }, ctxPauta);
     case 'glinida':
@@ -242,8 +248,10 @@ function evaluarRegla(d: DatosFarmacoUi, ctxPauta: ContextoReglas, clin: DatosCl
     case 'biologico':
       if (!d.fechaUltimaDosis || d.periodicidadDias === undefined) return consultarGenerico(d, 'Biológico: falta la fecha de la última dosis o la periodicidad');
       return reglaBiologico({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'biologico', periodicidadDias: d.periodicidadDias, fechaUltimaDosis: d.fechaUltimaDosis }, ctxPauta.fechaHoraIntervencion);
-    case 'inmunosupresor_clasico':
-      return reglaInmunosupresorClasico({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'inmunosupresor', ...(d.indicacionInmuno ? { indicacion: d.indicacionInmuno } : {}) });
+    case 'inmunosupresor_clasico': {
+      const indicacion = d.indicacionInmuno ?? clin.indicacionInmuno;
+      return reglaInmunosupresorClasico({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'inmunosupresor', ...(indicacion ? { indicacion } : {}) });
+    }
     case 'fame_mantener':
       return reglaFameMantener({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'fame' });
     case 'jak':
@@ -270,6 +278,8 @@ function evaluarRegla(d: DatosFarmacoUi, ctxPauta: ContextoReglas, clin: DatosCl
 
     case 'mantener_generico':
       return reglaMantener(id, nc, d.principiosActivos, 'Mantener (§8)', d.via);
+    case 'alfabloqueante_flacido':
+      return reglaAlfabloqueanteFlacido(id, nc, d.principiosActivos[0] ?? 'alfabloqueante', ctxPauta);
     case 'no_catalogado':
       return reglaNoCatalogado(nc);
 

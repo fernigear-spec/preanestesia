@@ -141,6 +141,10 @@ export function validarProcedimientos(csvTexto: string): ResultadoValidacion {
     if (v.obstetrico !== undefined && v.obstetrico !== '' && !SI_NO.has(v.obstetrico)) {
       errores.push({ fichero, fila: fila.numeroFila, columna: 'obstetrico', mensaje: `valor fuera de lista (si/no): "${v.obstetrico}"` });
     }
+    // espacio_cerrado es opcional (por defecto "no"); si viene, debe ser si/no.
+    if (v.espacio_cerrado !== undefined && v.espacio_cerrado !== '' && !SI_NO.has(v.espacio_cerrado)) {
+      errores.push({ fichero, fila: fila.numeroFila, columna: 'espacio_cerrado', mensaje: `valor fuera de lista (si/no): "${v.espacio_cerrado}"` });
+    }
   }
 
   return { ok: errores.length === 0, errores };

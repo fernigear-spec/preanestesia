@@ -1,0 +1,26 @@
+{
+  "id": "dolor_cronico",
+  "titulo": "Dolor crónico",
+  "fuente": "docs/documento_fuente.md §5.7, §5.16.7",
+  "preguntas": [
+    { "id": "localizacion", "etiqueta": "Localización del dolor", "tipo": "texto" },
+    {
+      "id": "posturas_o_zonas",
+      "etiqueta": "Posturas en las que el dolor es insoportable o zonas sin sensibilidad",
+      "tipo": "texto",
+      "porque": "Ayuda a colocar al paciente en el quirófano evitando posturas dolorosas o zonas con déficit."
+    },
+    {
+      "id": "deficit_neurologico",
+      "etiqueta": "¿Tiene un déficit neurológico previo?",
+      "tipo": "boolean",
+      "porque": "Debe quedar documentado antes de la anestesia para poder compararlo después."
+    },
+    {
+      "id": "deficit_descripcion",
+      "etiqueta": "Descripción del déficit neurológico",
+      "tipo": "texto",
+      "visibleSi": { "pregunta": "deficit_neurologico", "igual": true }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "id": "trasplante",
   "titulo": "Trasplante de órgano",
-  "fuente": "docs/documento_fuente.md §5b, §8.8",
+  "fuente": "docs/documento_fuente.md §5.10, §5.16.15, §8.8",
   "preguntas": [
     {
       "id": "organo",
@@ -12,9 +12,64 @@
         { "valor": "hepatico", "etiqueta": "Hígado" },
         { "valor": "cardiaco", "etiqueta": "Corazón" },
         { "valor": "pulmonar", "etiqueta": "Pulmón" },
+        { "valor": "pancreas", "etiqueta": "Páncreas" },
+        { "valor": "medula", "etiqueta": "Médula ósea" },
         { "valor": "otro", "etiqueta": "Otro" }
       ]
     },
-    { "id": "fecha", "etiqueta": "Año del trasplante", "tipo": "texto" }
+    {
+      "id": "fecha",
+      "etiqueta": "Fecha del trasplante",
+      "tipo": "fecha",
+      "porque": "Un trasplante de menos de 6 meses implica inmunosupresión intensa."
+    },
+    { "id": "analitica_injerto_fecha", "etiqueta": "Fecha de la última analítica del injerto", "tipo": "fecha" },
+    {
+      "id": "creatinina",
+      "etiqueta": "Creatinina más reciente (si es trasplante renal)",
+      "tipo": "numero",
+      "unidad": "mg/dL",
+      "min": 0.2,
+      "max": 20,
+      "porque": "En el trasplante renal, la creatinina permite calcular el aclaramiento.",
+      "visibleSi": { "pregunta": "organo", "igual": "renal" }
+    },
+    { "id": "creatinina_fecha", "etiqueta": "Fecha de esa creatinina", "tipo": "fecha", "visibleSi": { "pregunta": "organo", "igual": "renal" } },
+    {
+      "id": "rechazo",
+      "etiqueta": "Episodios de rechazo",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "nunca", "etiqueta": "Nunca" },
+        { "valor": "pasado", "etiqueta": "En el pasado" },
+        { "valor": "reciente", "etiqueta": "En los últimos 6 meses" }
+      ]
+    },
+    { "id": "ultima_revision", "etiqueta": "Fecha de la última revisión con el equipo de trasplante", "tipo": "fecha" },
+    { "id": "aporta_informe", "etiqueta": "¿Aporta informe del equipo de trasplante?", "tipo": "boolean" },
+    {
+      "id": "niveles_en_rango",
+      "etiqueta": "¿Los niveles de los inmunosupresores están en rango?",
+      "tipo": "opcion",
+      "porque": "Niveles fuera de rango pueden requerir ajuste antes de la cirugía.",
+      "opciones": [
+        { "valor": "si", "etiqueta": "Sí" },
+        { "valor": "no", "etiqueta": "No" },
+        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+      ]
+    },
+    {
+      "id": "infeccion_activa",
+      "etiqueta": "¿Fiebre, infección reciente o antibiótico/antifúngico actual?",
+      "tipo": "boolean",
+      "porque": "Una infección activa en un paciente inmunodeprimido puede aconsejar posponer la cirugía programada."
+    },
+    { "id": "profilaxis", "etiqueta": "Profilaxis antiinfecciosa (cotrimoxazol, antivirales…)", "tipo": "texto" },
+    {
+      "id": "sintomas_organo",
+      "etiqueta": "Según el órgano: fatiga o falta de aire (corazón/pulmón), tos (pulmón), medicamentos sin receta (riñón)",
+      "tipo": "texto",
+      "porque": "El corazón trasplantado puede tener isquemia indolora; en el riñón hay que evitar AINE; en el pulmón hay riesgo de retención de secreciones."
+    }
   ]
 }

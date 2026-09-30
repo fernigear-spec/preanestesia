@@ -1,36 +1,25 @@
 {
-  "id": "artritis_reumatoide",
-  "titulo": "Artritis reumatoide",
+  "id": "dermatomiositis_polimiositis",
+  "titulo": "Dermatomiositis o polimiositis",
   "fuente": "docs/documento_fuente.md §5.8, §5.16.13",
   "preguntas": [
     {
-      "id": "afectacion_cervical",
-      "etiqueta": "¿Dolor, rigidez o limitación para mover el cuello?",
+      "id": "debilidad_cervical_disfagia",
+      "etiqueta": "¿Debilidad en el cuello o dificultad para tragar?",
       "tipo": "boolean",
-      "porque": "En la artritis reumatoide puede haber inestabilidad de las vértebras del cuello: hay que evitar movimientos bruscos al dormir al paciente."
+      "porque": "Aumenta el riesgo de aspiración durante la anestesia."
     },
     {
-      "id": "apertura_bucal",
-      "etiqueta": "¿Dificultad para abrir la boca o problemas de la mandíbula?",
+      "id": "disnea_fatiga",
+      "etiqueta": "¿Falta de aire o fatiga inusual al caminar?",
       "tipo": "boolean",
-      "porque": "Limita el acceso a la vía aérea para la intubación."
+      "porque": "Puede indicar afectación de los músculos respiratorios o del pulmón."
     },
     {
-      "id": "ronquera_disnea",
-      "etiqueta": "¿Ronquera crónica o falta de aire?",
+      "id": "problemas_cardiacos",
+      "etiqueta": "¿Problemas de corazón conocidos?",
       "tipo": "boolean",
-      "porque": "Puede indicar afectación de las articulaciones de la laringe (cricoaritenoidea)."
-    },
-    {
-      "id": "indicacion_inmunosupresor",
-      "etiqueta": "Si toma inmunosupresores, ¿por qué motivo?",
-      "tipo": "opcion",
-      "porque": "La suspensión de los inmunosupresores clásicos depende de la indicación.",
-      "opciones": [
-        { "valor": "autoinmune", "etiqueta": "Enfermedad autoinmune" },
-        { "valor": "enfermedad_sistemica_grave", "etiqueta": "Enfermedad sistémica grave" },
-        { "valor": "trasplante", "etiqueta": "Trasplante" }
-      ]
+      "porque": "Estas enfermedades pueden inflamar el corazón (miocarditis)."
     },
     { "id": "corticoides_3m", "etiqueta": "¿Ha tomado corticoides (cortisona) en los últimos 3 meses?", "tipo": "boolean", "porque": "Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3)." },
     { "id": "cortico_farmaco", "etiqueta": "¿Cuál?", "tipo": "opcion", "opciones": [ { "valor": "prednisona", "etiqueta": "Prednisona" }, { "valor": "prednisolona", "etiqueta": "Prednisolona" }, { "valor": "metilprednisolona", "etiqueta": "Metilprednisolona" }, { "valor": "deflazacort", "etiqueta": "Deflazacort" }, { "valor": "dexametasona", "etiqueta": "Dexametasona" }, { "valor": "hidrocortisona", "etiqueta": "Hidrocortisona" } ], "visibleSi": { "pregunta": "corticoides_3m", "igual": true } },
