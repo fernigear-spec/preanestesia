@@ -548,3 +548,70 @@ body {
 .aviso-inactividad p {
   margin: 0 0 10px;
 }
+
+/* Panel de administración (§14.1) */
+.pie-admin {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+.admin-contenido {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 720px) {
+  .admin-contenido { grid-template-columns: 1fr; }
+}
+.admin-lista .admin-grupo { margin-bottom: 14px; }
+.admin-lista h2 { font-size: 0.95rem; margin: 0 0 6px; }
+.admin-lista ul { list-style: none; margin: 0; padding: 0; }
+.admin-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radio);
+  background: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+.admin-item:hover { background: var(--color-principal-claro); }
+.admin-item.seleccionado {
+  background: var(--color-principal-claro);
+  border-color: var(--color-principal);
+  font-weight: 600;
+}
+.admin-textarea {
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: var(--radio);
+  resize: vertical;
+}
+.admin-tabla-scroll { overflow-x: auto; max-height: 60vh; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: var(--radio); }
+.admin-tabla { border-collapse: collapse; font-size: 0.8rem; }
+.admin-tabla th, .admin-tabla td { border: 1px solid #e6e6e6; padding: 2px 4px; white-space: nowrap; }
+.admin-tabla th { position: sticky; top: 0; background: #f4f6fb; z-index: 1; }
+.admin-tabla input { border: none; padding: 3px 4px; min-width: 90px; font: inherit; background: transparent; }
+.admin-tabla input:focus { outline: 2px solid var(--color-principal); background: #fff; }
+.admin-meta { font-size: 0.8rem; opacity: 0.7; margin: 4px 0; }
+.admin-diff pre {
+  background: #0f1115;
+  color: #e6e6e6;
+  padding: 10px;
+  border-radius: var(--radio);
+  overflow-x: auto;
+  font-size: 0.8rem;
+  max-height: 50vh;
+}
+.admin-diff .diff-anadida { color: #7ee787; }
+.admin-diff .diff-quitada { color: #ffa198; }
+.admin-ayuda { margin-top: 14px; }
+.admin-ayuda ol { font-size: 0.9rem; line-height: 1.5; }

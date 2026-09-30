@@ -80,6 +80,31 @@ function tokenizar(texto: string, sep: string): string[][] {
   return registros;
 }
 
+/**
+ * Serializa columnas + filas de nuevo a CSV (separador ';' por defecto).
+ * Entrecomilla un campo si contiene el separador, comillas o saltos de línea, y
+ * escapa las comillas dobles («"» → «""»), de forma que parseCsv lo recupere igual.
+ * Se usa en el panel de administración (§14.1) para descargar el fichero editado.
+ */
+export function serializarCsv(
+  columnas: string[],
+  filas: Array<Record<string, string>>,
+  sep = ';',
+): string {
+  const escapar = (valor: string): string => {
+    const v = valor ?? '';
+    if (v.includes(sep) || v.includes('"') || v.includes('\n') || v.includes('\r')) {
+      return `"${v.replace(/"/g, '""')}"`;
+    }
+    return v;
+  };
+  const lineas = [columnas.map(escapar).join(sep)];
+  for (const fila of filas) {
+    lineas.push(columnas.map((col) => escapar(fila[col] ?? '')).join(sep));
+  }
+  return lineas.join('\n') + '\n';
+}
+
 export function parseCsv(texto: string, sep = ';'): CsvParseResult {
   const registros = tokenizar(texto, sep).filter(
     (r) => !(r.length === 1 && r[0] === ''),

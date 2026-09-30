@@ -17,6 +17,7 @@ import type { Modalidad } from '../dominio/tipos.ts';
 import { VistaPaciente } from './paciente/VistaPaciente.tsx';
 import { BloqueHojaPaciente } from './paciente/BloqueHojaPaciente.tsx';
 import { Salidas } from './pasos/Salidas.tsx';
+import { PanelAdmin } from './admin/PanelAdmin.tsx';
 
 const TIPO_ANESTESIA_ETIQUETA: Record<IntervencionPrevia['tipoAnestesia'], string> = {
   general: 'general',
@@ -48,6 +49,7 @@ export function App() {
     const h = typeof window !== 'undefined' ? window.location.hash : '';
     return h.startsWith('#p=') ? h.slice(3) : null;
   });
+  const [admin, setAdmin] = useState<boolean>(() => typeof window !== 'undefined' && window.location.hash === '#admin');
 
   // Reinicia la entrevista (borra todo de la memoria y vuelve al inicio).
   const nuevoPaciente = useCallback(() => {
@@ -67,6 +69,20 @@ export function App() {
       <div className="app">
         <BandaPrueba />
         <VistaPaciente cadena={pacientePayload} />
+      </div>
+    );
+  }
+
+  if (admin) {
+    return (
+      <div className="app">
+        <BandaPrueba />
+        <PanelAdmin onSalir={() => {
+          setAdmin(false);
+          if (typeof window !== 'undefined' && window.location.hash === '#admin') {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+        }} />
       </div>
     );
   }
@@ -417,6 +433,9 @@ export function App() {
         <p>
           Recomendaciones generadas según los protocolos del Servicio de Anestesiología. Validación
           final por el anestesiólogo.
+        </p>
+        <p className="pie-admin">
+          <button type="button" className="boton-enlace" onClick={() => setAdmin(true)}>Administración de contenido</button>
         </p>
       </footer>
     </div>

@@ -454,4 +454,30 @@ test.describe('Vista previa', () => {
     await expect(page.getByText(/Dosis alta de opioides/)).toBeVisible();
     await expect(page.getByText(/dolor transicional/)).toBeVisible();
   });
+
+  test('panel de administración (§14.1): editar tabla, validar en vivo y descargar', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Administración de contenido' }).click();
+    await expect(page.getByRole('heading', { name: 'Administración de contenido' })).toBeVisible();
+
+    // Seleccionar farmacos.csv y comprobar la tabla editable.
+    await page.getByRole('button', { name: 'datos/farmacos.csv', exact: true }).click();
+    await expect(page.getByRole('table')).toBeVisible();
+
+    // Poner un id_regla inexistente en la primera fila → aviso de validación (caso 21).
+    await page.getByRole('textbox', { name: 'id_regla fila 1' }).fill('regla_inventada');
+    await expect(page.getByText(/no existe en reglas_farmacos\.json/)).toBeVisible();
+
+    // Descargar el fichero editado.
+    const [descarga] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: /Descargar farmacos\.csv/ }).click(),
+    ]);
+    expect(descarga.suggestedFilename()).toBe('farmacos.csv');
+
+    // Un fichero JSON se edita como texto y se valida.
+    await page.getByRole('button', { name: 'datos/opioides.json', exact: true }).click();
+    await expect(page.getByRole('textbox', { name: /Contenido de datos\/opioides\.json/ })).toBeVisible();
+    await expect(page.getByText(/JSON válido/)).toBeVisible();
+  });
 });
