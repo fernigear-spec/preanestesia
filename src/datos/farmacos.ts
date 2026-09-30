@@ -16,6 +16,10 @@ export interface FarmacoCatalogoUi {
   requiereConfirmacion: boolean;
   indicacionesPosibles: string[];
   via: 'oral' | 'no_oral';
+  /** Texto para el paciente del catálogo, que sobrescribe el de la regla (§3). */
+  textoPaciente?: string;
+  /** Texto para el anestesiólogo del catálogo (§3). */
+  textoAnestesiologo?: string;
 }
 
 function lista(v: string | undefined): string[] {
@@ -37,6 +41,8 @@ export function cargarFarmacos(csvTexto: string = csvFarmacos): FarmacoCatalogoU
       requiereConfirmacion: (v.requiere_confirmacion ?? 'no').trim().toLowerCase() === 'si',
       indicacionesPosibles: lista(v.indicaciones_posibles),
       via: (v.via ?? 'oral').trim().toLowerCase() === 'no_oral' ? 'no_oral' : 'oral',
+      ...((v.texto_paciente ?? '').trim() ? { textoPaciente: (v.texto_paciente ?? '').trim() } : {}),
+      ...((v.texto_anestesiologo ?? '').trim() ? { textoAnestesiologo: (v.texto_anestesiologo ?? '').trim() } : {}),
     };
   });
 }

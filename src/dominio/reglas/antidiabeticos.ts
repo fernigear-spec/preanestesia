@@ -1,8 +1,7 @@
 /**
  * Antidiabéticos e insulina — docs/documento_fuente.md §8.5 (Decisiones 5, 6, 8).
- * Cubre: metformina, SGLT2, GLP-1 semanal y diario, bomba de insulina.
- * (Sulfonilureas, glinidas, DPP-4, pioglitazona e insulinas basales se añadirán
- *  como reglas simples análogas; el motor y las pruebas ya validan el patrón.)
+ * Cubre: metformina, sulfonilureas, glinidas, DPP-4, pioglitazona, SGLT2, GLP-1
+ * semanal y diario, bomba de insulina y la combinación fija insulina basal+GLP-1.
  */
 import type { ContextoReglas, ResultadoFarmaco } from '../tipos.ts';
 import { startOfDay, endOfDay } from '../fechas/plazos.ts';
@@ -48,6 +47,100 @@ export function reglaMetformina(e: EntradaMetformina, ctx: ContextoReglas): Resu
     fechaHoraUltimaToma: ultima,
     textoPaciente: `No la tome el día de la intervención. Su última toma será el ${fechaLarga(ultima)} a las ${horaReloj(ultima)}.`,
     reglaAplicada: 'Metformina: no tomar el día de la intervención',
+  };
+}
+
+// ————————————— Sulfonilureas, glinidas y pioglitazona (§8.5) —————————————
+// "No tomar el día de la intervención": última toma el día previo a su hora
+// habitual más tardía. Comparte la mecánica de la metformina (sin la excepción
+// del contraste yodado).
+
+/** Fecha/hora de la última toma el día previo a la intervención (hora habitual más tardía). */
+function ultimaTomaDiaPrevio(intervencion: Date, horas: string[] | undefined): Date {
+  const ultima = new Date(intervencion);
+  ultima.setDate(ultima.getDate() - 1);
+  const orden = [...(horas ?? ['09:00'])].sort();
+  const [hh, mm] = (orden[orden.length - 1] ?? '09:00').split(':').map((x) => parseInt(x, 10));
+  ultima.setHours(hh ?? 9, mm ?? 0, 0, 0);
+  return ultima;
+}
+
+export interface EntradaAntidiabeticoSimple {
+  idFarmaco: string;
+  nombreComercial: string;
+  principio: string;
+  /** Grupo para el texto de la regla (sulfonilurea, glinida, pioglitazona). */
+  grupo: 'sulfonilurea' | 'glinida' | 'pioglitazona';
+}
+
+const NOMBRE_GRUPO_ADO: Record<EntradaAntidiabeticoSimple['grupo'], string> = {
+  sulfonilurea: 'Sulfonilurea',
+  glinida: 'Glinida',
+  pioglitazona: 'Pioglitazona',
+};
+
+/** Sulfonilureas, glinidas y pioglitazona: no tomar el día de la intervención (§8.5). */
+export function reglaAntidiabeticoNoDiaIq(e: EntradaAntidiabeticoSimple, ctx: ContextoReglas): ResultadoFarmaco {
+  const ultima = ultimaTomaDiaPrevio(ctx.fechaHoraIntervencion, ctx.pautaFarmaco?.horas);
+  return {
+    idFarmaco: e.idFarmaco,
+    nombreComercial: e.nombreComercial,
+    principiosActivos: [e.principio],
+    accion: 'suspender',
+    fechaHoraUltimaToma: ultima,
+    textoPaciente: `No lo tome el día de la intervención. Su última toma será el ${fechaLarga(ultima)} a las ${horaReloj(ultima)}.`,
+    reglaAplicada: `${NOMBRE_GRUPO_ADO[e.grupo]} (${e.principio}): no tomar el día de la intervención`,
+    fuente: FUENTE,
+    requiereConfirmacion: false,
+  };
+}
+
+// ————————————— Inhibidores DPP-4 (§8.5) —————————————
+// "Tomar hasta el día previo; no tomar la mañana de la intervención": la última
+// toma permitida es la del día anterior (a su hora habitual más tardía).
+
+export interface EntradaDpp4 {
+  idFarmaco: string;
+  nombreComercial: string;
+  principio: string;
+}
+
+export function reglaDpp4(e: EntradaDpp4, ctx: ContextoReglas): ResultadoFarmaco {
+  const ultima = ultimaTomaDiaPrevio(ctx.fechaHoraIntervencion, ctx.pautaFarmaco?.horas);
+  return {
+    idFarmaco: e.idFarmaco,
+    nombreComercial: e.nombreComercial,
+    principiosActivos: [e.principio],
+    accion: 'suspender',
+    fechaHoraUltimaToma: ultima,
+    textoPaciente: `Puede tomarlo hasta el día anterior. No lo tome la mañana de la intervención. Su última toma será el ${fechaLarga(ultima)} a las ${horaReloj(ultima)}.`,
+    reglaAplicada: `DPP-4 (${e.principio}): tomar hasta el día previo; no la mañana de la intervención`,
+    fuente: FUENTE,
+    requiereConfirmacion: false,
+  };
+}
+
+// ————————————— Combinación fija insulina basal + GLP-1 (§8.5) —————————————
+// (degludec+liraglutida, glargina+lixisenatida): requiere confirmación, porque
+// omitir el GLP-1 dejaría sin insulina basal.
+
+export interface EntradaInsulinaGlp1Fija {
+  idFarmaco: string;
+  nombreComercial: string;
+  principiosActivos: string[];
+}
+
+export function reglaInsulinaGlp1Fija(e: EntradaInsulinaGlp1Fija): ResultadoFarmaco {
+  return {
+    idFarmaco: e.idFarmaco,
+    nombreComercial: e.nombreComercial,
+    principiosActivos: e.principiosActivos,
+    accion: 'consultar',
+    textoPaciente: `Sobre ${e.nombreComercial}, el anestesiólogo le indicará qué hacer. No lo cambie por su cuenta.`,
+    reglaAplicada: 'Combinación fija insulina basal + GLP-1: requiere confirmación (omitir el GLP-1 dejaría sin insulina basal)',
+    fuente: FUENTE,
+    requiereConfirmacion: true,
+    textoAnestesiologo: 'Combinación fija insulina basal + GLP-1: omitir el GLP-1 dejaría sin insulina basal.',
   };
 }
 

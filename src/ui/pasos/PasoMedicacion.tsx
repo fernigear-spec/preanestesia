@@ -52,6 +52,8 @@ export function PasoMedicacion({ inicial, intervencion, enfermedades, onContinua
       requiereConfirmacionCatalogo: f.requiereConfirmacion,
       indicacionesPosibles: f.indicacionesPosibles,
       horas: [],
+      ...(f.textoPaciente ? { textoPaciente: f.textoPaciente } : {}),
+      ...(f.textoAnestesiologo ? { textoAnestesiologo: f.textoAnestesiologo } : {}),
     };
     setMedicacion((m) => [...m, nuevo]);
     setConsulta('');
@@ -307,6 +309,9 @@ function evaluarFicha(f: FarmacoTomadoUi, intervencion: DatosIntervencion): Resu
     ...(f.insulinaNocheUi !== undefined ? { insulinaNocheUi: f.insulinaNocheUi } : {}),
     ...(f.insulinaMananaUi !== undefined ? { insulinaMananaUi: f.insulinaMananaUi } : {}),
     ...(f.tipoHbpm ? { tipoHbpm: f.tipoHbpm } : {}),
+    ...(f.requiereConfirmacionCatalogo ? { requiereConfirmacionCatalogo: true } : {}),
+    ...(f.textoPaciente ? { textoPacienteOverride: f.textoPaciente } : {}),
+    ...(f.textoAnestesiologo ? { textoAnestesiologoOverride: f.textoAnestesiologo } : {}),
   };
   const r = evaluarFarmacoUi(datos, ctx);
   const texto = textoHojaPaciente(r);
@@ -345,6 +350,7 @@ function grupoCoherencia(f: FarmacoTomadoUi): string | null {
     insulinas: 'insulina',
     cardiovascular: 'antihipertensivo',
     inmunosupresores: 'inmunosupresor',
+    respiratorio: 'inhalador',
   };
   return mapa[f.grupo] ?? null;
 }

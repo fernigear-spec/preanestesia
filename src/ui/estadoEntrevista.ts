@@ -114,6 +114,10 @@ export interface FarmacoTomadoUi {
   insulinaNocheUi?: number;
   insulinaMananaUi?: number;
   tipoHbpm?: 'profilactica' | 'terapeutica' | 'indeterminada';
+  /** Texto para el paciente del catálogo (sobrescribe el de la regla, §3). */
+  textoPaciente?: string;
+  /** Texto para el anestesiólogo del catálogo (§3). */
+  textoAnestesiologo?: string;
 }
 
 export interface EstadoEntrevista {
