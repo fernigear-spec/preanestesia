@@ -465,7 +465,7 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('table')).toBeVisible();
 
     // Poner un id_regla inexistente en la primera fila → aviso de validación (caso 21).
-    await page.getByRole('textbox', { name: 'id_regla fila 1' }).fill('regla_inventada');
+    await page.getByRole('textbox', { name: 'id_regla fila 1', exact: true }).fill('regla_inventada');
     await expect(page.getByText(/no existe en reglas_farmacos\.json/)).toBeVisible();
 
     // Descargar el fichero editado.
