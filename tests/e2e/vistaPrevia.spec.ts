@@ -175,7 +175,7 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    await page.locator('#edad').fill('68');
+    await page.locator('#edad').fill('60');
     await page.getByRole('radio', { name: 'Hombre' }).check();
     await page.locator('#peso').fill('80');
     await page.locator('#talla').fill('175');
