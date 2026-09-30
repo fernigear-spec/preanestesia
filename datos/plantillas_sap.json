@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "descripcion": "Plantillas y configuración del texto de SAP (docs/documento_fuente.md §10.1). Orden de bloques, abreviaturas permitidas y política de negativos.",
+    "version_contenido": "0.1.0",
+    "fecha_revision": "2026-09-30"
+  },
+  "orden_bloques": [
+    "cabecera", "datos", "alergias", "habitos", "antecedentes_patologicos",
+    "iq_previas", "antecedentes_anestesicos", "capacidad_funcional", "via_aerea",
+    "escalas", "asa", "tratamiento_habitual", "plan", "pruebas", "consentimiento", "pendientes"
+  ],
+  "abreviaturas": {
+    "hipertensión arterial": "HTA",
+    "diabetes mellitus": "DM2",
+    "fibrilación auricular": "FA",
+    "anestesia general": "AG",
+    "marcapasos": "MP",
+    "apertura bucal": "AB",
+    "distancia tiromentoniana": "DTM",
+    "hipertermia maligna": "HM",
+    "no alergias medicamentosas conocidas": "NAMC",
+    "antecedentes personales": "AP",
+    "intervenciones quirúrgicas": "IQ",
+    "tratamiento": "tto"
+  },
+  "negativos": {
+    "namc": true,
+    "hm": true,
+    "familiares_anestesicos": true,
+    "mtnd4": true,
+    "hemstop": true
+  }
+}

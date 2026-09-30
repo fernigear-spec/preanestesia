@@ -169,6 +169,14 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('heading', { name: /Resumen de la entrevista/ })).toBeVisible();
     await expect(page.getByText(/Hernioplastia inguinal abierta/)).toBeVisible();
     await expect(page.getByText(/No alergias conocidas/)).toBeVisible();
+
+    // Salidas del paso 11: resumen del anestesiólogo, ASA sugerido y texto para SAP.
+    await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
+    await expect(page.getByText(/ASA sugerido/)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Escalas/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Texto para SAP/ })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Texto para SAP' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Copiar', exact: true })).toBeVisible();
   });
 
   test('§12: no se genera la hoja/QR con Plavix y stent sin confirmar; sí tras confirmar', async ({ page }) => {

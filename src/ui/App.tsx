@@ -10,29 +10,11 @@ import { PasoCribado } from './pasos/PasoCribado.tsx';
 import { PasoMedicacion } from './pasos/PasoMedicacion.tsx';
 import { PasoViaAerea } from './pasos/PasoViaAerea.tsx';
 import { PasoConsentimiento } from './pasos/PasoConsentimiento.tsx';
-import { ESTADO_INICIAL, INCIDENCIAS_ANESTESICAS, calcularImc, type EstadoEntrevista, type IntervencionPrevia } from './estadoEntrevista.ts';
+import { ESTADO_INICIAL, INCIDENCIAS_ANESTESICAS, type EstadoEntrevista, type IntervencionPrevia } from './estadoEntrevista.ts';
 import type { Modalidad } from '../dominio/tipos.ts';
-import { calcularHemstop } from '../dominio/escalas/hemstop.ts';
-import { derivarRiesgoYPruebas } from '../dominio/entrevista/riesgoYPruebas.ts';
-import type { Prueba } from '../dominio/pruebas/tablaPruebas.ts';
 import { VistaPaciente } from './paciente/VistaPaciente.tsx';
 import { BloqueHojaPaciente } from './paciente/BloqueHojaPaciente.tsx';
-
-const PRUEBA_ETIQUETA: Record<Prueba, string> = {
-  hemograma: 'Hemograma',
-  coagulacion: 'Coagulación',
-  bioquimica: 'Bioquímica',
-  ecg: 'ECG',
-  rx_torax: 'Radiografía de tórax',
-  ecocardiograma: 'Ecocardiograma',
-};
-
-/** Grupo antitrombótico de un id_regla (para los factores de pruebas). */
-function grupoAntitrombotico(idRegla: string): string | null {
-  if (/^(acod_|avk_)/.test(idRegla) || idRegla === 'hbpm' || idRegla === 'fondaparinux' || idRegla === 'heparina_sodica') return 'anticoagulante';
-  if (/^p2y12_/.test(idRegla) || ['aas', 'triflusal', 'dipiridamol', 'cilostazol', 'gp_iibiiia', 'sulodexida'].includes(idRegla)) return 'antiagregante';
-  return null;
-}
+import { Salidas } from './pasos/Salidas.tsx';
 
 const TIPO_ANESTESIA_ETIQUETA: Record<IntervencionPrevia['tipoAnestesia'], string> = {
   general: 'general',
@@ -366,39 +348,6 @@ export function App() {
               </>
             )}
 
-            {cribado && (() => {
-              const imc = calcularImc(basicos.pesoKg, basicos.tallaCm);
-              const grupos = new Set(
-                (medicacion ?? [])
-                  .map((f) => grupoAntitrombotico(f.idRegla))
-                  .filter((g): g is string => g !== null),
-              );
-              const rp = derivarRiesgoYPruebas({
-                respuestas: cribado.respuestasModulos,
-                enfermedades: new Set(cribado.enfermedades),
-                edadAnios: basicos.edadAnios,
-                imc,
-                hemstopPositivo: calcularHemstop(cribado.hemstop).positivo,
-                medicacionGrupos: grupos,
-                riesgoCardiovascular: intervencion.riesgoCardiovascular,
-                riesgoHemorragico: intervencion.riesgoHemorragico,
-                neuroaxialProbable: intervencion.neuroaxialProbable,
-                tecnica: intervencion.tecnica,
-              });
-              return (
-                <>
-                  <h3>Clase de riesgo y pruebas complementarias (provisional)</h3>
-                  <ul className="resumen-lista">
-                    <li><strong>Clase de riesgo del paciente:</strong> {rp.clase.clase}{rp.clase.determinantes.length > 0 ? ` (${rp.clase.determinantes.join(', ')})` : ''}</li>
-                    <li>
-                      <strong>Pruebas propuestas:</strong>{' '}
-                      {rp.pruebas.length === 0 ? 'ninguna' : rp.pruebas.map((p) => PRUEBA_ETIQUETA[p.prueba]).join(', ')}
-                    </li>
-                  </ul>
-                </>
-              );
-            })()}
-
             <h3>Vía aérea</h3>
             <ul className="resumen-lista">
               <li>{viaAerea ? describirViaAerea(viaAerea, modalidad === 'telefonica') : 'no recogida'}</li>
@@ -426,6 +375,8 @@ export function App() {
                 }
               />
             )}
+
+            <Salidas entrevista={entrevista} modalidad={modalidad ?? 'presencial'} />
 
             <div className="acciones">
               <button type="button" className="boton-secundario" onClick={() => setPantalla('paso1')}>Editar desde el paso 1</button>
