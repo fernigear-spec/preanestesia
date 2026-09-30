@@ -295,11 +295,13 @@ Tres preguntas, 0 a 12 puntos. Positivo ≥ 4 en hombres y ≥ 3 en mujeres: con
 
 ## 7. Pruebas complementarias (protocolo propio del servicio)
 
-### 7.1 Riesgo quirúrgico (mortalidad, ictus o infarto a 30 días)
-Desde `procedimientos.csv`:
-- Bajo (< 1 %): procedimientos superficiales de menos de 30 minutos, oftalmología, cirugía dental (salvo implantes complejos), mama, ginecología menor, endoscopias diagnósticas, cirugía endoscópica menor (salvo RTU de próstata), escleroterapia y ligadura de varices.
-- Intermedio (1 a 5 %): cabeza y cuello, intraperitoneal, torácica menor, vascular periférica, ortopédica, urológica mayor (incluidas RTU de próstata, RTU de tumores vesicales medianos o grandes y nefrolitotomías percutáneas o endoscópicas), endoscopia terapéutica compleja (CPRE, mucosectomías), ginecología mayor, neurocirugía.
-- Alto (> 5 %): vascular mayor (aorta y grandes vasos periféricos), cardiaca, neumonectomía, torácica mayor, hepatopancreática, cirugía con alto sangrado potencial como la oncológica multivisceral.
+### 7.1 Riesgo quirúrgico (clasificación ESC 2022)
+Decisión del servicio (2026-09-30): se sustituye la clasificación anterior por la ESC 2022. Desde `procedimientos.csv`. El riesgo hemorrágico no cambia.
+- Bajo (< 1 %): cirugía superficial; mama; dental; tiroides y paratiroides; oftalmología; ginecología menor (legrado, conización, histeroscopia, biopsias); traumatología menor (artroscopias, meniscectomía, ligamentoplastia, mano, muñeca, pie, túnel carpiano, retirada de material); plástica no mayor; urología menor (RTU de próstata y vesical, ureteroscopia, biopsia de próstata, cistoscopia, hidrocele, orquiectomía, vasectomía, circuncisión, catéter doble J); ORL menor (amigdalectomía, adenoidectomía, septoplastia, rinoplastia, cirugía endoscópica nasosinusal, timpanoplastia, mastoidectomía, microcirugía de laringe, drenajes timpánicos); hernia inguinal abierta y umbilical; proctología; endoscopias diagnósticas y con biopsia; resección pulmonar menor por VATS; cirugía pediátrica menor.
+- Intermedio (1 a 5 %): intraperitoneal (colecistectomía, apendicectomía, hernia laparoscópica, eventroplastia, colectomías no multiviscerales, gastrectomía, cirugía bariátrica, esplenectomía, hernia de hiato); cabeza y cuello mayor (laringectomía, vaciamiento cervical, parotidectomía, cirugía ortognática, tumor de cavidad oral, traqueotomía, uvulopalatofaringoplastia); intratorácica no mayor (lobectomía, segmentectomía, timectomía, mediastinoscopia, cirugía pleural); neurocirugía; ortopedia mayor (cadera, rodilla, hombro, fémur, columna); urología y ginecología mayores (nefrectomía, prostatectomía, nefrolitotomía percutánea, histerectomía, miomectomía, prolapso, cirugía oncológica ovárica no multivisceral); cesárea; EVAR; endarterectomía carotídea asintomática; angioplastia periférica; trasplante renal; endoscopia terapéutica compleja (CPRE, mucosectomía, polipectomía); radiología intervencionista mayor.
+- Alto (> 5 %): suprarrenalectomía; cirugía aórtica y vascular mayor abierta; revascularización abierta de miembro inferior y amputación por isquemia; endarterectomía carotídea sintomática; duodenopancreatectomía; hepatectomía y cirugía de vía biliar; esofagectomía; neumonectomía; trasplante pulmonar o hepático; cistectomía total; cirugía de intestino perforado; cirugía oncológica multivisceral; cirugía cardiaca.
+
+La endarterectomía carotídea se separa en sintomática (alto) y asintomática (intermedio); la amputación de miembro inferior en traumática (intermedio) y por isquemia (alto).
 
 ### 7.2 Clase de riesgo del paciente
 La más alta de las que asignen los módulos:
