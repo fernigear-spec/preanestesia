@@ -12,11 +12,9 @@ import { ESTADO_INICIAL, INCIDENCIAS_ANESTESICAS, calcularImc, type EstadoEntrev
 import type { Modalidad } from '../dominio/tipos.ts';
 import { calcularHemstop } from '../dominio/escalas/hemstop.ts';
 import { derivarRiesgoYPruebas } from '../dominio/entrevista/riesgoYPruebas.ts';
-import { derivarHechosClinicos } from '../dominio/entrevista/hechosClinicos.ts';
 import type { Prueba } from '../dominio/pruebas/tablaPruebas.ts';
 import { VistaPaciente } from './paciente/VistaPaciente.tsx';
-import { HojaPaciente } from './paciente/HojaPaciente.tsx';
-import { construirPlanPaciente } from './paciente/construirPlanUi.ts';
+import { BloqueHojaPaciente } from './paciente/BloqueHojaPaciente.tsx';
 
 const PRUEBA_ETIQUETA: Record<Prueba, string> = {
   hemograma: 'Hemograma',
@@ -59,7 +57,6 @@ export function App() {
   const [pantalla, setPantalla] = useState<Pantalla>('inicio');
   const [modalidad, setModalidad] = useState<Modalidad | null>(null);
   const [entrevista, setEntrevista] = useState<EstadoEntrevista>(ESTADO_INICIAL);
-  const [mostrarHoja, setMostrarHoja] = useState(false);
   // Si la URL trae «#p=…», es un QR/enlace de paciente: se abre la vista interactiva.
   const [pacientePayload] = useState<string | null>(() => {
     const h = typeof window !== 'undefined' ? window.location.hash : '';
@@ -379,30 +376,20 @@ export function App() {
             })()}
 
             <h3>Hoja del paciente</h3>
-            {mostrarHoja && cribado ? (
-              <HojaPaciente
-                plan={construirPlanPaciente(
-                  medicacion ?? [],
-                  intervencion,
-                  derivarHechosClinicos({
-                    respuestas: cribado.respuestasModulos,
-                    enfermedades: new Set(cribado.enfermedades),
-                    medicacion: (medicacion ?? []).map((f) => ({ principiosActivos: f.principiosActivos, idRegla: f.idRegla })),
-                    edadAnios: basicos.edadAnios,
-                    pesoKg: basicos.pesoKg,
-                    sexo: basicos.sexo,
-                    fechaIntervencion: intervencion.fechaHora,
-                    espacioCerrado: intervencion.espacioCerrado,
-                    contrasteYodado: intervencion.contrasteYodado,
-                  }),
-                  basicos.pesoKg,
-                )}
+            {cribado && (
+              <BloqueHojaPaciente
+                medicacion={medicacion ?? []}
                 intervencion={intervencion}
+                basicos={basicos}
+                cribado={cribado}
+                habitos={habitos}
+                onActualizar={(i, cambios) =>
+                  setEntrevista((e) => ({
+                    ...e,
+                    medicacion: (e.medicacion ?? []).map((f, j) => (j === i ? { ...f, ...cambios } : f)),
+                  }))
+                }
               />
-            ) : (
-              <button type="button" className="boton-primario" onClick={() => setMostrarHoja(true)}>
-                Generar hoja y QR del paciente
-              </button>
             )}
 
             <div className="acciones">

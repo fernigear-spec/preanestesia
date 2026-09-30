@@ -124,6 +124,10 @@ export interface FarmacoTomadoUi {
   textoPaciente?: string;
   /** Texto para el anestesiólogo del catálogo (§3). */
   textoAnestesiologo?: string;
+  /** Nombre del anestesiólogo que confirma el punto pendiente (§12). */
+  confirmadoPor?: string;
+  /** Marcado explícitamente como «le llamaremos» (§12): se muestra la frase única. */
+  leLlamaremos?: boolean;
 }
 
 export interface EstadoEntrevista {

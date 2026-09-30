@@ -518,3 +518,16 @@ body {
   border: 1px solid var(--color-borde, #d0d5dd);
   border-radius: 8px;
 }
+
+/* Puntos pendientes de confirmación (§12) */
+.lista-pendientes { list-style: none; padding: 0; }
+.pendiente { margin: 8px 0; padding: 10px; border: 1px solid var(--color-borde, #d0d5dd); border-radius: 8px; }
+.pendiente-controles { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.lista-ayuno { margin: 8px 0; }
+
+/* Impresión / PDF de la hoja del paciente */
+@media print {
+  .no-print, .banda-prueba, .cabecera, .pie-app { display: none !important; }
+  .app, .contenido, .tarjeta { margin: 0; padding: 0; box-shadow: none; border: none; }
+  .tabla-medicacion th { background: #eee !important; -webkit-print-color-adjust: exact; }
+}

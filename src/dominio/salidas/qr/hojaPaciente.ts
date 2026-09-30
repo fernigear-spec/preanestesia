@@ -46,6 +46,64 @@ export interface FarmacoQr {
   cf?: string;
   /** Texto fijo del paciente para fármacos sin plazo (mantener/consultar). */
   tx?: string;
+  /** Variante de «mantener» (para localizar sin texto libre): oral/no_oral/inhalador/colirio. */
+  mv?: 'oral' | 'no_oral' | 'inhalador' | 'colirio';
+}
+
+/** Margen de un plazo (para el modo sin fecha y la coletilla). */
+export interface MargenPlazo {
+  tipo: 'dias' | 'horas';
+  n: number;
+}
+
+/**
+ * Instrucción de medicación en forma ESTRUCTURADA (idioma-independiente), para
+ * poder renderizarla en castellano o catalán en la vista del paciente (§10.2, punto 4).
+ */
+export type InstruccionEstructurada =
+  | { k: 'confirmacion' }
+  | { k: 'no_cumplible' }
+  | { k: 'mantener'; mv: 'oral' | 'no_oral' | 'inhalador' | 'colirio' }
+  | { k: 'texto_fijo'; tx: string }
+  | { k: 'suspender'; fecha: number; adelantada: boolean; horaOriginal?: string; margen: MargenPlazo }
+  | { k: 'no_dia_iq' }
+  | { k: 'margen'; margen: MargenPlazo };
+
+export interface InstruccionPacienteEstructurada {
+  nombre: string;
+  plazoNoCumplible: boolean;
+  e: InstruccionEstructurada;
+}
+
+/** Una línea de ayuno en el QR: código, horas antes y (opcional) cota del rango. */
+export interface LineaAyunoQr {
+  c: string;
+  ha: number;
+  hf?: number;
+}
+
+/** Ayuno estructurado en el QR (§8.14): se recalculan las horas de reloj con la fecha. */
+export interface AyunoQr {
+  /** Pauta pediátrica. */
+  ped: boolean;
+  /** Situación especial (código). */
+  sit: string;
+  /** Líneas del ayuno. */
+  ln: LineaAyunoQr[];
+}
+
+/** Elementos condicionales de la hoja (§10.2). */
+export interface ExtrasHojaQr {
+  /** Traer la CPAP (SAOS). */
+  cpap: boolean;
+  /** Traer los inhaladores (asma/EPOC). */
+  inhaladores: boolean;
+  /** Recomendaciones de prevención del delirium (§6.10). */
+  delirium: boolean;
+  /** Consejo de tabaco. */
+  tabaco: boolean;
+  /** Consejo/hoja de alcohol. */
+  alcohol: boolean;
 }
 
 /** Datos del paciente que viajan en el QR (campo `d` del Payload, §8.16d). */
@@ -56,6 +114,10 @@ export interface ContenidoQrPaciente {
   fi: number | null;
   /** Fármacos. */
   far: FarmacoQr[];
+  /** Ayuno estructurado (§8.14). */
+  ay?: AyunoQr;
+  /** Elementos condicionales de la hoja (§10.2). */
+  ex?: ExtrasHojaQr;
 }
 
 /** Instrucción recalculada para un fármaco. */
@@ -144,6 +206,61 @@ export function recalcularHoja(
     }
     return recalcularFarmaco(f, iv, contenido.tel, ahora);
   });
+}
+
+/**
+ * Versión ESTRUCTURADA del recálculo (para la vista del paciente en es/ca).
+ * Devuelve, por fármaco, qué hay que decir sin texto ya redactado.
+ */
+export function recalcularHojaEstructurada(
+  contenido: ContenidoQrPaciente,
+  fechaIntervencion: Date | null = null,
+  ahora: Date = new Date(),
+): InstruccionPacienteEstructurada[] {
+  const fiMs = fechaIntervencion ? fechaIntervencion.getTime() : contenido.fi;
+  const iv = fiMs !== null ? new Date(fiMs) : null;
+  return contenido.far.map((f) => instruccionEstructurada(f, iv, ahora));
+}
+
+function mantenerODeTexto(f: FarmacoQr): InstruccionEstructurada {
+  if (f.mv) return { k: 'mantener', mv: f.mv };
+  return { k: 'texto_fijo', tx: f.tx ?? '' };
+}
+
+function instruccionEstructurada(f: FarmacoQr, iv: Date | null, ahora: Date): InstruccionPacienteEstructurada {
+  const base = { nombre: f.n, plazoNoCumplible: false };
+  if (f.rc && (f.cf === undefined || f.cf === '')) {
+    return { ...base, e: { k: 'confirmacion' } };
+  }
+  if (iv === null) {
+    if (f.pt === 'sin_plazo') return { ...base, e: mantenerODeTexto(f) };
+    if (f.pt === 'no_dia_iq') return { ...base, e: { k: 'no_dia_iq' } };
+    return { ...base, e: { k: 'margen', margen: { tipo: f.pt, n: f.pd ?? 0 } } };
+  }
+  if (f.pt === 'sin_plazo') return { ...base, e: mantenerODeTexto(f) };
+
+  const pauta: PautaHoraria = { horas: f.hh };
+  if (f.pt === 'no_dia_iq') {
+    const ultima = ultimaTomaPorDias(iv, 0, pauta);
+    if (plazoNoAlcanzable(ultima, ahora)) return { nombre: f.n, plazoNoCumplible: true, e: { k: 'no_cumplible' } };
+    return { ...base, e: { k: 'no_dia_iq' } };
+  }
+  if (f.pt === 'dias') {
+    const ultima = ultimaTomaPorDias(iv, f.pd ?? 0, pauta);
+    if (plazoNoAlcanzable(ultima, ahora)) return { nombre: f.n, plazoNoCumplible: true, e: { k: 'no_cumplible' } };
+    return { ...base, e: { k: 'suspender', fecha: ultima.getTime(), adelantada: false, margen: { tipo: 'dias', n: f.pd ?? 0 } } };
+  }
+  // horas
+  const r = ultimaTomaPorHoras(iv, f.pd ?? 0, pauta, f.ad);
+  if (plazoNoAlcanzable(r.ultimaToma, ahora)) return { nombre: f.n, plazoNoCumplible: true, e: { k: 'no_cumplible' } };
+  const e: InstruccionEstructurada = {
+    k: 'suspender',
+    fecha: r.ultimaToma.getTime(),
+    adelantada: r.tipo === 'adelantada',
+    margen: { tipo: 'horas', n: f.pd ?? 0 },
+  };
+  if (r.tipo === 'adelantada' && r.horaOriginal) e.horaOriginal = `${String(r.horaOriginal.getHours()).padStart(2, '0')}:${String(r.horaOriginal.getMinutes()).padStart(2, '0')}`;
+  return { ...base, e };
 }
 
 function recalcularFarmaco(f: FarmacoQr, iv: Date, telefono: string, ahora: Date): InstruccionPaciente {

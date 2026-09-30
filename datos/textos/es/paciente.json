@@ -12,11 +12,11 @@
   "que_traer_titulo": "Qué debe traer",
   "que_traer_items": [
     "La lista de su medicación habitual",
-    "Los informes médicos que tenga",
-    "Sus gafas y audífonos si los usa"
+    "Los informes médicos que tenga"
   ],
   "que_traer_cpap": "Su aparato de CPAP",
   "que_traer_inhaladores": "Sus inhaladores",
+  "que_traer_delirium": "Sus gafas y audífonos; venga acompañado por un familiar",
   "consentimiento_titulo": "Consentimiento",
   "cuando_llamar_titulo": "Cuándo debe llamar",
   "cuando_llamar_items": [
@@ -33,5 +33,53 @@
   "idioma_es": "Castellano",
   "idioma_ca": "Català",
   "pie": "Recomendaciones generadas según los protocolos del Servicio de Anestesiología. Validación final por el anestesiólogo.",
-  "medicacion_pendiente_traduccion": ""
+  "consejos_titulo": "Consejos",
+  "tabaco_texto": "Dejar de fumar antes de la operación reduce las complicaciones. Cuanto antes lo deje, mejor.",
+  "alcohol_texto": "Reduzca o evite el alcohol en los días previos a la intervención.",
+  "delirium_titulo": "Después de la operación",
+  "delirium_texto": "Para prevenir la desorientación tras la anestesia: traiga sus gafas y audífonos, venga acompañado y no empiece pastillas para dormir por su cuenta.",
+  "dias_semana": ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
+  "meses": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+  "med": {
+    "confirmacion": "Sobre {n}, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta.",
+    "no_cumplible": "Con esta fecha ya no es posible seguir la pauta de {n}. Llame al {tel} lo antes posible.",
+    "mantener_oral": "Siga tomándolo como siempre, también el día de la intervención, con un sorbo de agua.",
+    "mantener_no_oral": "No cambie nada: siga con su tratamiento como siempre.",
+    "mantener_inhalador": "Siga usándolo como siempre, también el día de la intervención, y tráigalo consigo.",
+    "mantener_colirio": "Siga aplicándolo como siempre, también el día de la intervención.",
+    "suspender_normal": "Tome la última dosis el {fecha} a las {hora}. Después no vuelva a tomarlo hasta que se lo indiquen.",
+    "suspender_adelantada": "El {fecha}, tome la dosis a las {hora} en lugar de a las {horaOriginal}. Será la última. Después no vuelva a tomarlo hasta que se lo indiquen.",
+    "no_dia_iq": "No lo tome el día de la intervención.",
+    "margen_dias": "No lo tome los {n} días anteriores a la intervención ni ese mismo día.",
+    "margen_horas": "Su última toma debe ser como mínimo {n} horas antes de la hora de la intervención.",
+    "coletilla_dias": " (como mínimo {n} días antes de la intervención)",
+    "coletilla_horas": " (como mínimo {n} horas antes de la intervención)"
+  },
+  "ayuno": {
+    "hasta": "hasta las {hora}",
+    "rango": "entre las {a} y las {b}",
+    "antes": "hasta {n} h antes de la intervención",
+    "rango_antes": "entre {a} y {b} h antes de la intervención",
+    "sin_hora": "según indicación",
+    "labels": {
+      "comida_copiosa": "Comida copiosa, grasa o con mucha carne",
+      "comida_ligera": "Comida ligera (tostadas, cereales, fruta)",
+      "liquidos_claros_libres": "Líquidos claros (agua, infusiones, zumo sin pulpa)",
+      "liquidos_claros_max": "Líquidos claros: máximo 2 vasos entre 4 y 2 h antes; nada después salvo la medicación con un sorbo",
+      "bebida_carbohidratos": "Bebida de carbohidratos",
+      "diabetes_liquidos": "Líquidos claros sin azúcar",
+      "solidos_8h": "Sólidos (ayuno de 8 horas)",
+      "suspender_enteral": "Suspender la nutrición por sonda",
+      "ped_liquidos": "Líquidos claros",
+      "ped_materna": "Leche materna",
+      "ped_formula": "Leche de fórmula y sólidos",
+      "ped_formula_menor6": "Leche de fórmula"
+    }
+  },
+  "sit": {
+    "diabetes_gastroparesia": "Por su problema de vaciamiento del estómago, el ayuno de sólidos es de 8 horas.",
+    "embarazo_20sem": "Por el embarazo, el ayuno se individualiza; siga las indicaciones que le den.",
+    "reflujo_sintomatico": "Mantenga su medicación para el reflujo y evite las comidas que se lo provocan el día previo.",
+    "glp1_semanal_no_suspendido": "Tome solo líquidos claros las 24 horas previas (siga la hoja adjunta)."
+  }
 }

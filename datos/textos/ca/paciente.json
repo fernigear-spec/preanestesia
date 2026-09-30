@@ -13,11 +13,11 @@
   "que_traer_titulo": "Què ha de portar",
   "que_traer_items": [
     "La llista de la seva medicació habitual",
-    "Els informes mèdics que tingui",
-    "Les seves ulleres i audiòfons si en fa servir"
+    "Els informes mèdics que tingui"
   ],
   "que_traer_cpap": "El seu aparell de CPAP",
   "que_traer_inhaladores": "Els seus inhaladors",
+  "que_traer_delirium": "Les seves ulleres i audiòfons; vingui acompanyat d'un familiar",
   "consentimiento_titulo": "Consentiment",
   "cuando_llamar_titulo": "Quan ha de trucar",
   "cuando_llamar_items": [
@@ -34,5 +34,53 @@
   "idioma_es": "Castellano",
   "idioma_ca": "Català",
   "pie": "Recomanacions generades segons els protocols del Servei d'Anestesiologia. Validació final per l'anestesiòleg.",
-  "medicacion_pendiente_traduccion": "(Les instruccions de cada medicament es mostren en castellà, pendents de revisió en català.)"
+  "consejos_titulo": "Consells",
+  "tabaco_texto": "Deixar de fumar abans de l'operació redueix les complicacions. Com abans ho deixi, millor.",
+  "alcohol_texto": "Redueixi o eviti l'alcohol els dies previs a la intervenció.",
+  "delirium_titulo": "Després de l'operació",
+  "delirium_texto": "Per prevenir la desorientació després de l'anestèsia: porti les seves ulleres i audiòfons, vingui acompanyat i no comenci pastilles per dormir pel seu compte.",
+  "dias_semana": ["diumenge", "dilluns", "dimarts", "dimecres", "dijous", "divendres", "dissabte"],
+  "meses": ["gener", "febrer", "març", "abril", "maig", "juny", "juliol", "agost", "setembre", "octubre", "novembre", "desembre"],
+  "med": {
+    "confirmacion": "Sobre {n}, l'anestesiòleg el trucarà per indicar-li què fer. No ho canviï pel seu compte.",
+    "no_cumplible": "Amb aquesta data ja no és possible seguir la pauta de {n}. Truqui al {tel} com abans millor.",
+    "mantener_oral": "Continuï prenent-lo com sempre, també el dia de la intervenció, amb un glop d'aigua.",
+    "mantener_no_oral": "No canviï res: continuï amb el seu tractament com sempre.",
+    "mantener_inhalador": "Continuï fent-lo servir com sempre, també el dia de la intervenció, i porti'l amb vostè.",
+    "mantener_colirio": "Continuï aplicant-lo com sempre, també el dia de la intervenció.",
+    "suspender_normal": "Prengui l'última dosi el {fecha} a les {hora}. Després no torni a prendre'l fins que l'hi indiquin.",
+    "suspender_adelantada": "El {fecha}, prengui la dosi a les {hora} en lloc de a les {horaOriginal}. Serà l'última. Després no torni a prendre'l fins que l'hi indiquin.",
+    "no_dia_iq": "No el prengui el dia de la intervenció.",
+    "margen_dias": "No el prengui els {n} dies anteriors a la intervenció ni aquell mateix dia.",
+    "margen_horas": "L'última presa ha de ser com a mínim {n} hores abans de l'hora de la intervenció.",
+    "coletilla_dias": " (com a mínim {n} dies abans de la intervenció)",
+    "coletilla_horas": " (com a mínim {n} hores abans de la intervenció)"
+  },
+  "ayuno": {
+    "hasta": "fins a les {hora}",
+    "rango": "entre les {a} i les {b}",
+    "antes": "fins a {n} h abans de la intervenció",
+    "rango_antes": "entre {a} i {b} h abans de la intervenció",
+    "sin_hora": "segons indicació",
+    "labels": {
+      "comida_copiosa": "Menjar abundant, greixós o amb molta carn",
+      "comida_ligera": "Menjar lleuger (torrades, cereals, fruita)",
+      "liquidos_claros_libres": "Líquids clars (aigua, infusions, suc sense polpa)",
+      "liquidos_claros_max": "Líquids clars: màxim 2 gots entre 4 i 2 h abans; res després tret de la medicació amb un glop",
+      "bebida_carbohidratos": "Beguda de carbohidrats",
+      "diabetes_liquidos": "Líquids clars sense sucre",
+      "solidos_8h": "Sòlids (dejuni de 8 hores)",
+      "suspender_enteral": "Suspendre la nutrició per sonda",
+      "ped_liquidos": "Líquids clars",
+      "ped_materna": "Llet materna",
+      "ped_formula": "Llet de fórmula i sòlids",
+      "ped_formula_menor6": "Llet de fórmula"
+    }
+  },
+  "sit": {
+    "diabetes_gastroparesia": "Pel seu problema de buidament de l'estómac, el dejuni de sòlids és de 8 hores.",
+    "embarazo_20sem": "Per l'embaràs, el dejuni s'individualitza; segueixi les indicacions que li donin.",
+    "reflujo_sintomatico": "Mantingui la seva medicació per al reflux i eviti els menjars que l'hi provoquen el dia previ.",
+    "glp1_semanal_no_suspendido": "Prengui només líquids clars les 24 hores prèvies (segueixi el full adjunt)."
+  }
 }

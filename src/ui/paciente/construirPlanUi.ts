@@ -26,6 +26,13 @@ function proximaDosisSemanal(diaSemana: number, intervencion: Date): Date {
   return d;
 }
 
+/** Variante de «mantener» para localizar la instrucción del paciente. */
+function varianteMantener(f: FarmacoTomadoUi): 'oral' | 'no_oral' | 'inhalador' | 'colirio' {
+  if (f.subgrupo === 'colirio_glaucoma') return 'colirio';
+  if (f.grupo === 'respiratorio' && f.via === 'no_oral') return 'inhalador';
+  return f.via === 'no_oral' ? 'no_oral' : 'oral';
+}
+
 export function construirPlanPaciente(
   medicacion: FarmacoTomadoUi[],
   intervencion: DatosIntervencion,
@@ -56,8 +63,11 @@ export function construirPlanPaciente(
       ...(f.textoPaciente ? { textoPacienteOverride: f.textoPaciente } : {}),
       ...(f.textoAnestesiologo ? { textoAnestesiologoOverride: f.textoAnestesiologo } : {}),
     };
-    const resultado = evaluarCombinacionUi(datos, f.idReglas, ctx, clin);
+    const evaluado = evaluarCombinacionUi(datos, f.idReglas, ctx, clin);
+    // Confirmación del anestesiólogo (§12): si se ha confirmado con su nombre, la
+    // hoja muestra la pauta; si se marcó «le llamaremos», sigue como no confirmado.
+    const resultado = f.confirmadoPor ? { ...evaluado, confirmadoPor: f.confirmadoPor } : evaluado;
     const meta = metadatosPlazo(f.idRegla, f.dosisMg, f.tipoHbpm);
-    return { resultado, horas: f.horas, meta };
+    return { resultado, horas: f.horas, meta, variante: varianteMantener(f) };
   });
 }

@@ -165,6 +165,50 @@ test.describe('Vista previa', () => {
     await expect(page.getByText(/No alergias conocidas/)).toBeVisible();
   });
 
+  test('§12: no se genera la hoja/QR con Plavix y stent sin confirmar; sí tras confirmar', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    await page.locator('#edad').fill('68');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('80');
+    await page.locator('#talla').fill('175');
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
+    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+
+    // Paso 7: marcar cardiopatía isquémica (stent).
+    await page.getByRole('checkbox', { name: 'Cardiopatía isquémica / infarto' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 8: Plavix sin Adiro (monoterapia → requiere confirmación).
+    await page.locator('#med').fill('Plavix');
+    await page.getByRole('button', { name: /Plavix/ }).first().click();
+    await page.getByRole('button', { name: '09:00', exact: true }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Resumen: hay pendiente → no se puede generar.
+    await expect(page.getByText(/pendientes de confirmar/)).toBeVisible();
+    await expect(page.getByRole('button', { name: /Generar hoja y QR del paciente/ })).toHaveCount(0);
+
+    // Confirmar con el nombre del anestesiólogo.
+    await page.getByLabel(/Nombre del anestesiólogo para Plavix/).fill('Dra. García');
+    await page.getByRole('button', { name: 'Confirmar', exact: true }).click();
+
+    // Ahora sí se puede generar.
+    await expect(page.getByRole('button', { name: /Generar hoja y QR del paciente/ })).toBeVisible();
+  });
+
   test('genera la hoja del paciente con su QR desde el resumen', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Presencial' }).click();

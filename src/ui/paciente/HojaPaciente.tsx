@@ -1,16 +1,18 @@
 /**
- * Hoja del paciente con su QR (§10.2, §11.1). Se muestra desde el resumen (consulta
- * presencial). Construye el contenido estructurado, lo serializa en el enlace
- * (tras «#p=»), genera la imagen del QR y ofrece «Copiar enlace para el paciente».
- * Al escanear el QR se abre la vista interactiva (VistaPaciente).
+ * Hoja del paciente con su QR (§10.2, §11.1), mostrada desde el resumen. Construye
+ * el contenido estructurado (medicación, ayuno y condicionales), lo serializa en el
+ * enlace (tras «#p=»), genera la imagen del QR y ofrece copiar el enlace y guardar
+ * como PDF. Al escanear el QR se abre la vista interactiva (VistaPaciente).
  */
 import { useEffect, useMemo, useState } from 'react';
 import QRCode from 'qrcode';
 import config from '../../../datos/config.json';
 import type { DatosIntervencion } from '../../dominio/tipos.ts';
 import {
-  recalcularHoja,
+  recalcularHojaEstructurada,
   caducidadQrPaciente,
+  type AyunoQr,
+  type ExtrasHojaQr,
 } from '../../dominio/salidas/qr/hojaPaciente.ts';
 import {
   construirContenidoQrPaciente,
@@ -18,24 +20,29 @@ import {
   type FarmacoPlan,
 } from '../../dominio/salidas/qr/construirContenido.ts';
 import { serializar, cabeEnQr } from '../../dominio/salidas/qr/serializar.ts';
+import { textosPaciente } from './textosPaciente.ts';
+import { CuerpoHoja } from './CuerpoHoja.tsx';
 
 interface Props {
   plan: FarmacoPlan[];
   intervencion: DatosIntervencion;
+  ay?: AyunoQr | undefined;
+  ex?: ExtrasHojaQr | undefined;
 }
 
-export function HojaPaciente({ plan, intervencion }: Props) {
+export function HojaPaciente({ plan, intervencion, ay, ex }: Props) {
   const [cadena, setCadena] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [copiado, setCopiado] = useState(false);
+  const t = textosPaciente('es');
 
   const contenido = useMemo(
-    () => construirContenidoQrPaciente(plan, config.telefono_contacto, intervencion.fechaHora),
-    [plan, intervencion.fechaHora],
+    () => construirContenidoQrPaciente(plan, config.telefono_contacto, intervencion.fechaHora, ay, ex),
+    [plan, intervencion.fechaHora, ay, ex],
   );
 
   const instrucciones = useMemo(
-    () => recalcularHoja(contenido, intervencion.fechaHora),
+    () => recalcularHojaEstructurada(contenido, intervencion.fechaHora),
     [contenido, intervencion.fechaHora],
   );
 
@@ -55,9 +62,7 @@ export function HojaPaciente({ plan, intervencion }: Props) {
         if (vivo) setQrDataUrl(null);
       }
     });
-    return () => {
-      vivo = false;
-    };
+    return () => { vivo = false; };
   }, [contenido, intervencion.fechaHora]);
 
   const enlace = cadena ? `${location.origin}${location.pathname}#p=${cadena}` : '';
@@ -78,25 +83,10 @@ export function HojaPaciente({ plan, intervencion }: Props) {
     <section className="tarjeta hoja-paciente" aria-labelledby="hoja-tit">
       <h2 id="hoja-tit">Hoja del paciente</h2>
 
-      <h3>Qué hacer con cada medicamento</h3>
-      {instrucciones.length === 0 ? (
-        <p>No se ha registrado medicación.</p>
-      ) : (
-        <table className="tabla-medicacion">
-          <thead><tr><th>Medicamento</th><th>Qué hacer</th></tr></thead>
-          <tbody>
-            {instrucciones.map((i, k) => (
-              <tr key={k} className={i.plazoNoCumplible ? 'fila-alerta' : ''}>
-                <td>{i.nombre}</td>
-                <td>{i.texto}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      <CuerpoHoja instrucciones={instrucciones} ay={ay} ex={ex} fecha={intervencion.fechaHora ? intervencion.fechaHora.getTime() : null} t={t} />
 
       <h3>Código QR para el paciente</h3>
-      <p>El paciente puede escanear este código con el móvil para ver sus recomendaciones y, si le cambian la fecha, recalcularlas.</p>
+      <p className="no-print">El paciente puede escanear este código con el móvil para ver sus recomendaciones y, si le cambian la fecha, recalcularlas.</p>
       {qrDataUrl ? (
         <img className="qr-img" src={qrDataUrl} alt="Código QR de la hoja del paciente" width={240} height={240} />
       ) : (
@@ -105,10 +95,11 @@ export function HojaPaciente({ plan, intervencion }: Props) {
       {!cabe && (
         <p className="aviso aviso-atencion">La información es demasiado extensa para el QR; use el enlace.</p>
       )}
-      <div className="acciones">
+      <div className="acciones no-print">
         <button type="button" className="boton-secundario" onClick={copiar} disabled={!enlace}>
           {copiado ? 'Enlace copiado ✓' : 'Copiar enlace para el paciente'}
         </button>
+        <button type="button" className="boton-secundario" onClick={() => window.print()}>Guardar como PDF</button>
       </div>
 
       <p className="aviso aviso-info">

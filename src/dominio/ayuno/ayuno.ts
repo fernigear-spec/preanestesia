@@ -6,12 +6,31 @@
 import { horaReloj } from '../fechas/plazos.ts';
 import type { Alerta } from '../tipos.ts';
 
+/** Código de la línea de ayuno (idioma-independiente; la etiqueta se localiza). */
+export type CodigoAyuno =
+  | 'comida_copiosa'
+  | 'comida_ligera'
+  | 'liquidos_claros_libres'
+  | 'liquidos_claros_max'
+  | 'bebida_carbohidratos'
+  | 'diabetes_liquidos'
+  | 'solidos_8h'
+  | 'suspender_enteral'
+  | 'ped_liquidos'
+  | 'ped_materna'
+  | 'ped_formula'
+  | 'ped_formula_menor6';
+
 export interface LineaAyuno {
+  /** Código estable (para el QR y la localización). */
+  codigo: CodigoAyuno;
   concepto: string;
-  /** Hora de reloj límite ("HH:MM"). */
+  /** Hora de reloj límite ("HH:MM") o rango ("HH:MM–HH:MM"); "—" si no aplica. */
   hora: string;
   /** Horas antes de la inducción. */
   horasAntes: number;
+  /** Para rangos (bebida de carbohidratos): la otra cota en horas antes. */
+  rangoHorasAntes?: number;
 }
 
 export interface PlanAyuno {
@@ -40,9 +59,9 @@ export interface EntradaAyuno {
   situacion: SituacionEspecial;
 }
 
-function linea(induccion: Date, horasAntes: number, concepto: string): LineaAyuno {
+function linea(induccion: Date, horasAntes: number, codigo: CodigoAyuno, concepto: string): LineaAyuno {
   const hora = new Date(induccion.getTime() - horasAntes * 3_600_000);
-  return { concepto, hora: horaReloj(hora), horasAntes };
+  return { codigo, concepto, hora: horaReloj(hora), horasAntes };
 }
 
 export function calcularAyuno(e: EntradaAyuno): PlanAyuno {
@@ -51,12 +70,12 @@ export function calcularAyuno(e: EntradaAyuno): PlanAyuno {
 
   if (e.pediatrico) {
     const lineas: LineaAyuno[] = [
-      linea(e.induccion, 1, 'Líquidos claros'),
-      linea(e.induccion, 3, 'Leche materna'),
-      linea(e.induccion, 6, 'Leche de fórmula y sólidos'),
+      linea(e.induccion, 1, 'ped_liquidos', 'Líquidos claros'),
+      linea(e.induccion, 3, 'ped_materna', 'Leche materna'),
+      linea(e.induccion, 6, 'ped_formula', 'Leche de fórmula y sólidos'),
     ];
     if (e.edadMeses !== undefined && e.edadMeses < 6) {
-      lineas[2] = linea(e.induccion, 4, 'Leche de fórmula (menor de 6 meses)');
+      lineas[2] = linea(e.induccion, 4, 'ped_formula_menor6', 'Leche de fórmula (menor de 6 meses)');
     }
     return {
       lineas,
@@ -74,20 +93,20 @@ export function calcularAyuno(e: EntradaAyuno): PlanAyuno {
 
   // Adultos: líneas base.
   const lineas: LineaAyuno[] = [
-    linea(e.induccion, 8, 'Comida copiosa/grasa/proteica'),
-    linea(e.induccion, 6, 'Comida ligera baja en grasa'),
-    linea(e.induccion, 4, 'Líquidos claros libres (hasta aquí)'),
-    linea(e.induccion, 2, 'Líquidos claros (máx. 400 mL entre 4 y 2 h; nada después salvo medicación con un sorbo)'),
+    linea(e.induccion, 8, 'comida_copiosa', 'Comida copiosa/grasa/proteica'),
+    linea(e.induccion, 6, 'comida_ligera', 'Comida ligera baja en grasa'),
+    linea(e.induccion, 4, 'liquidos_claros_libres', 'Líquidos claros libres (hasta aquí)'),
+    linea(e.induccion, 2, 'liquidos_claros_max', 'Líquidos claros (máx. 400 mL entre 4 y 2 h; nada después salvo medicación con un sorbo)'),
   ];
 
   let permiteCarbohidratos = true;
 
   switch (e.situacion) {
     case 'diabetes':
-      lineas.push({ concepto: 'Líquidos claros sin alto contenido de azúcar', hora: '—', horasAntes: 0 });
+      lineas.push({ codigo: 'diabetes_liquidos', concepto: 'Líquidos claros sin alto contenido de azúcar', hora: '—', horasAntes: 0 });
       break;
     case 'diabetes_gastroparesia':
-      lineas[0] = linea(e.induccion, 8, 'Sólidos (ayuno de sólidos de 8 h por gastroparesia)');
+      lineas[0] = linea(e.induccion, 8, 'solidos_8h', 'Sólidos (ayuno de sólidos de 8 h por gastroparesia)');
       permiteCarbohidratos = false;
       alertas.push(alerta('Diabetes con gastroparesia: ayuno de sólidos de 8 h; premedicación con metoclopramida.', 'ayuno §8.14'));
       break;
@@ -100,7 +119,7 @@ export function calcularAyuno(e: EntradaAyuno): PlanAyuno {
       alertas.push(alerta('Reflujo grave sintomático el día de la intervención: riesgo de estómago lleno.', 'ayuno §8.14'));
       break;
     case 'bariatrica_sintomatica':
-      lineas[0] = linea(e.induccion, 8, 'Sólidos (ayuno de sólidos de 8 h por cirugía bariátrica sintomática)');
+      lineas[0] = linea(e.induccion, 8, 'solidos_8h', 'Sólidos (ayuno de sólidos de 8 h por cirugía bariátrica sintomática)');
       permiteCarbohidratos = false;
       alertas.push(alerta('Cirugía bariátrica previa sintomática: ayuno de sólidos de 8 h; metoclopramida e inducción de secuencia rápida.', 'ayuno §8.14'));
       break;
@@ -113,7 +132,7 @@ export function calcularAyuno(e: EntradaAyuno): PlanAyuno {
       alertas.push(alerta('Contraste oral en las 4 h previas: riesgo de estómago lleno.', 'ayuno §8.14'));
       break;
     case 'nutricion_enteral_gastrica':
-      lineas.push(linea(e.induccion, 8, 'Suspender nutrición enteral gástrica'));
+      lineas.push(linea(e.induccion, 8, 'suspender_enteral', 'Suspender nutrición enteral gástrica'));
       break;
     case 'ninguna':
       break;
@@ -121,9 +140,11 @@ export function calcularAyuno(e: EntradaAyuno): PlanAyuno {
 
   if (permiteCarbohidratos) {
     lineas.push({
+      codigo: 'bebida_carbohidratos',
       concepto: 'Bebida de carbohidratos (entre 2 y 3 h antes)',
       hora: `${horaReloj(new Date(e.induccion.getTime() - 3 * 3_600_000))}–${horaReloj(new Date(e.induccion.getTime() - 2 * 3_600_000))}`,
       horasAntes: 2,
+      rangoHorasAntes: 3,
     });
   }
 
