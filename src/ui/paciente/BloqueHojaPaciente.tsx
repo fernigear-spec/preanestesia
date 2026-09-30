@@ -69,6 +69,8 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
       ...(habitos?.cfs !== undefined ? { cfs: habitos.cfs } : {}),
       ...(cuatroAtPuntuacion !== undefined ? { cuatroAtPuntuacion } : {}),
       edadPediatricaMaxima: EDAD_PEDIATRICA_MAXIMA,
+      glp1Semanal: medicacion.some((f) => f.idRegla === 'glp1_semanal'),
+      diabetes: new Set(cribado.enfermedades).has('diabetes'),
     });
     const refFecha = intervencion.fechaHora ?? new Date(Date.now() + 90 * MS_DIA);
     const planAyuno = calcularAyuno({
@@ -78,7 +80,7 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
       situacion: extrasIn.situacion,
     });
     return { ayunoQr: ayunoQrDesde(planAyuno, extrasIn.pediatrico, extrasIn.situacion), extras: extrasIn.extras };
-  }, [basicos, cribado, habitos, sexo, intervencion.fechaHora]);
+  }, [basicos, cribado, habitos, sexo, intervencion.fechaHora, medicacion]);
 
   const pendientes = medicacion
     .map((f, i) => ({ f, i, requiere: plan[i]?.resultado.requiereConfirmacion === true }))

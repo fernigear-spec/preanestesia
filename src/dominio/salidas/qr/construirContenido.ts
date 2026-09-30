@@ -5,7 +5,7 @@
  * textos fijos de los fármacos sin plazo (mantener/consultar).
  */
 import type { ResultadoFarmaco } from '../../tipos.ts';
-import type { ContenidoQrPaciente, FarmacoQr, AyunoQr, ExtrasHojaQr } from './hojaPaciente.ts';
+import type { ContenidoQrPaciente, FarmacoQr, AyunoQr, ExtrasHojaQr, InsulinaQr } from './hojaPaciente.ts';
 import type { Payload } from './serializar.ts';
 import type { PlanAyuno } from '../../ayuno/ayuno.ts';
 
@@ -24,6 +24,8 @@ export interface FarmacoPlan {
   meta: MetaPlazo;
   /** Variante de «mantener» para localizar la instrucción (oral/no_oral/inhalador/colirio). */
   variante?: 'oral' | 'no_oral' | 'inhalador' | 'colirio';
+  /** Ajuste de insulina estructurado, si el fármaco es una insulina. */
+  ins?: InsulinaQr;
 }
 
 /** Construye un FarmacoQr a partir de un fármaco del plan. */
@@ -43,6 +45,7 @@ export function farmacoQrDesde(f: FarmacoPlan): FarmacoQr {
   // castellano) y, si es «mantener», también su variante (para localizar en catalán).
   if (f.meta.pt === 'sin_plazo') item.tx = r.textoPaciente;
   if (r.accion === 'mantener' && f.variante) item.mv = f.variante;
+  if (f.ins) item.ins = f.ins;
   return item;
 }
 

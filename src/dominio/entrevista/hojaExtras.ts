@@ -19,6 +19,10 @@ export interface EntradaHojaExtras {
   cfs?: number;
   cuatroAtPuntuacion?: number;
   edadPediatricaMaxima: number;
+  /** El paciente toma un GLP-1 semanal (para la dieta líquida de 24 h). */
+  glp1Semanal: boolean;
+  /** El paciente es diabético. */
+  diabetes: boolean;
 }
 
 export interface ResultadoHojaExtras {
@@ -46,6 +50,15 @@ export function derivarHojaExtras(e: EntradaHojaExtras): ResultadoHojaExtras {
     (e.cuatroAtPuntuacion !== undefined && e.cuatroAtPuntuacion >= 1) ||
     e.enfermedades.has('deterioro_cognitivo');
 
+  // Hojas anexas (§8.14 bis): dieta líquida 24 h (GLP-1 semanal), ayuno diabético,
+  // tabaco y alcohol.
+  const anexos: string[] = [];
+  if (e.glp1Semanal && e.diabetes) anexos.push('liquida24h_diabetes');
+  else if (e.glp1Semanal) anexos.push('liquida24h');
+  else if (e.diabetes) anexos.push('ayuno_diabetico');
+  if (e.tabacoActivo) anexos.push('tabaco');
+  if (e.auditPositivo) anexos.push('alcohol');
+
   const saos = r['saos'] ?? {};
   const extras: ExtrasHojaQr = {
     cpap: saos.cpap === true || e.enfermedades.has('saos'),
@@ -53,6 +66,7 @@ export function derivarHojaExtras(e: EntradaHojaExtras): ResultadoHojaExtras {
     delirium,
     tabaco: e.tabacoActivo,
     alcohol: e.auditPositivo,
+    anexos,
   };
 
   return { pediatrico, situacion, extras };

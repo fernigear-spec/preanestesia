@@ -48,6 +48,23 @@ export interface FarmacoQr {
   tx?: string;
   /** Variante de «mantener» (para localizar sin texto libre): oral/no_oral/inhalador/colirio. */
   mv?: 'oral' | 'no_oral' | 'inhalador' | 'colirio';
+  /** Ajuste de insulina estructurado (para localizar sin texto libre). */
+  ins?: InsulinaQr;
+}
+
+/** Ajuste de insulina estructurado en el QR (§8.5), para localizar y recalcular fechas. */
+export interface InsulinaQr {
+  tipo: 'basal' | 'nph' | 'premezclada' | 'rapida';
+  /** Basal: tomas reducidas (momento, dosis ajustada, dosis original, hora). */
+  tomas?: Array<{ m: 'noche_previa' | 'manana_intervencion'; d: number; o: number; h: string }>;
+  /** NPH: dosis de la noche (completa) y de la mañana (50 %) con su original. */
+  nocheUi?: number;
+  mananaUi?: number;
+  mananaOrig?: number;
+  horaNoche?: string;
+  horaManana?: string;
+  /** Rápida: hora del desayuno. */
+  horaDesayuno?: string;
 }
 
 /** Margen de un plazo (para el modo sin fecha y la coletilla). */
@@ -67,6 +84,7 @@ export type InstruccionEstructurada =
   | { k: 'texto_fijo'; tx: string }
   | { k: 'suspender'; fecha: number; adelantada: boolean; horaOriginal?: string; margen: MargenPlazo }
   | { k: 'no_dia_iq' }
+  | { k: 'insulina'; ins: InsulinaQr }
   | { k: 'margen'; margen: MargenPlazo };
 
 export interface InstruccionPacienteEstructurada {
@@ -104,6 +122,8 @@ export interface ExtrasHojaQr {
   tabaco: boolean;
   /** Consejo/hoja de alcohol. */
   alcohol: boolean;
+  /** Ids de las hojas anexas que aplican (§8.14 bis). */
+  anexos: string[];
 }
 
 /** Datos del paciente que viajan en el QR (campo `d` del Payload, §8.16d). */
@@ -231,6 +251,9 @@ function instruccionEstructurada(f: FarmacoQr, iv: Date | null, ahora: Date): In
   const base = { nombre: f.n, plazoNoCumplible: false };
   if (f.rc && (f.cf === undefined || f.cf === '')) {
     return { ...base, e: { k: 'confirmacion' } };
+  }
+  if (f.ins) {
+    return { ...base, e: { k: 'insulina', ins: f.ins } };
   }
   if (iv === null) {
     if (f.pt === 'sin_plazo') return { ...base, e: mantenerODeTexto(f) };

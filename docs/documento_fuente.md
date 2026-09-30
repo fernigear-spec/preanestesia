@@ -459,7 +459,7 @@ Adultos sin factores de riesgo:
 - Solo en las notas del anestesiólogo: hasta 50 mL de leche en el café o el té no retrasan la cirugía aunque no se recomienda; chicle o caramelo sin tragar en las 2 h previas no retrasan la cirugía.
 
 Situaciones especiales:
-- Diabetes: líquidos claros sin alto contenido de azúcar. Con síntomas de gastroparesia, ayuno de sólidos de 8 h y alerta de premedicación con metoclopramida.
+- Diabetes: mismo ayuno que el resto de pacientes, incluida la bebida de carbohidratos; para sus líquidos claros libres, elegir los que no lleven mucho azúcar. La bebida de carbohidratos solo se excluye si hay factores de vaciamiento gástrico lento (por ejemplo, gastroparesia), igual que en cualquier paciente. Con síntomas de gastroparesia, ayuno de sólidos de 8 h y alerta de premedicación con metoclopramida.
 - GLP-1 semanal: dieta de líquidos claros las 24 h previas con la hoja anexa (lista de lo permitido; en diabéticos, además, 150 a 200 g de hidratos al día, ajuste de la medicación, controles de glucemia cada 3 a 4 h, actuación si la glucemia es < 100 mg/dL y el ejemplo de plan de ingesta del protocolo). Si no lo ha suspendido: alerta de estómago lleno.
 - Reflujo grave o disfagia: ayuno estándar, evitar el día previo los alimentos que le provocan reflujo, mantener la medicación antirreflujo. Sintomático el día de la intervención: alerta de estómago lleno.
 - Cirugía bariátrica previa sintomática: ayuno de sólidos de 8 h, alerta de premedicación con metoclopramida y de inducción de secuencia rápida.
@@ -469,6 +469,46 @@ Situaciones especiales:
 - Pediatría: líquidos claros hasta 1 h antes, leche materna 3 h, leche de fórmula y sólidos 6 h; en menores de 6 meses, fórmula 4 h. Aviso de riesgo de hipoglucemia en recién nacidos y lactantes pequeños si el ayuno se alarga.
 - Nota para el anestesiólogo cuando el contenido gástrico sea incierto (demencia, barrera idiomática, dolor intenso, enfermedad neuromuscular, GLP-1 no suspendido): valorar ecografía gástrica.
 - Indicaciones de profilaxis de aspiración (solo notas del anestesiólogo): ayuno insuficiente, embarazo avanzado, reflujo grave sintomático, obesidad mórbida, diabetes descompensada, gastroparesia, bariátrica sintomática. Incluir la tabla del protocolo con dosis y tiempos (citrato sódico 0,3 M 30 mL VO 10 a 30 min antes; famotidina 20 mg VO 1 a 2 h antes o IV 30 a 60 min antes; omeprazol 40 mg VO la noche previa y/o 2 a 3 h antes, o pantoprazol 40 mg IV 30 a 60 min antes; metoclopramida 10 mg IV 15 a 30 min antes o VO 60 a 90 min antes; eritromicina 3 mg/kg IV, máximo 250 mg, 30 a 60 min antes) con sus precauciones.
+
+### 8.14 bis. Textos de las hojas anexas para el paciente
+
+Textos literales de las hojas anexas de la hoja del paciente (§10.2). Ninguna menciona dosis de fármacos: para la medicación remiten siempre a la hoja de medicación. Se traducen al catalán marcados como pendientes de revisión.
+
+Cuándo se adjunta cada anexo: **1** con GLP-1 semanal sin diabetes; **2** con GLP-1 semanal y diabetes; **3** con diabetes sin GLP-1 semanal; **4** si fuma; **5** si el AUDIT-C es positivo.
+
+**Anexo 1. Dieta de líquidos claros de 24 horas (GLP-1 semanal, paciente no diabético)**
+«Durante las 24 horas anteriores a la intervención, desde el [día] a las [hora], tome solo líquidos claros.
+Puede tomar: agua; caldos colados, sin grasa ni trozos (de pollo, carne o verduras); gelatina que no sea roja ni morada; zumos sin pulpa (manzana, uva blanca); bebidas isotónicas transparentes; infusiones, té o café sin leche.
+No tome: alimentos sólidos, leche ni lácteos, zumos con pulpa, batidos ni suplementos nutricionales.
+Las últimas horas: siga el apartado de ayuno de su hoja. Puede tomar líquidos claros hasta 4 horas antes de la intervención; entre 4 y 2 horas antes, como máximo 400 mL en total; en las 2 horas previas, nada, salvo la medicación indicada con un sorbo de agua.»
+
+**Anexo 2. Dieta de líquidos claros de 24 horas en el paciente diabético (GLP-1 semanal y diabetes)**
+Todo el texto del anexo 1, y además:
+«Como tiene diabetes, durante estas 24 horas necesita tomar azúcar en forma de líquidos claros, repartido cada 2 o 3 horas, para evitar bajadas de azúcar.
+Mida su glucosa cada 3 o 4 horas. Si está por debajo de 100 mg/dL, tome 120 mL de zumo de manzana o de bebida isotónica y vuelva a medirla a los 15 o 20 minutos.
+Ejemplo de un día:
+07:00 · 1 taza (240 mL) de zumo de manzana
+09:30 · 1 taza de caldo colado y 1 gelatina sin azúcar
+12:00 · 1 vaso (240 mL) de bebida isotónica transparente
+14:30 · 1 taza de zumo de uva blanca
+17:00 · 1 taza de té sin azúcar y 2 polos de hielo transparentes
+19:30 · 1 vaso (240 mL) de bebida isotónica transparente
+22:00 · 1 taza de caldo colado o agua y 1 gelatina sin azúcar
+Si su glucosa está baja, puede repetir una ración de zumo o de bebida isotónica.
+Sus medicamentos para la diabetes: siga exactamente lo que indica su hoja de medicación.
+Lleve su medidor de glucosa al hospital.»
+
+**Anexo 3. Ayuno del paciente diabético (sin dieta de 24 horas)**
+«Siga el apartado de ayuno de su hoja, incluida la bebida de carbohidratos si su hoja se la indica.
+Mida su glucosa al levantarse el día de la intervención. Si está por debajo de 100 mg/dL o nota síntomas de bajada (sudor, temblor, mareo), tome 120 mL de zumo de manzana o de bebida isotónica aunque esté en ayunas, vuelva a medirla a los 15 o 20 minutos y avise al llegar al hospital.
+Sus medicamentos para la diabetes: siga exactamente lo que indica su hoja de medicación.
+Lleve su medidor de glucosa al hospital.»
+
+**Anexo 4. Tabaco**
+«Dejar de fumar antes de la operación reduce las complicaciones de la herida y de los pulmones. Cuanto antes lo deje, mejor, aunque solo sea unos días antes. Si quiere ayuda para dejarlo, consulte con su médico de familia o su farmacéutico. El día de la intervención no fume.»
+
+**Anexo 5. Alcohol**
+«Reduzca o evite el alcohol en las semanas previas a la operación. Si bebe alcohol todos los días en cantidad, no lo deje de golpe sin consultarlo: dígalo en la consulta o a su médico de familia, porque dejarlo bruscamente puede ser peligroso. No beba alcohol en las 24 horas anteriores a la intervención.»
 
 ### 8.16 Fecha desconocida, márgenes y recálculo
 

@@ -12,6 +12,7 @@ import { construirContexto } from '../../dominio/reglas/motor.ts';
 import { evaluarCombinacionUi, metadatosPlazo, type DatosFarmacoUi } from '../../dominio/reglas/despachador.ts';
 import type { DatosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
 import type { FarmacoPlan } from '../../dominio/salidas/qr/construirContenido.ts';
+import type { InsulinaQr } from '../../dominio/salidas/qr/hojaPaciente.ts';
 import type { FarmacoTomadoUi } from '../estadoEntrevista.ts';
 
 const MS_DIA = 86_400_000;
@@ -31,6 +32,31 @@ function varianteMantener(f: FarmacoTomadoUi): 'oral' | 'no_oral' | 'inhalador' 
   if (f.subgrupo === 'colirio_glaucoma') return 'colirio';
   if (f.grupo === 'respiratorio' && f.via === 'no_oral') return 'inhalador';
   return f.via === 'no_oral' ? 'no_oral' : 'oral';
+}
+
+const floorPct = (dosis: number, pct: number) => Math.floor((dosis * pct) / 100);
+const momentoDeHora = (hora: string): 'noche_previa' | 'manana_intervencion' =>
+  (parseInt(hora.split(':')[0] ?? '0', 10) >= 18 ? 'noche_previa' : 'manana_intervencion');
+
+/** Ajuste de insulina estructurado (§8.5) para el QR, si el fármaco es una insulina. */
+function insulinaDe(f: FarmacoTomadoUi): InsulinaQr | undefined {
+  const horaManana = f.horas.find((h) => parseInt(h.split(':')[0] ?? '0', 10) < 18) ?? '08:00';
+  const horaNoche = f.horas.find((h) => parseInt(h.split(':')[0] ?? '0', 10) >= 18) ?? '21:00';
+  switch (f.idRegla) {
+    case 'insulina_basal': {
+      const o = f.insulinaBasalUi ?? 0;
+      const h = f.horas[0] ?? '09:00';
+      return { tipo: 'basal', tomas: [{ m: momentoDeHora(h), d: floorPct(o, 80), o, h }] };
+    }
+    case 'insulina_nph':
+      return { tipo: 'nph', nocheUi: f.insulinaNocheUi ?? 0, mananaUi: floorPct(f.insulinaMananaUi ?? 0, 50), mananaOrig: f.insulinaMananaUi ?? 0, horaNoche, horaManana };
+    case 'insulina_premezclada':
+      return { tipo: 'premezclada', mananaUi: floorPct(f.insulinaMananaUi ?? 0, 50), mananaOrig: f.insulinaMananaUi ?? 0, horaManana };
+    case 'insulina_rapida':
+      return { tipo: 'rapida', horaDesayuno: horaManana };
+    default:
+      return undefined;
+  }
 }
 
 export function construirPlanPaciente(
@@ -68,6 +94,7 @@ export function construirPlanPaciente(
     // hoja muestra la pauta; si se marcó «le llamaremos», sigue como no confirmado.
     const resultado = f.confirmadoPor ? { ...evaluado, confirmadoPor: f.confirmadoPor } : evaluado;
     const meta = metadatosPlazo(f.idRegla, f.dosisMg, f.tipoHbpm);
-    return { resultado, horas: f.horas, meta, variante: varianteMantener(f) };
+    const ins = insulinaDe(f);
+    return { resultado, horas: f.horas, meta, variante: varianteMantener(f), ...(ins ? { ins } : {}) };
   });
 }

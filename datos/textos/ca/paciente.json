@@ -55,7 +55,17 @@
     "margen_dias": "No el prengui els {n} dies anteriors a la intervenció ni aquell mateix dia.",
     "margen_horas": "L'última presa ha de ser com a mínim {n} hores abans de l'hora de la intervenció.",
     "coletilla_dias": " (com a mínim {n} dies abans de la intervenció)",
-    "coletilla_horas": " (com a mínim {n} hores abans de la intervenció)"
+    "coletilla_horas": " (com a mínim {n} hores abans de la intervenció)",
+    "insulina": {
+      "momento_manana_fecha": "el matí de la intervenció ({fecha} a les {hora})",
+      "momento_manana": "el matí de la intervenció",
+      "momento_noche_fecha": "la nit prèvia ({fecha} a les {hora})",
+      "momento_noche": "la nit prèvia",
+      "basal": "Redueixi la seva insulina basal: {cuando}, posi's {d} UI en lloc de {o}. Els dies anteriors, la dosi de sempre.",
+      "nph": "{cuandoNoche}, la seva dosi completa ({noche} UI). {cuandoManana}, {manana} UI en lloc de {mananaOrig} (la meitat).",
+      "premezclada": "{cuandoManana}, posi's {manana} UI en lloc de {mananaOrig} (la meitat de la seva dosi habitual).",
+      "rapida": "{cuandoManana} no es posi la dosi de l'esmorzar. Només pauta correctora segons la glucèmia capil·lar, seguint les indicacions de l'hospital."
+    }
   },
   "ayuno": {
     "hasta": "fins a les {hora}",
@@ -83,5 +93,57 @@
     "embarazo_20sem": "Per l'embaràs, el dejuni s'individualitza; segueixi les indicacions que li donin.",
     "reflujo_sintomatico": "Mantingui la seva medicació per al reflux i eviti els menjars que l'hi provoquen el dia previ.",
     "glp1_semanal_no_suspendido": "Prengui només líquids clars les 24 hores prèvies (segueixi el full adjunt)."
+  },
+  "anexos_titulo": "Fulls addicionals",
+  "anexos": {
+    "inicio_con_fecha": "el {inicio}",
+    "inicio_sin_fecha": "el dia que li indiquin (24 hores abans de la intervenció)",
+    "liquida24h": {
+      "titulo": "Dieta de líquids clars de 24 hores",
+      "parrafos": [
+        "Durant les 24 hores anteriors a la intervenció, des de {inicio}, prengui només líquids clars.",
+        "Pot prendre: aigua; brous colats, sense greix ni trossos (de pollastre, carn o verdures); gelatina que no sigui vermella ni morada; sucs sense polpa (poma, raïm blanc); begudes isotòniques transparents; infusions, te o cafè sense llet.",
+        "No prengui: aliments sòlids, llet ni lactis, sucs amb polpa, batuts ni suplements nutricionals.",
+        "Les últimes hores: segueixi l'apartat de dejuni del seu full. Pot prendre líquids clars fins a 4 hores abans de la intervenció; entre 4 i 2 hores abans, com a màxim 400 mL en total; en les 2 hores prèvies, res, tret de la medicació indicada amb un glop d'aigua."
+      ]
+    },
+    "diabetes_extra": {
+      "parrafos": [
+        "Com que té diabetis, durant aquestes 24 hores necessita prendre sucre en forma de líquids clars, repartit cada 2 o 3 hores, per evitar baixades de sucre.",
+        "Mesuri la seva glucosa cada 3 o 4 hores. Si està per sota de 100 mg/dL, prengui 120 mL de suc de poma o de beguda isotònica i torni a mesurar-la al cap de 15 o 20 minuts.",
+        "Exemple d'un dia:",
+        "07:00 · 1 tassa (240 mL) de suc de poma",
+        "09:30 · 1 tassa de brou colat i 1 gelatina sense sucre",
+        "12:00 · 1 got (240 mL) de beguda isotònica transparent",
+        "14:30 · 1 tassa de suc de raïm blanc",
+        "17:00 · 1 tassa de te sense sucre i 2 gelats de gel transparents",
+        "19:30 · 1 got (240 mL) de beguda isotònica transparent",
+        "22:00 · 1 tassa de brou colat o aigua i 1 gelatina sense sucre",
+        "Si la seva glucosa està baixa, pot repetir una ració de suc o de beguda isotònica.",
+        "Els seus medicaments per a la diabetis: segueixi exactament el que indica el seu full de medicació.",
+        "Porti el seu mesurador de glucosa a l'hospital."
+      ]
+    },
+    "ayuno_diabetico": {
+      "titulo": "Dejuni del pacient diabètic",
+      "parrafos": [
+        "Segueixi l'apartat de dejuni del seu full, inclosa la beguda de carbohidrats si el seu full l'hi indica.",
+        "Mesuri la seva glucosa en llevar-se el dia de la intervenció. Si està per sota de 100 mg/dL o nota símptomes de baixada (suor, tremolor, mareig), prengui 120 mL de suc de poma o de beguda isotònica encara que estigui en dejú, torni a mesurar-la al cap de 15 o 20 minuts i avisi en arribar a l'hospital.",
+        "Els seus medicaments per a la diabetis: segueixi exactament el que indica el seu full de medicació.",
+        "Porti el seu mesurador de glucosa a l'hospital."
+      ]
+    },
+    "tabaco": {
+      "titulo": "Tabac",
+      "parrafos": [
+        "Deixar de fumar abans de l'operació redueix les complicacions de la ferida i dels pulmons. Com abans ho deixi, millor, encara que només sigui uns dies abans. Si vol ajuda per deixar-ho, consulti amb el seu metge de família o el seu farmacèutic. El dia de la intervenció no fumi."
+      ]
+    },
+    "alcohol": {
+      "titulo": "Alcohol",
+      "parrafos": [
+        "Redueixi o eviti l'alcohol les setmanes prèvies a l'operació. Si beu alcohol cada dia en quantitat, no ho deixi de cop sense consultar-ho: digui-ho a la consulta o al seu metge de família, perquè deixar-ho bruscament pot ser perillós. No begui alcohol en les 24 hores anteriors a la intervenció."
+      ]
+    }
   }
 }

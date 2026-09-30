@@ -20,8 +20,61 @@ export function horaReloj(epoch: number): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
+function capitalizar(s: string): string {
+  return s.length > 0 ? s[0]!.toUpperCase() + s.slice(1) : s;
+}
+
+/** Fecha/hora concreta de una toma de insulina según el momento y la hora habitual. */
+function epochToma(fecha: number, hora: string, momento: 'noche_previa' | 'manana_intervencion'): number {
+  const [h, mm] = hora.split(':').map((x) => parseInt(x, 10));
+  const d = new Date(fecha);
+  if (momento === 'noche_previa') d.setDate(d.getDate() - 1);
+  d.setHours(h ?? 0, mm ?? 0, 0, 0);
+  return d.getTime();
+}
+
+/** Frase «cuándo» de una toma de insulina, con fecha y hora si se conocen. */
+function cuandoInsulina(momento: 'noche_previa' | 'manana_intervencion', hora: string, fecha: number | null, t: TextosPaciente): string {
+  const ins = t.med.insulina;
+  if (fecha === null) return momento === 'noche_previa' ? ins.momento_noche : ins.momento_manana;
+  const ep = epochToma(fecha, hora, momento);
+  return momento === 'noche_previa'
+    ? rellenar(ins.momento_noche_fecha, { fecha: fechaLarga(ep, t), hora: horaReloj(ep) })
+    : rellenar(ins.momento_manana_fecha, { fecha: fechaLarga(ep, t), hora: horaReloj(ep) });
+}
+
+/** Texto localizado de un ajuste de insulina (§8.5). */
+export function renderInsulina(ins: import('../../dominio/salidas/qr/hojaPaciente.ts').InsulinaQr, t: TextosPaciente, fecha: number | null): string {
+  const p = t.med.insulina;
+  if (ins.tipo === 'basal') {
+    const partes = (ins.tomas ?? []).map((toma) =>
+      rellenar(p.basal, { cuando: cuandoInsulina(toma.m, toma.h, fecha, t), d: toma.d, o: toma.o }),
+    );
+    return partes.join(' ');
+  }
+  if (ins.tipo === 'nph') {
+    return capitalizar(rellenar(p.nph, {
+      cuandoNoche: cuandoInsulina('noche_previa', ins.horaNoche ?? '21:00', fecha, t),
+      noche: ins.nocheUi ?? 0,
+      cuandoManana: cuandoInsulina('manana_intervencion', ins.horaManana ?? '08:00', fecha, t),
+      manana: ins.mananaUi ?? 0,
+      mananaOrig: ins.mananaOrig ?? 0,
+    }));
+  }
+  if (ins.tipo === 'premezclada') {
+    return capitalizar(rellenar(p.premezclada, {
+      cuandoManana: cuandoInsulina('manana_intervencion', ins.horaManana ?? '08:00', fecha, t),
+      manana: ins.mananaUi ?? 0,
+      mananaOrig: ins.mananaOrig ?? 0,
+    }));
+  }
+  return capitalizar(rellenar(p.rapida, {
+    cuandoManana: cuandoInsulina('manana_intervencion', ins.horaDesayuno ?? '08:00', fecha, t),
+  }));
+}
+
 /** Texto localizado de una instrucción de medicación. */
-export function renderMed(instr: InstruccionPacienteEstructurada, t: TextosPaciente, telefono: string): string {
+export function renderMed(instr: InstruccionPacienteEstructurada, t: TextosPaciente, telefono: string, fecha: number | null): string {
   const m = t.med;
   const e = instr.e;
   switch (e.k) {
@@ -37,6 +90,8 @@ export function renderMed(instr: InstruccionPacienteEstructurada, t: TextosPacie
       return t.idioma === 'ca' ? m.otro : e.tx;
     case 'no_dia_iq':
       return m.no_dia_iq;
+    case 'insulina':
+      return renderInsulina(e.ins, t, fecha);
     case 'margen':
       return e.margen.tipo === 'dias'
         ? rellenar(m.margen_dias, { n: e.margen.n })
@@ -58,6 +113,36 @@ export function renderMed(instr: InstruccionPacienteEstructurada, t: TextosPacie
 export interface LineaAyunoRender {
   etiqueta: string;
   cuando: string;
+}
+
+export interface AnexoRender {
+  titulo: string;
+  parrafos: string[];
+}
+
+/** Hojas anexas aplicables, ya localizadas (§8.14 bis). */
+export function renderAnexos(ids: string[], fecha: number | null, t: TextosPaciente): AnexoRender[] {
+  const a = t.anexos;
+  const inicio = fecha !== null
+    ? rellenar(a.inicio_con_fecha, { inicio: `${fechaLarga(fecha - 24 * 3_600_000, t)} a las ${horaReloj(fecha - 24 * 3_600_000)}` })
+    : a.inicio_sin_fecha;
+  const parrafosCon = (parr: string[]): string[] => parr.map((p) => rellenar(p, { inicio }));
+
+  const out: AnexoRender[] = [];
+  for (const id of ids) {
+    if (id === 'liquida24h') {
+      out.push({ titulo: a.liquida24h.titulo, parrafos: parrafosCon(a.liquida24h.parrafos) });
+    } else if (id === 'liquida24h_diabetes') {
+      out.push({ titulo: a.liquida24h.titulo, parrafos: [...parrafosCon(a.liquida24h.parrafos), ...a.diabetes_extra.parrafos] });
+    } else if (id === 'ayuno_diabetico') {
+      out.push({ titulo: a.ayuno_diabetico.titulo, parrafos: a.ayuno_diabetico.parrafos });
+    } else if (id === 'tabaco') {
+      out.push({ titulo: a.tabaco.titulo, parrafos: a.tabaco.parrafos });
+    } else if (id === 'alcohol') {
+      out.push({ titulo: a.alcohol.titulo, parrafos: a.alcohol.parrafos });
+    }
+  }
+  return out;
 }
 
 /** Líneas de ayuno localizadas, con horas de reloj si hay fecha o «h antes» si no. */

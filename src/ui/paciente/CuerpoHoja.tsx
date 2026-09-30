@@ -6,7 +6,7 @@
 import config from '../../../datos/config.json';
 import type { AyunoQr, ExtrasHojaQr, InstruccionPacienteEstructurada } from '../../dominio/salidas/qr/hojaPaciente.ts';
 import type { TextosPaciente } from './textosPaciente.ts';
-import { renderMed, renderAyuno, fechaLarga, horaReloj } from './render.ts';
+import { renderMed, renderAyuno, renderAnexos, fechaLarga, horaReloj } from './render.ts';
 
 interface Props {
   instrucciones: InstruccionPacienteEstructurada[];
@@ -38,7 +38,7 @@ export function CuerpoHoja({ instrucciones, ay, ex, fecha, t }: Props) {
             {instrucciones.map((i, k) => (
               <tr key={k} className={i.plazoNoCumplible ? 'fila-alerta' : ''}>
                 <td>{i.nombre}</td>
-                <td>{renderMed(i, t, config.telefono_contacto)}</td>
+                <td>{renderMed(i, t, config.telefono_contacto, fecha)}</td>
               </tr>
             ))}
           </tbody>
@@ -85,6 +85,13 @@ export function CuerpoHoja({ instrucciones, ay, ex, fecha, t }: Props) {
 
       <h2>{t.telefono_titulo}</h2>
       <p><strong>{config.telefono_contacto}</strong></p>
+
+      {ex && ex.anexos.length > 0 && renderAnexos(ex.anexos, fecha, t).map((anexo, k) => (
+        <section key={k} className="anexo">
+          <h2>{anexo.titulo}</h2>
+          {anexo.parrafos.map((p, j) => <p key={j}>{p}</p>)}
+        </section>
+      ))}
     </>
   );
 }

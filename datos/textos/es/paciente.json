@@ -54,7 +54,17 @@
     "margen_dias": "No lo tome los {n} días anteriores a la intervención ni ese mismo día.",
     "margen_horas": "Su última toma debe ser como mínimo {n} horas antes de la hora de la intervención.",
     "coletilla_dias": " (como mínimo {n} días antes de la intervención)",
-    "coletilla_horas": " (como mínimo {n} horas antes de la intervención)"
+    "coletilla_horas": " (como mínimo {n} horas antes de la intervención)",
+    "insulina": {
+      "momento_manana_fecha": "la mañana de la intervención ({fecha} a las {hora})",
+      "momento_manana": "la mañana de la intervención",
+      "momento_noche_fecha": "la noche previa ({fecha} a las {hora})",
+      "momento_noche": "la noche previa",
+      "basal": "Reduzca su insulina basal: {cuando}, póngase {d} UI en lugar de {o}. Los días anteriores, la dosis de siempre.",
+      "nph": "{cuandoNoche}, su dosis completa ({noche} UI). {cuandoManana}, {manana} UI en lugar de {mananaOrig} (la mitad).",
+      "premezclada": "{cuandoManana}, póngase {manana} UI en lugar de {mananaOrig} (la mitad de su dosis habitual).",
+      "rapida": "{cuandoManana} no se ponga la dosis del desayuno. Solo pauta correctora según la glucemia capilar, siguiendo las indicaciones del hospital."
+    }
   },
   "ayuno": {
     "hasta": "hasta las {hora}",
@@ -82,5 +92,57 @@
     "embarazo_20sem": "Por el embarazo, el ayuno se individualiza; siga las indicaciones que le den.",
     "reflujo_sintomatico": "Mantenga su medicación para el reflujo y evite las comidas que se lo provocan el día previo.",
     "glp1_semanal_no_suspendido": "Tome solo líquidos claros las 24 horas previas (siga la hoja adjunta)."
+  },
+  "anexos_titulo": "Hojas adicionales",
+  "anexos": {
+    "inicio_con_fecha": "el {inicio}",
+    "inicio_sin_fecha": "el día que le indiquen (24 horas antes de la intervención)",
+    "liquida24h": {
+      "titulo": "Dieta de líquidos claros de 24 horas",
+      "parrafos": [
+        "Durante las 24 horas anteriores a la intervención, desde {inicio}, tome solo líquidos claros.",
+        "Puede tomar: agua; caldos colados, sin grasa ni trozos (de pollo, carne o verduras); gelatina que no sea roja ni morada; zumos sin pulpa (manzana, uva blanca); bebidas isotónicas transparentes; infusiones, té o café sin leche.",
+        "No tome: alimentos sólidos, leche ni lácteos, zumos con pulpa, batidos ni suplementos nutricionales.",
+        "Las últimas horas: siga el apartado de ayuno de su hoja. Puede tomar líquidos claros hasta 4 horas antes de la intervención; entre 4 y 2 horas antes, como máximo 400 mL en total; en las 2 horas previas, nada, salvo la medicación indicada con un sorbo de agua."
+      ]
+    },
+    "diabetes_extra": {
+      "parrafos": [
+        "Como tiene diabetes, durante estas 24 horas necesita tomar azúcar en forma de líquidos claros, repartido cada 2 o 3 horas, para evitar bajadas de azúcar.",
+        "Mida su glucosa cada 3 o 4 horas. Si está por debajo de 100 mg/dL, tome 120 mL de zumo de manzana o de bebida isotónica y vuelva a medirla a los 15 o 20 minutos.",
+        "Ejemplo de un día:",
+        "07:00 · 1 taza (240 mL) de zumo de manzana",
+        "09:30 · 1 taza de caldo colado y 1 gelatina sin azúcar",
+        "12:00 · 1 vaso (240 mL) de bebida isotónica transparente",
+        "14:30 · 1 taza de zumo de uva blanca",
+        "17:00 · 1 taza de té sin azúcar y 2 polos de hielo transparentes",
+        "19:30 · 1 vaso (240 mL) de bebida isotónica transparente",
+        "22:00 · 1 taza de caldo colado o agua y 1 gelatina sin azúcar",
+        "Si su glucosa está baja, puede repetir una ración de zumo o de bebida isotónica.",
+        "Sus medicamentos para la diabetes: siga exactamente lo que indica su hoja de medicación.",
+        "Lleve su medidor de glucosa al hospital."
+      ]
+    },
+    "ayuno_diabetico": {
+      "titulo": "Ayuno del paciente diabético",
+      "parrafos": [
+        "Siga el apartado de ayuno de su hoja, incluida la bebida de carbohidratos si su hoja se la indica.",
+        "Mida su glucosa al levantarse el día de la intervención. Si está por debajo de 100 mg/dL o nota síntomas de bajada (sudor, temblor, mareo), tome 120 mL de zumo de manzana o de bebida isotónica aunque esté en ayunas, vuelva a medirla a los 15 o 20 minutos y avise al llegar al hospital.",
+        "Sus medicamentos para la diabetes: siga exactamente lo que indica su hoja de medicación.",
+        "Lleve su medidor de glucosa al hospital."
+      ]
+    },
+    "tabaco": {
+      "titulo": "Tabaco",
+      "parrafos": [
+        "Dejar de fumar antes de la operación reduce las complicaciones de la herida y de los pulmones. Cuanto antes lo deje, mejor, aunque solo sea unos días antes. Si quiere ayuda para dejarlo, consulte con su médico de familia o su farmacéutico. El día de la intervención no fume."
+      ]
+    },
+    "alcohol": {
+      "titulo": "Alcohol",
+      "parrafos": [
+        "Reduzca o evite el alcohol en las semanas previas a la operación. Si bebe alcohol todos los días en cantidad, no lo deje de golpe sin consultarlo: dígalo en la consulta o a su médico de familia, porque dejarlo bruscamente puede ser peligroso. No beba alcohol en las 24 horas anteriores a la intervención."
+      ]
+    }
   }
 }

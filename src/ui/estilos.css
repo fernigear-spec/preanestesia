@@ -530,4 +530,5 @@ body {
   .no-print, .banda-prueba, .cabecera, .pie-app { display: none !important; }
   .app, .contenido, .tarjeta { margin: 0; padding: 0; box-shadow: none; border: none; }
   .tabla-medicacion th { background: #eee !important; -webkit-print-color-adjust: exact; }
+  .anexo { break-before: page; page-break-before: always; }
 }
