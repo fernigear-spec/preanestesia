@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import config from '../../datos/config.json';
 import { BandaPrueba } from './BandaPrueba.tsx';
+import { useInactividad, useAvisoSalida } from './privacidad.ts';
 import { PasoIntervencion } from './pasos/PasoIntervencion.tsx';
 import { PasoBasicos } from './pasos/PasoBasicos.tsx';
 import { PasoAntecedentes } from './pasos/PasoAntecedentes.tsx';
@@ -47,6 +49,19 @@ export function App() {
     return h.startsWith('#p=') ? h.slice(3) : null;
   });
 
+  // Reinicia la entrevista (borra todo de la memoria y vuelve al inicio).
+  const nuevoPaciente = useCallback(() => {
+    setModalidad(null);
+    setEntrevista(ESTADO_INICIAL);
+    setPantalla('inicio');
+  }, []);
+
+  // Privacidad (§2): temporizador de inactividad y aviso al salir. Solo cuando hay
+  // una entrevista en curso (no en la pantalla de inicio ni en la vista del paciente).
+  const entrevistaEnCurso = !pacientePayload && pantalla !== 'inicio';
+  const inactividad = useInactividad(entrevistaEnCurso, nuevoPaciente, config.minutos_inactividad * 60_000);
+  useAvisoSalida(entrevistaEnCurso);
+
   if (pacientePayload) {
     return (
       <div className="app">
@@ -54,12 +69,6 @@ export function App() {
         <VistaPaciente cadena={pacientePayload} />
       </div>
     );
-  }
-
-  function nuevoPaciente() {
-    setModalidad(null);
-    setEntrevista(ESTADO_INICIAL);
-    setPantalla('inicio');
   }
 
   const { intervencion, procedimiento, basicos, antecedentes, mtnd4, alergias, habitos, cribado, medicacion, viaAerea, consentimiento } = entrevista;
@@ -71,6 +80,23 @@ export function App() {
         <h1>AnesHealth · Entrevista preanestésica</h1>
         <p className="subtitulo">Servicio de Anestesiología · Hospital Vithas Barcelona</p>
       </header>
+
+      {inactividad.avisoVisible && (
+        <div className="aviso-inactividad" role="alertdialog" aria-labelledby="inactividad-tit">
+          <p id="inactividad-tit">
+            <strong>¿Sigue con el paciente?</strong> Por privacidad, los datos se borrarán
+            en {inactividad.segundosRestantes} s por inactividad.
+          </p>
+          <div className="acciones">
+            <button type="button" className="boton-primario" onClick={inactividad.continuar}>
+              Seguir con el paciente
+            </button>
+            <button type="button" className="boton-secundario" onClick={nuevoPaciente}>
+              Borrar ahora
+            </button>
+          </div>
+        </div>
+      )}
 
       <main className="contenido">
         {pantalla === 'inicio' && (

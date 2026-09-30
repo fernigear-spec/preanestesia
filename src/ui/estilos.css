@@ -532,3 +532,19 @@ body {
   .tabla-medicacion th { background: #eee !important; -webkit-print-color-adjust: exact; }
   .anexo { break-before: page; page-break-before: always; }
 }
+
+/* Aviso de inactividad (privacidad §2) */
+.aviso-inactividad {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #fff4e5;
+  border: 1px solid #b06a00;
+  border-radius: var(--radio);
+  padding: 14px 16px;
+  margin: 12px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+.aviso-inactividad p {
+  margin: 0 0 10px;
+}

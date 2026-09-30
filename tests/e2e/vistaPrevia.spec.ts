@@ -172,7 +172,7 @@ test.describe('Vista previa', () => {
 
     // Salidas del paso 11: resumen del anestesiólogo, ASA sugerido y texto para SAP.
     await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
-    await expect(page.getByText(/ASA sugerido/)).toBeVisible();
+    await expect(page.locator('label[for="asa-manual"]')).toContainText('ASA sugerido');
     await expect(page.getByRole('heading', { name: /Escalas/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: /Texto para SAP/ })).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Texto para SAP' })).toBeVisible();
@@ -281,5 +281,51 @@ test.describe('Vista previa', () => {
     expect(ls).not.toContain('paciente');
     expect(ss).not.toContain('paciente');
     expect(cookies.filter((c) => /paciente|clinic/i.test(c.name))).toHaveLength(0);
+  });
+
+  test('privacidad (§2): el service worker solo cachea el esqueleto, nunca datos del paciente', async ({ page }) => {
+    // Generar una hoja de paciente para tener un enlace con datos en «#p=…».
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.locator('#edad').fill('60');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('80');
+    await page.locator('#talla').fill('175');
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
+    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> resumen
+    await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
+    await expect(page.getByRole('img', { name: /Código QR/ })).toBeVisible();
+
+    // Esperar a que el service worker esté listo y revisar el contenido de la caché.
+    const claveCache = await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+      const nombres = await caches.keys();
+      let volcado = '';
+      for (const n of nombres) {
+        const c = await caches.open(n);
+        const reqs = await c.keys();
+        volcado += reqs.map((r) => r.url).join('\n') + '\n';
+      }
+      return volcado;
+    });
+
+    // La caché solo guarda el esqueleto (js/css/html/manifest), nunca la URL con «#p=»
+    // (el fragmento no llega al service worker) ni ningún dato del paciente.
+    expect(claveCache).not.toContain('#p=');
+    expect(claveCache).not.toContain('paciente');
   });
 });
