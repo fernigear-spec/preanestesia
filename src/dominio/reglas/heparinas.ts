@@ -20,23 +20,61 @@ const FUENTE = 'docs/documento_fuente.md §8.4 (SETH; ASRA 2018; protocolo del s
 
 export type TipoHbpm = 'profilactica' | 'terapeutica' | 'indeterminada';
 
-export interface RangoSeth {
-  profilaxis_max?: number;
-  tratamiento_min?: number;
+/**
+ * Umbrales SETH de una HBPM (de reglas_farmacos.json → tablas_seth). Admite umbrales
+ * por peso (unidad/kg/día) y fijos (unidad/día), y un umbral de tratamiento reducido
+ * cuando el aclaramiento es < 30 mL/min (ajuste renal). Los números salen del JSON.
+ */
+export interface TablaSeth {
+  unidad?: 'mg' | 'UI';
+  /** Techo de profilaxis en unidad/kg/día (dosis ajustada al peso). */
+  profilaxis_max_por_kg_dia?: number;
+  /** Techo de profilaxis fijo en unidad/día. */
+  profilaxis_max_dia?: number;
+  /** Mínimo de tratamiento en unidad/kg/día. */
+  tratamiento_min_por_kg_dia?: number;
+  /** Mínimo de tratamiento en unidad/kg/día con aclaramiento < 30 (dosis renal reducida). */
+  tratamiento_min_por_kg_dia_crcl_lt30?: number;
+  /** Mínimo de tratamiento fijo en unidad/día. */
+  tratamiento_min_dia?: number;
+}
+
+/** Datos necesarios para clasificar una HBPM (§8.4): no basta la dosis. */
+export interface EntradaClasificacionHbpm {
+  /** Dosis por toma (mg para enoxaparina; UI para el resto). */
+  dosisPorToma: number;
+  /** Tomas al día (1 = cada 24 h; 2 = cada 12 h). */
+  tomasDia: number;
+  /** Peso real del paciente (kg). */
+  pesoKg: number;
+  /** Aclaramiento de creatinina (mL/min) o null si no se conoce. */
+  aclaramiento: number | null;
 }
 
 /**
- * Clasifica una HBPM por dosis usando la tabla SETH del fármaco.
- * @param dosisDiaria dosis total diaria (mg para enoxaparina, UI para las demás).
- * @param rango umbrales del fármaco (de tablas_seth).
+ * Clasifica una HBPM en profiláctica/terapéutica usando dosis, pauta, peso y
+ * aclaramiento contra las dos tablas de la SETH del fármaco (§8.4). Si no encaja en
+ * ninguna, devuelve 'indeterminada' (la regla preguntará). Ejemplos: enoxaparina
+ * 60 mg/24 h en 90 kg es profilaxis; 40 mg/12 h en 110 kg es profilaxis;
+ * 1 mg/kg/12 h es tratamiento; 1 mg/kg/24 h con aclaramiento < 30 es tratamiento.
  */
-export function clasificarHbpm(dosisDiaria: number, rango: RangoSeth): TipoHbpm {
-  if (rango.profilaxis_max !== undefined && dosisDiaria <= rango.profilaxis_max) {
-    return 'profilactica';
-  }
-  if (rango.tratamiento_min !== undefined && dosisDiaria >= rango.tratamiento_min) {
-    return 'terapeutica';
-  }
+export function clasificarHbpm(e: EntradaClasificacionHbpm, tabla: TablaSeth): TipoHbpm {
+  const diaria = e.dosisPorToma * e.tomasDia;
+  const porKgDia = e.pesoKg > 0 ? diaria / e.pesoKg : null;
+  const renal = e.aclaramiento !== null && e.aclaramiento < 30;
+
+  // Tratamiento (se comprueba primero: prima la dosis terapéutica).
+  if (renal && tabla.tratamiento_min_por_kg_dia_crcl_lt30 !== undefined && porKgDia !== null
+    && porKgDia >= tabla.tratamiento_min_por_kg_dia_crcl_lt30) return 'terapeutica';
+  if (tabla.tratamiento_min_por_kg_dia !== undefined && porKgDia !== null
+    && porKgDia >= tabla.tratamiento_min_por_kg_dia) return 'terapeutica';
+  if (tabla.tratamiento_min_dia !== undefined && diaria >= tabla.tratamiento_min_dia) return 'terapeutica';
+
+  // Profilaxis.
+  if (tabla.profilaxis_max_por_kg_dia !== undefined && porKgDia !== null
+    && porKgDia <= tabla.profilaxis_max_por_kg_dia) return 'profilactica';
+  if (tabla.profilaxis_max_dia !== undefined && diaria <= tabla.profilaxis_max_dia) return 'profilactica';
+
   return 'indeterminada';
 }
 

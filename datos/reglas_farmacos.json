@@ -12,12 +12,12 @@
     "intercostal"
   ],
   "tablas_seth": {
-    "_descripcion": "Umbrales de dosis diaria para clasificar HBPM como profilaxis o tratamiento (docs/documento_fuente.md §8.4). Si la dosis no encaja en ningún rango, la aplicación pregunta. Valores del protocolo del servicio; verificar antes del uso clínico.",
-    "enoxaparina": { "profilaxis_max_mg_dia": 40, "tratamiento_min_mg_dia": 60, "unidad": "mg" },
-    "bemiparina": { "profilaxis_max_ui_dia": 3500, "tratamiento_min_ui_dia": 5000, "unidad": "UI" },
-    "tinzaparina": { "profilaxis_max_ui_dia": 4500, "tratamiento_min_ui_dia": 10000, "unidad": "UI" },
-    "nadroparina": { "profilaxis_max_ui_dia": 3800, "tratamiento_min_ui_dia": 5700, "unidad": "UI" },
-    "dalteparina": { "profilaxis_max_ui_dia": 5000, "tratamiento_min_ui_dia": 10000, "unidad": "UI" }
+    "_descripcion": "Umbrales SETH para clasificar la HBPM por dosis, pauta, peso y aclaramiento (docs/documento_fuente.md §8.4). Enoxaparina se clasifica por dosis/kg/día (la profilaxis puede intensificarse por peso y el tratamiento reducirse por aclaramiento < 30). El resto usa umbrales fijos por día. Si no encaja, la aplicación pregunta. Valores del protocolo del servicio; verificar antes del uso clínico.",
+    "enoxaparina": { "unidad": "mg", "profilaxis_max_por_kg_dia": 1.0, "tratamiento_min_por_kg_dia": 1.5, "tratamiento_min_por_kg_dia_crcl_lt30": 1.0 },
+    "bemiparina": { "unidad": "UI", "profilaxis_max_dia": 3500, "tratamiento_min_dia": 5000 },
+    "tinzaparina": { "unidad": "UI", "profilaxis_max_dia": 4500, "tratamiento_min_dia": 10000 },
+    "nadroparina": { "unidad": "UI", "profilaxis_max_dia": 3800, "tratamiento_min_dia": 5700 },
+    "dalteparina": { "unidad": "UI", "profilaxis_max_dia": 5000, "tratamiento_min_dia": 10000 }
   },
   "reglas": {
     "avk_warfarina": {

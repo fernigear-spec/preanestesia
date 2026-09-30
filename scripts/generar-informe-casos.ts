@@ -261,7 +261,7 @@ function add(id: string, calculado: string, textoPaciente: string, _a?: string |
   add('B2', farmacoResumen(r), r.textoPaciente, fh(r.fechaHoraUltimaToma) === 'mié 14/10 20:00');
 }
 {
-  const clas = clasificarHbpm(160, { profilaxis_max: 40, tratamiento_min: 60 });
+  const clas = clasificarHbpm({ dosisPorToma: 80, tomasDia: 2, pesoKg: 80, aclaramiento: 60 }, { unidad: 'mg', profilaxis_max_por_kg_dia: 1.0, tratamiento_min_por_kg_dia: 1.5, tratamiento_min_por_kg_dia_crcl_lt30: 1.0 });
   const r = reglaHbpm({ idFarmaco: 'enox', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'terapeutica' }, ctx({ aclaramiento: 60, pautaFarmaco: P('09:00', '21:00') }));
   add('B3', `clasificación: ${clas}; ${farmacoResumen(r)}`, r.textoPaciente, 'terapéutica; 24 h; adelantar mié 14/10 09:00→08:00', clas === 'terapeutica' && fh(r.fechaHoraUltimaToma) === 'mié 14/10 08:00');
 }

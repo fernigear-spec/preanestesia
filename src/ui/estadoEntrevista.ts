@@ -120,6 +120,9 @@ export interface FarmacoTomadoUi {
   insulinaNocheUi?: number;
   insulinaMananaUi?: number;
   tipoHbpm?: 'profilactica' | 'terapeutica' | 'indeterminada';
+  /** HBPM (§8.4): dosis por toma (mg o UI) y tomas al día, para clasificarla. */
+  hbpmDosis?: number;
+  hbpmTomasDia?: number;
   /** Opioides (§5.7): dosis por toma (mg) o tasa del parche (µg/h). */
   opioideDosis?: number;
   /** Opioides: número de tomas al día (no aplica en parches). */

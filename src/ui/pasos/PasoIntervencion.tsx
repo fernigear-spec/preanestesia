@@ -6,7 +6,7 @@
  * está a más de 60 días. Los riesgos se heredan del procedimiento elegido.
  */
 import { useMemo, useState } from 'react';
-import type { DatosIntervencion, Regimen, Caracter, TecnicaAnestesica } from '../../dominio/tipos.ts';
+import type { DatosIntervencion, Regimen, Caracter, TecnicaAnestesica, RiesgoCardiovascular, RiesgoHemorragico } from '../../dominio/tipos.ts';
 import {
   cargarProcedimientos,
   buscarProcedimientos,
@@ -55,6 +55,11 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
   const [caracter, setCaracter] = useState<Caracter>('programada');
   const [tecnica, setTecnica] = useState<TecnicaAnestesica>('general');
   const [contrasteYodado, setContrasteYodado] = useState<'si' | 'no' | 'no_se_sabe'>('no');
+  // «Otro procedimiento» (no listado): la enfermera fija los riesgos a mano (§7.1).
+  const [otro, setOtro] = useState(false);
+  const [otroCv, setOtroCv] = useState<RiesgoCardiovascular | ''>('');
+  const [otroHemo, setOtroHemo] = useState<RiesgoHemorragico | ''>('');
+  const [otroNeuroaxial, setOtroNeuroaxial] = useState(false);
 
   const resultados = useMemo(
     () => (elegido ? [] : buscarProcedimientos(procedimientos, consulta)),
@@ -70,31 +75,46 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
   }, [fecha, hora, fechaDesconocida]);
   const avisoMas60 = diasHasta !== null && diasHasta > 60;
 
-  // Se puede continuar con fecha, o marcando "fecha aún no conocida".
-  const puedeContinuar = elegido !== null && (fechaDesconocida || fecha !== '');
+  // Se puede continuar con fecha (o "sin fecha") y con un procedimiento del catálogo
+  // o con "otro" y sus riesgos marcados a mano.
+  const otroCompleto = otro && otroCv !== '' && otroHemo !== '';
+  const puedeContinuar = (fechaDesconocida || fecha !== '') && (elegido !== null || otroCompleto);
 
   function continuar() {
-    if (!elegido) return;
+    if (!elegido && !otroCompleto) return;
     if (!fechaDesconocida && fecha === '') return;
     const fechaHora = fechaDesconocida ? null : new Date(`${fecha}T${hora === '' ? '08:00' : hora}`);
+    const proc: Procedimiento = elegido ?? {
+      id: 'otro',
+      nombre: 'Otro procedimiento (no listado)',
+      especialidad: 'otro',
+      riesgoCardiovascular: otroCv as RiesgoCardiovascular,
+      riesgoHemorragico: otroHemo as RiesgoHemorragico,
+      grupoOftalmologico: 'no_aplica',
+      neuroaxialProbable: otroNeuroaxial,
+      duracionMayor30min: true,
+      riesgoTromboticoAlto: false,
+      espacioCerrado: false,
+      obstetrico: false,
+    };
     const datos: DatosIntervencion = {
       fechaHora,
       fechaDesconocida,
       horaAsumida,
-      procedimientoId: elegido.id,
-      riesgoCardiovascular: elegido.riesgoCardiovascular,
-      riesgoHemorragico: elegido.riesgoHemorragico,
-      grupoOftalmologico: elegido.grupoOftalmologico,
-      neuroaxialProbable: elegido.neuroaxialProbable,
-      duracionMayor30min: elegido.duracionMayor30min,
-      riesgoTromboticoAlto: elegido.riesgoTromboticoAlto,
-      espacioCerrado: elegido.espacioCerrado,
+      procedimientoId: proc.id,
+      riesgoCardiovascular: proc.riesgoCardiovascular,
+      riesgoHemorragico: proc.riesgoHemorragico,
+      grupoOftalmologico: proc.grupoOftalmologico,
+      neuroaxialProbable: proc.neuroaxialProbable,
+      duracionMayor30min: proc.duracionMayor30min,
+      riesgoTromboticoAlto: proc.riesgoTromboticoAlto,
+      espacioCerrado: proc.espacioCerrado,
       contrasteYodado,
       regimen,
       caracter,
       tecnica,
     };
-    onContinuar(datos, elegido);
+    onContinuar(datos, proc);
   }
 
   return (
@@ -152,6 +172,11 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
               Cambiar
             </button>
           </div>
+        ) : otro ? (
+          <div className="elegido">
+            <span><strong>Otro procedimiento (no listado)</strong> · marque los riesgos abajo</span>
+            <button type="button" className="boton-enlace" onClick={() => setOtro(false)}>Cambiar</button>
+          </div>
         ) : (
           <>
             <input
@@ -177,9 +202,41 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
             {consulta.trim() !== '' && resultados.length === 0 && (
               <p className="aviso aviso-info" role="note">Sin resultados. Pruebe con otra palabra.</p>
             )}
+            <button type="button" className="boton-enlace" onClick={() => setOtro(true)}>
+              El procedimiento no está en la lista → otro procedimiento
+            </button>
           </>
         )}
       </div>
+
+      {/* Otro procedimiento: riesgos a mano (§7.1), sin valores por defecto del catálogo */}
+      {otro && (
+        <div className="riesgos" aria-live="polite">
+          <p className="riesgos-titulo">Marque los riesgos del procedimiento (no hay valores por defecto):</p>
+          <div className="campo">
+            <label htmlFor="otro-cv">Riesgo cardiovascular</label>
+            <select id="otro-cv" value={otroCv} onChange={(e) => setOtroCv(e.target.value as RiesgoCardiovascular | '')}>
+              <option value="">— elija —</option>
+              <option value="bajo">Bajo</option>
+              <option value="intermedio">Intermedio</option>
+              <option value="alto">Alto</option>
+            </select>
+          </div>
+          <div className="campo">
+            <label htmlFor="otro-hemo">Riesgo hemorrágico</label>
+            <select id="otro-hemo" value={otroHemo} onChange={(e) => setOtroHemo(e.target.value as RiesgoHemorragico | '')}>
+              <option value="">— elija —</option>
+              <option value="minimo">Mínimo</option>
+              <option value="bajo">Bajo</option>
+              <option value="alto">Alto</option>
+            </select>
+          </div>
+          <label className={`radio-tarjeta ${otroNeuroaxial ? 'seleccionado' : ''}`}>
+            <input type="checkbox" checked={otroNeuroaxial} onChange={() => setOtroNeuroaxial(!otroNeuroaxial)} />
+            Técnica neuroaxial o bloqueo profundo probable
+          </label>
+        </div>
+      )}
 
       {/* Riesgos heredados del procedimiento */}
       {elegido && (

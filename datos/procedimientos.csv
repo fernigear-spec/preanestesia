@@ -1,24 +1,24 @@
 id;procedimiento;especialidad;riesgo_cardiovascular;riesgo_hemorragico;grupo_oftalmologico;neuroaxial_o_bloqueo_profundo_probable;duracion_mayor_30min;riesgo_trombotico_alto;obstetrico;espacio_cerrado
 cgd_hernioplastia_inguinal;Hernioplastia inguinal abierta;cirugia_general;bajo;bajo;no_aplica;no;si;no;no;no
-cgd_hernioplastia_inguinal_lap;Hernioplastia inguinal laparoscopica;cirugia_general;bajo;bajo;no_aplica;no;si;no;no;no
+cgd_hernioplastia_inguinal_lap;Hernioplastia inguinal laparoscopica;cirugia_general;intermedio;bajo;no_aplica;no;si;no;no;no
 cgd_hernioplastia_umbilical;Hernioplastia umbilical;cirugia_general;bajo;bajo;no_aplica;no;si;no;no;no
 cgd_eventroplastia;Eventroplastia de pared abdominal;cirugia_general;intermedio;alto;no_aplica;no;si;no;no;no
 cgd_colecistectomia_lap;Colecistectomia laparoscopica;cirugia_general;intermedio;bajo;no_aplica;no;si;no;no;no
 cgd_colecistectomia_abierta;Colecistectomia abierta;cirugia_general;intermedio;alto;no_aplica;no;si;no;no;no
-cgd_apendicectomia;Apendicectomia;cirugia_general;bajo;bajo;no_aplica;no;si;no;no;no
+cgd_apendicectomia;Apendicectomia;cirugia_general;intermedio;bajo;no_aplica;no;si;no;no;no
 cgd_colectomia_no_onco;Colectomia no oncologica;cirugia_general;intermedio;alto;no_aplica;no;si;no;no;no
-cgd_colectomia_onco;Colectomia oncologica;cirugia_general;alto;alto;no_aplica;no;si;si;no;no
-cgd_hemicolectomia;Hemicolectomia;cirugia_general;alto;alto;no_aplica;no;si;si;no;no
-cgd_reseccion_rectal;Reseccion anterior de recto;cirugia_general;alto;alto;no_aplica;si;si;si;no;no
-cgd_amputacion_abdominoperineal;Amputacion abdominoperineal;cirugia_general;alto;alto;no_aplica;si;si;si;no;no
-cgd_gastrectomia;Gastrectomia;cirugia_general;alto;alto;no_aplica;no;si;si;no;no
+cgd_colectomia_onco;Colectomia oncologica;cirugia_general;intermedio;alto;no_aplica;no;si;si;no;no
+cgd_hemicolectomia;Hemicolectomia;cirugia_general;intermedio;alto;no_aplica;no;si;si;no;no
+cgd_reseccion_rectal;Reseccion anterior de recto;cirugia_general;intermedio;alto;no_aplica;si;si;si;no;no
+cgd_amputacion_abdominoperineal;Amputacion abdominoperineal;cirugia_general;intermedio;alto;no_aplica;si;si;si;no;no
+cgd_gastrectomia;Gastrectomia;cirugia_general;intermedio;alto;no_aplica;no;si;si;no;no
 cgd_esofagectomia;Esofagectomia;cirugia_general;alto;alto;no_aplica;no;si;si;no;no
-cgd_bariatrica_bypass;Bypass gastrico;cirugia_general;alto;alto;no_aplica;no;si;si;no;no
+cgd_bariatrica_bypass;Bypass gastrico;cirugia_general;intermedio;alto;no_aplica;no;si;si;no;no
 cgd_bariatrica_gastrectomia;Gastrectomia vertical;cirugia_general;intermedio;alto;no_aplica;no;si;si;no;no
 cgd_tiroidectomia;Tiroidectomia;cirugia_general;intermedio;bajo;no_aplica;no;si;no;no;no
 cgd_paratiroidectomia;Paratiroidectomia;cirugia_general;intermedio;bajo;no_aplica;no;si;no;no;no
 cgd_suprarrenalectomia;Suprarrenalectomia laparoscopica;cirugia_general;alto;alto;no_aplica;no;si;si;no;no
-cgd_esplenectomia;Esplenectomia;cirugia_general;alto;alto;no_aplica;no;si;si;no;no
+cgd_esplenectomia;Esplenectomia;cirugia_general;intermedio;alto;no_aplica;no;si;si;no;no
 cgd_mastectomia;Mastectomia;cirugia_general;bajo;bajo;no_aplica;no;si;no;no;no
 cgd_tumorectomia_mama;Tumorectomia de mama;cirugia_general;bajo;bajo;no_aplica;no;si;no;no;no
 cgd_biopsia_ganglio_centinela;Biopsia de ganglio centinela;cirugia_general;bajo;bajo;no_aplica;no;si;no;no;no
@@ -43,9 +43,9 @@ uro_nefrolitotomia;Nefrolitotomia percutanea;urologia;intermedio;alto;no_aplica;
 uro_ureteroscopia;Ureteroscopia;urologia;bajo;bajo;no_aplica;si;si;no;no;no
 uro_litotricia;Litotricia extracorporea;urologia;intermedio;alto;no_aplica;no;si;no;no;no
 uro_prostatectomia_radical;Prostatectomia radical;urologia;intermedio;alto;no_aplica;si;si;no;no;no
-uro_nefrectomia;Nefrectomia;urologia;alto;alto;no_aplica;no;si;si;no;no
-uro_nefrectomia_parcial;Nefrectomia parcial;urologia;alto;alto;no_aplica;no;si;si;no;no
-uro_cistectomia;Cistectomia radical;urologia;alto;alto;no_aplica;no;si;si;no;no
+uro_nefrectomia;Nefrectomia;urologia;intermedio;alto;no_aplica;no;si;si;no;no
+uro_nefrectomia_parcial;Nefrectomia parcial;urologia;intermedio;alto;no_aplica;no;si;si;no;no
+uro_cistectomia;Cistectomia radical;urologia;intermedio;alto;no_aplica;no;si;si;no;no
 uro_biopsia_prostata;Biopsia de prostata;urologia;bajo;bajo;no_aplica;no;no;no;no;no
 uro_biopsia_renal;Biopsia renal;urologia;intermedio;alto;no_aplica;no;si;no;no;no
 uro_vasectomia;Vasectomia;urologia;bajo;minimo;no_aplica;no;no;no;no;no
@@ -79,7 +79,7 @@ tra_artroscopia_rodilla;Artroscopia de rodilla;traumatologia;bajo;bajo;no_aplica
 tra_artroscopia_hombro;Artroscopia de hombro;traumatologia;bajo;bajo;no_aplica;si;si;no;no;no
 tra_ligamentoplastia;Ligamentoplastia de rodilla;traumatologia;bajo;bajo;no_aplica;si;si;no;no;no
 tra_meniscectomia;Meniscectomia artroscopica;traumatologia;bajo;bajo;no_aplica;si;si;no;no;no
-tra_cirugia_columna_lumbar;Artrodesis lumbar;traumatologia;alto;alto;no_aplica;si;si;si;no;si
+tra_cirugia_columna_lumbar;Artrodesis lumbar;traumatologia;intermedio;alto;no_aplica;si;si;si;no;si
 tra_hernia_discal;Discectomia lumbar;traumatologia;intermedio;alto;no_aplica;si;si;no;no;si
 tra_laminectomia;Laminectomia;traumatologia;intermedio;alto;no_aplica;si;si;si;no;si
 tra_cirugia_mano;Cirugia de mano;traumatologia;bajo;bajo;no_aplica;si;si;no;no;no
@@ -155,12 +155,12 @@ tor_mediastinoscopia;Mediastinoscopia;toracica;intermedio;bajo;no_aplica;no;si;n
 tor_biopsia_pleural;Biopsia pleural;toracica;intermedio;bajo;no_aplica;no;si;no;no;no
 tor_pleurodesis;Pleurodesis;toracica;intermedio;bajo;no_aplica;no;si;no;no;no
 tor_timectomia;Timectomia;toracica;alto;alto;no_aplica;no;si;si;no;no
-nrc_craneotomia_tumor;Craneotomia por tumor;neurocirugia;alto;alto;no_aplica;no;si;si;no;si
-nrc_craneotomia_aneurisma;Craneotomia por aneurisma;neurocirugia;alto;alto;no_aplica;no;si;si;no;si
-nrc_hematoma_subdural;Evacuacion de hematoma subdural;neurocirugia;alto;alto;no_aplica;no;si;si;no;si
+nrc_craneotomia_tumor;Craneotomia por tumor;neurocirugia;intermedio;alto;no_aplica;no;si;si;no;si
+nrc_craneotomia_aneurisma;Craneotomia por aneurisma;neurocirugia;intermedio;alto;no_aplica;no;si;si;no;si
+nrc_hematoma_subdural;Evacuacion de hematoma subdural;neurocirugia;intermedio;alto;no_aplica;no;si;si;no;si
 nrc_derivacion_ventricular;Derivacion ventriculoperitoneal;neurocirugia;intermedio;alto;no_aplica;no;si;no;no;si
-nrc_cirugia_hipofisis;Cirugia transesfenoidal de hipofisis;neurocirugia;alto;alto;no_aplica;no;si;si;no;si
-nrc_canal_medular;Cirugia del canal medular;neurocirugia;alto;alto;no_aplica;si;si;si;no;si
+nrc_cirugia_hipofisis;Cirugia transesfenoidal de hipofisis;neurocirugia;intermedio;alto;no_aplica;no;si;si;no;si
+nrc_canal_medular;Cirugia del canal medular;neurocirugia;intermedio;alto;no_aplica;si;si;si;no;si
 nrc_estimulador_medular;Implante de estimulador medular;neurocirugia;intermedio;alto;no_aplica;si;si;no;no;si
 nrc_puncion_lumbar;Puncion lumbar;neurocirugia;bajo;alto;no_aplica;si;no;no;no;si
 car_marcapasos;Implante de marcapasos o DAI;cardiologia;intermedio;bajo;no_aplica;no;si;no;no;no
@@ -189,7 +189,7 @@ ped_orquidopexia;Orquidopexia;pediatria;bajo;bajo;no_aplica;si;si;no;no;no
 ped_fimosis;Cirugia de fimosis;pediatria;bajo;minimo;no_aplica;no;no;no;no;no
 ped_frenillo;Frenulectomia;pediatria;bajo;minimo;no_aplica;no;no;no;no;no
 ped_hipospadias;Correccion de hipospadias;pediatria;bajo;bajo;no_aplica;si;si;no;no;no
-ped_apendicectomia;Apendicectomia pediatrica;pediatria;bajo;bajo;no_aplica;no;si;no;no;no
+ped_apendicectomia;Apendicectomia pediatrica;pediatria;intermedio;bajo;no_aplica;no;si;no;no;no
 ped_estrabismo;Cirugia de estrabismo pediatrica;pediatria;bajo;bajo;riesgo_moderado_alto;no;si;no;no;no
 ped_cardiopatia_congenita;Cirugia de cardiopatia congenita;pediatria;alto;alto;no_aplica;no;si;si;no;no
 gen_cirugia_perineal;Cirugia perineal o proctologica;cirugia_general;bajo;bajo;no_aplica;si;si;no;no;no

@@ -494,6 +494,21 @@ test.describe('Vista previa', () => {
     await expect(page.getByText(/7 días/)).toBeVisible();
   });
 
+  test('paso 1: "otro procedimiento" exige marcar los riesgos a mano (§7.1)', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.getByRole('button', { name: /no está en la lista/ }).click();
+    await expect(page.getByText(/no hay valores por defecto/)).toBeVisible();
+    // Sin riesgos marcados, no se puede continuar.
+    await expect(page.getByRole('button', { name: 'Continuar' })).toBeDisabled();
+    await page.locator('#otro-cv').selectOption('intermedio');
+    await page.locator('#otro-hemo').selectOption('bajo');
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await expect(page.getByRole('heading', { name: /Paso 2 · Datos básicos/ })).toBeVisible();
+  });
+
   test('§14.2 modo entrenamiento: carga un caso y muestra la comparación con lo esperado', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Modo entrenamiento' }).click();

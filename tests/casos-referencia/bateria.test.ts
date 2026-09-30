@@ -137,11 +137,18 @@ describe('Casos B · heparinas y fondaparinux', () => {
     const r = reglaHbpm({ idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'profilactica' }, ctx({ neuroaxial: true, pautaFarmaco: P('18:00') }));
     expect(esFecha(r.fechaHoraUltimaToma, 2026, 9, 14, 18, 0)).toBeTrue();
   });
-  it('B1 clasificación SETH: 40 mg enoxaparina → profiláctica', () => {
-    expect(clasificarHbpm(40, { profilaxis_max: 40, tratamiento_min: 60 })).toBe('profilactica');
+  it('B1 clasificación SETH enoxaparina (dosis/pauta/peso/aclaramiento §8.4)', () => {
+    const enox = { unidad: 'mg' as const, profilaxis_max_por_kg_dia: 1.0, tratamiento_min_por_kg_dia: 1.5, tratamiento_min_por_kg_dia_crcl_lt30: 1.0 };
+    // 60 mg/24 h en 90 kg → profiláctica (0,67 mg/kg/día).
+    expect(clasificarHbpm({ dosisPorToma: 60, tomasDia: 1, pesoKg: 90, aclaramiento: 80 }, enox)).toBe('profilactica');
+    // 40 mg/12 h en 110 kg → profiláctica (0,73 mg/kg/día).
+    expect(clasificarHbpm({ dosisPorToma: 40, tomasDia: 2, pesoKg: 110, aclaramiento: 80 }, enox)).toBe('profilactica');
+    // 1 mg/kg/12 h → terapéutica (2 mg/kg/día).
+    expect(clasificarHbpm({ dosisPorToma: 90, tomasDia: 2, pesoKg: 90, aclaramiento: 80 }, enox)).toBe('terapeutica');
+    // 1 mg/kg/24 h con aclaramiento < 30 → terapéutica (dosis renal reducida).
+    expect(clasificarHbpm({ dosisPorToma: 90, tomasDia: 1, pesoKg: 90, aclaramiento: 25 }, enox)).toBe('terapeutica');
   });
-  it('B3 enoxaparina 160 mg/día (80 mg/12h) → terapéutica; 24 h, adelantar mié 14/10 09:00→08:00', () => {
-    expect(clasificarHbpm(160, { profilaxis_max: 40, tratamiento_min: 60 })).toBe('terapeutica');
+  it('B3 enoxaparina terapéutica: 24 h, adelantar mié 14/10 09:00→08:00', () => {
     const r = reglaHbpm({ idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'terapeutica' }, ctx({ aclaramiento: 60, pautaFarmaco: P('09:00', '21:00') }));
     expect(esFecha(r.fechaHoraUltimaToma, 2026, 9, 14, 8, 0)).toBeTrue();
   });

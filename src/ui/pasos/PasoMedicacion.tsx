@@ -22,6 +22,10 @@ import {
 } from '../../dominio/coherencia/coherencia.ts';
 import { cargarFarmacos, buscarFarmacos, type FarmacoCatalogoUi } from '../../datos/farmacos.ts';
 import { HORAS_FRECUENTES, reglaNecesitaHoras, type FarmacoTomadoUi } from '../estadoEntrevista.ts';
+import reglasFarmacos from '../../../datos/reglas_farmacos.json';
+import { clasificarHbpm, type TablaSeth } from '../../dominio/reglas/heparinas.ts';
+
+const TABLAS_SETH = reglasFarmacos.tablas_seth as Record<string, TablaSeth>;
 
 interface Props {
   inicial: FarmacoTomadoUi[] | null;
@@ -176,8 +180,22 @@ function FichaFarmaco({
   const esInsulinaBasal = f.idRegla === 'insulina_basal';
   const esInsulinaNph = f.idRegla === 'insulina_nph';
   const esInsulinaPremezclada = f.idRegla === 'insulina_premezclada';
-  const esHbpm = f.idRegla === 'hbpm' || f.idRegla === 'fondaparinux';
+  const esHbpmSeth = f.idRegla === 'hbpm';
+  const esFondaparinux = f.idRegla === 'fondaparinux';
+  const tablaSeth = TABLAS_SETH[f.principiosActivos[0] ?? ''];
+  const unidadHbpm = tablaSeth?.unidad ?? 'mg';
   const necesitaDosis = f.idRegla === 'aas' || f.idRegla === 'metotrexato';
+
+  /** Reclasifica la HBPM (§8.4) al cambiar dosis o pauta y fija tipoHbpm. */
+  function actualizarHbpm(cambios: Partial<FarmacoTomadoUi>) {
+    const dosis = cambios.hbpmDosis ?? f.hbpmDosis;
+    const tomas = cambios.hbpmTomasDia ?? f.hbpmTomasDia;
+    let tipo: FarmacoTomadoUi['tipoHbpm'] = f.tipoHbpm;
+    if (dosis && tomas && tablaSeth) {
+      tipo = clasificarHbpm({ dosisPorToma: dosis, tomasDia: tomas, pesoKg, aclaramiento: hechos.aclaramiento }, tablaSeth);
+    }
+    onCambio({ ...cambios, ...(tipo ? { tipoHbpm: tipo } : {}) });
+  }
   const esOpioide = f.grupo === 'opioides';
   const esParche = esOpioide && f.via === 'transdermica';
 
@@ -264,9 +282,26 @@ function FichaFarmaco({
         </>
       )}
 
-      {esHbpm && (
+      {esHbpmSeth && (
         <div className="campo">
-          <label>Dosis de la heparina</label>
+          <label htmlFor={`hbpmd-${f.idFarmaco}`}>Dosis por toma ({unidadHbpm})</label>
+          <input id={`hbpmd-${f.idFarmaco}`} type="number" min={0} inputMode="decimal" value={f.hbpmDosis ?? ''} onChange={(e) => actualizarHbpm({ hbpmDosis: Number(e.target.value) })} />
+          <label htmlFor={`hbpmt-${f.idFarmaco}`}>Tomas al día</label>
+          <select id={`hbpmt-${f.idFarmaco}`} value={f.hbpmTomasDia ?? ''} onChange={(e) => actualizarHbpm({ hbpmTomasDia: Number(e.target.value) })}>
+            <option value="" disabled>Elija</option>
+            <option value={1}>1 (cada 24 h)</option>
+            <option value={2}>2 (cada 12 h)</option>
+          </select>
+          <p className="horas-elegidas">
+            Clasificación (SETH): <strong>{f.tipoHbpm ?? 'pendiente de dosis y pauta'}</strong>
+            {f.tipoHbpm === 'indeterminada' ? ' — no encaja; se preguntará al anestesiólogo' : ''}
+          </p>
+        </div>
+      )}
+
+      {esFondaparinux && (
+        <div className="campo">
+          <label>Dosis del fondaparinux</label>
           <div className="grupo-radios">
             {(['profilactica', 'terapeutica'] as const).map((t) => (
               <label key={t} className={`radio-tarjeta ${f.tipoHbpm === t ? 'seleccionado' : ''}`}>

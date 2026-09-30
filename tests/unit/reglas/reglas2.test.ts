@@ -26,10 +26,12 @@ const H = (d?: Date) => (d ? Math.round((IV.getTime() - d.getTime()) / 3_600_000
 const D = (d?: Date) => (d ? Math.round((IV.getTime() - d.getTime()) / 86_400_000) : NaN);
 
 describe('Heparinas y fondaparinux (§8.4)', () => {
-  it('clasifica enoxaparina 40 mg como profilaxis y 120 mg como tratamiento', () => {
-    expect(clasificarHbpm(40, { profilaxis_max: 40, tratamiento_min: 60 })).toBe('profilactica');
-    expect(clasificarHbpm(120, { profilaxis_max: 40, tratamiento_min: 60 })).toBe('terapeutica');
-    expect(clasificarHbpm(50, { profilaxis_max: 40, tratamiento_min: 60 })).toBe('indeterminada');
+  it('clasifica enoxaparina por dosis/pauta/peso/aclaramiento; dosis intermedia → indeterminada', () => {
+    const enox = { unidad: 'mg' as const, profilaxis_max_por_kg_dia: 1.0, tratamiento_min_por_kg_dia: 1.5, tratamiento_min_por_kg_dia_crcl_lt30: 1.0 };
+    expect(clasificarHbpm({ dosisPorToma: 40, tomasDia: 1, pesoKg: 70, aclaramiento: 80 }, enox)).toBe('profilactica');
+    expect(clasificarHbpm({ dosisPorToma: 70, tomasDia: 2, pesoKg: 70, aclaramiento: 80 }, enox)).toBe('terapeutica');
+    // 1,2 mg/kg/día con función renal normal: entre profilaxis y tratamiento → preguntar.
+    expect(clasificarHbpm({ dosisPorToma: 84, tomasDia: 1, pesoKg: 70, aclaramiento: 80 }, enox)).toBe('indeterminada');
   });
   it('HBPM profiláctica (dosis a las 20:00) → 12 h', () => {
     const r = reglaHbpm({ idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'profilactica' }, ctx({ pautaFarmaco: { horas: ['20:00'] } }));
