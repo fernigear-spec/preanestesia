@@ -13,14 +13,36 @@
   ],
   "tablas_seth": {
     "_descripcion": "Umbrales SETH para clasificar la HBPM por dosis, pauta, peso y aclaramiento (docs/documento_fuente.md §8.4). Enoxaparina se clasifica por dosis/kg/día (la profilaxis puede intensificarse por peso y el tratamiento reducirse por aclaramiento < 30). El resto usa umbrales fijos por día. Si no encaja, la aplicación pregunta. Valores del protocolo del servicio; verificar antes del uso clínico.",
-    "enoxaparina": { "unidad": "mg", "profilaxis_max_por_kg_dia": 1.0, "tratamiento_min_por_kg_dia": 1.5, "tratamiento_min_por_kg_dia_crcl_lt30": 1.0 },
-    "bemiparina": { "unidad": "UI", "profilaxis_max_dia": 3500, "tratamiento_min_dia": 5000 },
-    "tinzaparina": { "unidad": "UI", "profilaxis_max_dia": 4500, "tratamiento_min_dia": 10000 },
-    "nadroparina": { "unidad": "UI", "profilaxis_max_dia": 3800, "tratamiento_min_dia": 5700 },
-    "dalteparina": { "unidad": "UI", "profilaxis_max_dia": 5000, "tratamiento_min_dia": 10000 }
+    "enoxaparina": {
+      "unidad": "mg",
+      "profilaxis_max_por_kg_dia": 1,
+      "tratamiento_min_por_kg_dia": 1.5,
+      "tratamiento_min_por_kg_dia_crcl_lt30": 1
+    },
+    "bemiparina": {
+      "unidad": "UI",
+      "profilaxis_max_dia": 3500,
+      "tratamiento_min_dia": 5000
+    },
+    "tinzaparina": {
+      "unidad": "UI",
+      "profilaxis_max_dia": 4500,
+      "tratamiento_min_dia": 10000
+    },
+    "nadroparina": {
+      "unidad": "UI",
+      "profilaxis_max_dia": 3800,
+      "tratamiento_min_dia": 5700
+    },
+    "dalteparina": {
+      "unidad": "UI",
+      "profilaxis_max_dia": 5000,
+      "tratamiento_min_dia": 10000
+    }
   },
   "reglas": {
     "avk_warfarina": {
+      "descripcion": "Antivitamina K (warfarina): suspender 5 días antes. No se suspende en cirugía oftalmológica de bajo riesgo ni si el riesgo hemorrágico es mínimo. Con alto riesgo tromboembólico (válvula mecánica, etc.) se valora terapia puente con HBPM y requiere confirmación del anestesiólogo.",
       "tipo": "antivitamina_k",
       "farmaco": "warfarina",
       "dias_suspension": 5,
@@ -29,6 +51,7 @@
       "fuente": "docs/documento_fuente.md §8.1 (protocolo del servicio)"
     },
     "avk_acenocumarol": {
+      "descripcion": "Antivitamina K (acenocumarol/Sintrom): suspender 3 días antes. No se suspende en cirugía oftalmológica de bajo riesgo ni si el riesgo hemorrágico es mínimo. Con alto riesgo tromboembólico se valora terapia puente con HBPM y requiere confirmación.",
       "tipo": "antivitamina_k",
       "farmaco": "acenocumarol",
       "dias_suspension": 3,
@@ -37,6 +60,7 @@
       "fuente": "docs/documento_fuente.md §8.1 (protocolo del servicio)"
     },
     "acod_dabigatran": {
+      "descripcion": "ACOD dabigatrán: la última toma se fija en HORAS antes, no en plazos absolutos, ajustadas por función renal. Riesgo hemorrágico bajo: 48 h; alto o técnica neuroaxial: 72 h. Con neuroaxial se alarga por aclaramiento (72 h si >80, 96 h si 50-80, 120 h si <50 mL/min). No se suspende en oftalmología de bajo riesgo.",
       "tipo": "acod",
       "subtipo": "dabigatran",
       "horas_hemorragico_bajo": 48,
@@ -50,6 +74,7 @@
       "fuente": "docs/documento_fuente.md §8.2 (protocolo del servicio; EHRA 2021)"
     },
     "acod_antixa": {
+      "descripcion": "ACOD anti-Xa (apixabán, rivaroxabán, edoxabán): última toma 48 h antes con riesgo hemorrágico bajo; 72 h con riesgo alto o técnica neuroaxial. Con aclaramiento < 30 mL/min se añaden horas (24 h más; 96 h con neuroaxial). Si falta el aclaramiento, requiere confirmación. No se suspende en oftalmología de bajo riesgo.",
       "tipo": "acod",
       "subtipo": "antixa",
       "horas_hemorragico_bajo": 48,
@@ -60,30 +85,35 @@
       "fuente": "docs/documento_fuente.md §8.2 (protocolo del servicio; EHRA 2021)"
     },
     "aas": {
+      "descripcion": "Ácido acetilsalicílico: se mantiene si la dosis diaria es ≤ 200 mg. Con dosis alta se suspende 7 días antes. En neurocirugía intracraneal o medular y en cirugía de espacio cerrado requiere confirmación aunque la indicación sea cardiovascular.",
       "tipo": "antiagregante_aas",
       "dosis_mantener_max_mg": 200,
       "dias_suspension_dosis_alta": 7,
       "fuente": "docs/documento_fuente.md §8.3 (ESC 2022)"
     },
     "p2y12_clopidogrel": {
+      "descripcion": "Clopidogrel: suspender 5 días antes (7 días con técnica neuroaxial o bloqueo profundo). En portador de stent o en monoterapia sin AAS, requiere confirmación del anestesiólogo. Stent reciente: alerta de diferir la cirugía.",
       "tipo": "p2y12",
       "dias_estandar": 5,
       "dias_neuroaxial_o_profundo": 7,
       "fuente": "docs/documento_fuente.md §8.3 (protocolo del servicio)"
     },
     "p2y12_ticagrelor": {
+      "descripcion": "Ticagrelor: suspender 5 días antes (7 días con neuroaxial o bloqueo profundo). En portador de stent o monoterapia sin AAS, requiere confirmación.",
       "tipo": "p2y12",
       "dias_estandar": 5,
       "dias_neuroaxial_o_profundo": 7,
       "fuente": "docs/documento_fuente.md §8.3 (protocolo del servicio)"
     },
     "p2y12_prasugrel": {
+      "descripcion": "Prasugrel: suspender 7 días antes (10 días con neuroaxial o bloqueo profundo). En portador de stent o monoterapia sin AAS, requiere confirmación.",
       "tipo": "p2y12",
       "dias_estandar": 7,
       "dias_neuroaxial_o_profundo": 10,
       "fuente": "docs/documento_fuente.md §8.3 (protocolo del servicio)"
     },
     "triflusal": {
+      "descripcion": "Triflusal: suspender 7 días antes (10 días con neuroaxial o bloqueo profundo).",
       "tipo": "plazo_simple",
       "dias_estandar": 7,
       "dias_neuroaxial_o_profundo": 10,
@@ -91,64 +121,128 @@
       "fuente": "docs/documento_fuente.md §8.3"
     },
     "dipiridamol": {
+      "descripcion": "Dipiridamol: última toma 24 h antes (48 h con neuroaxial o bloqueo profundo).",
       "tipo": "plazo_simple_horas",
       "horas_estandar": 24,
       "horas_neuroaxial_o_profundo": 48,
       "fuente": "docs/documento_fuente.md §8.3"
     },
     "cilostazol": {
+      "descripcion": "Cilostazol: se mantiene salvo riesgo hemorrágico alto o técnica neuroaxial, en cuyo caso se suspende 3 días antes.",
       "tipo": "condicional_hemorragico",
       "dias_si_alto_o_neuroaxial": 3,
       "mantener_si_no": true,
       "fuente": "docs/documento_fuente.md §8.3"
     },
     "sulodexida": {
+      "descripcion": "Sulodexida: se mantiene salvo riesgo hemorrágico alto o neuroaxial (última dosis 48 h antes). No interviene en la decisión de pruebas complementarias.",
       "tipo": "condicional_hemorragico",
       "horas_si_alto_o_neuroaxial": 48,
       "mantener_si_no": true,
       "no_interviene_en_pruebas": true,
       "fuente": "docs/documento_fuente.md §8.3"
     },
-    "aine_ibuprofeno": { "tipo": "aine", "horas": 24, "fuente": "docs/documento_fuente.md §8.6" },
-    "aine_naproxeno": { "tipo": "aine", "horas": 72, "fuente": "docs/documento_fuente.md §8.6" },
-    "aine_diclofenaco": { "tipo": "aine", "horas": 24, "fuente": "docs/documento_fuente.md §8.6" },
-    "aine_dexketoprofeno": { "tipo": "aine", "horas": 24, "fuente": "docs/documento_fuente.md §8.6" },
-    "aine_ketorolaco": { "tipo": "aine", "horas": 24, "fuente": "docs/documento_fuente.md §8.6" },
-    "aine_celecoxib": { "tipo": "aine_mantener", "fuente": "docs/documento_fuente.md §8.6" },
-    "aine_etoricoxib": { "tipo": "aine_mantener", "fuente": "docs/documento_fuente.md §8.6" },
+    "aine_ibuprofeno": {
+      "descripcion": "Ibuprofeno (AINE): suspender 24 h antes.",
+      "tipo": "aine",
+      "horas": 24,
+      "fuente": "docs/documento_fuente.md §8.6"
+    },
+    "aine_naproxeno": {
+      "descripcion": "Naproxeno (AINE): suspender 72 h antes (vida media larga).",
+      "tipo": "aine",
+      "horas": 72,
+      "fuente": "docs/documento_fuente.md §8.6"
+    },
+    "aine_diclofenaco": {
+      "descripcion": "Diclofenaco (AINE): suspender 24 h antes.",
+      "tipo": "aine",
+      "horas": 24,
+      "fuente": "docs/documento_fuente.md §8.6"
+    },
+    "aine_dexketoprofeno": {
+      "descripcion": "Dexketoprofeno (AINE): suspender 24 h antes.",
+      "tipo": "aine",
+      "horas": 24,
+      "fuente": "docs/documento_fuente.md §8.6"
+    },
+    "aine_ketorolaco": {
+      "descripcion": "Ketorolaco (AINE): suspender 24 h antes.",
+      "tipo": "aine",
+      "horas": 24,
+      "fuente": "docs/documento_fuente.md §8.6"
+    },
+    "aine_celecoxib": {
+      "descripcion": "Celecoxib (COX-2): se mantiene (no afecta a la agregación plaquetaria).",
+      "tipo": "aine_mantener",
+      "fuente": "docs/documento_fuente.md §8.6"
+    },
+    "aine_etoricoxib": {
+      "descripcion": "Etoricoxib (COX-2): se mantiene (no afecta a la agregación plaquetaria).",
+      "tipo": "aine_mantener",
+      "fuente": "docs/documento_fuente.md §8.6"
+    },
     "metformina": {
+      "descripcion": "Metformina: no tomar el día de la intervención. Con contraste yodado, suspender 48 h. En combinaciones fijas que la retiran antes de su plazo, nota de vigilar la glucemia.",
       "tipo": "antidiabetico_no_dia_iq",
       "contraste_suspender_h": 48,
       "fuente": "docs/documento_fuente.md §8.5 (protocolo; CPOC)"
     },
-    "sulfonilurea": { "tipo": "antidiabetico_no_dia_iq", "fuente": "docs/documento_fuente.md §8.5" },
-    "glinida": { "tipo": "antidiabetico_no_dia_iq", "fuente": "docs/documento_fuente.md §8.5" },
-    "dpp4": { "tipo": "antidiabetico_no_manana_iq", "fuente": "docs/documento_fuente.md §8.5" },
-    "pioglitazona": { "tipo": "antidiabetico_no_dia_iq", "fuente": "docs/documento_fuente.md §8.5" },
-    "sglt2": { "tipo": "sglt2", "dias": 3, "dias_ertugliflozina": 4, "fuente": "docs/documento_fuente.md §8.5" },
+    "sulfonilurea": {
+      "descripcion": "Sulfonilurea: no tomar el día de la intervención (riesgo de hipoglucemia en ayunas).",
+      "tipo": "antidiabetico_no_dia_iq",
+      "fuente": "docs/documento_fuente.md §8.5"
+    },
+    "glinida": {
+      "descripcion": "Glinida: no tomar el día de la intervención.",
+      "tipo": "antidiabetico_no_dia_iq",
+      "fuente": "docs/documento_fuente.md §8.5"
+    },
+    "dpp4": {
+      "descripcion": "Inhibidor DPP-4: no tomar la mañana de la intervención.",
+      "tipo": "antidiabetico_no_manana_iq",
+      "fuente": "docs/documento_fuente.md §8.5"
+    },
+    "pioglitazona": {
+      "descripcion": "Pioglitazona: no tomar el día de la intervención.",
+      "tipo": "antidiabetico_no_dia_iq",
+      "fuente": "docs/documento_fuente.md §8.5"
+    },
+    "sglt2": {
+      "descripcion": "Inhibidor SGLT2: suspender 3 días antes (4 días la ertugliflozina) por el riesgo de cetoacidosis euglucémica.",
+      "tipo": "sglt2",
+      "dias": 3,
+      "dias_ertugliflozina": 4,
+      "fuente": "docs/documento_fuente.md §8.5"
+    },
     "glp1_semanal": {
+      "descripcion": "Agonista GLP-1 semanal: la última dosis debe ser al menos 7 días antes de la intervención; si la siguiente cae dentro de esos 7 días, se omite. Dieta líquida las 24 h previas.",
       "tipo": "glp1_semanal",
       "ventana_dias": 7,
       "dieta_liquidos_24h": true,
       "fuente": "docs/documento_fuente.md §8.5 (Decisión 8)"
     },
     "glp1_diario": {
+      "descripcion": "Agonista GLP-1 diario: la última dosis 4 días antes de la intervención.",
       "tipo": "glp1_diario",
       "dias_ultima_dosis_antes": 4,
       "fuente": "docs/documento_fuente.md §8.5 (Decisión 8)"
     },
     "bomba_insulina": {
+      "descripcion": "Bomba de insulina: mantener la basal al 80 %. En régimen con ingreso o riesgo cardiovascular intermedio o alto, requiere confirmación del anestesiólogo.",
       "tipo": "bomba_insulina",
       "basal_pct_min": 80,
       "basal_pct_max": 80,
       "fuente": "docs/documento_fuente.md §8.5 (Decisión 6)"
     },
     "insulina_glp1_fija": {
+      "descripcion": "Combinación fija insulina basal + GLP-1: requiere confirmación (omitir el GLP-1 dejaría sin insulina basal).",
       "tipo": "requiere_confirmacion",
       "texto_anestesiologo": "Combinación fija insulina basal + GLP-1: omitir el GLP-1 dejaría sin insulina basal.",
       "fuente": "docs/documento_fuente.md §8.5"
     },
     "litio": {
+      "descripcion": "Litio: última toma 24 h antes con riesgo cardiovascular bajo; 48 h con intermedio; 72 h con alto.",
       "tipo": "litio",
       "horas_riesgo_bajo": 24,
       "horas_riesgo_intermedio": 48,
@@ -156,45 +250,172 @@
       "fuente": "docs/documento_fuente.md §8.7"
     },
     "ieca_ara2": {
+      "descripcion": "IECA / ARA-II: no tomar el día de la intervención. Excepción: si el motivo es insuficiencia cardiaca con disfunción sistólica, infarto reciente o proteinuria/nefropatía, se mantiene.",
       "tipo": "ieca_ara2",
       "horas": 24,
       "fuente": "docs/documento_fuente.md §8.10 (ESC 2022)"
     },
     "sacubitrilo_valsartan": {
+      "descripcion": "Sacubitrilo/valsartán (Entresto): requiere confirmación del anestesiólogo.",
       "tipo": "requiere_confirmacion",
       "texto_anestesiologo": "Sacubitrilo/valsartán: requiere confirmación del anestesiólogo.",
       "fuente": "docs/documento_fuente.md §8.10"
     },
     "corticoide_sistemico": {
+      "descripcion": "Corticoide sistémico: se mantiene; valorar dosis de estrés perioperatoria si equivale a ≥ 5 mg/día de prednisona más de 3 semanas.",
       "tipo": "mantener",
       "nota_dosis_estres": true,
       "fuente": "docs/documento_fuente.md §8.11 / §5.3"
     },
-    "diuretico": { "tipo": "no_manana_iq", "fuente": "docs/documento_fuente.md §8.10" },
-    "hbpm": { "tipo": "hbpm", "profilactica_h": 12, "terapeutica_h": 24, "fuente": "docs/documento_fuente.md §8.4 (SETH; ASRA 2018)" },
-    "heparina_sodica": { "tipo": "heparina_sodica", "horas": 6, "fuente": "docs/documento_fuente.md §8.4" },
-    "fondaparinux": { "tipo": "fondaparinux", "prof_h": 36, "prof_h_neuroaxial": 48, "terap_h": 48, "terap_h_alarga": 72, "crcl_contraindicado": 20, "fuente": "docs/documento_fuente.md §8.4" },
-    "gp_iibiiia": { "tipo": "gp_iibiiia", "requiere_confirmacion": true, "fuente": "docs/documento_fuente.md §8.3" },
-    "insulina_basal": { "tipo": "insulina_basal", "pct_noche": 80, "pct_manana": 80, "fuente": "docs/documento_fuente.md §8.5" },
-    "insulina_nph": { "tipo": "insulina_nph", "pct_manana": 50, "fuente": "docs/documento_fuente.md §8.5" },
-    "insulina_rapida": { "tipo": "insulina_rapida", "fuente": "docs/documento_fuente.md §8.5" },
-    "insulina_premezclada": { "tipo": "insulina_premezclada", "pct_manana": 50, "fuente": "docs/documento_fuente.md §8.5" },
-    "imao_irreversible": { "tipo": "imao_irreversible", "dias_min": 10, "dias_max": 14, "requiere_confirmacion": true, "fuente": "docs/documento_fuente.md §8.7" },
-    "moclobemida": { "tipo": "moclobemida", "horas": 24, "fuente": "docs/documento_fuente.md §8.7" },
-    "imao_b": { "tipo": "imao_b", "fuente": "docs/documento_fuente.md §8.7" },
-    "inmunosupresor_clasico": { "tipo": "inmunosupresor_clasico", "dias_autoinmune": 2, "fuente": "docs/documento_fuente.md §8.8 (ACR 2022)" },
-    "metotrexato": { "tipo": "metotrexato", "umbral_mg_semana": 20, "fuente": "docs/documento_fuente.md §8.8 (ACR 2022)" },
-    "fame_mantener": { "tipo": "fame_mantener", "fuente": "docs/documento_fuente.md §8.8 (ACR 2022)" },
-    "jak": { "tipo": "jak", "dias": 3, "fuente": "docs/documento_fuente.md §8.8 (ACR 2022)" },
-    "biologico": { "tipo": "biologico", "requiere_confirmacion": true, "fuente": "docs/documento_fuente.md §8.8" },
-    "tirosina_cinasa": { "tipo": "tirosina_cinasa", "fuente": "docs/documento_fuente.md §8.9" },
-    "antiangiogenico": { "tipo": "antiangiogenico", "semanas": 8, "requiere_confirmacion": true, "fuente": "docs/documento_fuente.md §8.9" },
-    "antiangiogenico_intravitreo": { "tipo": "mantener", "fuente": "docs/documento_fuente.md §8.9" },
-    "fitoterapia": { "tipo": "fitoterapia", "dias": 14, "dias_min": 7, "fuente": "docs/documento_fuente.md §8.11" },
-    "anticonceptivo_ths": { "tipo": "anticonceptivo_ths", "semanas_sugerencia": 6, "fuente": "docs/documento_fuente.md §8.11" },
-    "mantener_generico": { "tipo": "mantener", "fuente": "docs/documento_fuente.md §8" },
-    "alfabloqueante_flacido": { "tipo": "mantener_condicional_oftalmo", "nota_oftalmo": "Riesgo de síndrome de iris flácido intraoperatorio: avisar al oftalmólogo.", "fuente": "docs/documento_fuente.md §8" },
+    "diuretico": {
+      "descripcion": "Diurético: no tomar la mañana de la intervención.",
+      "tipo": "no_manana_iq",
+      "fuente": "docs/documento_fuente.md §8.10"
+    },
+    "hbpm": {
+      "descripcion": "HBPM: profiláctica → última dosis 12 h antes; terapéutica → 24 h antes. La clasificación (profiláctica/terapéutica) usa dosis, pauta, peso y aclaramiento (tablas SETH); si no encaja, se pregunta. En dosis terapéutica, nota de valorar anti-Xa si hay dudas.",
+      "tipo": "hbpm",
+      "profilactica_h": 12,
+      "terapeutica_h": 24,
+      "fuente": "docs/documento_fuente.md §8.4 (SETH; ASRA 2018)"
+    },
+    "heparina_sodica": {
+      "descripcion": "Heparina sódica intravenosa: uso hospitalario; se suspende 4-6 h antes.",
+      "tipo": "heparina_sodica",
+      "horas": 6,
+      "fuente": "docs/documento_fuente.md §8.4"
+    },
+    "fondaparinux": {
+      "descripcion": "Fondaparinux: profiláctico 36 h antes (48 h con neuroaxial, bloqueo profundo o alto riesgo hemorrágico; contraindicado con aclaramiento < 20, alerta). Terapéutico 48 h antes (72 h con neuroaxial, bloqueo profundo, alto riesgo hemorrágico o aclaramiento < 50).",
+      "tipo": "fondaparinux",
+      "prof_h": 36,
+      "prof_h_neuroaxial": 48,
+      "terap_h": 48,
+      "terap_h_alarga": 72,
+      "crcl_contraindicado": 20,
+      "fuente": "docs/documento_fuente.md §8.4"
+    },
+    "gp_iibiiia": {
+      "descripcion": "Inhibidor de la glicoproteína IIb/IIIa: requiere confirmación (uso hospitalario).",
+      "tipo": "gp_iibiiia",
+      "requiere_confirmacion": true,
+      "fuente": "docs/documento_fuente.md §8.3"
+    },
+    "insulina_basal": {
+      "descripcion": "Insulina basal (glargina, degludec, detemir): la dosis de la noche previa y la de la mañana de la intervención, al 80 %.",
+      "tipo": "insulina_basal",
+      "pct_noche": 80,
+      "pct_manana": 80,
+      "fuente": "docs/documento_fuente.md §8.5"
+    },
+    "insulina_nph": {
+      "descripcion": "Insulina NPH: dosis de la noche previa completa; la de la mañana de la intervención, al 50 %.",
+      "tipo": "insulina_nph",
+      "pct_manana": 50,
+      "fuente": "docs/documento_fuente.md §8.5"
+    },
+    "insulina_rapida": {
+      "descripcion": "Insulina rápida: no ponerse la dosis del desayuno el día de la intervención; solo pauta correctora según la glucemia.",
+      "tipo": "insulina_rapida",
+      "fuente": "docs/documento_fuente.md §8.5"
+    },
+    "insulina_premezclada": {
+      "descripcion": "Insulina premezclada: la dosis de la mañana de la intervención, al 50 %.",
+      "tipo": "insulina_premezclada",
+      "pct_manana": 50,
+      "fuente": "docs/documento_fuente.md §8.5"
+    },
+    "imao_irreversible": {
+      "descripcion": "IMAO irreversible: suspender 10-14 días antes; requiere confirmación. Nota: evitar meperidina y azul de metileno (riesgo de síndrome serotoninérgico).",
+      "tipo": "imao_irreversible",
+      "dias_min": 10,
+      "dias_max": 14,
+      "requiere_confirmacion": true,
+      "fuente": "docs/documento_fuente.md §8.7"
+    },
+    "moclobemida": {
+      "descripcion": "Moclobemida (IMAO reversible): última toma 24 h antes. Nota: precaución con fármacos serotoninérgicos y meperidina.",
+      "tipo": "moclobemida",
+      "horas": 24,
+      "fuente": "docs/documento_fuente.md §8.7"
+    },
+    "imao_b": {
+      "descripcion": "IMAO-B (selegilina, rasagilina): se mantiene, con nota al anestesiólogo.",
+      "tipo": "imao_b",
+      "fuente": "docs/documento_fuente.md §8.7"
+    },
+    "inmunosupresor_clasico": {
+      "descripcion": "Inmunosupresor clásico: la conducta depende de la indicación. En enfermedad autoinmune, suspender 2 días antes; en trasplante, mantener. Requiere confirmación según la indicación.",
+      "tipo": "inmunosupresor_clasico",
+      "dias_autoinmune": 2,
+      "fuente": "docs/documento_fuente.md §8.8 (ACR 2022)"
+    },
+    "metotrexato": {
+      "descripcion": "Metotrexato: se mantiene si la dosis semanal es < 20 mg; con ≥ 20 mg/semana, valorar según la función renal.",
+      "tipo": "metotrexato",
+      "umbral_mg_semana": 20,
+      "fuente": "docs/documento_fuente.md §8.8 (ACR 2022)"
+    },
+    "fame_mantener": {
+      "descripcion": "FAME que se mantiene (hidroxicloroquina, sulfasalazina, etc.).",
+      "tipo": "fame_mantener",
+      "fuente": "docs/documento_fuente.md §8.8 (ACR 2022)"
+    },
+    "jak": {
+      "descripcion": "Inhibidor JAK (tofacitinib, baricitinib, etc.): suspender 3 días antes.",
+      "tipo": "jak",
+      "dias": 3,
+      "fuente": "docs/documento_fuente.md §8.8 (ACR 2022)"
+    },
+    "biologico": {
+      "descripcion": "Fármaco biológico: requiere confirmación; se procura programar la cirugía a mitad del intervalo entre dosis.",
+      "tipo": "biologico",
+      "requiere_confirmacion": true,
+      "fuente": "docs/documento_fuente.md §8.8"
+    },
+    "tirosina_cinasa": {
+      "descripcion": "Inhibidor de la tirosina-cinasa: valorar la suspensión perioperatoria según el fármaco; consultar con el anestesiólogo.",
+      "tipo": "tirosina_cinasa",
+      "fuente": "docs/documento_fuente.md §8.9"
+    },
+    "antiangiogenico": {
+      "descripcion": "Antiangiogénico (bevacizumab y similares): retrasar la cirugía 6-8 semanas desde la última dosis; requiere confirmación (alerta).",
+      "tipo": "antiangiogenico",
+      "semanas": 8,
+      "requiere_confirmacion": true,
+      "fuente": "docs/documento_fuente.md §8.9"
+    },
+    "antiangiogenico_intravitreo": {
+      "descripcion": "Antiangiogénico intravítreo: se mantiene (no afecta a la cirugía).",
+      "tipo": "mantener",
+      "fuente": "docs/documento_fuente.md §8.9"
+    },
+    "fitoterapia": {
+      "descripcion": "Fitoterapia y suplementos con efecto sobre la coagulación: suspender 14 días antes si es posible (mínimo 7).",
+      "tipo": "fitoterapia",
+      "dias": 14,
+      "dias_min": 7,
+      "fuente": "docs/documento_fuente.md §8.11"
+    },
+    "anticonceptivo_ths": {
+      "descripcion": "Anticonceptivo hormonal / THS: en cirugía de riesgo trombótico alto, valorar suspender 4-6 semanas antes; requiere confirmación. Si no, se mantiene. En ambos casos, advertencia del sugammadex según la vía (oral: instrucciones de «dosis olvidada»; no oral: método de barrera 7 días).",
+      "tipo": "anticonceptivo_ths",
+      "semanas_sugerencia": 6,
+      "fuente": "docs/documento_fuente.md §8.11"
+    },
+    "mantener_generico": {
+      "descripcion": "Se mantiene según su vía de administración; sin plazo de suspensión.",
+      "tipo": "mantener",
+      "fuente": "docs/documento_fuente.md §8"
+    },
+    "alfabloqueante_flacido": {
+      "descripcion": "Alfabloqueante urológico (tamsulosina, silodosina): se mantiene; en cirugía oftalmológica, aviso del riesgo de síndrome de iris flácido intraoperatorio.",
+      "tipo": "mantener_condicional_oftalmo",
+      "nota_oftalmo": "Riesgo de síndrome de iris flácido intraoperatorio: avisar al oftalmólogo.",
+      "fuente": "docs/documento_fuente.md §8"
+    },
     "no_catalogado": {
+      "descripcion": "Fármaco no catalogado: mantener y consultar con el anestesiólogo.",
       "tipo": "no_catalogado",
       "texto_paciente": "Siga tomándolo como siempre y consúltelo con el anestesiólogo.",
       "fuente": "docs/documento_fuente.md §8.0"

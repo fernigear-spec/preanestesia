@@ -1,446 +1,532 @@
 # Contenido clínico
 
-> **Documento generado automáticamente** a partir de los datos de la aplicación
-> (`datos/`). Recoge, en lenguaje legible y con su fuente, todas las reglas que
-> aplica la herramienta para que el Servicio de Anestesiología lo revise y lo firme.
->
-> No sustituye al juicio clínico: es el reflejo de lo que hace la aplicación.
+> **Documento generado automáticamente** a partir de los datos (`datos/`) y de la lógica del programa.
+> Describe **lo que hace la aplicación** —plazos, condiciones, excepciones, confirmaciones, alertas y los textos que ve el paciente— para que el Servicio de Anestesiología lo revise y lo firme. No sustituye al juicio clínico.
 >
 > **Versión de contenido:** 0.1.0 · **Fecha de revisión clínica:** 2026-09-29
 >
-> Para regenerarlo: `node --experimental-strip-types scripts/generar-contenido-clinico.ts`.
+> Regenerar: `npm run contenido:clinico`.
+
+## Índice
+
+- 1. Parámetros de configuración
+- 2. Convenciones del motor (fechas y adelanto de anticoagulantes)
+- 3. Reglas de medicación
+- 4. Textos que ve el paciente (muestras)
+- 5. Fecha desconocida y recálculo
+- 6. Mecanismo de confirmación del anestesiólogo
+- 7. Ayuno y hojas anexas
+- 8. Sugammadex y anticoncepción
+- 9. Cribado mitocondrial mtND4
+- 10. ASA sugerido
+- 11. Escalas y cálculos
+- 12. Clase de riesgo del paciente y pruebas complementarias
+- 13. Catálogo de fármacos
+- 14. Conversión de opioides
+- 15. Procedimientos
+- 16. Módulos de enfermedad
+- 17. Pendiente de revisión por el servicio
 
 ## 1. Parámetros de configuración
 
-Valores que gobiernan la aplicación (`datos/config.json`).
-
 | Parámetro | Valor |
 | --- | --- |
-| Borrado por inactividad | 30 minutos |
+| Borrado por inactividad | 30 min |
 | Edad pediátrica máxima | 17 años |
 | Límite de caracteres del texto SAP | 2000 |
-| Validez del QR del paciente (con fecha) | 30 días |
-| Validez del QR del paciente (sin fecha) | 90 días |
-| Validez del QR del anestesiólogo | 60 días |
+| Validez del QR del paciente (con/sin fecha) | 30 / 90 días |
 
-## 2. Reglas de medicación
+## 2. Convenciones del motor (fechas y adelanto de anticoagulantes) — §8.0
 
-_Fuente general: `datos/reglas_farmacos.json` · Parámetros de las reglas de medicación. Los números salen de aquí (docs/documento_fuente.md §8). La lógica que no cabe en parámetros va en src/dominio/reglas/._
+- Los **plazos en horas** (ACOD, heparinas, fondaparinux, litio, moclobemida, AINE, dipiridamol, sulodexida, GP IIb/IIIa) se cuentan desde la última toma hasta la hora prevista de la intervención. Una toma que cae exactamente en el límite está permitida.
+- Los **plazos en días** (antivitamina K, AAS, P2Y12, triflusal, cilostazol, SGLT2, JAK, fitoterapia, IMAO irreversibles): «suspender N días» significa no tomarlo los N días previos ni el día de la intervención.
+- **Adelanto de anticoagulantes** (plazo en horas): si la primera toma posterior al límite cae como máximo 10 h después, la hoja indica **adelantarla** a la hora límite («el lunes, tome la dosis a las 08:00 en lugar de a las 09:00; será la última»), siempre que quede al menos la mitad del intervalo desde la toma anterior (6 h en pautas cada 12 h; 12 h en pautas cada 24 h). Si no, la última toma es la anterior permitida. Nunca se atrasa una toma; en el resto de fármacos no se adelantan tomas.
+- La fecha/hora límite se traduce a lenguaje del paciente con el **día de la semana**.
+- **Combinaciones fijas** (una sola pastilla): una instrucción por medicamento con el plazo más restrictivo de sus componentes. Si la combinación retira la metformina antes de su plazo, nota de vigilar la glucemia.
+- Cada regla guarda su **fuente** (protocolo del servicio o guía: ESC 2022/2024, CPOC, ACR 2022, CDC 2022, ASRA 2018, EHRA 2021).
 
-### 2.1. Parámetros generales
+**Bloqueos considerados profundos:** paravertebral, plexo lumbar, compartimento psoas, plexo cervical profundo, intercostal.
 
-**Bloqueos considerados «profundos»** (obligan a plazos de suspensión mayores): paravertebral, plexo lumbar, compartimento psoas, plexo cervical profundo, intercostal.
+## 3. Reglas de medicación
 
-**Umbrales de dosis para clasificar la HBPM** (tablas SETH). Si la dosis diaria no
-encaja en ningún rango, la aplicación pregunta.
+_Cada regla, en lenguaje llano, con su fuente. Los números salen de `datos/reglas_farmacos.json`._
 
-| Heparina | Profilaxis (máx.) | Tratamiento (mín.) |
+### 3.1. Umbrales de la HBPM (tablas SETH, §8.4)
+
+La HBPM se clasifica en profiláctica o terapéutica con **dosis, pauta, peso y aclaramiento** (no solo la dosis). Si no encaja en ninguna tabla, la aplicación pregunta. Ejemplos: enoxaparina 60 mg/24 h en 90 kg es profilaxis; 40 mg/12 h en 110 kg es profilaxis; 1 mg/kg/12 h es tratamiento; 1 mg/kg/24 h con aclaramiento < 30 es tratamiento.
+
+| Heparina | Profilaxis | Tratamiento |
 | --- | --- | --- |
-| enoxaparina | 40 mg/día | 60 mg/día |
-| bemiparina | 3500 UI/día | 5000 UI/día |
-| tinzaparina | 4500 UI/día | 10000 UI/día |
-| nadroparina | 3800 UI/día | 5700 UI/día |
-| dalteparina | 5000 UI/día | 10000 UI/día |
+| enoxaparina | ≤ 1 mg/kg/día | ≥ 1.5 mg/kg/día (≥ 1 con aclaramiento < 30) |
+| bemiparina | ≤ 3500 UI/día | ≥ 5000 UI/día |
+| tinzaparina | ≤ 4500 UI/día | ≥ 10000 UI/día |
+| nadroparina | ≤ 3800 UI/día | ≥ 5700 UI/día |
+| dalteparina | ≤ 5000 UI/día | ≥ 10000 UI/día |
 
-### 2.2. Reglas por fármaco o grupo
+### 3.2. Reglas por fármaco o grupo
 
-#### `avk_warfarina` — Antivitamina K (Sintrom/warfarina)
+#### `avk_warfarina` — Antivitamina K
 
-- Suspender **5 días** antes.
-- No se suspende en cirugía oftalmológica de bajo riesgo.
-- No se suspende si el riesgo hemorrágico es mínimo.
+Antivitamina K (warfarina): suspender 5 días antes. No se suspende en cirugía oftalmológica de bajo riesgo ni si el riesgo hemorrágico es mínimo. Con alto riesgo tromboembólico (válvula mecánica, etc.) se valora terapia puente con HBPM y requiere confirmación del anestesiólogo.
 
 _Fuente: docs/documento_fuente.md §8.1 (protocolo del servicio)_
 
-#### `avk_acenocumarol` — Antivitamina K (Sintrom/warfarina)
+#### `avk_acenocumarol` — Antivitamina K
 
-- Suspender **3 días** antes.
-- No se suspende en cirugía oftalmológica de bajo riesgo.
-- No se suspende si el riesgo hemorrágico es mínimo.
+Antivitamina K (acenocumarol/Sintrom): suspender 3 días antes. No se suspende en cirugía oftalmológica de bajo riesgo ni si el riesgo hemorrágico es mínimo. Con alto riesgo tromboembólico se valora terapia puente con HBPM y requiere confirmación.
 
 _Fuente: docs/documento_fuente.md §8.1 (protocolo del servicio)_
 
-#### `acod_dabigatran` — Anticoagulante oral de acción directa (ACOD)
+#### `acod_dabigatran` — ACOD
 
-- Riesgo hemorrágico bajo: última toma **48 h** antes.
-- Riesgo hemorrágico alto o técnica neuroaxial: **72 h** antes.
-- Aclaramiento 50-80 mL/min: **24 h** antes.
-- Aclaramiento < 50 mL/min: **48 h** antes.
-- Neuroaxial con aclaramiento > 80 mL/min: **72 h** antes.
-- Neuroaxial con aclaramiento 50-80 mL/min: **96 h** antes.
-- Neuroaxial con aclaramiento < 50 mL/min: **120 h** antes.
-- No se suspende en cirugía oftalmológica de bajo riesgo.
+ACOD dabigatrán: la última toma se fija en HORAS antes, no en plazos absolutos, ajustadas por función renal. Riesgo hemorrágico bajo: 48 h; alto o técnica neuroaxial: 72 h. Con neuroaxial se alarga por aclaramiento (72 h si >80, 96 h si 50-80, 120 h si <50 mL/min). No se suspende en oftalmología de bajo riesgo.
 
 _Fuente: docs/documento_fuente.md §8.2 (protocolo del servicio; EHRA 2021)_
 
-#### `acod_antixa` — Anticoagulante oral de acción directa (ACOD)
+#### `acod_antixa` — ACOD
 
-- Riesgo hemorrágico bajo: última toma **48 h** antes.
-- Riesgo hemorrágico alto o técnica neuroaxial: **72 h** antes.
-- Aclaramiento < 30 mL/min: **24 h** antes.
-- Neuroaxial con aclaramiento < 30 mL/min: **96 h** antes.
-- No se suspende en cirugía oftalmológica de bajo riesgo.
+ACOD anti-Xa (apixabán, rivaroxabán, edoxabán): última toma 48 h antes con riesgo hemorrágico bajo; 72 h con riesgo alto o técnica neuroaxial. Con aclaramiento < 30 mL/min se añaden horas (24 h más; 96 h con neuroaxial). Si falta el aclaramiento, requiere confirmación. No se suspende en oftalmología de bajo riesgo.
 
 _Fuente: docs/documento_fuente.md §8.2 (protocolo del servicio; EHRA 2021)_
 
-#### `aas` — Ácido acetilsalicílico
+#### `aas` — AAS
 
-- Se mantiene si la dosis diaria es ≤ **200 mg**.
-- Con dosis alta, suspender **7 días** antes.
+Ácido acetilsalicílico: se mantiene si la dosis diaria es ≤ 200 mg. Con dosis alta se suspende 7 días antes. En neurocirugía intracraneal o medular y en cirugía de espacio cerrado requiere confirmación aunque la indicación sea cardiovascular.
 
 _Fuente: docs/documento_fuente.md §8.3 (ESC 2022)_
 
-#### `p2y12_clopidogrel` — Antiagregante P2Y12 (clopidogrel, ticagrelor, prasugrel)
+#### `p2y12_clopidogrel` — Antiagregante P2Y12
 
-- Plazo estándar: **5 días** antes.
-- Con técnica neuroaxial o bloqueo profundo: **7 días** antes.
-
-_Fuente: docs/documento_fuente.md §8.3 (protocolo del servicio)_
-
-#### `p2y12_ticagrelor` — Antiagregante P2Y12 (clopidogrel, ticagrelor, prasugrel)
-
-- Plazo estándar: **5 días** antes.
-- Con técnica neuroaxial o bloqueo profundo: **7 días** antes.
+Clopidogrel: suspender 5 días antes (7 días con técnica neuroaxial o bloqueo profundo). En portador de stent o en monoterapia sin AAS, requiere confirmación del anestesiólogo. Stent reciente: alerta de diferir la cirugía.
 
 _Fuente: docs/documento_fuente.md §8.3 (protocolo del servicio)_
 
-#### `p2y12_prasugrel` — Antiagregante P2Y12 (clopidogrel, ticagrelor, prasugrel)
+#### `p2y12_ticagrelor` — Antiagregante P2Y12
 
-- Plazo estándar: **7 días** antes.
-- Con técnica neuroaxial o bloqueo profundo: **10 días** antes.
+Ticagrelor: suspender 5 días antes (7 días con neuroaxial o bloqueo profundo). En portador de stent o monoterapia sin AAS, requiere confirmación.
 
 _Fuente: docs/documento_fuente.md §8.3 (protocolo del servicio)_
 
-#### `triflusal` — Suspensión con plazo fijo en días
+#### `p2y12_prasugrel` — Antiagregante P2Y12
 
-- Plazo estándar: **7 días** antes.
-- Con técnica neuroaxial o bloqueo profundo: **10 días** antes.
-- Si no aplica el plazo, acción: **suspender**.
+Prasugrel: suspender 7 días antes (10 días con neuroaxial o bloqueo profundo). En portador de stent o monoterapia sin AAS, requiere confirmación.
 
-_Fuente: docs/documento_fuente.md §8.3_
+_Fuente: docs/documento_fuente.md §8.3 (protocolo del servicio)_
 
-#### `dipiridamol` — Suspensión con plazo fijo en horas
+#### `triflusal` — Plazo fijo en días
 
-- Plazo estándar: **24 h** antes.
-- Con técnica neuroaxial o bloqueo profundo: **48 h** antes.
+Triflusal: suspender 7 días antes (10 días con neuroaxial o bloqueo profundo).
 
 _Fuente: docs/documento_fuente.md §8.3_
 
-#### `cilostazol` — Depende del riesgo hemorrágico / técnica neuroaxial
+#### `dipiridamol` — Plazo fijo en horas
 
-- Si riesgo hemorrágico alto o neuroaxial: **3 días** antes.
-- En el resto de los casos, se mantiene.
-
-_Fuente: docs/documento_fuente.md §8.3_
-
-#### `sulodexida` — Depende del riesgo hemorrágico / técnica neuroaxial
-
-- Si riesgo hemorrágico alto o neuroaxial: **48 h** antes.
-- En el resto de los casos, se mantiene.
-- No interviene en la decisión de pruebas complementarias.
+Dipiridamol: última toma 24 h antes (48 h con neuroaxial o bloqueo profundo).
 
 _Fuente: docs/documento_fuente.md §8.3_
 
-#### `aine_ibuprofeno` — Antiinflamatorio no esteroideo (AINE)
+#### `cilostazol` — Según riesgo hemorrágico
 
-- Última toma **24 h** antes.
+Cilostazol: se mantiene salvo riesgo hemorrágico alto o técnica neuroaxial, en cuyo caso se suspende 3 días antes.
 
-_Fuente: docs/documento_fuente.md §8.6_
+_Fuente: docs/documento_fuente.md §8.3_
 
-#### `aine_naproxeno` — Antiinflamatorio no esteroideo (AINE)
+#### `sulodexida` — Según riesgo hemorrágico
 
-- Última toma **72 h** antes.
+Sulodexida: se mantiene salvo riesgo hemorrágico alto o neuroaxial (última dosis 48 h antes). No interviene en la decisión de pruebas complementarias.
 
-_Fuente: docs/documento_fuente.md §8.6_
+_Fuente: docs/documento_fuente.md §8.3_
 
-#### `aine_diclofenaco` — Antiinflamatorio no esteroideo (AINE)
+#### `aine_ibuprofeno` — AINE
 
-- Última toma **24 h** antes.
-
-_Fuente: docs/documento_fuente.md §8.6_
-
-#### `aine_dexketoprofeno` — Antiinflamatorio no esteroideo (AINE)
-
-- Última toma **24 h** antes.
+Ibuprofeno (AINE): suspender 24 h antes.
 
 _Fuente: docs/documento_fuente.md §8.6_
 
-#### `aine_ketorolaco` — Antiinflamatorio no esteroideo (AINE)
+#### `aine_naproxeno` — AINE
 
-- Última toma **24 h** antes.
-
-_Fuente: docs/documento_fuente.md §8.6_
-
-#### `aine_celecoxib` — AINE que se mantiene (coxib)
-
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
+Naproxeno (AINE): suspender 72 h antes (vida media larga).
 
 _Fuente: docs/documento_fuente.md §8.6_
 
-#### `aine_etoricoxib` — AINE que se mantiene (coxib)
+#### `aine_diclofenaco` — AINE
 
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
+Diclofenaco (AINE): suspender 24 h antes.
 
 _Fuente: docs/documento_fuente.md §8.6_
 
-#### `metformina` — Antidiabético: no tomar el día de la intervención
+#### `aine_dexketoprofeno` — AINE
 
-- Con contraste yodado, suspender **48 h**.
+Dexketoprofeno (AINE): suspender 24 h antes.
+
+_Fuente: docs/documento_fuente.md §8.6_
+
+#### `aine_ketorolaco` — AINE
+
+Ketorolaco (AINE): suspender 24 h antes.
+
+_Fuente: docs/documento_fuente.md §8.6_
+
+#### `aine_celecoxib` — AINE (coxib): mantener
+
+Celecoxib (COX-2): se mantiene (no afecta a la agregación plaquetaria).
+
+_Fuente: docs/documento_fuente.md §8.6_
+
+#### `aine_etoricoxib` — AINE (coxib): mantener
+
+Etoricoxib (COX-2): se mantiene (no afecta a la agregación plaquetaria).
+
+_Fuente: docs/documento_fuente.md §8.6_
+
+#### `metformina` — Antidiabético: no el día
+
+Metformina: no tomar el día de la intervención. Con contraste yodado, suspender 48 h. En combinaciones fijas que la retiran antes de su plazo, nota de vigilar la glucemia.
 
 _Fuente: docs/documento_fuente.md §8.5 (protocolo; CPOC)_
 
-#### `sulfonilurea` — Antidiabético: no tomar el día de la intervención
+#### `sulfonilurea` — Antidiabético: no el día
 
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
-
-_Fuente: docs/documento_fuente.md §8.5_
-
-#### `glinida` — Antidiabético: no tomar el día de la intervención
-
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
+Sulfonilurea: no tomar el día de la intervención (riesgo de hipoglucemia en ayunas).
 
 _Fuente: docs/documento_fuente.md §8.5_
 
-#### `dpp4` — Antidiabético: no tomar la mañana de la intervención
+#### `glinida` — Antidiabético: no el día
 
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
-
-_Fuente: docs/documento_fuente.md §8.5_
-
-#### `pioglitazona` — Antidiabético: no tomar el día de la intervención
-
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
+Glinida: no tomar el día de la intervención.
 
 _Fuente: docs/documento_fuente.md §8.5_
 
-#### `sglt2` — Inhibidor SGLT2 (glicemia; riesgo de cetoacidosis)
+#### `dpp4` — Antidiabético: no la mañana
 
-- Suspender **3 días** antes.
-- Ertugliflozina: **4 días** antes.
+Inhibidor DPP-4: no tomar la mañana de la intervención.
 
 _Fuente: docs/documento_fuente.md §8.5_
 
-#### `glp1_semanal` — Agonista GLP-1 semanal
+#### `pioglitazona` — Antidiabético: no el día
 
-- Ventana de omisión de la dosis: **7 días** alrededor de la intervención.
-- Dieta líquida las 24 h previas.
+Pioglitazona: no tomar el día de la intervención.
+
+_Fuente: docs/documento_fuente.md §8.5_
+
+#### `sglt2` — SGLT2
+
+Inhibidor SGLT2: suspender 3 días antes (4 días la ertugliflozina) por el riesgo de cetoacidosis euglucémica.
+
+_Fuente: docs/documento_fuente.md §8.5_
+
+#### `glp1_semanal` — GLP-1 semanal
+
+Agonista GLP-1 semanal: la última dosis debe ser al menos 7 días antes de la intervención; si la siguiente cae dentro de esos 7 días, se omite. Dieta líquida las 24 h previas.
 
 _Fuente: docs/documento_fuente.md §8.5 (Decisión 8)_
 
-#### `glp1_diario` — Agonista GLP-1 diario
+#### `glp1_diario` — GLP-1 diario
 
-- Última dosis **4 días** antes.
+Agonista GLP-1 diario: la última dosis 4 días antes de la intervención.
 
 _Fuente: docs/documento_fuente.md §8.5 (Decisión 8)_
 
 #### `bomba_insulina` — Bomba de insulina
 
-- Insulina basal al **80%** (mínimo).
-- Insulina basal al **80%** (máximo).
+Bomba de insulina: mantener la basal al 80 %. En régimen con ingreso o riesgo cardiovascular intermedio o alto, requiere confirmación del anestesiólogo.
 
 _Fuente: docs/documento_fuente.md §8.5 (Decisión 6)_
 
-#### `insulina_glp1_fija` — Requiere confirmación del anestesiólogo
+#### `insulina_glp1_fija` — Requiere confirmación
 
-- Nota al anestesiólogo: «Combinación fija insulina basal + GLP-1: omitir el GLP-1 dejaría sin insulina basal.».
+Combinación fija insulina basal + GLP-1: requiere confirmación (omitir el GLP-1 dejaría sin insulina basal).
 
 _Fuente: docs/documento_fuente.md §8.5_
 
 #### `litio` — Litio
 
-- Riesgo cardiovascular bajo: **24 h** antes.
-- Riesgo cardiovascular intermedio: **48 h** antes.
-- Riesgo cardiovascular alto: **72 h** antes.
+Litio: última toma 24 h antes con riesgo cardiovascular bajo; 48 h con intermedio; 72 h con alto.
 
 _Fuente: docs/documento_fuente.md §8.7_
 
-#### `ieca_ara2` — IECA / ARA-II
+#### `ieca_ara2` — IECA/ARA-II
 
-- Última toma **24 h** antes.
+IECA / ARA-II: no tomar el día de la intervención. Excepción: si el motivo es insuficiencia cardiaca con disfunción sistólica, infarto reciente o proteinuria/nefropatía, se mantiene.
 
 _Fuente: docs/documento_fuente.md §8.10 (ESC 2022)_
 
-#### `sacubitrilo_valsartan` — Requiere confirmación del anestesiólogo
+#### `sacubitrilo_valsartan` — Requiere confirmación
 
-- Nota al anestesiólogo: «Sacubitrilo/valsartán: requiere confirmación del anestesiólogo.».
+Sacubitrilo/valsartán (Entresto): requiere confirmación del anestesiólogo.
 
 _Fuente: docs/documento_fuente.md §8.10_
 
-#### `corticoide_sistemico` — Se mantiene
+#### `corticoide_sistemico` — Mantener
 
-- Valorar dosis de estrés de corticoide perioperatoria.
+Corticoide sistémico: se mantiene; valorar dosis de estrés perioperatoria si equivale a ≥ 5 mg/día de prednisona más de 3 semanas.
 
 _Fuente: docs/documento_fuente.md §8.11 / §5.3_
 
-#### `diuretico` — No tomar la mañana de la intervención
+#### `diuretico` — No la mañana
 
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
+Diurético: no tomar la mañana de la intervención.
 
 _Fuente: docs/documento_fuente.md §8.10_
 
-#### `hbpm` — Heparina de bajo peso molecular (HBPM)
+#### `hbpm` — HBPM
 
-- Dosis profiláctica: **12 h** antes.
-- Dosis terapéutica: **24 h** antes.
+HBPM: profiláctica → última dosis 12 h antes; terapéutica → 24 h antes. La clasificación (profiláctica/terapéutica) usa dosis, pauta, peso y aclaramiento (tablas SETH); si no encaja, se pregunta. En dosis terapéutica, nota de valorar anti-Xa si hay dudas.
 
 _Fuente: docs/documento_fuente.md §8.4 (SETH; ASRA 2018)_
 
 #### `heparina_sodica` — Heparina sódica
 
-- Última toma **6 h** antes.
+Heparina sódica intravenosa: uso hospitalario; se suspende 4-6 h antes.
 
 _Fuente: docs/documento_fuente.md §8.4_
 
 #### `fondaparinux` — Fondaparinux
 
-- Dosis profiláctica: **36 h** antes.
-- Dosis profiláctica con neuroaxial: **48 h** antes.
-- Dosis terapéutica: **48 h** antes.
-- Dosis terapéutica (alargado): **72 h** antes.
-- Contraindicado con aclaramiento < **20 mL/min**.
+Fondaparinux: profiláctico 36 h antes (48 h con neuroaxial, bloqueo profundo o alto riesgo hemorrágico; contraindicado con aclaramiento < 20, alerta). Terapéutico 48 h antes (72 h con neuroaxial, bloqueo profundo, alto riesgo hemorrágico o aclaramiento < 50).
 
 _Fuente: docs/documento_fuente.md §8.4_
 
-#### `gp_iibiiia` — Inhibidor de la glicoproteína IIb/IIIa
+#### `gp_iibiiia` — GP IIb/IIIa
 
-- Requiere confirmación del anestesiólogo.
+Inhibidor de la glicoproteína IIb/IIIa: requiere confirmación (uso hospitalario).
 
 _Fuente: docs/documento_fuente.md §8.3_
 
 #### `insulina_basal` — Insulina basal
 
-- Dosis de la noche previa al **80%**.
-- Dosis de la mañana al **80%**.
+Insulina basal (glargina, degludec, detemir): la dosis de la noche previa y la de la mañana de la intervención, al 80 %.
 
 _Fuente: docs/documento_fuente.md §8.5_
 
 #### `insulina_nph` — Insulina NPH
 
-- Dosis de la mañana al **50%**.
+Insulina NPH: dosis de la noche previa completa; la de la mañana de la intervención, al 50 %.
 
 _Fuente: docs/documento_fuente.md §8.5_
 
 #### `insulina_rapida` — Insulina rápida
 
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
+Insulina rápida: no ponerse la dosis del desayuno el día de la intervención; solo pauta correctora según la glucemia.
 
 _Fuente: docs/documento_fuente.md §8.5_
 
 #### `insulina_premezclada` — Insulina premezclada
 
-- Dosis de la mañana al **50%**.
+Insulina premezclada: la dosis de la mañana de la intervención, al 50 %.
 
 _Fuente: docs/documento_fuente.md §8.5_
 
 #### `imao_irreversible` — IMAO irreversible
 
-- Mínimo **10 días**.
-- Máximo **14 días**.
-- Requiere confirmación del anestesiólogo.
+IMAO irreversible: suspender 10-14 días antes; requiere confirmación. Nota: evitar meperidina y azul de metileno (riesgo de síndrome serotoninérgico).
 
 _Fuente: docs/documento_fuente.md §8.7_
 
-#### `moclobemida` — Moclobemida (IMAO reversible)
+#### `moclobemida` — Moclobemida
 
-- Última toma **24 h** antes.
+Moclobemida (IMAO reversible): última toma 24 h antes. Nota: precaución con fármacos serotoninérgicos y meperidina.
 
 _Fuente: docs/documento_fuente.md §8.7_
 
-#### `imao_b` — IMAO-B (selegilina, rasagilina)
+#### `imao_b` — IMAO-B
 
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
+IMAO-B (selegilina, rasagilina): se mantiene, con nota al anestesiólogo.
 
 _Fuente: docs/documento_fuente.md §8.7_
 
 #### `inmunosupresor_clasico` — Inmunosupresor clásico
 
-- En enfermedad autoinmune: **2 días** antes.
+Inmunosupresor clásico: la conducta depende de la indicación. En enfermedad autoinmune, suspender 2 días antes; en trasplante, mantener. Requiere confirmación según la indicación.
 
 _Fuente: docs/documento_fuente.md §8.8 (ACR 2022)_
 
 #### `metotrexato` — Metotrexato
 
-- Umbral: **20 mg/semana**.
+Metotrexato: se mantiene si la dosis semanal es < 20 mg; con ≥ 20 mg/semana, valorar según la función renal.
 
 _Fuente: docs/documento_fuente.md §8.8 (ACR 2022)_
 
-#### `fame_mantener` — FAME que se mantiene
+#### `fame_mantener` — FAME (mantener)
 
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
+FAME que se mantiene (hidroxicloroquina, sulfasalazina, etc.).
 
 _Fuente: docs/documento_fuente.md §8.8 (ACR 2022)_
 
 #### `jak` — Inhibidor JAK
 
-- Suspender **3 días** antes.
+Inhibidor JAK (tofacitinib, baricitinib, etc.): suspender 3 días antes.
 
 _Fuente: docs/documento_fuente.md §8.8 (ACR 2022)_
 
-#### `biologico` — Fármaco biológico
+#### `biologico` — Biológico
 
-- Requiere confirmación del anestesiólogo.
+Fármaco biológico: requiere confirmación; se procura programar la cirugía a mitad del intervalo entre dosis.
 
 _Fuente: docs/documento_fuente.md §8.8_
 
-#### `tirosina_cinasa` — Inhibidor de la tirosina-cinasa
+#### `tirosina_cinasa` — Tirosina-cinasa
 
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
+Inhibidor de la tirosina-cinasa: valorar la suspensión perioperatoria según el fármaco; consultar con el anestesiólogo.
 
 _Fuente: docs/documento_fuente.md §8.9_
 
 #### `antiangiogenico` — Antiangiogénico
 
-- Suspender **8 semanas** antes.
-- Requiere confirmación del anestesiólogo.
+Antiangiogénico (bevacizumab y similares): retrasar la cirugía 6-8 semanas desde la última dosis; requiere confirmación (alerta).
 
 _Fuente: docs/documento_fuente.md §8.9_
 
-#### `antiangiogenico_intravitreo` — Se mantiene
+#### `antiangiogenico_intravitreo` — Mantener
 
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
+Antiangiogénico intravítreo: se mantiene (no afecta a la cirugía).
 
 _Fuente: docs/documento_fuente.md §8.9_
 
-#### `fitoterapia` — Fitoterapia / productos de herbolario
+#### `fitoterapia` — fitoterapia
 
-- Suspender **14 días** antes.
-- Mínimo **7 días**.
-
-_Fuente: docs/documento_fuente.md §8.11_
-
-#### `anticonceptivo_ths` — Anticonceptivo hormonal / THS
-
-- Sugerencia: valorar suspender **6 semanas** antes.
+Fitoterapia y suplementos con efecto sobre la coagulación: suspender 14 días antes si es posible (mínimo 7).
 
 _Fuente: docs/documento_fuente.md §8.11_
 
-#### `mantener_generico` — Se mantiene
+#### `anticonceptivo_ths` — anticonceptivo ths
 
-- (Sin parámetros numéricos; la lógica está en el motor de reglas.)
+Anticonceptivo hormonal / THS: en cirugía de riesgo trombótico alto, valorar suspender 4-6 semanas antes; requiere confirmación. Si no, se mantiene. En ambos casos, advertencia del sugammadex según la vía (oral: instrucciones de «dosis olvidada»; no oral: método de barrera 7 días).
+
+_Fuente: docs/documento_fuente.md §8.11_
+
+#### `mantener_generico` — Mantener
+
+Se mantiene según su vía de administración; sin plazo de suspensión.
 
 _Fuente: docs/documento_fuente.md §8_
 
-#### `alfabloqueante_flacido` — Se mantiene (aviso en cirugía oftalmológica)
+#### `alfabloqueante_flacido` — Mantener (aviso oftálmico)
 
-- Aviso en oftalmología: «Riesgo de síndrome de iris flácido intraoperatorio: avisar al oftalmólogo.».
+Alfabloqueante urológico (tamsulosina, silodosina): se mantiene; en cirugía oftalmológica, aviso del riesgo de síndrome de iris flácido intraoperatorio.
 
 _Fuente: docs/documento_fuente.md §8_
 
-#### `no_catalogado` — Fármaco no catalogado
+#### `no_catalogado` — No catalogado
 
-- Texto al paciente: «Siga tomándolo como siempre y consúltelo con el anestesiólogo.».
+Fármaco no catalogado: mantener y consultar con el anestesiólogo.
 
 _Fuente: docs/documento_fuente.md §8.0_
 
-## 3. Catálogo de fármacos
+## 4. Textos que ve el paciente (muestras)
 
-_Fuente: `datos/farmacos.csv`. La columna «Regla» indica qué regla de la sección 2
-se aplica a cada fármaco. `verificado_cima = no` significa que el nombre comercial
-aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
+_Muestras con fecha de ejemplo: **martes 4 de noviembre de 2026 a las 08:00**. Los textos salen de `datos/textos/es/paciente.json` (y su traducción al catalán)._
 
-### 3.1. aine
+| Situación | Texto para el paciente |
+| --- | --- |
+| Mantener (oral) | Siga tomándolo como siempre, también el día de la intervención, con un sorbo de agua. |
+| Mantener (parche/transdérmica) | Siga con su parche como siempre, también el día de la intervención. |
+| Mantener (subcutánea) | Siga con sus inyecciones como siempre. |
+| No tomar el día de la intervención | No lo tome el día de la intervención. |
+| Suspensión por días | Tome la última dosis el martes 4 de noviembre de 2026 a las 08:00. Después no vuelva a tomarlo hasta que se lo indiquen. (como mínimo 3 días antes de la intervención) |
+| Suspensión con adelanto | El martes 4 de noviembre de 2026, tome la dosis a las 08:00 en lugar de a las 09:00. Será la última. Después no vuelva a tomarlo hasta que se lo indiquen. (como mínimo 3 horas antes de la intervención) |
+| Margen sin fecha (días) | No lo tome los 3 días anteriores a la intervención ni ese mismo día. |
+| Margen sin fecha (horas) | Su última toma debe ser como mínimo 48 horas antes de la hora de la intervención. |
+| Requiere confirmación | Sobre Sintrom, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta. |
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+## 5. Fecha desconocida y recálculo — §8.16
+
+- Si aún no se conoce la fecha, las instrucciones se dan como **margen** («como mínimo 72 horas antes de la intervención») y **no se adelantan tomas**.
+- El QR guarda el tipo de plazo (días/horas), la duración, el adelanto y si es anticoagulante, pero **no** fechas ni datos clínicos.
+- Cuando el paciente recibe la fecha, abre de nuevo el enlace, la introduce y **se recalcula todo** con fechas concretas.
+- Sin hora, se asume las **08:00** y la hoja avisa de que si cambia la fecha o la hora debe llamar.
+
+## 6. Mecanismo de confirmación del anestesiólogo — §12
+
+- Cualquier fármaco con `requiere_confirmacion = sí`, o cualquier regla que devuelva ese estado, queda **pendiente de confirmar**.
+- Mientras no se confirme, **no se genera la hoja/QR del paciente**; la pantalla lo señala.
+- El anestesiólogo confirma con su **nombre** (queda registrado) o marca «le llamaremos» (la hoja muestra la frase de que le llamarán).
+- Casos típicos: AAS en neurocirugía/espacio cerrado, P2Y12 con stent o monoterapia, antivitamina K con puente, sacubitrilo/valsartán, biológicos, antiangiogénicos, bomba de insulina con ingreso o riesgo alto, HBPM que no encaja en las tablas.
+
+## 7. Ayuno y hojas anexas — §8.14 y §8.14 bis
+
+Las horas se calculan desde la hora prevista de inducción y se muestran como horas de reloj.
+
+**Adulto sin factores de riesgo:** líquidos claros libres hasta 4 h antes (entre 4 y 2 h, máx. 400 mL; nada en las 2 h previas salvo medicación con un sorbo); comida ligera hasta 6 h; comida copiosa/grasa/proteica hasta 8 h; bebida de carbohidratos entre 2 y 3 h antes (salvo vaciamiento gástrico lento).
+
+**Situaciones especiales:** diabetes (mismo ayuno; con gastroparesia, sólidos 8 h y premedicación con metoclopramida); GLP-1 semanal (líquidos claros 24 h, hoja anexa; si no se ha suspendido, alerta de estómago lleno); reflujo grave sintomático; bariátrica sintomática (sólidos 8 h + secuencia rápida); embarazo ≥ 20 semanas (ayuno individualizado); nutrición enteral; pediatría (líquidos 1 h, leche materna 3 h, fórmula/sólidos 6 h; fórmula 4 h en < 6 meses).
+
+**Hojas anexas** (§8.14 bis): 1) líquidos claros 24 h (GLP-1 semanal sin diabetes); 2) líquidos claros 24 h en diabético (GLP-1 semanal con diabetes); 3) ayuno del diabético (diabetes sin GLP-1 semanal); 4) tabaco (si fuma); 5) alcohol (si el AUDIT-C es positivo). Ninguna menciona dosis; para la medicación remiten a la hoja de medicación.
+
+## 8. Sugammadex y anticoncepción hormonal — §8.15
+
+- En toda mujer con anticonceptivo hormonal y posible anestesia general, si se usa sugammadex la hoja lo advierte de forma condicional.
+- **Anticonceptivo oral:** equivale a olvidar una toma → seguir las instrucciones de «dosis olvidada».
+- **No oral** (implante, anillo, parche, DIU hormonal): usar método de barrera durante **7 días**.
+- La nota del anestesiólogo recuerda informar a la paciente al alta si se ha usado.
+
+## 9. Cribado mitocondrial mtND4 (SEDAR 2026) — §9
+
+- Pregunta obligatoria a todos los pacientes, con guion respetuoso para la enfermera.
+- **Alerta roja** si: test positivo; ascendencia venezolana materna directa; origen materno desconocido u ovodonación; o antecedentes familiares compatibles sin test.
+- **Alerta informativa** si el test es negativo (variante ausente): decisión del anestesiólogo.
+- Medidas (notas del anestesiólogo): si es diferible y hay test, hacer el estudio genético y diferir; si no, evitar halogenados (TIVA), purgar la máquina, priorizar regional, monitorizar profundidad y mantener normoxia/normocapnia/normotermia.
+- En la hoja del paciente solo: «El anestesiólogo hablará con usted sobre este punto antes de la intervención».
+
+## 10. ASA sugerido — §6.1
+
+Cada respuesta de los módulos lleva una clase ASA mínima (ejemplos ASA 2020). El ASA sugerido es el máximo y se muestran las respuestas que lo determinan. Se puede modificar a mano; las salidas indican el valor final y si se ha modificado. Sufijo **E** en urgencias.
+
+- ASA I: sano, no fumador, alcohol mínimo o nulo.
+- ASA II: fumador activo, bebedor social, embarazo, IMC 30 a < 40, diabetes o HTA bien controladas, enfermedad pulmonar leve.
+- ASA III: diabetes/HTA mal controladas, EPOC, IMC ≥ 40, dependencia de alcohol, marcapasos, FE moderadamente reducida, ERC en diálisis, infarto/ictus/stent de más de 3 meses.
+- ASA IV: infarto/ictus/stent de menos de 3 meses, isquemia activa, disfunción valvular grave, FE gravemente reducida, ERC sin diálisis.
+
+## 11. Escalas y cálculos — §6
+
+Cada escala muestra la puntuación, la categoría y los componentes que suman.
+
+- **EGRI (El-Ganzouri)** vía aérea: apertura bucal, distancia tiromentoniana, Mallampati, movilidad cervical, protrusión, peso e intubación difícil previa. **≥ 4: riesgo elevado** de laringoscopia difícil. En telefónica, EGRI parcial con aviso «exploración pendiente».
+- **Langeron** (ventilación difícil con mascarilla): barba, IMC > 26, edéntulo, edad > 55, ronquido. **≥ 2: riesgo.**
+- **STOP-Bang** (adultos sin SAOS diagnosticado): ronquido, cansancio, apneas, HTA, IMC > 35, edad > 50, cuello > 40 cm, varón. 0-2 bajo; 3-4 intermedio; **5-8 alto (alerta)**; también alto con ≥ 2 de los cuatro primeros más varón/IMC/cuello.
+- **STBUR** (niños): 5 ítems de sueño. **≥ 3: riesgo (alerta); 5: alerta alta.**
+- **Apfel** (NVPO adultos): mujer, no fumador, NVPO/cinetosis previas, opioides postoperatorios. 0=10 %, 1=20 %, 2=40 %, 3=60 %, 4=80 %.
+- **POVOC** (NVPO niños): cirugía ≥ 30 min, edad ≥ 3, estrabismo, NVPO del niño o familiares. 0=9 %, 1=10 %, 2=30 %, 3=55 %, 4=70 %.
+- **CHA₂DS₂-VA** (FA/flúter): IC 1, HTA 1, edad ≥ 75 = 2, diabetes 1, ictus/AIT/tromboembolismo 2, enfermedad vascular 1, edad 65-74 = 1. Informativo.
+- **Capacidad funcional**: dos pisos y DASI; METs = (0,43 × DASI + 9,6) / 3,5. **Reducida: < 4 METs o DASI ≤ 34.**
+- **Aclaramiento** (Cockcroft-Gault) con peso real; sin dato, las reglas dependientes del riñón lo indican y requieren confirmación.
+- **AUDIT-C**: positivo ≥ 4 (hombres) o ≥ 3 (mujeres) → consejo y hoja de alcohol; **≥ 8: alerta de abstinencia**.
+- **Fragilidad/delirium (≥ 65)**: CFS 1-9 (**≥ 5: fragilidad, alerta**); 4AT (0 improbable; **1-3 posible deterioro, alerta**; **≥ 4 posible delirium, alerta roja**).
+- **Morfina equivalente** (§6.8): suma de dosis × factor (opioides.json). **≥ 50 mg/día: alerta; ≥ 90 mg/día: alerta alta.** Buprenorfina y metadona sin conversión.
+- **HEMSTOP**: **≥ 2 positivo** → se pide coagulación aunque la tabla no lo pida, y alerta.
+
+## 12. Clase de riesgo del paciente y pruebas complementarias — §7
+
+**Clase de riesgo** (la más alta que asignen los módulos): bajo, bajo-moderado, moderado, alto.
+
+**Tabla de decisión de pruebas** (§7.3):
+
+| Cirugía | Prueba | Bajo | Bajo-moderado | Moderado | Alto |
+| --- | --- | --- | --- | --- | --- |
+| Bajo riesgo | Hemograma y coagulación | No* | Sí | Sí | Sí |
+| Bajo riesgo | Bioquímica | No | Sí | Sí | Sí |
+| Bajo riesgo | ECG | No | Sí | Sí | Sí |
+| Bajo riesgo | Rx tórax | No*** | No*** | No*** | No*** |
+| Intermedio | Hemograma y coagulación | Sí | Sí | Sí | Sí |
+| Intermedio | Bioquímica | No | Sí | Sí | Sí |
+| Intermedio | ECG | No | Sí | Sí | Sí |
+| Intermedio | Rx tórax | No*** | No*** | No*** | Sí |
+| Alto | Hemograma y coagulación | Sí | Sí | Sí | Sí |
+| Alto | Bioquímica | No | Sí | Sí | Sí |
+| Alto | ECG | Sí | Sí | Sí | Sí |
+| Alto | Rx tórax | No*** | Sí | Sí | Sí |
+
+\* Bajo/bajo: hemograma y coagulación solo si sospecha de anemia, trastorno de coagulación/anticoagulante, anestesia regional posible, sangrado previsible o HEMSTOP positivo. \*** Rx de tórax solo ante sospecha o cambio de enfermedad cardiopulmonar (la aplicación pregunta).
+
+**Validez:** hemograma 30 días, bioquímica 30 días, coagulación 14 días, ECG 3 meses, Rx tórax 3 meses, ecocardiograma 12 meses (18 si la función ventricular es conocida y estable). La aplicación compara la fecha de la prueba con la de la intervención: si sigue vigente ese día, no se repite.
+
+## 13. Catálogo de fármacos
+
+_`datos/farmacos.csv`. `verificado_cima` indica si el nombre comercial se ha comprobado en CIMA (AEMPS)._
+
+### aine
+
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Espidifen\|Dalsy\|Neobrufen | ibuprofeno | `aine_ibuprofeno` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Naprosyn\|Antalgin | naproxeno | `aine_naproxeno` | no | oral | ✓ verificado (2026-09-30, CIMA manual) |
@@ -451,16 +537,16 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Celebrex | celecoxib | `aine_celecoxib` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Arcoxia | etoricoxib | `aine_etoricoxib` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.2. analgesicos
+### analgesicos
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Gelocatil\|Termalgin\|Efferalgan | paracetamol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Nolotil | metamizol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.3. antiagregantes
+### antiagregantes
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Adiro\|Tromalyt | acido_acetilsalicilico | `aas` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Plavix\|Iscover | clopidogrel | `p2y12_clopidogrel` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -473,9 +559,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Aggrastat | tirofiban | `gp_iibiiia` | sí | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Kengrexal | cangrelor | `gp_iibiiia` | sí | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.4. anticoagulantes
+### anticoagulantes
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Sintrom | acenocumarol | `avk_acenocumarol` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Aldocumar | warfarina | `avk_warfarina` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -491,9 +577,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Arixtra | fondaparinux | `fondaparinux` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | heparina sodica | heparina_sodica | `heparina_sodica` | no | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.5. antidiabeticos
+### antidiabeticos
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Dianben | metformina | `metformina` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Januvia\|Tesavel\|Xelevia | sitagliptina | `dpp4` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -521,9 +607,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Qtern | dapagliflozina+saxagliptina | `sglt2+dpp4` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Trijardy | empagliflozina+metformina+linagliptina | `sglt2+metformina+dpp4` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.6. cardiovascular
+### cardiovascular
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Renitec | enalapril | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Zestril\|Prinivil | lisinopril | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, CIMA manual) |
@@ -560,17 +646,17 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Viacoram | perindopril+amlodipino | `ieca_ara2+mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Sevikar | olmesartan+amlodipino | `ieca_ara2+mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.7. digestivo
+### digestivo
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Nexium\|Axiago | esomeprazol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Opiren | lansoprazol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Pariet | rabeprazol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.8. fitoterapia
+### fitoterapia
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | ginkgo | ginkgo | `fitoterapia` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | ajo | ajo | `fitoterapia` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -581,9 +667,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | omega 3 | omega_3 | `fitoterapia` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | hiperico | hiperico | `fitoterapia` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.9. glp1
+### glp1
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Ozempic\|Wegovy | semaglutida | `glp1_semanal` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Rybelsus | semaglutida | `glp1_diario` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -593,24 +679,24 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Lyxumia | lixisenatida | `glp1_diario` | no | subcutanea | ✓ verificado (2026-09-30, CIMA manual) |
 | Mounjaro | tirzepatida | `glp1_semanal` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.10. glucosaminoglucanos
+### glucosaminoglucanos
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Aterina | sulodexida | `sulodexida` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.11. hematologia
+### hematologia
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Fero-Gradumet\|Tardyferon | sulfato_ferroso | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Ferbisol | ferroglicina_sulfato | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Ferinject | hierro_carboximaltosa | `mantener_generico` | no | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Venofer | hierro_sacarosa | `mantener_generico` | no | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.12. hormonas
+### hormonas
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Eutirox | levotiroxina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Dacortin | prednisona | `corticoide_sistemico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -633,9 +719,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | terapia hormonal sustitutiva parche\|THS parche | estradiol | `anticonceptivo_ths` | no | transdermica | ✗ sin verificar |
 | terapia hormonal sustitutiva vaginal\|THS vaginal | estradiol | `anticonceptivo_ths` | no | vaginal | ✗ sin verificar |
 
-### 3.13. inmunosupresores
+### inmunosupresores
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Imurel | azatioprina | `inmunosupresor_clasico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Sandimmun Neoral | ciclosporina | `inmunosupresor_clasico` | no | oral | ✓ verificado (2026-09-30, CIMA manual) |
@@ -659,9 +745,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Cosentyx | secukinumab | `biologico` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Stelara | ustekinumab | `biologico` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.14. insulinas
+### insulinas
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Xultophy | insulina_degludec+liraglutida | `insulina_glp1_fija` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Suliqua | insulina_glargina+lixisenatida | `insulina_glp1_fija` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -678,9 +764,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Humalog Mix 50 | insulina_lispro | `insulina_premezclada` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Ryzodeg | insulina_degludec+insulina_aspart | `insulina_premezclada` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.15. neurologia
+### neurologia
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Keppra | levetiracetam | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Briviact | brivaracetam | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -697,9 +783,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Neurontin | gabapentina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Lyrica | pregabalina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.16. oftalmologia
+### oftalmologia
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Timoftol | timolol | `mantener_generico` | no | colirio | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Alphagan | brimonidina | `mantener_generico` | no | colirio | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -711,9 +797,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | pilocarpina | pilocarpina | `mantener_generico` | no | colirio | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Edemox | acetazolamida | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.17. oncologicos
+### oncologicos
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Glivec | imatinib | `tirosina_cinasa` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Sprycel | dasatinib | `tirosina_cinasa` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -727,9 +813,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Eylea | aflibercept | `antiangiogenico_intravitreo` | no | intravitrea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Cyramza | ramucirumab | `antiangiogenico` | sí | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.18. opioides
+### opioides
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | MST Continus\|Sevredol | morfina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | codeina | codeina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -742,9 +828,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Suboxone | buprenorfina\|naloxona | `mantener_generico` | no | sublingual | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | metadona | metadona | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.19. psicofarmacos
+### psicofarmacos
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Parnate | tranilcipromina | `imao_irreversible` | sí | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Manerix | moclobemida | `moclobemida` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -790,9 +876,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Leponex | clozapina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Etumina | clotiapina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.20. respiratorio
+### respiratorio
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Ventolin\|Buto-Asma | salbutamol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Terbasmin | terbutalina | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -819,9 +905,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Trimbow | beclometasona+formoterol+glicopirronio | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Singulair | montelukast | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-### 3.21. urologia
+### urologia
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| Nombres comerciales | Principios | Regla | Confirmación | Vía | Verificación |
 | --- | --- | --- | --- | --- | --- |
 | Omnic\|Urolosin | tamsulosina | `alfabloqueante_flacido` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | Silodyx\|Urorec | silodosina | `alfabloqueante_flacido` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
@@ -829,11 +915,9 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 | Carduran | doxazosina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 | terazosina | terazosina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
-## 4. Conversión de opioides a morfina oral equivalente
+## 14. Conversión de opioides a morfina oral equivalente
 
-_Fuente: `datos/opioides.json` · Factores de conversión a morfina oral equivalente (docs/documento_fuente.md §6.8). (CDC 2022)_
-
-| Opioide | Factor a morfina oral |
+| Opioide | Factor |
 | --- | --- |
 | morfina oral | 1 |
 | codeina | 0.15 |
@@ -843,315 +927,312 @@ _Fuente: `datos/opioides.json` · Factores de conversión a morfina oral equival
 | hidromorfona oral | 5 |
 | fentanilo transdermico | 2.4 |
 
-**Sin conversión directa** (requieren valoración específica): buprenorfina, metadona.
+**Sin conversión** (valoración específica): buprenorfina, metadona.
 
-## 5. Procedimientos y su riesgo
+## 15. Procedimientos
 
-_Fuente: `datos/procedimientos.csv`. Cada procedimiento fija el riesgo cardiovascular
-y hemorrágico, si la técnica neuroaxial/bloqueo profundo es probable y otros factores
-que alimentan las reglas y la decisión de pruebas._
+_`datos/procedimientos.csv`. Riesgo cardiovascular según §7.1 (el alto se reserva para vascular mayor, cardiaca, neumonectomía, torácica mayor, hepatopancreática y oncológica multivisceral)._
 
-### 5.1. cardiaca
+### cardiaca
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Bypass coronario | alto | alto | no | no |
-| Recambio valvular | alto | alto | no | no |
-| Reparacion valvular | alto | alto | no | no |
-| Cirugia de aorta ascendente | alto | alto | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Bypass coronario | alto | alto | no | no_aplica | no | si | no |
+| Recambio valvular | alto | alto | no | no_aplica | no | si | no |
+| Reparacion valvular | alto | alto | no | no_aplica | no | si | no |
+| Cirugia de aorta ascendente | alto | alto | no | no_aplica | no | si | no |
 
-### 5.2. cardiologia
+### cardiologia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Implante de marcapasos o DAI | intermedio | bajo | no | no |
-| Ablacion cardiaca | intermedio | bajo | no | no |
-| Estudio electrofisiologico | intermedio | bajo | no | no |
-| Cateterismo coronario diagnostico | intermedio | bajo | no | no |
-| Angioplastia coronaria con stent | alto | alto | no | no |
-| Valvuloplastia percutanea | alto | alto | no | no |
-| Implante valvular aortico transcateter (TAVI) | alto | alto | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Implante de marcapasos o DAI | intermedio | bajo | no | no_aplica | no | no | no |
+| Ablacion cardiaca | intermedio | bajo | no | no_aplica | no | no | no |
+| Estudio electrofisiologico | intermedio | bajo | no | no_aplica | no | no | no |
+| Cateterismo coronario diagnostico | intermedio | bajo | no | no_aplica | no | no | no |
+| Angioplastia coronaria con stent | alto | alto | no | no_aplica | no | si | no |
+| Valvuloplastia percutanea | alto | alto | no | no_aplica | no | si | no |
+| Implante valvular aortico transcateter (TAVI) | alto | alto | no | no_aplica | no | si | no |
 
-### 5.3. cirugia general
+### cirugia general
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Hernioplastia inguinal abierta | bajo | bajo | no | no |
-| Hernioplastia inguinal laparoscopica | bajo | bajo | no | no |
-| Hernioplastia umbilical | bajo | bajo | no | no |
-| Eventroplastia de pared abdominal | intermedio | alto | no | no |
-| Colecistectomia laparoscopica | intermedio | bajo | no | no |
-| Colecistectomia abierta | intermedio | alto | no | no |
-| Apendicectomia | bajo | bajo | no | no |
-| Colectomia no oncologica | intermedio | alto | no | no |
-| Colectomia oncologica | alto | alto | no | no |
-| Hemicolectomia | alto | alto | no | no |
-| Reseccion anterior de recto | alto | alto | si | no |
-| Amputacion abdominoperineal | alto | alto | si | no |
-| Gastrectomia | alto | alto | no | no |
-| Esofagectomia | alto | alto | no | no |
-| Bypass gastrico | alto | alto | no | no |
-| Gastrectomia vertical | intermedio | alto | no | no |
-| Tiroidectomia | intermedio | bajo | no | no |
-| Paratiroidectomia | intermedio | bajo | no | no |
-| Suprarrenalectomia laparoscopica | alto | alto | no | no |
-| Esplenectomia | alto | alto | no | no |
-| Mastectomia | bajo | bajo | no | no |
-| Tumorectomia de mama | bajo | bajo | no | no |
-| Biopsia de ganglio centinela | bajo | bajo | no | no |
-| Exeresis cutanea pequena | bajo | minimo | no | no |
-| Drenaje de absceso | bajo | minimo | no | no |
-| Cirugia de fistula anal | bajo | bajo | si | no |
-| Hemorroidectomia | bajo | bajo | si | no |
-| Exeresis de sinus pilonidal | bajo | bajo | no | no |
-| Cirugia perineal o proctologica | bajo | bajo | si | no |
-| Colocacion de reservorio subcutaneo | bajo | bajo | no | no |
-| Otro procedimiento | intermedio | bajo | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Hernioplastia inguinal abierta | bajo | bajo | no | no_aplica | no | no | no |
+| Hernioplastia inguinal laparoscopica | intermedio | bajo | no | no_aplica | no | no | no |
+| Hernioplastia umbilical | bajo | bajo | no | no_aplica | no | no | no |
+| Eventroplastia de pared abdominal | intermedio | alto | no | no_aplica | no | no | no |
+| Colecistectomia laparoscopica | intermedio | bajo | no | no_aplica | no | no | no |
+| Colecistectomia abierta | intermedio | alto | no | no_aplica | no | no | no |
+| Apendicectomia | intermedio | bajo | no | no_aplica | no | no | no |
+| Colectomia no oncologica | intermedio | alto | no | no_aplica | no | no | no |
+| Colectomia oncologica | intermedio | alto | no | no_aplica | no | si | no |
+| Hemicolectomia | intermedio | alto | no | no_aplica | no | si | no |
+| Reseccion anterior de recto | intermedio | alto | si | no_aplica | no | si | no |
+| Amputacion abdominoperineal | intermedio | alto | si | no_aplica | no | si | no |
+| Gastrectomia | intermedio | alto | no | no_aplica | no | si | no |
+| Esofagectomia | alto | alto | no | no_aplica | no | si | no |
+| Bypass gastrico | intermedio | alto | no | no_aplica | no | si | no |
+| Gastrectomia vertical | intermedio | alto | no | no_aplica | no | si | no |
+| Tiroidectomia | intermedio | bajo | no | no_aplica | no | no | no |
+| Paratiroidectomia | intermedio | bajo | no | no_aplica | no | no | no |
+| Suprarrenalectomia laparoscopica | alto | alto | no | no_aplica | no | si | no |
+| Esplenectomia | intermedio | alto | no | no_aplica | no | si | no |
+| Mastectomia | bajo | bajo | no | no_aplica | no | no | no |
+| Tumorectomia de mama | bajo | bajo | no | no_aplica | no | no | no |
+| Biopsia de ganglio centinela | bajo | bajo | no | no_aplica | no | no | no |
+| Exeresis cutanea pequena | bajo | minimo | no | no_aplica | no | no | no |
+| Drenaje de absceso | bajo | minimo | no | no_aplica | no | no | no |
+| Cirugia de fistula anal | bajo | bajo | si | no_aplica | no | no | no |
+| Hemorroidectomia | bajo | bajo | si | no_aplica | no | no | no |
+| Exeresis de sinus pilonidal | bajo | bajo | no | no_aplica | no | no | no |
+| Cirugia perineal o proctologica | bajo | bajo | si | no_aplica | no | no | no |
+| Colocacion de reservorio subcutaneo | bajo | bajo | no | no_aplica | no | no | no |
+| Otro procedimiento | intermedio | bajo | no | no_aplica | no | no | no |
 
-### 5.4. dermatologia
+### dermatologia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Exeresis de tumor cutaneo | bajo | minimo | no | no |
-| Cirugia de Mohs | bajo | bajo | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Exeresis de tumor cutaneo | bajo | minimo | no | no_aplica | no | no | no |
+| Cirugia de Mohs | bajo | bajo | no | no_aplica | no | no | no |
 
-### 5.5. digestivo
+### digestivo
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Endoscopia digestiva alta diagnostica | bajo | minimo | no | no |
-| Colonoscopia diagnostica | bajo | minimo | no | no |
-| Endoscopia con biopsia | bajo | bajo | no | no |
-| Colonoscopia con polipectomia | intermedio | alto | no | no |
-| CPRE con esfinterotomia | intermedio | alto | no | no |
-| Mucosectomia endoscopica | intermedio | alto | no | no |
-| Gastrostomia endoscopica percutanea | intermedio | bajo | no | no |
-| Ligadura endoscopica de varices esofagicas | intermedio | alto | no | no |
-| Biopsia hepatica | intermedio | alto | no | no |
-| Manometria esofagica | bajo | minimo | no | no |
-| Gastroscopia terapeutica | intermedio | alto | no | no |
-| Dilatacion esofagica endoscopica | intermedio | bajo | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Endoscopia digestiva alta diagnostica | bajo | minimo | no | no_aplica | no | no | no |
+| Colonoscopia diagnostica | bajo | minimo | no | no_aplica | no | no | no |
+| Endoscopia con biopsia | bajo | bajo | no | no_aplica | no | no | no |
+| Colonoscopia con polipectomia | intermedio | alto | no | no_aplica | no | no | no |
+| CPRE con esfinterotomia | intermedio | alto | no | no_aplica | no | no | no |
+| Mucosectomia endoscopica | intermedio | alto | no | no_aplica | no | no | no |
+| Gastrostomia endoscopica percutanea | intermedio | bajo | no | no_aplica | no | no | no |
+| Ligadura endoscopica de varices esofagicas | intermedio | alto | no | no_aplica | no | no | no |
+| Biopsia hepatica | intermedio | alto | no | no_aplica | no | no | no |
+| Manometria esofagica | bajo | minimo | no | no_aplica | no | no | no |
+| Gastroscopia terapeutica | intermedio | alto | no | no_aplica | no | no | no |
+| Dilatacion esofagica endoscopica | intermedio | bajo | no | no_aplica | no | no | no |
 
-### 5.6. ginecologia
+### ginecologia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Histerectomia | intermedio | alto | no | no |
-| Histerectomia laparoscopica | intermedio | alto | no | no |
-| Anexectomia | intermedio | alto | no | no |
-| Laparoscopia ginecologica diagnostica | bajo | bajo | no | no |
-| Legrado uterino | bajo | bajo | no | no |
-| Conizacion cervical | bajo | bajo | no | no |
-| Histeroscopia | bajo | bajo | no | no |
-| Cirugia de prolapso genital | intermedio | alto | si | no |
-| Cabestrillo suburetral | bajo | bajo | si | no |
-| Miomectomia | intermedio | alto | no | no |
-| Cirugia oncologica ovarica | alto | alto | no | no |
-| Biopsia endometrial | bajo | minimo | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Histerectomia | intermedio | alto | no | no_aplica | no | no | no |
+| Histerectomia laparoscopica | intermedio | alto | no | no_aplica | no | no | no |
+| Anexectomia | intermedio | alto | no | no_aplica | no | no | no |
+| Laparoscopia ginecologica diagnostica | bajo | bajo | no | no_aplica | no | no | no |
+| Legrado uterino | bajo | bajo | no | no_aplica | no | no | no |
+| Conizacion cervical | bajo | bajo | no | no_aplica | no | no | no |
+| Histeroscopia | bajo | bajo | no | no_aplica | no | no | no |
+| Cirugia de prolapso genital | intermedio | alto | si | no_aplica | no | no | no |
+| Cabestrillo suburetral | bajo | bajo | si | no_aplica | no | no | no |
+| Miomectomia | intermedio | alto | no | no_aplica | no | no | no |
+| Cirugia oncologica ovarica | alto | alto | no | no_aplica | no | si | no |
+| Biopsia endometrial | bajo | minimo | no | no_aplica | no | no | no |
 
-### 5.7. maxilofacial
+### maxilofacial
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Cirugia ortognatica | intermedio | alto | no | no |
-| Extraccion de terceros molares | bajo | bajo | no | no |
-| Extraccion de 1 a 3 piezas dentarias | bajo | minimo | no | no |
-| Implante dental simple | bajo | minimo | no | no |
-| Implante dental complejo con injerto | bajo | bajo | no | no |
-| Cirugia periodontal | bajo | minimo | no | no |
-| Osteosintesis de fractura mandibular | intermedio | bajo | no | no |
-| Cirugia de tumor de cavidad oral | intermedio | alto | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Cirugia ortognatica | intermedio | alto | no | no_aplica | no | no | no |
+| Extraccion de terceros molares | bajo | bajo | no | no_aplica | no | no | no |
+| Extraccion de 1 a 3 piezas dentarias | bajo | minimo | no | no_aplica | no | no | no |
+| Implante dental simple | bajo | minimo | no | no_aplica | no | no | no |
+| Implante dental complejo con injerto | bajo | bajo | no | no_aplica | no | no | no |
+| Cirugia periodontal | bajo | minimo | no | no_aplica | no | no | no |
+| Osteosintesis de fractura mandibular | intermedio | bajo | no | no_aplica | no | no | no |
+| Cirugia de tumor de cavidad oral | intermedio | alto | no | no_aplica | no | no | no |
 
-### 5.8. neurocirugia
+### neurocirugia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Craneotomia por tumor | alto | alto | no | si |
-| Craneotomia por aneurisma | alto | alto | no | si |
-| Evacuacion de hematoma subdural | alto | alto | no | si |
-| Derivacion ventriculoperitoneal | intermedio | alto | no | si |
-| Cirugia transesfenoidal de hipofisis | alto | alto | no | si |
-| Cirugia del canal medular | alto | alto | si | si |
-| Implante de estimulador medular | intermedio | alto | si | si |
-| Puncion lumbar | bajo | alto | si | si |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Craneotomia por tumor | intermedio | alto | no | no_aplica | no | si | si |
+| Craneotomia por aneurisma | intermedio | alto | no | no_aplica | no | si | si |
+| Evacuacion de hematoma subdural | intermedio | alto | no | no_aplica | no | si | si |
+| Derivacion ventriculoperitoneal | intermedio | alto | no | no_aplica | no | no | si |
+| Cirugia transesfenoidal de hipofisis | intermedio | alto | no | no_aplica | no | si | si |
+| Cirugia del canal medular | intermedio | alto | si | no_aplica | no | si | si |
+| Implante de estimulador medular | intermedio | alto | si | no_aplica | no | no | si |
+| Puncion lumbar | bajo | alto | si | no_aplica | no | no | si |
 
-### 5.9. obstetricia
+### obstetricia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Cesarea | intermedio | alto | si | no |
-| Parto instrumental | intermedio | alto | si | no |
-| Legrado obstetrico | bajo | bajo | no | no |
-| Cerclaje cervical | bajo | bajo | si | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Cesarea | intermedio | alto | si | no_aplica | si | no | no |
+| Parto instrumental | intermedio | alto | si | no_aplica | si | no | no |
+| Legrado obstetrico | bajo | bajo | no | no_aplica | si | no | no |
+| Cerclaje cervical | bajo | bajo | si | no_aplica | si | no | no |
 
-### 5.10. oftalmologia
+### oftalmologia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Cirugia de catarata con anestesia topica | bajo | minimo | no | no |
-| Cirugia de chalazion | bajo | minimo | no | no |
-| Cirugia de pterigion | bajo | minimo | no | no |
-| Cirugia de catarata con bloqueo retrobulbar | bajo | bajo | no | no |
-| Cirugia palpebral | bajo | bajo | no | no |
-| Dacriocistorrinostomia | bajo | bajo | no | no |
-| Dacriocistectomia | bajo | bajo | no | no |
-| Queratoplastia | bajo | bajo | no | no |
-| Evisceracion ocular | bajo | bajo | no | no |
-| Enucleacion ocular | bajo | bajo | no | no |
-| Cirugia de glaucoma | bajo | bajo | no | no |
-| Cerclaje escleral | bajo | bajo | no | no |
-| Vitrectomia | bajo | bajo | no | no |
-| Cirugia de desprendimiento de retina | bajo | bajo | no | no |
-| Cirugia de estrabismo | bajo | bajo | no | no |
-| Descompresion orbitaria | intermedio | alto | no | no |
-| Cirugia tumoral ocular | intermedio | alto | no | no |
-| Inyeccion intravitrea | bajo | minimo | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Cirugia de catarata con anestesia topica | bajo | minimo | no | riesgo_bajo | no | no | no |
+| Cirugia de chalazion | bajo | minimo | no | riesgo_bajo | no | no | no |
+| Cirugia de pterigion | bajo | minimo | no | riesgo_bajo | no | no | no |
+| Cirugia de catarata con bloqueo retrobulbar | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Cirugia palpebral | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Dacriocistorrinostomia | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Dacriocistectomia | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Queratoplastia | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Evisceracion ocular | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Enucleacion ocular | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Cirugia de glaucoma | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Cerclaje escleral | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Vitrectomia | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Cirugia de desprendimiento de retina | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Cirugia de estrabismo | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Descompresion orbitaria | intermedio | alto | no | riesgo_moderado_alto | no | no | no |
+| Cirugia tumoral ocular | intermedio | alto | no | riesgo_moderado_alto | no | no | no |
+| Inyeccion intravitrea | bajo | minimo | no | riesgo_bajo | no | no | no |
 
-### 5.11. orl
+### orl
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Amigdalectomia | bajo | bajo | no | no |
-| Adenoidectomia | bajo | bajo | no | no |
-| Septoplastia | bajo | bajo | no | no |
-| Rinoseptoplastia | bajo | bajo | no | no |
-| Cirugia endoscopica nasosinusal | bajo | bajo | no | no |
-| Timpanoplastia | bajo | bajo | no | no |
-| Mastoidectomia | bajo | bajo | no | no |
-| Tiroidectomia | intermedio | bajo | no | no |
-| Parotidectomia | intermedio | bajo | no | no |
-| Laringectomia | intermedio | alto | no | no |
-| Vaciamiento cervical ganglionar | intermedio | alto | no | no |
-| Microcirugia de laringe | bajo | bajo | no | no |
-| Traqueotomia | intermedio | bajo | no | no |
-| Septorrinoplastia de revision | bajo | bajo | no | no |
-| Uvulopalatofaringoplastia | intermedio | bajo | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Amigdalectomia | bajo | bajo | no | no_aplica | no | no | no |
+| Adenoidectomia | bajo | bajo | no | no_aplica | no | no | no |
+| Septoplastia | bajo | bajo | no | no_aplica | no | no | no |
+| Rinoseptoplastia | bajo | bajo | no | no_aplica | no | no | no |
+| Cirugia endoscopica nasosinusal | bajo | bajo | no | no_aplica | no | no | no |
+| Timpanoplastia | bajo | bajo | no | no_aplica | no | no | no |
+| Mastoidectomia | bajo | bajo | no | no_aplica | no | no | no |
+| Tiroidectomia | intermedio | bajo | no | no_aplica | no | no | no |
+| Parotidectomia | intermedio | bajo | no | no_aplica | no | no | no |
+| Laringectomia | intermedio | alto | no | no_aplica | no | no | no |
+| Vaciamiento cervical ganglionar | intermedio | alto | no | no_aplica | no | no | no |
+| Microcirugia de laringe | bajo | bajo | no | no_aplica | no | no | no |
+| Traqueotomia | intermedio | bajo | no | no_aplica | no | no | no |
+| Septorrinoplastia de revision | bajo | bajo | no | no_aplica | no | no | no |
+| Uvulopalatofaringoplastia | intermedio | bajo | no | no_aplica | no | no | no |
 
-### 5.12. pediatria
+### pediatria
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Amigdalectomia pediatrica | bajo | bajo | no | no |
-| Adenoidectomia pediatrica | bajo | bajo | no | no |
-| Drenajes timpanicos | bajo | minimo | no | no |
-| Circuncision | bajo | minimo | no | no |
-| Herniorrafia inguinal pediatrica | bajo | bajo | si | no |
-| Orquidopexia | bajo | bajo | si | no |
-| Cirugia de fimosis | bajo | minimo | no | no |
-| Frenulectomia | bajo | minimo | no | no |
-| Correccion de hipospadias | bajo | bajo | si | no |
-| Apendicectomia pediatrica | bajo | bajo | no | no |
-| Cirugia de estrabismo pediatrica | bajo | bajo | no | no |
-| Cirugia de cardiopatia congenita | alto | alto | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Amigdalectomia pediatrica | bajo | bajo | no | no_aplica | no | no | no |
+| Adenoidectomia pediatrica | bajo | bajo | no | no_aplica | no | no | no |
+| Drenajes timpanicos | bajo | minimo | no | no_aplica | no | no | no |
+| Circuncision | bajo | minimo | no | no_aplica | no | no | no |
+| Herniorrafia inguinal pediatrica | bajo | bajo | si | no_aplica | no | no | no |
+| Orquidopexia | bajo | bajo | si | no_aplica | no | no | no |
+| Cirugia de fimosis | bajo | minimo | no | no_aplica | no | no | no |
+| Frenulectomia | bajo | minimo | no | no_aplica | no | no | no |
+| Correccion de hipospadias | bajo | bajo | si | no_aplica | no | no | no |
+| Apendicectomia pediatrica | intermedio | bajo | no | no_aplica | no | no | no |
+| Cirugia de estrabismo pediatrica | bajo | bajo | no | riesgo_moderado_alto | no | no | no |
+| Cirugia de cardiopatia congenita | alto | alto | no | no_aplica | no | si | no |
 
-### 5.13. plastica
+### plastica
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Rinoplastia | bajo | bajo | no | no |
-| Abdominoplastia | intermedio | bajo | no | no |
-| Mamoplastia de aumento | bajo | bajo | no | no |
-| Mamoplastia de reduccion | bajo | bajo | no | no |
-| Reconstruccion mamaria con colgajo | intermedio | alto | no | no |
-| Lipectomia | bajo | bajo | no | no |
-| Injerto de piel | bajo | bajo | no | no |
-| Cirugia de colgajo | intermedio | alto | no | no |
-| Dermolipectomia | intermedio | bajo | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Rinoplastia | bajo | bajo | no | no_aplica | no | no | no |
+| Abdominoplastia | intermedio | bajo | no | no_aplica | no | no | no |
+| Mamoplastia de aumento | bajo | bajo | no | no_aplica | no | no | no |
+| Mamoplastia de reduccion | bajo | bajo | no | no_aplica | no | no | no |
+| Reconstruccion mamaria con colgajo | intermedio | alto | no | no_aplica | no | si | no |
+| Lipectomia | bajo | bajo | no | no_aplica | no | no | no |
+| Injerto de piel | bajo | bajo | no | no_aplica | no | no | no |
+| Cirugia de colgajo | intermedio | alto | no | no_aplica | no | no | no |
+| Dermolipectomia | intermedio | bajo | no | no_aplica | no | no | no |
 
-### 5.14. radiologia intervencionista
+### radiologia intervencionista
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Angiografia no coronaria | intermedio | bajo | no | no |
-| Embolizacion arterial | intermedio | alto | no | no |
-| Drenaje percutaneo guiado | bajo | bajo | no | no |
-| Biopsia percutanea guiada por imagen | bajo | bajo | no | no |
-| Nefrostomia percutanea | intermedio | alto | no | no |
-| Quimioembolizacion hepatica | alto | alto | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Angiografia no coronaria | intermedio | bajo | no | no_aplica | no | no | no |
+| Embolizacion arterial | intermedio | alto | no | no_aplica | no | no | no |
+| Drenaje percutaneo guiado | bajo | bajo | no | no_aplica | no | no | no |
+| Biopsia percutanea guiada por imagen | bajo | bajo | no | no_aplica | no | no | no |
+| Nefrostomia percutanea | intermedio | alto | no | no_aplica | no | no | no |
+| Quimioembolizacion hepatica | alto | alto | no | no_aplica | no | no | no |
 
-### 5.15. toracica
+### toracica
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Neumonectomia | alto | alto | no | no |
-| Lobectomia pulmonar | alto | alto | no | no |
-| Segmentectomia pulmonar | alto | alto | no | no |
-| Videotoracoscopia (VATS) | alto | alto | si | no |
-| Mediastinoscopia | intermedio | bajo | no | no |
-| Biopsia pleural | intermedio | bajo | no | no |
-| Pleurodesis | intermedio | bajo | no | no |
-| Timectomia | alto | alto | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Neumonectomia | alto | alto | no | no_aplica | no | si | no |
+| Lobectomia pulmonar | alto | alto | no | no_aplica | no | si | no |
+| Segmentectomia pulmonar | alto | alto | no | no_aplica | no | si | no |
+| Videotoracoscopia (VATS) | alto | alto | si | no_aplica | no | si | no |
+| Mediastinoscopia | intermedio | bajo | no | no_aplica | no | no | no |
+| Biopsia pleural | intermedio | bajo | no | no_aplica | no | no | no |
+| Pleurodesis | intermedio | bajo | no | no_aplica | no | no | no |
+| Timectomia | alto | alto | no | no_aplica | no | si | no |
 
-### 5.16. traumatologia
+### traumatologia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Artroplastia total de rodilla | intermedio | alto | si | no |
-| Artroplastia total de cadera | intermedio | alto | si | no |
-| Artroplastia de hombro | intermedio | alto | si | no |
-| Osteosintesis de fractura de cadera | intermedio | alto | si | no |
-| Osteosintesis de femur | intermedio | alto | si | no |
-| Osteosintesis de tibia | intermedio | alto | si | no |
-| Osteosintesis de humero | intermedio | bajo | si | no |
-| Osteosintesis de muneca | bajo | bajo | si | no |
-| Artroscopia de rodilla | bajo | bajo | si | no |
-| Artroscopia de hombro | bajo | bajo | si | no |
-| Ligamentoplastia de rodilla | bajo | bajo | si | no |
-| Meniscectomia artroscopica | bajo | bajo | si | no |
-| Artrodesis lumbar | alto | alto | si | si |
-| Discectomia lumbar | intermedio | alto | si | si |
-| Laminectomia | intermedio | alto | si | si |
-| Cirugia de mano | bajo | bajo | si | no |
-| Liberacion del tunel carpiano | bajo | minimo | no | no |
-| Cirugia de Dupuytren | bajo | bajo | si | no |
-| Cirugia de hallux valgus | bajo | bajo | si | no |
-| Artroscopia de tobillo | bajo | bajo | si | no |
-| Retirada de material de osteosintesis | bajo | bajo | si | no |
-| Amputacion de miembro inferior | alto | alto | si | no |
-| Infiltracion articular | bajo | minimo | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Artroplastia total de rodilla | intermedio | alto | si | no_aplica | no | si | no |
+| Artroplastia total de cadera | intermedio | alto | si | no_aplica | no | si | no |
+| Artroplastia de hombro | intermedio | alto | si | no_aplica | no | no | no |
+| Osteosintesis de fractura de cadera | intermedio | alto | si | no_aplica | no | si | no |
+| Osteosintesis de femur | intermedio | alto | si | no_aplica | no | si | no |
+| Osteosintesis de tibia | intermedio | alto | si | no_aplica | no | no | no |
+| Osteosintesis de humero | intermedio | bajo | si | no_aplica | no | no | no |
+| Osteosintesis de muneca | bajo | bajo | si | no_aplica | no | no | no |
+| Artroscopia de rodilla | bajo | bajo | si | no_aplica | no | no | no |
+| Artroscopia de hombro | bajo | bajo | si | no_aplica | no | no | no |
+| Ligamentoplastia de rodilla | bajo | bajo | si | no_aplica | no | no | no |
+| Meniscectomia artroscopica | bajo | bajo | si | no_aplica | no | no | no |
+| Artrodesis lumbar | intermedio | alto | si | no_aplica | no | si | si |
+| Discectomia lumbar | intermedio | alto | si | no_aplica | no | no | si |
+| Laminectomia | intermedio | alto | si | no_aplica | no | si | si |
+| Cirugia de mano | bajo | bajo | si | no_aplica | no | no | no |
+| Liberacion del tunel carpiano | bajo | minimo | no | no_aplica | no | no | no |
+| Cirugia de Dupuytren | bajo | bajo | si | no_aplica | no | no | no |
+| Cirugia de hallux valgus | bajo | bajo | si | no_aplica | no | no | no |
+| Artroscopia de tobillo | bajo | bajo | si | no_aplica | no | no | no |
+| Retirada de material de osteosintesis | bajo | bajo | si | no_aplica | no | no | no |
+| Amputacion de miembro inferior | alto | alto | si | no_aplica | no | si | no |
+| Infiltracion articular | bajo | minimo | no | no_aplica | no | no | no |
 
-### 5.17. urologia
+### urologia
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| RTU de prostata | intermedio | alto | si | no |
-| RTU de tumor vesical | intermedio | alto | si | no |
-| Nefrolitotomia percutanea | intermedio | alto | no | no |
-| Ureteroscopia | bajo | bajo | si | no |
-| Litotricia extracorporea | intermedio | alto | no | no |
-| Prostatectomia radical | intermedio | alto | si | no |
-| Nefrectomia | alto | alto | no | no |
-| Nefrectomia parcial | alto | alto | no | no |
-| Cistectomia radical | alto | alto | no | no |
-| Biopsia de prostata | bajo | bajo | no | no |
-| Biopsia renal | intermedio | alto | no | no |
-| Vasectomia | bajo | minimo | no | no |
-| Orquiectomia | bajo | bajo | no | no |
-| Cirugia de hidrocele | bajo | bajo | si | no |
-| Colocacion de cateter doble J | bajo | bajo | si | no |
-| Cistoscopia diagnostica | bajo | minimo | no | no |
-| Circuncision en adulto | bajo | minimo | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| RTU de prostata | intermedio | alto | si | no_aplica | no | no | no |
+| RTU de tumor vesical | intermedio | alto | si | no_aplica | no | no | no |
+| Nefrolitotomia percutanea | intermedio | alto | no | no_aplica | no | no | no |
+| Ureteroscopia | bajo | bajo | si | no_aplica | no | no | no |
+| Litotricia extracorporea | intermedio | alto | no | no_aplica | no | no | no |
+| Prostatectomia radical | intermedio | alto | si | no_aplica | no | no | no |
+| Nefrectomia | intermedio | alto | no | no_aplica | no | si | no |
+| Nefrectomia parcial | intermedio | alto | no | no_aplica | no | si | no |
+| Cistectomia radical | intermedio | alto | no | no_aplica | no | si | no |
+| Biopsia de prostata | bajo | bajo | no | no_aplica | no | no | no |
+| Biopsia renal | intermedio | alto | no | no_aplica | no | no | no |
+| Vasectomia | bajo | minimo | no | no_aplica | no | no | no |
+| Orquiectomia | bajo | bajo | no | no_aplica | no | no | no |
+| Cirugia de hidrocele | bajo | bajo | si | no_aplica | no | no | no |
+| Colocacion de cateter doble J | bajo | bajo | si | no_aplica | no | no | no |
+| Cistoscopia diagnostica | bajo | minimo | no | no_aplica | no | no | no |
+| Circuncision en adulto | bajo | minimo | no | no_aplica | no | no | no |
 
-### 5.18. vascular
+### vascular
 
-| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Espacio cerrado |
-| --- | --- | --- | --- | --- |
-| Cirugia de aorta abdominal | alto | alto | no | no |
-| Reparacion endovascular de aneurisma (EVAR) | alto | alto | no | no |
-| Revascularizacion arterial periferica | alto | alto | no | no |
-| Bypass femoropopliteo | alto | alto | si | no |
-| Endarterectomia carotidea | alto | alto | no | no |
-| Amputacion por isquemia | alto | alto | si | no |
-| Fistula arteriovenosa para dialisis | intermedio | bajo | no | no |
-| Safenectomia por varices | bajo | bajo | si | no |
-| Escleroterapia de varices | bajo | minimo | no | no |
-| Ligadura de varices | bajo | minimo | no | no |
-| Colocacion de reservorio venoso | bajo | bajo | no | no |
+| Procedimiento | R. cardiovascular | R. hemorrágico | Neuroaxial/bloqueo | Oftalmológico | Obstétrico | R. trombótico alto | Espacio cerrado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Cirugia de aorta abdominal | alto | alto | no | no_aplica | no | si | no |
+| Reparacion endovascular de aneurisma (EVAR) | alto | alto | no | no_aplica | no | si | no |
+| Revascularizacion arterial periferica | alto | alto | no | no_aplica | no | si | no |
+| Bypass femoropopliteo | alto | alto | si | no_aplica | no | si | no |
+| Endarterectomia carotidea | alto | alto | no | no_aplica | no | si | no |
+| Amputacion por isquemia | alto | alto | si | no_aplica | no | si | no |
+| Fistula arteriovenosa para dialisis | intermedio | bajo | no | no_aplica | no | no | no |
+| Safenectomia por varices | bajo | bajo | si | no_aplica | no | no | no |
+| Escleroterapia de varices | bajo | minimo | no | no_aplica | no | no | no |
+| Ligadura de varices | bajo | minimo | no | no_aplica | no | no | no |
+| Colocacion de reservorio venoso | bajo | bajo | no | no_aplica | no | no | no |
 
-## 6. Módulos de enfermedades (anamnesis dirigida, §5.16)
+## 16. Módulos de enfermedad (anamnesis dirigida, §5.16)
 
-_Fuente: `datos/modulos/*.json`. Preguntas que la aplicación abre al marcar cada
-enfermedad en el cribado. El «porqué» explica su relevancia anestésica._
+_Preguntas que se abren al marcar cada enfermedad. Las alertas que generan las respuestas se describen en las secciones de escalas (§11), reglas de medicación (§3) y ayuno (§7); por ejemplo, HbA1c > 8,5 % (diabetes), bocio grande (vía aérea), IMC ≥ 40 (obesidad) o radioterapia cervical (vía aérea) generan sus avisos._
 
 ### Anemia
 
@@ -1611,6 +1692,20 @@ _Fuente: docs/documento_fuente.md §5.1_
   - Por qué: Si no hay ecocardiograma en los últimos 12 meses o hay síntomas nuevos, se solicita uno.
 - **¿Síntomas nuevos (más disnea, síncope o angina)?** — _boolean_
 
----
+## 17. Pendiente de revisión por el servicio
 
-_Documento generado el 2026-09-30 a partir de los datos del repositorio._
+- **Traducciones al catalán:** los textos de la hoja del paciente en catalán (`datos/textos/ca/paciente.json`) están marcados como pendientes de revisión clínica.
+- **Filas del catálogo sin verificar en CIMA (verificado_cima ≠ sí): 10.**
+  - `anticonceptivo_oral_combinado` — anticonceptivo oral combinado (no)
+  - `anticonceptivo_oral_gestageno` — anticonceptivo oral solo gestágeno (no)
+  - `anticonceptivo_implante` — implante anticonceptivo\|Implanon NXT (no)
+  - `anticonceptivo_diu_hormonal` — DIU hormonal\|Mirena\|Kyleena\|Jaydess (no)
+  - `anticonceptivo_anillo_vaginal` — anillo vaginal\|NuvaRing\|Circlet (no)
+  - `anticonceptivo_parche` — parche anticonceptivo\|Evra (no)
+  - `anticonceptivo_inyectable` — anticonceptivo inyectable\|Depo-Progevera (no)
+  - `ths_oral` — terapia hormonal sustitutiva oral\|THS oral (no)
+  - `ths_transdermica` — terapia hormonal sustitutiva parche\|THS parche (no)
+  - `ths_vaginal` — terapia hormonal sustitutiva vaginal\|THS vaginal (no)
+
+---
+_Generado el 2026-09-30._

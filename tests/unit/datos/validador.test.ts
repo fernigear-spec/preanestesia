@@ -17,6 +17,16 @@ function idsRegla(): Set<string> {
   return new Set(Object.keys(reglas.reglas));
 }
 
+describe('Reglas de medicación (§16)', () => {
+  it('cada regla de reglas_farmacos.json tiene una descripción en lenguaje llano', () => {
+    const { reglas } = JSON.parse(leer('datos/reglas_farmacos.json')) as { reglas: Record<string, { descripcion?: string }> };
+    const sinDescripcion = Object.entries(reglas)
+      .filter(([, r]) => typeof r.descripcion !== 'string' || r.descripcion.trim() === '')
+      .map(([id]) => id);
+    expect(sinDescripcion).toEqual([]);
+  });
+});
+
 describe('Parser CSV', () => {
   it('separador ; y numeración de filas (cabecera = 1)', () => {
     const r = parseCsv('a;b\n1;2\n3;4');
