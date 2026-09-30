@@ -455,6 +455,45 @@ test.describe('Vista previa', () => {
     await expect(page.getByText(/dolor transicional/)).toBeVisible();
   });
 
+  test('E17: implante anticonceptivo → nota de sugammadex (barrera 7 días) en el resumen', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Mujer 40 (para que la anticoncepción tenga sentido); sin posibilidad de embarazo.
+    await page.locator('#edad').fill('40');
+    await page.getByRole('radio', { name: 'Mujer' }).check();
+    await page.locator('#peso').fill('65');
+    await page.locator('#talla').fill('165');
+    await page.getByRole('radio', { name: /No hay posibilidad/ }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4
+    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+
+    // Paso 8: buscar y añadir el implante anticonceptivo (no pide hora de toma).
+    await page.locator('#med').fill('implante');
+    await page.getByRole('button', { name: /implante anticonceptivo/i }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> resumen
+
+    // La nota del sugammadex (§8.15) para vía no oral: método de barrera 7 días.
+    await page.getByRole('button', { name: /Notas técnicas/ }).click();
+    await expect(page.getByText(/método de barrera/)).toBeVisible();
+    await expect(page.getByText(/7 días/)).toBeVisible();
+  });
+
   test('panel de administración (§14.1): editar tabla, validar en vivo y descargar', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Administración de contenido' }).click();

@@ -9,6 +9,7 @@
  * la intervención (si se conoce) y la caducidad. La futura vista del paciente solo
  * tiene que llamar a `recalcularHoja` sobre el contenido decodificado.
  */
+import type { Via } from '../../tipos.ts';
 import type { PautaHoraria } from '../../fechas/ultimaToma.ts';
 import {
   ultimaTomaPorHoras,
@@ -46,8 +47,8 @@ export interface FarmacoQr {
   cf?: string;
   /** Texto fijo del paciente para fármacos sin plazo (mantener/consultar). */
   tx?: string;
-  /** Variante de «mantener» (para localizar sin texto libre): oral/no_oral/inhalador/colirio. */
-  mv?: 'oral' | 'no_oral' | 'inhalador' | 'colirio';
+  /** Variante de «mantener» (para localizar sin texto libre): la vía de administración. */
+  mv?: Via;
   /** Ajuste de insulina estructurado (para localizar sin texto libre). */
   ins?: InsulinaQr;
 }
@@ -80,7 +81,7 @@ export interface MargenPlazo {
 export type InstruccionEstructurada =
   | { k: 'confirmacion' }
   | { k: 'no_cumplible' }
-  | { k: 'mantener'; mv: 'oral' | 'no_oral' | 'inhalador' | 'colirio' }
+  | { k: 'mantener'; mv: Via }
   | { k: 'texto_fijo'; tx: string }
   | { k: 'suspender'; fecha: number; adelantada: boolean; horaOriginal?: string; margen: MargenPlazo }
   | { k: 'no_dia_iq' }

@@ -6,7 +6,7 @@
  * ResultadoFarmaco. Los grupos no cubiertos aquí devuelven un resultado de
  * "consultar" (el anestesiólogo lo revisará), nunca una pauta inventada.
  */
-import type { ContextoReglas, ResultadoFarmaco } from '../tipos.ts';
+import type { ContextoReglas, ResultadoFarmaco, Via } from '../tipos.ts';
 import { type DatosClinicos, HECHOS_VACIOS } from '../entrevista/hechosClinicos.ts';
 import { combinacionFija } from './motor.ts';
 import type { IndicacionInmuno } from './inmunosupresores.ts';
@@ -29,7 +29,7 @@ export interface DatosFarmacoUi {
   nombreComercial: string;
   principiosActivos: string[];
   idRegla: string; // primer id_regla del catálogo (una sola regla por ahora)
-  via: 'oral' | 'no_oral';
+  via: Via;
   /** Horas habituales de toma ("HH:MM"). */
   horas: string[];
   /** Dosis en mg (cuando la regla depende de ella: AAS, metotrexato, HBPM). */
@@ -274,7 +274,7 @@ function evaluarRegla(d: DatosFarmacoUi, ctxPauta: ContextoReglas, clin: DatosCl
     case 'fitoterapia':
       return reglaFitoterapia({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'fitoterapia' }, ctxPauta);
     case 'anticonceptivo_ths':
-      return reglaAnticonceptivoThs({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'anticonceptivo', esOral: d.via === 'oral' }, ctxPauta);
+      return reglaAnticonceptivoThs({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'anticonceptivo', via: d.via }, ctxPauta);
 
     case 'mantener_generico':
       return reglaMantener(id, nc, d.principiosActivos, 'Mantener (§8)', d.via);

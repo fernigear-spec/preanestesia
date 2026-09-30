@@ -133,27 +133,27 @@ describe('Punto 4 · B heparinas: despachador == regla directa', () => {
   it('B1 enoxaparina profiláctica, raquídea', () => {
     const c = ctx({ neuroaxial: true, pautaFarmaco: P('18:00') });
     const directo = reglaHbpm({ idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'profilactica' }, c);
-    expect(evaluarFarmacoUi(d('hbpm', { idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principiosActivos: ['enoxaparina'], via: 'no_oral', horas: ['18:00'], tipoHbpm: 'profilactica' }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('hbpm', { idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principiosActivos: ['enoxaparina'], via: 'subcutanea', horas: ['18:00'], tipoHbpm: 'profilactica' }), c, clin())).toEqual(directo);
   });
   it('B2 enoxaparina profiláctica 21:00, raquídea', () => {
     const c = ctx({ neuroaxial: true, pautaFarmaco: P('21:00') });
     const directo = reglaHbpm({ idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'profilactica' }, c);
-    expect(evaluarFarmacoUi(d('hbpm', { idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principiosActivos: ['enoxaparina'], via: 'no_oral', horas: ['21:00'], tipoHbpm: 'profilactica' }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('hbpm', { idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principiosActivos: ['enoxaparina'], via: 'subcutanea', horas: ['21:00'], tipoHbpm: 'profilactica' }), c, clin())).toEqual(directo);
   });
   it('B3 enoxaparina terapéutica, CrCl 60', () => {
     const c = ctx({ aclaramiento: 60, pautaFarmaco: P('09:00', '21:00') });
     const directo = reglaHbpm({ idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'terapeutica' }, c);
-    expect(evaluarFarmacoUi(d('hbpm', { idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principiosActivos: ['enoxaparina'], via: 'no_oral', horas: ['09:00', '21:00'], tipoHbpm: 'terapeutica' }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('hbpm', { idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principiosActivos: ['enoxaparina'], via: 'subcutanea', horas: ['09:00', '21:00'], tipoHbpm: 'terapeutica' }), c, clin())).toEqual(directo);
   });
   it('B4 fondaparinux profiláctico, CrCl 60, riesgo bajo', () => {
     const c = ctx({ riesgoHemorragico: 'bajo', aclaramiento: 60, pautaFarmaco: P('09:00') });
     const directo = reglaFondaparinux({ idFarmaco: 'fondaparinux', nombreComercial: 'Arixtra', dosis: 'profilactico' }, c).farmaco;
-    expect(evaluarFarmacoUi(d('fondaparinux', { idFarmaco: 'fondaparinux', nombreComercial: 'Arixtra', principiosActivos: ['fondaparinux'], via: 'no_oral', horas: ['09:00'], tipoHbpm: 'profilactica' }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('fondaparinux', { idFarmaco: 'fondaparinux', nombreComercial: 'Arixtra', principiosActivos: ['fondaparinux'], via: 'subcutanea', horas: ['09:00'], tipoHbpm: 'profilactica' }), c, clin())).toEqual(directo);
   });
   it('B5 fondaparinux terapéutico, CrCl 40', () => {
     const c = ctx({ riesgoHemorragico: 'bajo', aclaramiento: 40, pautaFarmaco: P('09:00') });
     const directo = reglaFondaparinux({ idFarmaco: 'fondaparinux', nombreComercial: 'Arixtra', dosis: 'terapeutico' }, c).farmaco;
-    expect(evaluarFarmacoUi(d('fondaparinux', { idFarmaco: 'fondaparinux', nombreComercial: 'Arixtra', principiosActivos: ['fondaparinux'], via: 'no_oral', horas: ['09:00'], tipoHbpm: 'terapeutica' }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('fondaparinux', { idFarmaco: 'fondaparinux', nombreComercial: 'Arixtra', principiosActivos: ['fondaparinux'], via: 'subcutanea', horas: ['09:00'], tipoHbpm: 'terapeutica' }), c, clin())).toEqual(directo);
   });
 });
 
@@ -233,7 +233,7 @@ describe('Punto 4 · D antidiabéticos: despachador == regla directa', () => {
     const c = ctx();
     const prox = new Date(2026, 9, 12, 9, 0);
     const directo = reglaGlp1Semanal({ idFarmaco: 'semaglutida_sem', nombreComercial: 'Ozempic', principio: 'semaglutida', proximaDosis: prox }, c);
-    expect(evaluarFarmacoUi(d('glp1_semanal', { idFarmaco: 'semaglutida_sem', nombreComercial: 'Ozempic', principiosActivos: ['semaglutida'], via: 'no_oral', proximaDosisSemanal: prox }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('glp1_semanal', { idFarmaco: 'semaglutida_sem', nombreComercial: 'Ozempic', principiosActivos: ['semaglutida'], via: 'subcutanea', proximaDosisSemanal: prox }), c, clin())).toEqual(directo);
   });
   it('D6 Rybelsus diario', () => {
     const c = ctx({ pautaFarmaco: P('08:00') });
@@ -243,17 +243,17 @@ describe('Punto 4 · D antidiabéticos: despachador == regla directa', () => {
   it('D7 Tresiba insulina basal', () => {
     const c = ctx();
     const directo = reglaInsulinaBasal({ idFarmaco: 'insulina_degludec', nombreComercial: 'Tresiba', principio: 'insulina_degludec', tomas: [{ hora: '09:00', dosisUi: 30 }], intervencion: IV });
-    expect(evaluarFarmacoUi(d('insulina_basal', { idFarmaco: 'insulina_degludec', nombreComercial: 'Tresiba', principiosActivos: ['insulina_degludec'], via: 'no_oral', horas: ['09:00'], insulinaBasalUi: 30 }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('insulina_basal', { idFarmaco: 'insulina_degludec', nombreComercial: 'Tresiba', principiosActivos: ['insulina_degludec'], via: 'subcutanea', horas: ['09:00'], insulinaBasalUi: 30 }), c, clin())).toEqual(directo);
   });
   it('D8 Insulatard NPH', () => {
     const c = ctx();
     const directo = reglaInsulinaNph({ idFarmaco: 'insulina_nph', nombreComercial: 'Insulatard', dosisNocheUi: 10, dosisMananaUi: 20, intervencion: IV, horaNoche: '21:00', horaManana: '08:00' });
-    expect(evaluarFarmacoUi(d('insulina_nph', { idFarmaco: 'insulina_nph', nombreComercial: 'Insulatard', principiosActivos: ['insulina_nph'], via: 'no_oral', horas: ['08:00', '21:00'], insulinaNocheUi: 10, insulinaMananaUi: 20 }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('insulina_nph', { idFarmaco: 'insulina_nph', nombreComercial: 'Insulatard', principiosActivos: ['insulina_nph'], via: 'subcutanea', horas: ['08:00', '21:00'], insulinaNocheUi: 10, insulinaMananaUi: 20 }), c, clin())).toEqual(directo);
   });
   it('D9 NovoMix 30 premezclada', () => {
     const c = ctx();
     const directo = reglaInsulinaPremezclada({ idFarmaco: 'novomix', nombreComercial: 'NovoMix 30', dosisMananaUi: 20, intervencion: IV, horaManana: '08:00' });
-    expect(evaluarFarmacoUi(d('insulina_premezclada', { idFarmaco: 'novomix', nombreComercial: 'NovoMix 30', principiosActivos: ['insulina_aspart'], via: 'no_oral', horas: ['08:00'], insulinaMananaUi: 20 }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('insulina_premezclada', { idFarmaco: 'novomix', nombreComercial: 'NovoMix 30', principiosActivos: ['insulina_aspart'], via: 'subcutanea', horas: ['08:00'], insulinaMananaUi: 20 }), c, clin())).toEqual(directo);
   });
 });
 
@@ -317,24 +317,24 @@ describe('Punto 4 · E otros: despachador == regla directa', () => {
   it('E11 metotrexato 15 mg/sem', () => {
     const c = ctx();
     const directo = reglaMetotrexato({ idFarmaco: 'metotrexato', nombreComercial: 'Metoject', dosisSemanalMg: 15 });
-    expect(evaluarFarmacoUi(d('metotrexato', { idFarmaco: 'metotrexato', nombreComercial: 'Metoject', principiosActivos: ['metotrexato'], via: 'no_oral', dosisMg: 15 }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('metotrexato', { idFarmaco: 'metotrexato', nombreComercial: 'Metoject', principiosActivos: ['metotrexato'], via: 'subcutanea', dosisMg: 15 }), c, clin())).toEqual(directo);
   });
   it('E12 adalimumab biológico', () => {
     const c = ctx();
     const fecha = new Date(2026, 9, 8);
     const directo = reglaBiologico({ idFarmaco: 'adalimumab', nombreComercial: 'Humira', principio: 'adalimumab', periodicidadDias: 14, fechaUltimaDosis: fecha }, IV);
-    expect(evaluarFarmacoUi(d('biologico', { idFarmaco: 'adalimumab', nombreComercial: 'Humira', principiosActivos: ['adalimumab'], via: 'no_oral', fechaUltimaDosis: fecha, periodicidadDias: 14 }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('biologico', { idFarmaco: 'adalimumab', nombreComercial: 'Humira', principiosActivos: ['adalimumab'], via: 'subcutanea', fechaUltimaDosis: fecha, periodicidadDias: 14 }), c, clin())).toEqual(directo);
   });
   it('E13 bevacizumab, última dosis hace 4 semanas', () => {
     const c = ctx();
     const directo = reglaAntiangiogenico({ idFarmaco: 'bevacizumab', nombreComercial: 'Avastin', principio: 'bevacizumab', semanasDesdeUltimaDosis: 4 }).farmaco;
     const fecha = new Date(2026, 8, 17); // 28 días antes de la intervención → 4 semanas
-    expect(evaluarFarmacoUi(d('antiangiogenico', { idFarmaco: 'bevacizumab', nombreComercial: 'Avastin', principiosActivos: ['bevacizumab'], via: 'no_oral', fechaUltimaDosis: fecha }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('antiangiogenico', { idFarmaco: 'bevacizumab', nombreComercial: 'Avastin', principiosActivos: ['bevacizumab'], via: 'subcutanea', fechaUltimaDosis: fecha }), c, clin())).toEqual(directo);
   });
   it('E14 Eylea intravítreo: mantener', () => {
     const c = ctx();
     const directo = reglaAntiangiogenico({ idFarmaco: 'aflibercept_intravitreo', nombreComercial: 'Eylea', principio: 'aflibercept', intravitreo: true }).farmaco;
-    expect(evaluarFarmacoUi(d('antiangiogenico_intravitreo', { idFarmaco: 'aflibercept_intravitreo', nombreComercial: 'Eylea', principiosActivos: ['aflibercept'], via: 'no_oral' }), c, clin())).toEqual(directo);
+    expect(evaluarFarmacoUi(d('antiangiogenico_intravitreo', { idFarmaco: 'aflibercept_intravitreo', nombreComercial: 'Eylea', principiosActivos: ['aflibercept'], via: 'subcutanea' }), c, clin())).toEqual(directo);
   });
   it('E15 ginkgo fitoterapia', () => {
     const c = ctx({ pautaFarmaco: P('09:00') });
@@ -343,13 +343,13 @@ describe('Punto 4 · E otros: despachador == regla directa', () => {
   });
   it('E16 anticonceptivo oral, riesgo trombótico alto', () => {
     const c = ctx({ riesgoTromboticoAlto: true });
-    const directo = reglaAnticonceptivoThs({ idFarmaco: 'aco', nombreComercial: 'ACO', principio: 'etinilestradiol', esOral: true }, c);
+    const directo = reglaAnticonceptivoThs({ idFarmaco: 'aco', nombreComercial: 'ACO', principio: 'etinilestradiol', via: 'oral' }, c);
     expect(evaluarFarmacoUi(d('anticonceptivo_ths', { idFarmaco: 'aco', nombreComercial: 'ACO', principiosActivos: ['etinilestradiol'], via: 'oral', horas: ['09:00'] }), c, clin())).toEqual(directo);
   });
   it('E17 implante anticonceptivo, sin riesgo trombótico alto', () => {
     const c = ctx({ riesgoTromboticoAlto: false });
-    const directo = reglaAnticonceptivoThs({ idFarmaco: 'implante', nombreComercial: 'Implante', principio: 'etonogestrel', esOral: false }, c);
-    expect(evaluarFarmacoUi(d('anticonceptivo_ths', { idFarmaco: 'implante', nombreComercial: 'Implante', principiosActivos: ['etonogestrel'], via: 'no_oral' }), c, clin())).toEqual(directo);
+    const directo = reglaAnticonceptivoThs({ idFarmaco: 'implante', nombreComercial: 'Implante', principio: 'etonogestrel', via: 'implante' }, c);
+    expect(evaluarFarmacoUi(d('anticonceptivo_ths', { idFarmaco: 'implante', nombreComercial: 'Implante', principiosActivos: ['etonogestrel'], via: 'implante' }), c, clin())).toEqual(directo);
   });
 });
 

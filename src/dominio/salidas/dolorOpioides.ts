@@ -3,6 +3,7 @@
  * paso 8 (con su dosis y pauta) calcula la dosis diaria equivalente de morfina oral
  * y las alertas del §5.7. No inventa datos: si falta la dosis, ese opioide aporta 0.
  */
+import type { Via } from '../tipos.ts';
 import {
   calcularMorfinaEquivalente,
   type OpioideTomado,
@@ -25,8 +26,8 @@ export const OPIOIDE_CATALOGO_A_FACTOR: Record<string, string> = {
 export interface OpioideUi {
   /** id del catálogo. */
   idFarmaco: string;
-  /** Vía: 'no_oral' = parche transdérmico (dosis en µg/h). */
-  via: 'oral' | 'no_oral';
+  /** Vía: 'transdermica' = parche (dosis en µg/h). */
+  via: Via;
   /** Dosis por toma (mg) o, en parche, la tasa (µg/h). */
   dosis?: number;
   /** Tomas al día (no aplica en parches). */
@@ -39,7 +40,7 @@ export interface OpioideUi {
  */
 export function dosisDiariaOpioide(o: OpioideUi): number {
   const dosis = o.dosis ?? 0;
-  if (o.via === 'no_oral') return dosis;
+  if (o.via === 'transdermica') return dosis;
   return dosis * (o.tomasDia ?? 0);
 }
 

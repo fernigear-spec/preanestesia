@@ -331,13 +331,13 @@ describe('Casos E · otros fármacos', () => {
     expect(esFecha(r.fechaHoraUltimaToma, 2026, 8, 30, 9, 0)).toBeTrue(); // día 15 previo = 30/09
   });
   it('E16 anticonceptivo oral, riesgo trombótico alto, AG: confirmación + sugammadex oral', () => {
-    const r = reglaAnticonceptivoThs({ idFarmaco: 'aco', nombreComercial: 'ACO', principio: 'etinilestradiol', esOral: true }, ctx({ riesgoTromboticoAlto: true }));
+    const r = reglaAnticonceptivoThs({ idFarmaco: 'aco', nombreComercial: 'ACO', principio: 'etinilestradiol', via: 'oral' }, ctx({ riesgoTromboticoAlto: true }));
     expect(r.requiereConfirmacion).toBeTrue();
     const sg = avisoSugammadex({ mujerConAnticonceptivoHormonal: true, tipo: 'oral', posibleAnestesiaGeneral: true });
     expect(sg.textoPaciente).toContain('olvidada');
   });
   it('E17 implante, sin riesgo trombótico alto, AG: sin regla trombótica; sugammadex no oral 7 días', () => {
-    const r = reglaAnticonceptivoThs({ idFarmaco: 'imp', nombreComercial: 'Implante', principio: 'etonogestrel', esOral: false }, ctx({ riesgoTromboticoAlto: false }));
+    const r = reglaAnticonceptivoThs({ idFarmaco: 'imp', nombreComercial: 'Implante', principio: 'etonogestrel', via: 'implante' }, ctx({ riesgoTromboticoAlto: false }));
     expect(r.accion).toBe('mantener');
     const sg = avisoSugammadex({ mujerConAnticonceptivoHormonal: true, tipo: 'no_oral', posibleAnestesiaGeneral: true });
     expect(sg.textoPaciente).toContain('7 días');

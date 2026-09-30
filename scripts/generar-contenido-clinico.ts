@@ -28,6 +28,16 @@ function ovacio(s: string | undefined): string {
   return t === '' ? '—' : esc(t);
 }
 
+/** Estado de verificación en CIMA de una fila del catálogo. */
+function verificacionTexto(v: Record<string, string>): string {
+  const estado = (v.verificado_cima ?? '').trim().toLowerCase();
+  const icono = estado === 'si' ? '✓ verificado' : estado === 'pendiente' ? '… pendiente' : '✗ sin verificar';
+  const fecha = (v.fecha_verificacion ?? '').trim();
+  const fuente = (v.fuente_verificacion ?? '').trim();
+  const extra = [fecha, fuente].filter(Boolean).join(', ');
+  return extra ? `${icono} (${esc(extra)})` : icono;
+}
+
 // ————————————————————————————————————————————————————————————————
 // Etiquetas legibles para los parámetros de las reglas de medicación.
 // ————————————————————————————————————————————————————————————————
@@ -252,12 +262,12 @@ for (const fila of farmacos.filas) {
 for (const grupo of [...porGrupo.keys()].sort()) {
   p(`### 3.${[...porGrupo.keys()].sort().indexOf(grupo) + 1}. ${grupo.replace(/_/g, ' ')}`);
   p();
-  p('| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |');
-  p('| --- | --- | --- | --- | --- |');
+  p('| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |');
+  p('| --- | --- | --- | --- | --- | --- |');
   for (const fila of porGrupo.get(grupo)!) {
     const v = fila.valores;
     const conf = /^(s[íi]|true|1)$/i.test((v.requiere_confirmacion ?? '').trim()) ? 'sí' : 'no';
-    p(`| ${ovacio(v.nombres_comerciales)} | ${ovacio(v.principios_activos)} | \`${ovacio(v.id_regla)}\` | ${conf} | ${ovacio(v.via)} |`);
+    p(`| ${ovacio(v.nombres_comerciales)} | ${ovacio(v.principios_activos)} | \`${ovacio(v.id_regla)}\` | ${conf} | ${ovacio(v.via)} | ${verificacionTexto(v)} |`);
   }
   p();
 }

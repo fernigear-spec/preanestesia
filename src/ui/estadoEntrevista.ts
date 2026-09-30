@@ -2,7 +2,7 @@
  * Estado en memoria de la entrevista mientras se recorren los pasos de la interfaz.
  * (No se persiste: privacidad, caso 23.) Cada paso rellena su parte.
  */
-import type { DatosIntervencion, DatosBasicos, Sexo } from '../dominio/tipos.ts';
+import type { DatosIntervencion, DatosBasicos, Sexo, Via } from '../dominio/tipos.ts';
 import type { EntradaMtnd4 } from '../dominio/mtnd4/mtnd4.ts';
 import type { Procedimiento } from '../datos/procedimientos.ts';
 
@@ -105,7 +105,7 @@ export interface FarmacoTomadoUi {
   grupo: string;
   subgrupo: string;
   pautaTipica: string;
-  via: 'oral' | 'no_oral';
+  via: Via;
   requiereConfirmacionCatalogo: boolean;
   indicacionesPosibles: string[];
   /** Horas de toma ("HH:MM"). */
@@ -182,7 +182,7 @@ export function reglaNecesitaHoras(idRegla: string): boolean {
     'biologico', 'antiangiogenico', 'antiangiogenico_intravitreo', 'tirosina_cinasa',
     'corticoide_sistemico', 'fame_mantener', 'inmunosupresor_clasico', 'jak',
     'mantener_generico', 'metotrexato', 'imao_irreversible', 'imao_b',
-    'sacubitrilo_valsartan', 'glp1_semanal',
+    'sacubitrilo_valsartan', 'glp1_semanal', 'anticonceptivo_ths',
   ]);
   return !sinHoras.has(idRegla);
 }

@@ -12,6 +12,7 @@ import type {
   DatosIntervencion,
   ResultadoFarmaco,
   AccionFarmaco,
+  Via,
 } from '../tipos.ts';
 import { diasAHoras } from '../fechas/plazos.ts';
 import {
@@ -126,16 +127,28 @@ export function plazoDesdeDias(ctx: ContextoReglas, dias: number): PlazoResultad
 export const TEXTO_MANTENER =
   'Siga tomándolo como siempre, también el día de la intervención, con un sorbo de agua.';
 
-/** Texto de "mantener" para vías NO orales (implante, parche, inyectable, inhalador, DIU). */
-export const TEXTO_MANTENER_NO_ORAL =
-  'No cambie nada: siga con su tratamiento como siempre.';
+/** Vía de administración concreta (re-exporta el tipo de dominio). */
+export type ViaAdministracion = Via;
 
-/** Vías de administración no orales. */
-export type ViaAdministracion = 'oral' | 'no_oral';
+/** Texto de "mantener" por vía de administración (§8.0). */
+const MANTENER_POR_VIA: Record<Via, string> = {
+  oral: TEXTO_MANTENER,
+  sublingual: 'Siga poniéndose el comprimido debajo de la lengua como siempre, también el día de la intervención.',
+  subcutanea: 'Siga con sus inyecciones como siempre.',
+  intramuscular: 'Siga con sus inyecciones como siempre.',
+  intravenosa: 'Este medicamento se administra en el hospital; usted no tiene que hacer nada.',
+  transdermica: 'Siga con su parche como siempre, también el día de la intervención.',
+  inhalada: 'Siga usándolo como siempre, también el día de la intervención, y tráigalo consigo.',
+  colirio: 'Siga aplicándose las gotas como siempre, también el día de la intervención.',
+  intravitrea: 'Este tratamiento se pone en el hospital (inyección en el ojo); usted no tiene que hacer nada.',
+  vaginal: 'Siga usándolo por vía vaginal como siempre.',
+  intrauterina: 'No tiene que hacer nada con su dispositivo (DIU); siga como siempre.',
+  implante: 'No tiene que hacer nada con su implante; siga como siempre.',
+};
 
 /** Devuelve el texto de "mantener" adecuado a la vía. */
-export function textoMantener(via: ViaAdministracion = 'oral'): string {
-  return via === 'no_oral' ? TEXTO_MANTENER_NO_ORAL : TEXTO_MANTENER;
+export function textoMantener(via: Via = 'oral'): string {
+  return MANTENER_POR_VIA[via] ?? TEXTO_MANTENER;
 }
 
 /**

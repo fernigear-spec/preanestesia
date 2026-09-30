@@ -324,9 +324,9 @@ describe('Cardiovasculares (§8.10)', () => {
 
 describe('Texto no oral y comportamiento de requiere-confirmación (§8.0, §12)', () => {
   it('fármaco no oral: "mantener" no dice "con un sorbo de agua"', () => {
-    const r = reglaMantener('fent', 'Durogesic', ['fentanilo'], 'parche: mantener', 'no_oral');
+    const r = reglaMantener('fent', 'Durogesic', ['fentanilo'], 'parche: mantener', 'transdermica');
     expect(r.textoPaciente).not.toContain('sorbo de agua');
-    expect(r.textoPaciente).toContain('No cambie nada');
+    expect(r.textoPaciente).toContain('parche');
   });
   it('fármaco oral: "mantener" mantiene "con un sorbo de agua"', () => {
     const r = reglaMantener('ena', 'Renitec', ['enalapril'], 'mantener');

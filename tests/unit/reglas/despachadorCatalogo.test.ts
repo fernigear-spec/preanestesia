@@ -8,7 +8,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from '../../_harness.ts';
-import type { ContextoReglas } from '../../../src/dominio/tipos.ts';
+import type { ContextoReglas, Via } from '../../../src/dominio/tipos.ts';
 import { parseCsv } from '../../../src/datos/csv.ts';
 import { evaluarFarmacoUi, type DatosFarmacoUi } from '../../../src/dominio/reglas/despachador.ts';
 import { HECHOS_VACIOS } from '../../../src/dominio/entrevista/hechosClinicos.ts';
@@ -26,7 +26,7 @@ interface FilaFarmaco {
   principiosActivos: string[];
   nombresComerciales: string[];
   idRegla: string[];
-  via: 'oral' | 'no_oral';
+  via: Via;
   textoPaciente: string;
   textoAnestesiologo: string;
   requiereConfirmacion: boolean;
@@ -40,7 +40,7 @@ function cargarFilas(csv: string): FilaFarmaco[] {
       principiosActivos: listaMas(v.principios_activos),
       nombresComerciales: listaBarra(v.nombres_comerciales),
       idRegla: listaMas(v.id_regla),
-      via: (v.via ?? 'oral').trim().toLowerCase() === 'no_oral' ? 'no_oral' : 'oral',
+      via: ((v.via ?? 'oral').trim().toLowerCase() || 'oral') as Via,
       textoPaciente: (v.texto_paciente ?? '').trim(),
       textoAnestesiologo: (v.texto_anestesiologo ?? '').trim(),
       requiereConfirmacion: (v.requiere_confirmacion ?? 'no').trim().toLowerCase() === 'si',

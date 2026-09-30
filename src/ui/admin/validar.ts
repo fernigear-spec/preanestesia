@@ -58,7 +58,7 @@ function validarCsv(texto: string, idsRegla?: Set<string>): ResultadoValidacion 
   // Comprobación específica de farmacos.csv: cada id_regla debe existir (caso 21).
   if (columnas.includes('id_regla') && idsRegla && idsRegla.size > 0) {
     for (const fila of filas) {
-      const reglas = (fila.valores.id_regla ?? '').split('|').map((s) => s.trim()).filter(Boolean);
+      const reglas = (fila.valores.id_regla ?? '').split('+').map((s) => s.trim()).filter(Boolean);
       for (const r of reglas) {
         if (!idsRegla.has(r)) {
           mensajes.push(`Fila ${fila.numeroFila}: la regla "${r}" no existe en reglas_farmacos.json.`);

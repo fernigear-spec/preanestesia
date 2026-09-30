@@ -440,383 +440,394 @@ aún debe revisarse en CIMA (AEMPS) antes del uso clínico._
 
 ### 3.1. aine
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Espidifen\|Dalsy\|Neobrufen | ibuprofeno | `aine_ibuprofeno` | no | oral |
-| Naprosyn\|Antalgin | naproxeno | `aine_naproxeno` | no | oral |
-| Voltaren | diclofenaco | `aine_diclofenaco` | no | oral |
-| Enantyum | dexketoprofeno | `aine_dexketoprofeno` | no | oral |
-| Toradol\|Droal | ketorolaco | `aine_ketorolaco` | no | oral |
-| Celebrex | celecoxib | `aine_celecoxib` | no | oral |
-| Arcoxia | etoricoxib | `aine_etoricoxib` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Espidifen\|Dalsy\|Neobrufen | ibuprofeno | `aine_ibuprofeno` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Naprosyn\|Antalgin | naproxeno | `aine_naproxeno` | no | oral | ✓ verificado (2026-09-30, CIMA manual) |
+| Voltaren | diclofenaco | `aine_diclofenaco` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Enantyum | dexketoprofeno | `aine_dexketoprofeno` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| ketorolaco | ketorolaco | `aine_ketorolaco` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Toradol | ketorolaco | `aine_ketorolaco` | no | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Celebrex | celecoxib | `aine_celecoxib` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Arcoxia | etoricoxib | `aine_etoricoxib` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.2. analgesicos
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Gelocatil\|Termalgin\|Efferalgan | paracetamol | `mantener_generico` | no | oral |
-| Nolotil | metamizol | `mantener_generico` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Gelocatil\|Termalgin\|Efferalgan | paracetamol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Nolotil | metamizol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.3. antiagregantes
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Adiro\|Tromalyt | acido_acetilsalicilico | `aas` | no | oral |
-| Plavix\|Iscover | clopidogrel | `p2y12_clopidogrel` | no | oral |
-| Efient | prasugrel | `p2y12_prasugrel` | no | oral |
-| Brilique | ticagrelor | `p2y12_ticagrelor` | no | oral |
-| Persantin | dipiridamol | `dipiridamol` | no | oral |
-| Disgren | triflusal | `triflusal` | no | oral |
-| Pletal | cilostazol | `cilostazol` | no | oral |
-| Integrilin | eptifibatida | `gp_iibiiia` | sí | oral |
-| Aggrastat | tirofiban | `gp_iibiiia` | sí | oral |
-| Kengrexal | cangrelor | `gp_iibiiia` | sí | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Adiro\|Tromalyt | acido_acetilsalicilico | `aas` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Plavix\|Iscover | clopidogrel | `p2y12_clopidogrel` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Efient | prasugrel | `p2y12_prasugrel` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Brilique | ticagrelor | `p2y12_ticagrelor` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Persantin | dipiridamol | `dipiridamol` | no | oral | ✓ verificado (2026-09-30, CIMA manual) |
+| Disgren | triflusal | `triflusal` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Pletal | cilostazol | `cilostazol` | no | oral | ✓ verificado (2026-09-30, CIMA manual) |
+| Integrilin | eptifibatida | `gp_iibiiia` | sí | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Aggrastat | tirofiban | `gp_iibiiia` | sí | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Kengrexal | cangrelor | `gp_iibiiia` | sí | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.4. anticoagulantes
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Sintrom | acenocumarol | `avk_acenocumarol` | no | oral |
-| Aldocumar | warfarina | `avk_warfarina` | no | oral |
-| Pradaxa | dabigatran | `acod_dabigatran` | no | oral |
-| Xarelto | rivaroxaban | `acod_antixa` | no | oral |
-| Eliquis | apixaban | `acod_antixa` | no | oral |
-| Lixiana | edoxaban | `acod_antixa` | no | oral |
-| Clexane\|Inhixa | enoxaparina | `hbpm` | no | no_oral |
-| Hibor | bemiparina | `hbpm` | no | no_oral |
-| Innohep | tinzaparina | `hbpm` | no | no_oral |
-| Fragmin | dalteparina | `hbpm` | no | no_oral |
-| Fraxiparina | nadroparina | `hbpm` | no | no_oral |
-| Arixtra | fondaparinux | `fondaparinux` | no | no_oral |
-| heparina sodica | heparina_sodica | `heparina_sodica` | no | no_oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Sintrom | acenocumarol | `avk_acenocumarol` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Aldocumar | warfarina | `avk_warfarina` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Pradaxa | dabigatran | `acod_dabigatran` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Xarelto | rivaroxaban | `acod_antixa` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Eliquis | apixaban | `acod_antixa` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Lixiana | edoxaban | `acod_antixa` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Clexane\|Inhixa | enoxaparina | `hbpm` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Hibor | bemiparina | `hbpm` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Innohep | tinzaparina | `hbpm` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Fragmin | dalteparina | `hbpm` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Fraxiparina | nadroparina | `hbpm` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Arixtra | fondaparinux | `fondaparinux` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| heparina sodica | heparina_sodica | `heparina_sodica` | no | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.5. antidiabeticos
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Dianben | metformina | `metformina` | no | oral |
-| Januvia\|Tesavel\|Xelevia | sitagliptina | `dpp4` | no | oral |
-| Galvus\|Jalra | vildagliptina | `dpp4` | no | oral |
-| Trajenta | linagliptina | `dpp4` | no | oral |
-| Onglyza | saxagliptina | `dpp4` | no | oral |
-| Vipidia | alogliptina | `dpp4` | no | oral |
-| Janumet\|Velmetia\|Efficib | sitagliptina+metformina | `dpp4+metformina` | no | oral |
-| Eucreas\|Icandra | vildagliptina+metformina | `dpp4+metformina` | no | oral |
-| Jentadueto | linagliptina+metformina | `dpp4+metformina` | no | oral |
-| Diamicron | gliclazida | `sulfonilurea` | no | oral |
-| Amaryl | glimepirida | `sulfonilurea` | no | oral |
-| Daonil | glibenclamida | `sulfonilurea` | no | oral |
-| Minodiab | glipizida | `sulfonilurea` | no | oral |
-| Novonorm | repaglinida | `glinida` | no | oral |
-| Starlix | nateglinida | `glinida` | no | oral |
-| Actos | pioglitazona | `pioglitazona` | no | oral |
-| Jardiance | empagliflozina | `sglt2` | no | oral |
-| Forxiga | dapagliflozina | `sglt2` | no | oral |
-| Invokana | canagliflozina | `sglt2` | no | oral |
-| Steglatro | ertugliflozina | `sglt2` | no | oral |
-| Synjardy | empagliflozina+metformina | `sglt2+metformina` | no | oral |
-| Xigduo | dapagliflozina+metformina | `sglt2+metformina` | no | oral |
-| Glyxambi | empagliflozina+linagliptina | `sglt2+dpp4` | no | oral |
-| Qtern | dapagliflozina+saxagliptina | `sglt2+dpp4` | no | oral |
-| Trijardy | empagliflozina+metformina+linagliptina | `sglt2+metformina+dpp4` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Dianben | metformina | `metformina` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Januvia\|Tesavel\|Xelevia | sitagliptina | `dpp4` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Galvus\|Jalra | vildagliptina | `dpp4` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Trajenta | linagliptina | `dpp4` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Onglyza | saxagliptina | `dpp4` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Vipidia | alogliptina | `dpp4` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Janumet\|Velmetia\|Efficib | sitagliptina+metformina | `dpp4+metformina` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Eucreas\|Icandra | vildagliptina+metformina | `dpp4+metformina` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Jentadueto | linagliptina+metformina | `dpp4+metformina` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Diamicron | gliclazida | `sulfonilurea` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Amaryl | glimepirida | `sulfonilurea` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Daonil | glibenclamida | `sulfonilurea` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Minodiab | glipizida | `sulfonilurea` | no | oral | ✓ verificado (2026-09-30, CIMA manual) |
+| Novonorm | repaglinida | `glinida` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Starlix | nateglinida | `glinida` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Actos | pioglitazona | `pioglitazona` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Jardiance | empagliflozina | `sglt2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Forxiga | dapagliflozina | `sglt2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Invokana | canagliflozina | `sglt2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Steglatro | ertugliflozina | `sglt2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Synjardy | empagliflozina+metformina | `sglt2+metformina` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Xigduo | dapagliflozina+metformina | `sglt2+metformina` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Glyxambi | empagliflozina+linagliptina | `sglt2+dpp4` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Qtern | dapagliflozina+saxagliptina | `sglt2+dpp4` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Trijardy | empagliflozina+metformina+linagliptina | `sglt2+metformina+dpp4` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.6. cardiovascular
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Renitec\|Eupressin | enalapril | `ieca_ara2` | no | oral |
-| Zestril\|Prinivil | lisinopril | `ieca_ara2` | no | oral |
-| Acovil | ramipril | `ieca_ara2` | no | oral |
-| Coversyl | perindopril | `ieca_ara2` | no | oral |
-| Capoten | captopril | `ieca_ara2` | no | oral |
-| Cozaar | losartan | `ieca_ara2` | no | oral |
-| Diovan | valsartan | `ieca_ara2` | no | oral |
-| Atacand\|Parapres | candesartan | `ieca_ara2` | no | oral |
-| Aprovel\|Karvea | irbesartan | `ieca_ara2` | no | oral |
-| Olmetec\|Openvas\|Ixia | olmesartan | `ieca_ara2` | no | oral |
-| Micardis\|Pritor | telmisartan | `ieca_ara2` | no | oral |
-| eprosartan | eprosartan | `ieca_ara2` | no | oral |
-| Entresto | sacubitrilo+valsartan | `sacubitrilo_valsartan` | sí | oral |
-| Emconcor | bisoprolol | `mantener_generico` | no | oral |
-| Tenormin | atenolol | `mantener_generico` | no | oral |
-| Coropres | carvedilol | `mantener_generico` | no | oral |
-| Lobivon | nebivolol | `mantener_generico` | no | oral |
-| Beloken | metoprolol | `mantener_generico` | no | oral |
-| Norvas | amlodipino | `mantener_generico` | no | oral |
-| Masdil | diltiazem | `mantener_generico` | no | oral |
-| Manidon | verapamilo | `mantener_generico` | no | oral |
-| Seguril | furosemida | `diuretico` | no | oral |
-| Sutril | torasemida | `diuretico` | no | oral |
-| Esidrex | hidroclorotiazida | `diuretico` | no | oral |
-| Aldactone | espironolactona | `diuretico` | no | oral |
-| Elecor | eplerenona | `diuretico` | no | oral |
-| Trangorex | amiodarona | `mantener_generico` | no | oral |
-| digoxina | digoxina | `mantener_generico` | no | oral |
-| Cardyl\|Zarator | atorvastatina | `mantener_generico` | no | oral |
-| Crestor | rosuvastatina | `mantener_generico` | no | oral |
-| Zocor | simvastatina | `mantener_generico` | no | oral |
-| Atacand Plus\|Parapres Plus | candesartan+hidroclorotiazida | `ieca_ara2+diuretico` | no | oral |
-| Viacoram | perindopril+amlodipino | `ieca_ara2+mantener_generico` | no | oral |
-| Sevikar | olmesartan+amlodipino | `ieca_ara2+mantener_generico` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Renitec | enalapril | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Zestril\|Prinivil | lisinopril | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, CIMA manual) |
+| Acovil | ramipril | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Coversyl | perindopril | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Capoten | captopril | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Cozaar | losartan | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Diovan | valsartan | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Atacand\|Parapres | candesartan | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Aprovel\|Karvea | irbesartan | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Olmetec\|Openvas\|Ixia | olmesartan | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Micardis\|Pritor | telmisartan | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| eprosartan | eprosartan | `ieca_ara2` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Entresto | sacubitrilo+valsartan | `sacubitrilo_valsartan` | sí | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Emconcor | bisoprolol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Tenormin | atenolol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, CIMA manual) |
+| Coropres | carvedilol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Lobivon | nebivolol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Beloken | metoprolol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, CIMA manual) |
+| Norvas | amlodipino | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Masdil | diltiazem | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Manidon | verapamilo | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Seguril | furosemida | `diuretico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Sutril | torasemida | `diuretico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Esidrex | hidroclorotiazida | `diuretico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Aldactone | espironolactona | `diuretico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Elecor | eplerenona | `diuretico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Trangorex | amiodarona | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| digoxina | digoxina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Cardyl\|Zarator | atorvastatina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Crestor | rosuvastatina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Zocor | simvastatina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Atacand Plus\|Parapres Plus | candesartan+hidroclorotiazida | `ieca_ara2+diuretico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Viacoram | perindopril+amlodipino | `ieca_ara2+mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Sevikar | olmesartan+amlodipino | `ieca_ara2+mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.7. digestivo
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Nexium\|Axiago | esomeprazol | `mantener_generico` | no | oral |
-| Opiren | lansoprazol | `mantener_generico` | no | oral |
-| Pariet | rabeprazol | `mantener_generico` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Nexium\|Axiago | esomeprazol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Opiren | lansoprazol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Pariet | rabeprazol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.8. fitoterapia
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| ginkgo | ginkgo | `fitoterapia` | no | oral |
-| ajo | ajo | `fitoterapia` | no | oral |
-| ginseng | ginseng | `fitoterapia` | no | oral |
-| kava | kava | `fitoterapia` | no | oral |
-| curcuma | curcuma | `fitoterapia` | no | oral |
-| vitamina E | vitamina_e | `fitoterapia` | no | oral |
-| omega 3 | omega_3 | `fitoterapia` | no | oral |
-| hiperico | hiperico | `fitoterapia` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| ginkgo | ginkgo | `fitoterapia` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| ajo | ajo | `fitoterapia` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| ginseng | ginseng | `fitoterapia` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| kava | kava | `fitoterapia` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| curcuma | curcuma | `fitoterapia` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| vitamina E | vitamina_e | `fitoterapia` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| omega 3 | omega_3 | `fitoterapia` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| hiperico | hiperico | `fitoterapia` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.9. glp1
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Ozempic\|Wegovy | semaglutida | `glp1_semanal` | no | no_oral |
-| Rybelsus | semaglutida | `glp1_diario` | no | oral |
-| Victoza\|Saxenda | liraglutida | `glp1_diario` | no | no_oral |
-| Trulicity | dulaglutida | `glp1_semanal` | no | no_oral |
-| Byetta\|Bydureon | exenatida | `glp1_semanal` | no | no_oral |
-| Lyxumia | lixisenatida | `glp1_diario` | no | oral |
-| Mounjaro | tirzepatida | `glp1_semanal` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Ozempic\|Wegovy | semaglutida | `glp1_semanal` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Rybelsus | semaglutida | `glp1_diario` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Victoza\|Saxenda | liraglutida | `glp1_diario` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Trulicity | dulaglutida | `glp1_semanal` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Byetta\|Bydureon | exenatida | `glp1_semanal` | no | subcutanea | ✓ verificado (2026-09-30, CIMA manual) |
+| Lyxumia | lixisenatida | `glp1_diario` | no | subcutanea | ✓ verificado (2026-09-30, CIMA manual) |
+| Mounjaro | tirzepatida | `glp1_semanal` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.10. glucosaminoglucanos
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Aterina | sulodexida | `sulodexida` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Aterina | sulodexida | `sulodexida` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.11. hematologia
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Fero-Gradumet\|Tardyferon | sulfato_ferroso | `mantener_generico` | no | oral |
-| Ferbisol | ferroglicina_sulfato | `mantener_generico` | no | oral |
-| Ferinject | hierro_carboximaltosa | `mantener_generico` | no | no_oral |
-| Venofer | hierro_sacarosa | `mantener_generico` | no | no_oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Fero-Gradumet\|Tardyferon | sulfato_ferroso | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Ferbisol | ferroglicina_sulfato | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Ferinject | hierro_carboximaltosa | `mantener_generico` | no | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Venofer | hierro_sacarosa | `mantener_generico` | no | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.12. hormonas
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Eutirox\|Levothroid | levotiroxina | `mantener_generico` | no | oral |
-| Dacortin | prednisona | `corticoide_sistemico` | no | oral |
-| Urbason | metilprednisolona | `corticoide_sistemico` | no | oral |
-| Hidroaltesona | hidrocortisona | `corticoide_sistemico` | no | oral |
-| anticonceptivos hormonales combinados | anticonceptivo_hormonal_combinado | `anticonceptivo_ths` | no | oral |
-| terapia hormonal sustitutiva | terapia_hormonal_sustitutiva | `anticonceptivo_ths` | no | oral |
-| omeprazol | omeprazol | `mantener_generico` | no | oral |
-| pantoprazol | pantoprazol | `mantener_generico` | no | oral |
-| Zyloric | alopurinol | `mantener_generico` | no | oral |
-| Deltius\|Thorens | colecalciferol | `mantener_generico` | no | oral |
-| Hidroferol | calcifediol | `mantener_generico` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Eutirox | levotiroxina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Dacortin | prednisona | `corticoide_sistemico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Urbason | metilprednisolona | `corticoide_sistemico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Hidroaltesona | hidrocortisona | `corticoide_sistemico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| terapia hormonal sustitutiva | terapia_hormonal_sustitutiva | `anticonceptivo_ths` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| omeprazol | omeprazol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| pantoprazol | pantoprazol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Zyloric | alopurinol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Deltius\|Thorens | colecalciferol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Hidroferol | calcifediol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| anticonceptivo oral combinado | etinilestradiol | `anticonceptivo_ths` | no | oral | ✗ sin verificar |
+| anticonceptivo oral solo gestágeno | desogestrel | `anticonceptivo_ths` | no | oral | ✗ sin verificar |
+| implante anticonceptivo\|Implanon NXT | etonogestrel | `anticonceptivo_ths` | no | implante | ✗ sin verificar |
+| DIU hormonal\|Mirena\|Kyleena\|Jaydess | levonorgestrel | `anticonceptivo_ths` | no | intrauterina | ✗ sin verificar |
+| anillo vaginal\|NuvaRing\|Circlet | etonogestrel\|etinilestradiol | `anticonceptivo_ths` | no | vaginal | ✗ sin verificar |
+| parche anticonceptivo\|Evra | norelgestromina\|etinilestradiol | `anticonceptivo_ths` | no | transdermica | ✗ sin verificar |
+| anticonceptivo inyectable\|Depo-Progevera | medroxiprogesterona | `anticonceptivo_ths` | no | intramuscular | ✗ sin verificar |
+| terapia hormonal sustitutiva oral\|THS oral | estradiol | `anticonceptivo_ths` | no | oral | ✗ sin verificar |
+| terapia hormonal sustitutiva parche\|THS parche | estradiol | `anticonceptivo_ths` | no | transdermica | ✗ sin verificar |
+| terapia hormonal sustitutiva vaginal\|THS vaginal | estradiol | `anticonceptivo_ths` | no | vaginal | ✗ sin verificar |
 
 ### 3.13. inmunosupresores
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Imurel | azatioprina | `inmunosupresor_clasico` | no | oral |
-| Sandimmun Neoral | ciclosporina | `inmunosupresor_clasico` | no | oral |
-| Prograf\|Advagraf\|Envarsus | tacrolimus | `inmunosupresor_clasico` | no | oral |
-| CellCept\|Myfortic | micofenolato | `inmunosupresor_clasico` | no | oral |
-| Metoject\|Imeth\|Bertanel\|Nordimet | metotrexato | `metotrexato` | no | oral |
-| Arava | leflunomida | `fame_mantener` | no | oral |
-| Dolquine | hidroxicloroquina | `fame_mantener` | no | oral |
-| Salazopyrina | sulfasalazina | `fame_mantener` | no | oral |
-| Xeljanz | tofacitinib | `jak` | no | oral |
-| Olumiant | baricitinib | `jak` | no | oral |
-| Rinvoq | upadacitinib | `jak` | no | oral |
-| Humira\|Amgevita\|Hyrimoz\|Imraldi\|Idacio\|Hulio\|Yuflyma | adalimumab | `biologico` | sí | no_oral |
-| Enbrel\|Benepali\|Erelzi | etanercept | `biologico` | sí | no_oral |
-| Remicade\|Inflectra\|Remsima | infliximab | `biologico` | sí | no_oral |
-| Cimzia | certolizumab | `biologico` | sí | no_oral |
-| Simponi | golimumab | `biologico` | sí | no_oral |
-| RoActemra | tocilizumab | `biologico` | sí | no_oral |
-| Orencia | abatacept | `biologico` | sí | no_oral |
-| MabThera\|Truxima\|Rixathon | rituximab | `biologico` | sí | no_oral |
-| Cosentyx | secukinumab | `biologico` | sí | no_oral |
-| Stelara | ustekinumab | `biologico` | sí | no_oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Imurel | azatioprina | `inmunosupresor_clasico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Sandimmun Neoral | ciclosporina | `inmunosupresor_clasico` | no | oral | ✓ verificado (2026-09-30, CIMA manual) |
+| Prograf\|Advagraf\|Envarsus | tacrolimus | `inmunosupresor_clasico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| CellCept\|Myfortic | micofenolato | `inmunosupresor_clasico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Metoject\|Imeth\|Bertanel\|Nordimet | metotrexato | `metotrexato` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Arava | leflunomida | `fame_mantener` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Dolquine | hidroxicloroquina | `fame_mantener` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Salazopyrina | sulfasalazina | `fame_mantener` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Xeljanz | tofacitinib | `jak` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Olumiant | baricitinib | `jak` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Rinvoq | upadacitinib | `jak` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Humira\|Amgevita\|Hyrimoz\|Imraldi\|Idacio\|Hulio\|Yuflyma | adalimumab | `biologico` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Enbrel\|Benepali\|Erelzi | etanercept | `biologico` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Remicade\|Inflectra\|Remsima | infliximab | `biologico` | sí | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Cimzia | certolizumab | `biologico` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Simponi | golimumab | `biologico` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| RoActemra | tocilizumab | `biologico` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Orencia | abatacept | `biologico` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| MabThera\|Truxima\|Rixathon | rituximab | `biologico` | sí | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Cosentyx | secukinumab | `biologico` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Stelara | ustekinumab | `biologico` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.14. insulinas
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Xultophy | insulina_degludec+liraglutida | `insulina_glp1_fija` | sí | no_oral |
-| Suliqua | insulina_glargina+lixisenatida | `insulina_glp1_fija` | sí | no_oral |
-| Lantus\|Abasaglar\|Toujeo | insulina_glargina | `insulina_basal` | no | no_oral |
-| Levemir | insulina_detemir | `insulina_basal` | no | no_oral |
-| Tresiba | insulina_degludec | `insulina_basal` | no | no_oral |
-| Insulatard\|Humulina NPH | insulina_nph | `insulina_nph` | no | no_oral |
-| Humalog | insulina_lispro | `insulina_rapida` | no | no_oral |
-| NovoRapid\|Fiasp | insulina_aspart | `insulina_rapida` | no | no_oral |
-| Apidra | insulina_glulisina | `insulina_rapida` | no | no_oral |
-| Actrapid\|Humulina Regular | insulina_regular | `insulina_rapida` | no | no_oral |
-| NovoMix 30 | insulina_aspart | `insulina_premezclada` | no | no_oral |
-| Humalog Mix 25 | insulina_lispro | `insulina_premezclada` | no | no_oral |
-| Humalog Mix 50 | insulina_lispro | `insulina_premezclada` | no | no_oral |
-| Ryzodeg | insulina_degludec+insulina_aspart | `insulina_premezclada` | no | no_oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Xultophy | insulina_degludec+liraglutida | `insulina_glp1_fija` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Suliqua | insulina_glargina+lixisenatida | `insulina_glp1_fija` | sí | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Lantus\|Abasaglar\|Toujeo | insulina_glargina | `insulina_basal` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Levemir | insulina_detemir | `insulina_basal` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Tresiba | insulina_degludec | `insulina_basal` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Insulatard\|Humulina NPH | insulina_nph | `insulina_nph` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Humalog | insulina_lispro | `insulina_rapida` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| NovoRapid\|Fiasp | insulina_aspart | `insulina_rapida` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Apidra | insulina_glulisina | `insulina_rapida` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Actrapid\|Humulina Regular | insulina_regular | `insulina_rapida` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| NovoMix 30 | insulina_aspart | `insulina_premezclada` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Humalog Mix 25 | insulina_lispro | `insulina_premezclada` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Humalog Mix 50 | insulina_lispro | `insulina_premezclada` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Ryzodeg | insulina_degludec+insulina_aspart | `insulina_premezclada` | no | subcutanea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.15. neurologia
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Keppra | levetiracetam | `mantener_generico` | no | oral |
-| Briviact | brivaracetam | `mantener_generico` | no | oral |
-| Lamictal\|Labileno | lamotrigina | `mantener_generico` | no | oral |
-| Depakine | acido_valproico | `mantener_generico` | no | oral |
-| Tegretol | carbamazepina | `mantener_generico` | no | oral |
-| Trileptal | oxcarbazepina | `mantener_generico` | no | oral |
-| Vimpat | lacosamida | `mantener_generico` | no | oral |
-| Topamax | topiramato | `mantener_generico` | no | oral |
-| Zonegran | zonisamida | `mantener_generico` | no | oral |
-| Neosidantoina | fenitoina | `mantener_generico` | no | oral |
-| Fycompa | perampanel | `mantener_generico` | no | oral |
-| Zebinix | eslicarbazepina | `mantener_generico` | no | oral |
-| Neurontin | gabapentina | `mantener_generico` | no | oral |
-| Lyrica | pregabalina | `mantener_generico` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Keppra | levetiracetam | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Briviact | brivaracetam | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Lamictal\|Labileno | lamotrigina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Depakine | acido_valproico | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Tegretol | carbamazepina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Trileptal | oxcarbazepina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Vimpat | lacosamida | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Topamax | topiramato | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Zonegran | zonisamida | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Neosidantoina | fenitoina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Fycompa | perampanel | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Zebinix | eslicarbazepina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Neurontin | gabapentina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Lyrica | pregabalina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.16. oftalmologia
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Timoftol | timolol | `mantener_generico` | no | no_oral |
-| Alphagan | brimonidina | `mantener_generico` | no | no_oral |
-| Trusopt | dorzolamida | `mantener_generico` | no | no_oral |
-| Azopt | brinzolamida | `mantener_generico` | no | no_oral |
-| Xalatan | latanoprost | `mantener_generico` | no | no_oral |
-| Lumigan | bimatoprost | `mantener_generico` | no | no_oral |
-| Travatan | travoprost | `mantener_generico` | no | no_oral |
-| pilocarpina | pilocarpina | `mantener_generico` | no | no_oral |
-| Edemox | acetazolamida | `mantener_generico` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Timoftol | timolol | `mantener_generico` | no | colirio | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Alphagan | brimonidina | `mantener_generico` | no | colirio | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Trusopt | dorzolamida | `mantener_generico` | no | colirio | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Azopt | brinzolamida | `mantener_generico` | no | colirio | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Xalatan | latanoprost | `mantener_generico` | no | colirio | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Lumigan | bimatoprost | `mantener_generico` | no | colirio | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Travatan | travoprost | `mantener_generico` | no | colirio | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| pilocarpina | pilocarpina | `mantener_generico` | no | colirio | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Edemox | acetazolamida | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.17. oncologicos
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Glivec | imatinib | `tirosina_cinasa` | no | oral |
-| Sprycel | dasatinib | `tirosina_cinasa` | no | oral |
-| Tasigna | nilotinib | `tirosina_cinasa` | no | oral |
-| Tarceva | erlotinib | `tirosina_cinasa` | no | oral |
-| Nexavar | sorafenib | `tirosina_cinasa` | no | oral |
-| Sutent | sunitinib | `tirosina_cinasa` | no | oral |
-| Erbitux | cetuximab | `tirosina_cinasa` | no | oral |
-| Avastin\|Mvasi\|Zirabev | bevacizumab | `antiangiogenico` | sí | no_oral |
-| Zaltrap | aflibercept | `antiangiogenico` | sí | no_oral |
-| Eylea | aflibercept | `antiangiogenico_intravitreo` | no | no_oral |
-| Cyramza | ramucirumab | `antiangiogenico` | sí | no_oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Glivec | imatinib | `tirosina_cinasa` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Sprycel | dasatinib | `tirosina_cinasa` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Tasigna | nilotinib | `tirosina_cinasa` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Tarceva | erlotinib | `tirosina_cinasa` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Nexavar | sorafenib | `tirosina_cinasa` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Sutent | sunitinib | `tirosina_cinasa` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Erbitux | cetuximab | `tirosina_cinasa` | no | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Avastin\|Mvasi\|Zirabev | bevacizumab | `antiangiogenico` | sí | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Zaltrap | aflibercept | `antiangiogenico` | sí | intravenosa | ✓ verificado (2026-09-30, CIMA manual) |
+| Eylea | aflibercept | `antiangiogenico_intravitreo` | no | intravitrea | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Cyramza | ramucirumab | `antiangiogenico` | sí | intravenosa | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.18. opioides
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| MST Continus\|Sevredol | morfina | `mantener_generico` | no | oral |
-| codeina | codeina | `mantener_generico` | no | oral |
-| Adolonta\|Zaldiar | tramadol | `mantener_generico` | no | oral |
-| Palexia | tapentadol | `mantener_generico` | no | oral |
-| Oxycontin\|Oxynorm\|Targin | oxicodona | `mantener_generico` | no | oral |
-| Jurnista | hidromorfona | `mantener_generico` | no | oral |
-| Durogesic | fentanilo | `mantener_generico` | no | no_oral |
-| Transtec\|Feliben\|Suboxone | buprenorfina | `mantener_generico` | no | oral |
-| metadona | metadona | `mantener_generico` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| MST Continus\|Sevredol | morfina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| codeina | codeina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Adolonta\|Zaldiar | tramadol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Palexia | tapentadol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Oxycontin\|Oxynorm\|Targin | oxicodona | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Jurnista | hidromorfona | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Durogesic | fentanilo | `mantener_generico` | no | transdermica | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Feliben\|Transtec | buprenorfina | `mantener_generico` | no | transdermica | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Suboxone | buprenorfina\|naloxona | `mantener_generico` | no | sublingual | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| metadona | metadona | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.19. psicofarmacos
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Parnate | tranilcipromina | `imao_irreversible` | sí | oral |
-| Manerix | moclobemida | `moclobemida` | no | oral |
-| fenelzina | fenelzina | `imao_irreversible` | sí | oral |
-| isocarboxazida | isocarboxazida | `imao_irreversible` | sí | oral |
-| Azilect | rasagilina | `imao_b` | no | oral |
-| Plurimen | selegilina | `imao_b` | no | oral |
-| Xadago | safinamida | `imao_b` | no | oral |
-| Plenur | litio | `litio` | no | oral |
-| Sinemet | levodopa+carbidopa | `mantener_generico` | no | oral |
-| Prozac\|Adofen | fluoxetina | `mantener_generico` | no | oral |
-| Besitran | sertralina | `mantener_generico` | no | oral |
-| Seroxat\|Motivan | paroxetina | `mantener_generico` | no | oral |
-| Seropram | citalopram | `mantener_generico` | no | oral |
-| Cipralex\|Esertia | escitalopram | `mantener_generico` | no | oral |
-| Dumirox | fluvoxamina | `mantener_generico` | no | oral |
-| Vandral\|Dobupal | venlafaxina | `mantener_generico` | no | oral |
-| Pristiq | desvenlafaxina | `mantener_generico` | no | oral |
-| Cymbalta\|Xeristar | duloxetina | `mantener_generico` | no | oral |
-| Rexer | mirtazapina | `mantener_generico` | no | oral |
-| Deprax | trazodona | `mantener_generico` | no | oral |
-| Elontril | bupropion | `mantener_generico` | no | oral |
-| Brintellix | vortioxetina | `mantener_generico` | no | oral |
-| Tryptizol | amitriptilina | `mantener_generico` | no | oral |
-| Paxtibi | nortriptilina | `mantener_generico` | no | oral |
-| Anafranil | clomipramina | `mantener_generico` | no | oral |
-| Valium | diazepam | `mantener_generico` | no | oral |
-| Orfidal\|Idalprem | lorazepam | `mantener_generico` | no | oral |
-| Trankimazin | alprazolam | `mantener_generico` | no | oral |
-| Rivotril | clonazepam | `mantener_generico` | no | oral |
-| Lexatin | bromazepam | `mantener_generico` | no | oral |
-| Noctamid | lormetazepam | `mantener_generico` | no | oral |
-| Tranxilium | clorazepato | `mantener_generico` | no | oral |
-| Stilnox\|Dalparan | zolpidem | `mantener_generico` | no | oral |
-| Limovan | zopiclona | `mantener_generico` | no | oral |
-| Seroquel | quetiapina | `mantener_generico` | no | oral |
-| Zyprexa | olanzapina | `mantener_generico` | no | oral |
-| Risperdal | risperidona | `mantener_generico` | no | oral |
-| Invega | paliperidona | `mantener_generico` | no | oral |
-| Xeplion | paliperidona | `mantener_generico` | no | no_oral |
-| Abilify | aripiprazol | `mantener_generico` | no | oral |
-| haloperidol | haloperidol | `mantener_generico` | no | oral |
-| Leponex | clozapina | `mantener_generico` | no | oral |
-| Etumina | clotiapina | `mantener_generico` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Parnate | tranilcipromina | `imao_irreversible` | sí | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Manerix | moclobemida | `moclobemida` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| fenelzina | fenelzina | `imao_irreversible` | sí | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| isocarboxazida | isocarboxazida | `imao_irreversible` | sí | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Azilect | rasagilina | `imao_b` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Plurimen | selegilina | `imao_b` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Xadago | safinamida | `imao_b` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Plenur | litio | `litio` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Sinemet | levodopa+carbidopa | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Prozac\|Adofen | fluoxetina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Besitran | sertralina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Seroxat\|Motivan | paroxetina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Seropram | citalopram | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Cipralex\|Esertia | escitalopram | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Dumirox | fluvoxamina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Vandral\|Dobupal | venlafaxina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Pristiq | desvenlafaxina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Cymbalta\|Xeristar | duloxetina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Rexer | mirtazapina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Deprax | trazodona | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Elontril | bupropion | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Brintellix | vortioxetina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Tryptizol | amitriptilina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Paxtibi | nortriptilina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Anafranil | clomipramina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Valium | diazepam | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Orfidal\|Idalprem | lorazepam | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Trankimazin | alprazolam | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Rivotril | clonazepam | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Lexatin | bromazepam | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Noctamid | lormetazepam | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Tranxilium | clorazepato | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Stilnox\|Dalparan | zolpidem | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Limovan | zopiclona | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Seroquel | quetiapina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Zyprexa | olanzapina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Risperdal | risperidona | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Invega | paliperidona | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Xeplion | paliperidona | `mantener_generico` | no | intramuscular | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Abilify | aripiprazol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| haloperidol | haloperidol | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Leponex | clozapina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Etumina | clotiapina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.20. respiratorio
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Ventolin\|Buto-Asma | salbutamol | `mantener_generico` | no | no_oral |
-| Terbasmin | terbutalina | `mantener_generico` | no | no_oral |
-| Atrovent | ipratropio | `mantener_generico` | no | no_oral |
-| Oxis\|Foradil | formoterol | `mantener_generico` | no | no_oral |
-| Serevent\|Beglan\|Inaspir | salmeterol | `mantener_generico` | no | no_oral |
-| Onbrez | indacaterol | `mantener_generico` | no | no_oral |
-| Spiriva | tiotropio | `mantener_generico` | no | no_oral |
-| Incruse | umeclidinio | `mantener_generico` | no | no_oral |
-| Seebri | glicopirronio | `mantener_generico` | no | no_oral |
-| Eklira | aclidinio | `mantener_generico` | no | no_oral |
-| Pulmicort | budesonida | `mantener_generico` | no | no_oral |
-| Flixotide\|Flusonal | fluticasona | `mantener_generico` | no | no_oral |
-| Becloasma | beclometasona | `mantener_generico` | no | no_oral |
-| Symbicort\|Rilast | budesonida+formoterol | `mantener_generico` | no | no_oral |
-| Seretide\|Anasma\|Inaladuo\|Plusvent | fluticasona+salmeterol | `mantener_generico` | no | no_oral |
-| Foster\|Formodual | beclometasona+formoterol | `mantener_generico` | no | no_oral |
-| Relvar | fluticasona_furoato+vilanterol | `mantener_generico` | no | no_oral |
-| Anoro | umeclidinio+vilanterol | `mantener_generico` | no | no_oral |
-| Ultibro | glicopirronio+indacaterol | `mantener_generico` | no | no_oral |
-| Spiolto | tiotropio+olodaterol | `mantener_generico` | no | no_oral |
-| Duaklir | aclidinio+formoterol | `mantener_generico` | no | no_oral |
-| Trelegy | fluticasona_furoato+umeclidinio+vilanterol | `mantener_generico` | no | no_oral |
-| Trimbow | beclometasona+formoterol+glicopirronio | `mantener_generico` | no | no_oral |
-| Singulair | montelukast | `mantener_generico` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Ventolin\|Buto-Asma | salbutamol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Terbasmin | terbutalina | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Atrovent | ipratropio | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Oxis\|Foradil | formoterol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Serevent\|Beglan\|Inaspir | salmeterol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Onbrez | indacaterol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Spiriva | tiotropio | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Incruse | umeclidinio | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Seebri | glicopirronio | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Eklira | aclidinio | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Pulmicort | budesonida | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Flixotide\|Flusonal | fluticasona | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Becloasma | beclometasona | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Symbicort\|Rilast | budesonida+formoterol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Seretide\|Anasma\|Inaladuo\|Plusvent | fluticasona+salmeterol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Foster\|Formodual | beclometasona+formoterol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Relvar | fluticasona_furoato+vilanterol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Anoro | umeclidinio+vilanterol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Ultibro | glicopirronio+indacaterol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Spiolto | tiotropio+olodaterol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Duaklir | aclidinio+formoterol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Trelegy | fluticasona_furoato+umeclidinio+vilanterol | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Trimbow | beclometasona+formoterol+glicopirronio | `mantener_generico` | no | inhalada | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Singulair | montelukast | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ### 3.21. urologia
 
-| Nombres comerciales | Principios activos | Regla | Confirmación | Vía |
-| --- | --- | --- | --- | --- |
-| Omnic\|Urolosin | tamsulosina | `alfabloqueante_flacido` | no | oral |
-| Silodyx\|Urorec | silodosina | `alfabloqueante_flacido` | no | oral |
-| Benestan | alfuzosina | `mantener_generico` | no | oral |
-| Carduran | doxazosina | `mantener_generico` | no | oral |
-| terazosina | terazosina | `mantener_generico` | no | oral |
+| Nombres comerciales | Principios activos | Regla | Confirmación | Vía | Verificación CIMA |
+| --- | --- | --- | --- | --- | --- |
+| Omnic\|Urolosin | tamsulosina | `alfabloqueante_flacido` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Silodyx\|Urorec | silodosina | `alfabloqueante_flacido` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Benestan | alfuzosina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| Carduran | doxazosina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
+| terazosina | terazosina | `mantener_generico` | no | oral | ✓ verificado (2026-09-30, cotejo CIMA asistido) |
 
 ## 4. Conversión de opioides a morfina oral equivalente
 

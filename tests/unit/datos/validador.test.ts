@@ -50,7 +50,7 @@ describe('Parser CSV', () => {
     const { filas } = parseCsv(leer('datos/farmacos.csv'));
     const bupren = filas.find((f) => f.valores.id === 'buprenorfina');
     expect(bupren?.valores.requiere_confirmacion).toBe('no');
-    expect(bupren?.valores.verificado_cima).toBe('no');
+    expect(bupren?.valores.verificado_cima).toBe('si');
     expect(bupren?.valores.texto_paciente).toContain('planificar analgesia');
   });
 });

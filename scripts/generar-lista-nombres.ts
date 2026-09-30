@@ -41,6 +41,8 @@ const salida: FilaNombre[] = [];
 for (const fila of filas) {
   const v = fila.valores;
   const id = v.id ?? '';
+  // Las filas de grupo de anticonceptivos/THS no son marcas comerciales verificadas.
+  if ((v.subgrupo ?? '') === 'anticonceptivo_ths') continue;
   const principios = (v.principios_activos ?? '').split('|').map((s) => s.trim()).filter(Boolean);
   const principioActivo = principios.join(' + ');
   const nombres = (v.nombres_comerciales ?? '').split('|').map((s) => s.trim()).filter(Boolean);

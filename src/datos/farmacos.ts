@@ -4,6 +4,12 @@
  */
 import { parseCsv } from './csv.ts';
 import csvFarmacos from '../../datos/farmacos.csv?raw';
+import type { Via } from '../dominio/tipos.ts';
+
+const VIAS_VALIDAS = new Set<Via>([
+  'oral', 'sublingual', 'subcutanea', 'intramuscular', 'intravenosa', 'transdermica',
+  'inhalada', 'colirio', 'intravitrea', 'vaginal', 'intrauterina', 'implante',
+]);
 
 export interface FarmacoCatalogoUi {
   id: string;
@@ -15,7 +21,7 @@ export interface FarmacoCatalogoUi {
   idRegla: string[];
   requiereConfirmacion: boolean;
   indicacionesPosibles: string[];
-  via: 'oral' | 'no_oral';
+  via: Via;
   /** Texto para el paciente del catálogo, que sobrescribe el de la regla (§3). */
   textoPaciente?: string;
   /** Texto para el anestesiólogo del catálogo (§3). */
@@ -24,6 +30,12 @@ export interface FarmacoCatalogoUi {
 
 function lista(v: string | undefined): string[] {
   return (v ?? '').split('|').map((s) => s.trim()).filter(Boolean);
+}
+
+/** Vía concreta del catálogo; 'oral' por defecto y ante valores desconocidos. */
+function normalizarVia(v: string | undefined): Via {
+  const s = (v ?? '').trim().toLowerCase();
+  return VIAS_VALIDAS.has(s as Via) ? (s as Via) : 'oral';
 }
 
 export function cargarFarmacos(csvTexto: string = csvFarmacos): FarmacoCatalogoUi[] {
@@ -40,7 +52,7 @@ export function cargarFarmacos(csvTexto: string = csvFarmacos): FarmacoCatalogoU
       idRegla: lista(v.id_regla),
       requiereConfirmacion: (v.requiere_confirmacion ?? 'no').trim().toLowerCase() === 'si',
       indicacionesPosibles: lista(v.indicaciones_posibles),
-      via: (v.via ?? 'oral').trim().toLowerCase() === 'no_oral' ? 'no_oral' : 'oral',
+      via: normalizarVia(v.via),
       ...((v.texto_paciente ?? '').trim() ? { textoPaciente: (v.texto_paciente ?? '').trim() } : {}),
       ...((v.texto_anestesiologo ?? '').trim() ? { textoAnestesiologo: (v.texto_anestesiologo ?? '').trim() } : {}),
     };

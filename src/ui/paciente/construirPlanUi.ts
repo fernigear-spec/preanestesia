@@ -27,11 +27,9 @@ function proximaDosisSemanal(diaSemana: number, intervencion: Date): Date {
   return d;
 }
 
-/** Variante de «mantener» para localizar la instrucción del paciente. */
-function varianteMantener(f: FarmacoTomadoUi): 'oral' | 'no_oral' | 'inhalador' | 'colirio' {
-  if (f.subgrupo === 'colirio_glaucoma') return 'colirio';
-  if (f.grupo === 'respiratorio' && f.via === 'no_oral') return 'inhalador';
-  return f.via === 'no_oral' ? 'no_oral' : 'oral';
+/** Variante de «mantener» para localizar la instrucción del paciente: la vía concreta. */
+function varianteMantener(f: FarmacoTomadoUi): FarmacoTomadoUi['via'] {
+  return f.via;
 }
 
 const floorPct = (dosis: number, pct: number) => Math.floor((dosis * pct) / 100);

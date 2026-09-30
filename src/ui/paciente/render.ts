@@ -83,7 +83,7 @@ export function renderMed(instr: InstruccionPacienteEstructurada, t: TextosPacie
     case 'no_cumplible':
       return rellenar(m.no_cumplible, { n: instr.nombre, tel: telefono });
     case 'mantener':
-      return m[`mantener_${e.mv}` as 'mantener_oral'];
+      return m[`mantener_${e.mv}` as 'mantener_oral'] ?? m.mantener_oral;
     case 'texto_fijo':
       // El texto libre solo existe en castellano; en catalán se usa el genérico
       // (§10.2, punto 4: la vista en catalán no muestra castellano).

@@ -444,12 +444,12 @@ function add(id: string, calculado: string, textoPaciente: string, _a?: string |
   add('E15', farmacoResumen(r), r.textoPaciente, 'suspender 14 días (mínimo 7); última mié 30/09 09:00', fh(r.fechaHoraUltimaToma) === 'mié 30/09 09:00');
 }
 {
-  const r = reglaAnticonceptivoThs({ idFarmaco: 'a', nombreComercial: 'ACO', principio: 'etinilestradiol', esOral: true }, ctx({ riesgoTromboticoAlto: true }));
+  const r = reglaAnticonceptivoThs({ idFarmaco: 'a', nombreComercial: 'ACO', principio: 'etinilestradiol', via: 'oral' }, ctx({ riesgoTromboticoAlto: true }));
   const sg = avisoSugammadex({ mujerConAnticonceptivoHormonal: true, tipo: 'oral', posibleAnestesiaGeneral: true });
   add('E16', `${farmacoResumen(r)}; sugammadex: ${sg.textoPaciente}`, r.textoPaciente, 'confirmación; sugammadex oral (dosis olvidada)', r.requiereConfirmacion && sg.textoPaciente.includes('olvidada'));
 }
 {
-  const r = reglaAnticonceptivoThs({ idFarmaco: 'i', nombreComercial: 'Implante', principio: 'etonogestrel', esOral: false }, ctx({ riesgoTromboticoAlto: false }));
+  const r = reglaAnticonceptivoThs({ idFarmaco: 'i', nombreComercial: 'Implante', principio: 'etonogestrel', via: 'implante' }, ctx({ riesgoTromboticoAlto: false }));
   const sg = avisoSugammadex({ mujerConAnticonceptivoHormonal: true, tipo: 'no_oral', posibleAnestesiaGeneral: true });
   add('E17', `${farmacoResumen(r)}; sugammadex: barrera 7 días=${sg.textoPaciente.includes('7 días')}`, r.textoPaciente, 'sin regla trombótica; sugammadex no oral (barrera 7 días)', r.accion === 'mantener' && sg.textoPaciente.includes('7 días'));
 }

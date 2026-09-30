@@ -136,13 +136,13 @@ describe('Otros (§8.11)', () => {
     expect(D(r.fechaHoraUltimaToma)).toBe(15);
   });
   it('anticonceptivo con riesgo trombótico alto → requiere confirmación; texto de anticonceptivo en hoja', () => {
-    const r = reglaAnticonceptivoThs({ idFarmaco: 'aco', nombreComercial: 'ACO', principio: 'etinilestradiol', esOral: true }, ctx({ riesgoTromboticoAlto: true }));
+    const r = reglaAnticonceptivoThs({ idFarmaco: 'aco', nombreComercial: 'ACO', principio: 'etinilestradiol', via: 'oral' }, ctx({ riesgoTromboticoAlto: true }));
     expect(r.requiereConfirmacion).toBeTrue();
     expect(r.textoPaciente).toContain('anticonceptivo');
     expect(r.textoAnestesiologo).toContain('4-6 semanas');
   });
   it('anticonceptivo sin riesgo trombótico alto → mantener', () => {
-    const r = reglaAnticonceptivoThs({ idFarmaco: 'aco', nombreComercial: 'ACO', principio: 'etinilestradiol', esOral: true }, ctx({ riesgoTromboticoAlto: false }));
+    const r = reglaAnticonceptivoThs({ idFarmaco: 'aco', nombreComercial: 'ACO', principio: 'etinilestradiol', via: 'oral' }, ctx({ riesgoTromboticoAlto: false }));
     expect(r.accion).toBe('mantener');
   });
   it('corticoide → mantener; nota de dosis de estrés si aplica', () => {

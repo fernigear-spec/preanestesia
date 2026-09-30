@@ -179,7 +179,7 @@ function FichaFarmaco({
   const esHbpm = f.idRegla === 'hbpm' || f.idRegla === 'fondaparinux';
   const necesitaDosis = f.idRegla === 'aas' || f.idRegla === 'metotrexato';
   const esOpioide = f.grupo === 'opioides';
-  const esParche = esOpioide && f.via === 'no_oral';
+  const esParche = esOpioide && f.via === 'transdermica';
 
   function alternarHora(h: string) {
     const horas = f.horas.includes(h) ? f.horas.filter((x) => x !== h) : [...f.horas, h].sort();

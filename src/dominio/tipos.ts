@@ -25,6 +25,26 @@ export type RiesgoCardiovascular = 'bajo' | 'intermedio' | 'alto';
 export type RiesgoHemorragico = 'minimo' | 'bajo' | 'alto';
 export type GrupoOftalmologico = 'no_aplica' | 'riesgo_bajo' | 'riesgo_moderado_alto';
 
+/** Vía de administración concreta (§8.0). Determina el texto de "mantener". */
+export type Via =
+  | 'oral'
+  | 'sublingual'
+  | 'subcutanea'
+  | 'intramuscular'
+  | 'intravenosa'
+  | 'transdermica'
+  | 'inhalada'
+  | 'colirio'
+  | 'intravitrea'
+  | 'vaginal'
+  | 'intrauterina'
+  | 'implante';
+
+/** Vías por las que se toma "con un sorbo de agua" (a efectos de sugammadex y texto). */
+export function esViaOral(via: Via): boolean {
+  return via === 'oral';
+}
+
 export interface DatosIntervencion {
   /** Fecha/hora prevista, o null si aún no se conoce (§8.16a). */
   fechaHora: Date | null;
@@ -82,9 +102,8 @@ export interface FarmacoCatalogo {
   grupo: string;
   subgrupo: string;
   pautaTipica: PautaTipica;
-  /** Vía de administración (§8.0). Por defecto 'oral'. Los no orales (implante,
-   *  parche, inyectable, inhalador, DIU) no usan "con un sorbo de agua". */
-  via?: 'oral' | 'no_oral';
+  /** Vía de administración concreta (§8.0). Por defecto 'oral'. */
+  via?: Via;
   /** id de regla por principio activo (se aplica la más restrictiva). */
   idRegla: string[];
   textoPaciente?: string;

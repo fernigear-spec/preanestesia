@@ -4,7 +4,7 @@
  * para recalcular (tipo de plazo, duración, horas, adelanto, anticoagulante) y los
  * textos fijos de los fármacos sin plazo (mantener/consultar).
  */
-import type { ResultadoFarmaco } from '../../tipos.ts';
+import type { ResultadoFarmaco, Via } from '../../tipos.ts';
 import type { ContenidoQrPaciente, FarmacoQr, AyunoQr, ExtrasHojaQr, InsulinaQr } from './hojaPaciente.ts';
 import type { Payload } from './serializar.ts';
 import type { PlanAyuno } from '../../ayuno/ayuno.ts';
@@ -22,8 +22,8 @@ export interface FarmacoPlan {
   resultado: ResultadoFarmaco;
   horas: string[];
   meta: MetaPlazo;
-  /** Variante de «mantener» para localizar la instrucción (oral/no_oral/inhalador/colirio). */
-  variante?: 'oral' | 'no_oral' | 'inhalador' | 'colirio';
+  /** Variante de «mantener» para localizar la instrucción: la vía de administración. */
+  variante?: Via;
   /** Ajuste de insulina estructurado, si el fármaco es una insulina. */
   ins?: InsulinaQr;
 }

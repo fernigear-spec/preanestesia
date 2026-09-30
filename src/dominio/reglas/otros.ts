@@ -5,11 +5,13 @@
  * - Detección de plazo no alcanzable (R3.2.5): si la fecha límite calculada ya
  *   pasó o cae hoy, el fármaco pasa a requerir confirmación y se alerta.
  */
-import type { ContextoReglas, ResultadoFarmaco, Alerta } from '../tipos.ts';
+import type { ContextoReglas, ResultadoFarmaco, Alerta, Via } from '../tipos.ts';
+import { esViaOral } from '../tipos.ts';
 import { TEXTO_MANTENER } from './motor.ts';
 // (textoMantener y ViaAdministracion se importan más abajo junto a plazoDesdeDias)
 import { plazoNoAlcanzable } from '../fechas/plazos.ts';
 import { plazoDesdeDias, faltaHora, resultadoFaltaHora, textoMantener, type ViaAdministracion } from './motor.ts';
+import { avisoSugammadex } from './sugammadex.ts';
 
 const FUENTE = 'docs/documento_fuente.md §8.0';
 
@@ -77,8 +79,18 @@ export interface EntradaAnticonceptivoThs {
   idFarmaco: string;
   nombreComercial: string;
   principio: string;
-  /** Tipo de anticonceptivo hormonal (para la advertencia de sugammadex, §8.15). */
-  esOral?: boolean;
+  /** Vía de administración (para el texto de "mantener" y la advertencia del sugammadex, §8.15). */
+  via?: Via;
+}
+
+/** Nota del anestesiólogo con la advertencia del sugammadex (§8.15) según la vía. */
+function notaSugammadex(via: Via): string {
+  const sg = avisoSugammadex({
+    mujerConAnticonceptivoHormonal: true,
+    tipo: esViaOral(via) ? 'oral' : 'no_oral',
+    posibleAnestesiaGeneral: true,
+  });
+  return `${sg.textoPaciente} ${sg.textoAnestesiologo}`.trim();
 }
 
 /**
@@ -86,8 +98,11 @@ export interface EntradaAnticonceptivoThs {
  * trombótico alto, requiere confirmación. La sugerencia de suspensión va solo en
  * las notas del anestesiólogo; la hoja del paciente muestra la línea general de
  * requiere confirmación referida al anticonceptivo hasta que se confirme.
+ * En ambos casos, la nota del anestesiólogo incluye la advertencia del sugammadex
+ * (§8.15) según la vía (oral: "dosis olvidada"; no oral: barrera 7 días).
  */
 export function reglaAnticonceptivoThs(e: EntradaAnticonceptivoThs, ctx: ContextoReglas): ResultadoFarmaco {
+  const via: Via = e.via ?? 'oral';
   const base = {
     idFarmaco: e.idFarmaco,
     nombreComercial: e.nombreComercial,
@@ -102,16 +117,17 @@ export function reglaAnticonceptivoThs(e: EntradaAnticonceptivoThs, ctx: Context
         'Sobre su anticonceptivo, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta.',
       reglaAplicada: 'Anticonceptivo/THS con riesgo trombótico alto: requiere confirmación',
       requiereConfirmacion: true,
-      textoAnestesiologo: 'Valorar suspender 4-6 semanas antes y método anticonceptivo alternativo.',
+      textoAnestesiologo: `Valorar suspender 4-6 semanas antes y método anticonceptivo alternativo. ${notaSugammadex(via)}`,
     };
   }
   return {
     ...base,
     accion: 'mantener',
-    // Implantes, parches, inyectables o DIU no son orales: no digas "con un sorbo de agua".
-    textoPaciente: textoMantener(e.esOral === false ? 'no_oral' : 'oral'),
+    // El texto de "mantener" se ajusta a la vía (parche, DIU, implante… no "con un sorbo de agua").
+    textoPaciente: textoMantener(via),
     reglaAplicada: 'Anticonceptivo/THS sin riesgo trombótico alto: mantener',
     requiereConfirmacion: false,
+    textoAnestesiologo: notaSugammadex(via),
   };
 }
 
