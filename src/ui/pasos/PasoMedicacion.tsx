@@ -8,9 +8,11 @@
  * motor (qué hacer y última toma) y las tarjetas del asistente de coherencia (§5b).
  */
 import { useMemo, useState } from 'react';
-import type { DatosIntervencion } from '../../dominio/tipos.ts';
+import type { DatosIntervencion, Sexo } from '../../dominio/tipos.ts';
 import { construirContexto } from '../../dominio/reglas/motor.ts';
-import { evaluarFarmacoUi, metadatosPlazo, type DatosFarmacoUi } from '../../dominio/reglas/despachador.ts';
+import { evaluarCombinacionUi, metadatosPlazo, type DatosFarmacoUi } from '../../dominio/reglas/despachador.ts';
+import { derivarHechosClinicos, type DatosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
+import type { RespuestasModulos } from '../../datos/modulos.ts';
 import { recalcularHoja, type FarmacoQr } from '../../dominio/salidas/qr/hojaPaciente.ts';
 import { textoHojaPaciente } from '../../dominio/salidas/hojaFarmaco.ts';
 import {
@@ -26,18 +28,36 @@ interface Props {
   intervencion: DatosIntervencion;
   /** Enfermedades marcadas en el paso 7 (para la coherencia enfermedad→fármaco). */
   enfermedades: string[];
+  /** Respuestas de los módulos del paso 7 (para derivar los hechos clínicos). */
+  respuestasModulos: RespuestasModulos;
+  /** Datos básicos del paso 2 (para el aclaramiento y el peso del contexto). */
+  basicos: { edadAnios: number; pesoKg: number; sexo: Sexo };
   onContinuar: (medicacion: FarmacoTomadoUi[]) => void;
   onVolver: () => void;
 }
 
 const DIAS_SEMANA = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
-export function PasoMedicacion({ inicial, intervencion, enfermedades, onContinuar, onVolver }: Props) {
+export function PasoMedicacion({ inicial, intervencion, enfermedades, respuestasModulos, basicos, onContinuar, onVolver }: Props) {
   const catalogo = useMemo(() => cargarFarmacos(), []);
   const [medicacion, setMedicacion] = useState<FarmacoTomadoUi[]>(inicial ?? []);
   const [consulta, setConsulta] = useState('');
 
   const resultados = useMemo(() => buscarFarmacos(catalogo, consulta), [catalogo, consulta]);
+
+  // Hechos clínicos derivados de la entrevista (§5, §7): ningún dato fijo.
+  const hechos = useMemo<DatosClinicos>(
+    () => derivarHechosClinicos({
+      respuestas: respuestasModulos,
+      enfermedades: new Set(enfermedades),
+      medicacion: medicacion.map((f) => ({ principiosActivos: f.principiosActivos, idRegla: f.idRegla })),
+      edadAnios: basicos.edadAnios,
+      pesoKg: basicos.pesoKg,
+      sexo: basicos.sexo,
+      fechaIntervencion: intervencion.fechaHora,
+    }),
+    [respuestasModulos, enfermedades, medicacion, basicos, intervencion.fechaHora],
+  );
 
   function anadir(f: FarmacoCatalogoUi) {
     const nuevo: FarmacoTomadoUi = {
@@ -45,6 +65,7 @@ export function PasoMedicacion({ inicial, intervencion, enfermedades, onContinua
       nombreComercial: f.nombresComerciales[0] ?? f.id,
       principiosActivos: f.principiosActivos,
       idRegla: f.idRegla[0] ?? 'mantener_generico',
+      idReglas: f.idRegla.length > 0 ? f.idRegla : ['mantener_generico'],
       grupo: f.grupo,
       subgrupo: f.subgrupo,
       pautaTipica: f.pautaTipica,
@@ -106,6 +127,8 @@ export function PasoMedicacion({ inicial, intervencion, enfermedades, onContinua
             key={`${f.idFarmaco}-${i}`}
             f={f}
             intervencion={intervencion}
+            hechos={hechos}
+            pesoKg={basicos.pesoKg}
             onCambio={(c) => actualizar(i, c)}
             onQuitar={() => quitar(i)}
           />
@@ -132,11 +155,15 @@ export function PasoMedicacion({ inicial, intervencion, enfermedades, onContinua
 function FichaFarmaco({
   f,
   intervencion,
+  hechos,
+  pesoKg,
   onCambio,
   onQuitar,
 }: {
   f: FarmacoTomadoUi;
   intervencion: DatosIntervencion;
+  hechos: DatosClinicos;
+  pesoKg: number;
   onCambio: (c: Partial<FarmacoTomadoUi>) => void;
   onQuitar: () => void;
 }) {
@@ -160,7 +187,7 @@ function FichaFarmaco({
     setHoraLibre('');
   }
 
-  const resultado = evaluarFicha(f, intervencion);
+  const resultado = evaluarFicha(f, intervencion, hechos, pesoKg);
 
   return (
     <div className="ficha-farmaco">
@@ -269,7 +296,7 @@ interface ResultadoFicha {
 
 /** Calcula el resultado en vivo de un fármaco. Con fecha usa el despachador; sin
  *  fecha usa el modo margen del QR (garantía §8.16: nunca llama a construirContexto). */
-function evaluarFicha(f: FarmacoTomadoUi, intervencion: DatosIntervencion): ResultadoFicha {
+function evaluarFicha(f: FarmacoTomadoUi, intervencion: DatosIntervencion, hechos: DatosClinicos, pesoKg: number): ResultadoFicha {
   const necesitaHoras = reglaNecesitaHoras(f.idRegla);
   if (necesitaHoras && f.horas.length === 0) {
     return { texto: 'Requiere dato: hora de la toma.', claseAviso: 'aviso-atencion' };
@@ -292,8 +319,8 @@ function evaluarFicha(f: FarmacoTomadoUi, intervencion: DatosIntervencion): Resu
     return { texto: inst[0]?.texto ?? '', claseAviso: 'aviso-info' };
   }
 
-  // Con fecha: despachador del motor.
-  const ctx = construirContexto(intervencion, 70, null);
+  // Con fecha: despachador del motor, con peso y aclaramiento reales.
+  const ctx = construirContexto(intervencion, pesoKg, hechos.aclaramiento);
   const datos: DatosFarmacoUi = {
     idFarmaco: f.idFarmaco,
     nombreComercial: f.nombreComercial,
@@ -313,7 +340,7 @@ function evaluarFicha(f: FarmacoTomadoUi, intervencion: DatosIntervencion): Resu
     ...(f.textoPaciente ? { textoPacienteOverride: f.textoPaciente } : {}),
     ...(f.textoAnestesiologo ? { textoAnestesiologoOverride: f.textoAnestesiologo } : {}),
   };
-  const r = evaluarFarmacoUi(datos, ctx);
+  const r = evaluarCombinacionUi(datos, f.idReglas, ctx, hechos);
   const texto = textoHojaPaciente(r);
   const clase = r.requiereConfirmacion ? 'aviso-atencion' : 'aviso-info';
   return { texto: `${accionLegible(r.accion)}: ${texto}`, claseAviso: clase };

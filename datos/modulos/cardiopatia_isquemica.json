@@ -1,0 +1,132 @@
+{
+  "id": "cardiopatia_isquemica",
+  "titulo": "Cardiopatía isquémica / infarto",
+  "fuente": "docs/documento_fuente.md §5.1",
+  "preguntas": [
+    {
+      "id": "infarto_previo",
+      "etiqueta": "¿Ha tenido un infarto o un síndrome coronario agudo?",
+      "tipo": "boolean",
+      "porque": "Un infarto reciente aumenta el riesgo perioperatorio y cambia el manejo de la medicación del corazón."
+    },
+    {
+      "id": "infarto_fecha",
+      "etiqueta": "Fecha del infarto o síndrome coronario agudo",
+      "tipo": "fecha",
+      "visibleSi": { "pregunta": "infarto_previo", "igual": true }
+    },
+    {
+      "id": "revascularizacion",
+      "etiqueta": "¿Le han revascularizado las arterias del corazón?",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "ninguna", "etiqueta": "No" },
+        { "valor": "percutanea", "etiqueta": "Sí, con cateterismo (angioplastia/stent)" },
+        { "valor": "quirurgica", "etiqueta": "Sí, con cirugía (bypass)" }
+      ]
+    },
+    {
+      "id": "revascularizacion_completitud",
+      "etiqueta": "¿La revascularización fue completa o incompleta?",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "completa", "etiqueta": "Completa" },
+        { "valor": "incompleta", "etiqueta": "Incompleta" },
+        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+      ],
+      "visibleSi": { "pregunta": "revascularizacion", "enLista": ["percutanea", "quirurgica"] }
+    },
+    {
+      "id": "portador_stent",
+      "etiqueta": "¿Le pusieron un stent (muelle) en las arterias del corazón?",
+      "tipo": "boolean",
+      "porque": "El tipo de stent y el tiempo desde su colocación determinan si se puede suspender la antiagregación."
+    },
+    {
+      "id": "stent_fecha",
+      "etiqueta": "Fecha del stent",
+      "tipo": "fecha",
+      "visibleSi": { "pregunta": "portador_stent", "igual": true }
+    },
+    {
+      "id": "stent_tipo",
+      "etiqueta": "Tipo de stent",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "farmacoactivo", "etiqueta": "Farmacoactivo (liberador de fármaco)" },
+        { "valor": "convencional", "etiqueta": "Convencional (metálico)" },
+        { "valor": "desconocido", "etiqueta": "Desconocido" }
+      ],
+      "visibleSi": { "pregunta": "portador_stent", "igual": true }
+    },
+    {
+      "id": "stent_motivo",
+      "etiqueta": "Motivo del stent",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "programado", "etiqueta": "Programado (procedimiento electivo)" },
+        { "valor": "sca", "etiqueta": "Por síndrome coronario agudo (infarto/angina inestable)" }
+      ],
+      "visibleSi": { "pregunta": "portador_stent", "igual": true }
+    },
+    {
+      "id": "angina_residual",
+      "etiqueta": "¿Tiene angina (dolor u opresión en el pecho al esforzarse) actualmente?",
+      "tipo": "boolean"
+    },
+    {
+      "id": "angina_esfuerzo",
+      "etiqueta": "¿Con qué esfuerzo le aparece la angina?",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "grandes", "etiqueta": "Solo con grandes esfuerzos" },
+        { "valor": "moderados", "etiqueta": "Con esfuerzos moderados" },
+        { "valor": "minimos", "etiqueta": "Con mínimos esfuerzos" },
+        { "valor": "reposo", "etiqueta": "En reposo" }
+      ],
+      "visibleSi": { "pregunta": "angina_residual", "igual": true }
+    },
+    {
+      "id": "angina_cambio_reciente",
+      "etiqueta": "¿La angina ha cambiado (más frecuente o más intensa) en las últimas semanas?",
+      "tipo": "boolean",
+      "porque": "Una angina que cambia recientemente puede indicar isquemia inestable: es una señal de alerta.",
+      "visibleSi": { "pregunta": "angina_residual", "igual": true }
+    },
+    {
+      "id": "prueba_isquemia",
+      "etiqueta": "Última prueba de esfuerzo o de detección de isquemia",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "no", "etiqueta": "No se ha hecho" },
+        { "valor": "negativa", "etiqueta": "Negativa" },
+        { "valor": "positiva", "etiqueta": "Positiva" },
+        { "valor": "no_concluyente", "etiqueta": "No concluyente" }
+      ]
+    },
+    {
+      "id": "prueba_isquemia_fecha",
+      "etiqueta": "Fecha de la prueba de isquemia",
+      "tipo": "fecha",
+      "visibleSi": { "pregunta": "prueba_isquemia", "enLista": ["negativa", "positiva", "no_concluyente"] }
+    },
+    {
+      "id": "ecocardiograma_fecha",
+      "etiqueta": "Fecha del último ecocardiograma",
+      "tipo": "fecha"
+    },
+    {
+      "id": "fevi",
+      "etiqueta": "Fracción de eyección (FEVI), si se conoce",
+      "tipo": "numero",
+      "unidad": "%",
+      "min": 5,
+      "max": 85
+    },
+    {
+      "id": "cardiologo",
+      "etiqueta": "Cardiólogo de referencia",
+      "tipo": "texto"
+    }
+  ]
+}

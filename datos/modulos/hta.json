@@ -1,0 +1,19 @@
+{
+  "id": "hta",
+  "titulo": "Hipertensión arterial",
+  "fuente": "docs/documento_fuente.md §5.1",
+  "preguntas": [
+    { "id": "anios_evolucion", "etiqueta": "Años de evolución", "tipo": "numero", "min": 0, "max": 90 },
+    {
+      "id": "control",
+      "etiqueta": "¿Está bien controlada?",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "bien", "etiqueta": "Bien controlada" },
+        { "valor": "mal", "etiqueta": "Mal controlada" },
+        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+      ]
+    },
+    { "id": "cifras_habituales", "etiqueta": "Cifras habituales (si las sabe)", "tipo": "texto" }
+  ]
+}

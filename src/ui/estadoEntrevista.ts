@@ -79,6 +79,7 @@ export interface HabitosUi {
 }
 
 import type { EntradaHemstop } from '../dominio/escalas/hemstop.ts';
+import type { RespuestasModulos } from '../datos/modulos.ts';
 
 /** Cribado por aparatos del paso 7 (R3.2.21–R3.2.23). */
 export interface CribadoUi {
@@ -86,6 +87,8 @@ export interface CribadoUi {
   ningunaConocida: boolean;
   /** Enfermedades marcadas (ids del catálogo por aparatos). */
   enfermedades: string[];
+  /** Respuestas de los módulos de patología desplegados (moduloId → respuestas). */
+  respuestasModulos: RespuestasModulos;
   /** HEMSTOP, que se hace siempre (R3.2.23). */
   hemstop: EntradaHemstop;
 }
@@ -95,7 +98,10 @@ export interface FarmacoTomadoUi {
   idFarmaco: string;
   nombreComercial: string;
   principiosActivos: string[];
+  /** id de regla principal (primero del catálogo). */
   idRegla: string;
+  /** Todos los id_regla del catálogo (para combinaciones fijas, §8.0). */
+  idReglas: string[];
   grupo: string;
   subgrupo: string;
   pautaTipica: string;
@@ -179,6 +185,21 @@ export const PREGUNTAS_HEMSTOP: Array<{ id: keyof EntradaHemstop; etiqueta: stri
   { id: 'sangradoEnParto', etiqueta: '¿Sangrado anómalo en el parto?' },
   { id: 'familiaresTrastornoCoagulacion', etiqueta: '¿Familiares con trastorno de la coagulación?' },
 ];
+
+/**
+ * Mapeo casilla del paso 7 → módulo de patología que despliega (§5).
+ * Por defecto la casilla abre el módulo con su mismo id; aquí van las excepciones
+ * (varias casillas que comparten un mismo módulo).
+ */
+export const MODULO_DE_ENFERMEDAD: Record<string, string> = {
+  stent_o_infarto: 'cardiopatia_isquemica',
+  protesis_mecanica: 'valvulopatia',
+};
+
+/** id del módulo que despliega una casilla del paso 7. */
+export function moduloDeEnfermedad(idEnfermedad: string): string {
+  return MODULO_DE_ENFERMEDAD[idEnfermedad] ?? idEnfermedad;
+}
 
 /** Cribado por aparatos (R3.2.21). Los ids que empiezan por una enfermedad de
  *  §5b.2 permiten al asistente de coherencia detectar tratamientos ausentes. */

@@ -1,0 +1,31 @@
+{
+  "id": "saos",
+  "titulo": "Apnea del sueño (SAOS)",
+  "fuente": "docs/documento_fuente.md §5.2, §6.3",
+  "preguntas": [
+    {
+      "id": "diagnosticado",
+      "etiqueta": "¿Tiene diagnóstico confirmado de apnea del sueño?",
+      "tipo": "boolean",
+      "porque": "Con diagnóstico confirmado no hace falta calcular STOP-Bang; sin diagnóstico, se calcula."
+    },
+    {
+      "id": "cpap",
+      "etiqueta": "¿Usa CPAP o BiPAP?",
+      "tipo": "boolean",
+      "visibleSi": { "pregunta": "diagnosticado", "igual": true }
+    },
+    {
+      "id": "cumplimiento",
+      "etiqueta": "¿La usa la mayoría de las noches?",
+      "tipo": "boolean",
+      "visibleSi": { "pregunta": "cpap", "igual": true }
+    },
+    {
+      "id": "presion",
+      "etiqueta": "Presión de la CPAP (si la sabe)",
+      "tipo": "texto",
+      "visibleSi": { "pregunta": "cpap", "igual": true }
+    }
+  ]
+}

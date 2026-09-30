@@ -1,0 +1,20 @@
+{
+  "id": "trasplante",
+  "titulo": "Trasplante de órgano",
+  "fuente": "docs/documento_fuente.md §5b, §8.8",
+  "preguntas": [
+    {
+      "id": "organo",
+      "etiqueta": "Órgano trasplantado",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "renal", "etiqueta": "Riñón" },
+        { "valor": "hepatico", "etiqueta": "Hígado" },
+        { "valor": "cardiaco", "etiqueta": "Corazón" },
+        { "valor": "pulmonar", "etiqueta": "Pulmón" },
+        { "valor": "otro", "etiqueta": "Otro" }
+      ]
+    },
+    { "id": "fecha", "etiqueta": "Año del trasplante", "tipo": "texto" }
+  ]
+}

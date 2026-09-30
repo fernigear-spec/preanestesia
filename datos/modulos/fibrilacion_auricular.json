@@ -1,0 +1,31 @@
+{
+  "id": "fibrilacion_auricular",
+  "titulo": "Fibrilación auricular / arritmia",
+  "fuente": "docs/documento_fuente.md §5.1, §6.5",
+  "preguntas": [
+    {
+      "id": "tipo",
+      "etiqueta": "Tipo de arritmia",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "fa_paroxistica", "etiqueta": "Fibrilación auricular paroxística" },
+        { "valor": "fa_persistente", "etiqueta": "Fibrilación auricular persistente" },
+        { "valor": "fa_permanente", "etiqueta": "Fibrilación auricular permanente" },
+        { "valor": "flutter", "etiqueta": "Flutter auricular" },
+        { "valor": "otra", "etiqueta": "Otra arritmia" }
+      ]
+    },
+    {
+      "id": "ictus_ait_previo",
+      "etiqueta": "¿Ha tenido un ictus, un AIT o una embolia?",
+      "tipo": "boolean",
+      "porque": "Un ictus/AIT reciente (menos de 3 meses) con FA es criterio de alto riesgo y puede requerir terapia puente."
+    },
+    {
+      "id": "ictus_ait_fecha",
+      "etiqueta": "Fecha del ictus/AIT/embolia",
+      "tipo": "fecha",
+      "visibleSi": { "pregunta": "ictus_ait_previo", "igual": true }
+    }
+  ]
+}

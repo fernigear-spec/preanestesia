@@ -1,0 +1,9 @@
+{
+  "id": "epilepsia",
+  "titulo": "Epilepsia",
+  "fuente": "docs/documento_fuente.md §5.6",
+  "preguntas": [
+    { "id": "tipo", "etiqueta": "Tipo de crisis", "tipo": "texto" },
+    { "id": "ultima_crisis", "etiqueta": "Fecha de la última crisis", "tipo": "fecha" }
+  ]
+}

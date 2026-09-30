@@ -1,0 +1,26 @@
+{
+  "id": "enfermedad_inflamatoria_intestinal",
+  "titulo": "Enfermedad inflamatoria intestinal",
+  "fuente": "docs/documento_fuente.md §5b, §8.8",
+  "preguntas": [
+    {
+      "id": "tipo",
+      "etiqueta": "Tipo",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "crohn", "etiqueta": "Enfermedad de Crohn" },
+        { "valor": "colitis_ulcerosa", "etiqueta": "Colitis ulcerosa" }
+      ]
+    },
+    {
+      "id": "indicacion_inmunosupresor",
+      "etiqueta": "Si toma inmunosupresores, ¿es por enfermedad autoinmune o sistémica grave?",
+      "tipo": "opcion",
+      "porque": "La suspensión de los inmunosupresores clásicos depende de la indicación.",
+      "opciones": [
+        { "valor": "autoinmune", "etiqueta": "Enfermedad autoinmune" },
+        { "valor": "enfermedad_sistemica_grave", "etiqueta": "Enfermedad sistémica grave" }
+      ]
+    }
+  ]
+}

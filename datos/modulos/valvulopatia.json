@@ -1,0 +1,63 @@
+{
+  "id": "valvulopatia",
+  "titulo": "Valvulopatía / prótesis valvular",
+  "fuente": "docs/documento_fuente.md §5.1",
+  "preguntas": [
+    {
+      "id": "valvula",
+      "etiqueta": "¿Qué válvula está afectada?",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "aortica", "etiqueta": "Aórtica" },
+        { "valor": "mitral", "etiqueta": "Mitral" },
+        { "valor": "tricuspide", "etiqueta": "Tricúspide" },
+        { "valor": "pulmonar", "etiqueta": "Pulmonar" },
+        { "valor": "varias", "etiqueta": "Varias" }
+      ]
+    },
+    {
+      "id": "gravedad",
+      "etiqueta": "Gravedad",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "leve", "etiqueta": "Leve" },
+        { "valor": "moderada", "etiqueta": "Moderada" },
+        { "valor": "grave", "etiqueta": "Grave" },
+        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+      ]
+    },
+    {
+      "id": "protesis",
+      "etiqueta": "¿Lleva prótesis (válvula artificial)?",
+      "tipo": "opcion",
+      "porque": "Una prótesis mecánica obliga a coordinar la anticoagulación y puede requerir terapia puente.",
+      "opciones": [
+        { "valor": "no", "etiqueta": "No" },
+        { "valor": "mecanica", "etiqueta": "Sí, mecánica" },
+        { "valor": "biologica", "etiqueta": "Sí, biológica" }
+      ]
+    },
+    {
+      "id": "protesis_posicion",
+      "etiqueta": "Posición de la prótesis",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "aortica", "etiqueta": "Aórtica" },
+        { "valor": "mitral", "etiqueta": "Mitral" },
+        { "valor": "tricuspide", "etiqueta": "Tricúspide" }
+      ],
+      "visibleSi": { "pregunta": "protesis", "enLista": ["mecanica", "biologica"] }
+    },
+    {
+      "id": "ecocardiograma_fecha",
+      "etiqueta": "Fecha del último ecocardiograma",
+      "tipo": "fecha",
+      "porque": "Si no hay ecocardiograma en los últimos 12 meses o hay síntomas nuevos, se solicita uno."
+    },
+    {
+      "id": "sintomas_nuevos",
+      "etiqueta": "¿Síntomas nuevos (más disnea, síncope o angina)?",
+      "tipo": "boolean"
+    }
+  ]
+}

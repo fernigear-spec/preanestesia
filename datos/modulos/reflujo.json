@@ -1,0 +1,23 @@
+{
+  "id": "reflujo",
+  "titulo": "Reflujo gastroesofágico",
+  "fuente": "docs/documento_fuente.md §5.9, §8.14",
+  "preguntas": [
+    {
+      "id": "gravedad",
+      "etiqueta": "¿Cómo es el reflujo?",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "leve", "etiqueta": "Leve u ocasional" },
+        { "valor": "grave", "etiqueta": "Grave / frecuente" }
+      ]
+    },
+    {
+      "id": "sintomatico_estos_dias",
+      "etiqueta": "¿Está con síntomas estos días?",
+      "tipo": "boolean",
+      "porque": "El reflujo grave sintomático el día de la cirugía es una alerta de estómago lleno."
+    },
+    { "id": "tratamiento", "etiqueta": "¿Toma tratamiento para el reflujo?", "tipo": "boolean" }
+  ]
+}

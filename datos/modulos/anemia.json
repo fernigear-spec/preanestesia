@@ -1,0 +1,29 @@
+{
+  "id": "anemia",
+  "titulo": "Anemia",
+  "fuente": "docs/documento_fuente.md §5.5",
+  "preguntas": [
+    {
+      "id": "hemoglobina",
+      "etiqueta": "Última hemoglobina",
+      "tipo": "numero",
+      "unidad": "g/dL",
+      "min": 3,
+      "max": 20,
+      "porque": "Una Hb < 13 g/dL antes de cirugía con sangrado previsible aconseja optimizar la anemia y pedir ferritina."
+    },
+    { "id": "hemoglobina_fecha", "etiqueta": "Fecha de esa hemoglobina", "tipo": "fecha" },
+    { "id": "ferropenia", "etiqueta": "¿Ferropenia (falta de hierro) conocida?", "tipo": "boolean" },
+    { "id": "sangrado_reciente", "etiqueta": "¿Sangrado reciente?", "tipo": "boolean" },
+    {
+      "id": "sintomas",
+      "etiqueta": "Síntomas",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        { "valor": "astenia", "etiqueta": "Cansancio" },
+        { "valor": "disnea", "etiqueta": "Falta de aire" },
+        { "valor": "palidez", "etiqueta": "Palidez" }
+      ]
+    }
+  ]
+}

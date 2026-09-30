@@ -6,7 +6,10 @@
  */
 import { useState } from 'react';
 import { calcularHemstop, type EntradaHemstop } from '../../dominio/escalas/hemstop.ts';
-import { APARATOS, PREGUNTAS_HEMSTOP, HEMSTOP_VACIO, type CribadoUi } from '../estadoEntrevista.ts';
+import { APARATOS, PREGUNTAS_HEMSTOP, HEMSTOP_VACIO, moduloDeEnfermedad, type CribadoUi } from '../estadoEntrevista.ts';
+import { MODULO_POR_ID } from '../../datos/modulosDatos.ts';
+import { RenderizadorModulo } from '../modulos/RenderizadorModulo.tsx';
+import type { RespuestasModulos, ValorRespuesta } from '../../datos/modulos.ts';
 
 interface Props {
   inicial: CribadoUi | null;
@@ -17,9 +20,22 @@ interface Props {
 export function PasoCribado({ inicial, onContinuar, onVolver }: Props) {
   const [ninguna, setNinguna] = useState(inicial?.ningunaConocida ?? false);
   const [enfermedades, setEnfermedades] = useState<Set<string>>(new Set(inicial?.enfermedades ?? []));
+  const [respuestasModulos, setRespuestasModulos] = useState<RespuestasModulos>(inicial?.respuestasModulos ?? {});
   const [hemstop, setHemstop] = useState<EntradaHemstop>(inicial?.hemstop ?? { ...HEMSTOP_VACIO });
 
   const resHemstop = calcularHemstop(hemstop);
+
+  // Módulos a desplegar: uno por cada casilla marcada que tenga módulo (sin repetir).
+  const modulosActivos = [...new Set([...enfermedades].map(moduloDeEnfermedad))]
+    .map((idModulo) => MODULO_POR_ID[idModulo])
+    .filter((m): m is NonNullable<typeof m> => m !== undefined);
+
+  function cambiarRespuesta(idModulo: string, idPregunta: string, valor: ValorRespuesta) {
+    setRespuestasModulos((prev) => ({
+      ...prev,
+      [idModulo]: { ...(prev[idModulo] ?? {}), [idPregunta]: valor },
+    }));
+  }
 
   function alternar(id: string) {
     setEnfermedades((prev) => {
@@ -40,9 +56,16 @@ export function PasoCribado({ inicial, onContinuar, onVolver }: Props) {
 
   // Se puede continuar siempre (el HEMSTOP se recoge aquí y el cribado admite «ninguna»).
   function continuar() {
+    // Conserva solo las respuestas de módulos aún activos.
+    const idsActivos = new Set(modulosActivos.map((m) => m.id));
+    const respuestasFiltradas: RespuestasModulos = {};
+    for (const [idModulo, resp] of Object.entries(respuestasModulos)) {
+      if (idsActivos.has(idModulo)) respuestasFiltradas[idModulo] = resp;
+    }
     onContinuar({
       ningunaConocida: ninguna && enfermedades.size === 0,
       enfermedades: [...enfermedades],
+      respuestasModulos: respuestasFiltradas,
       hemstop,
     });
   }
@@ -70,6 +93,20 @@ export function PasoCribado({ inicial, onContinuar, onVolver }: Props) {
           </div>
         </fieldset>
       ))}
+
+      {modulosActivos.length > 0 && (
+        <div className="modulos-desplegados">
+          <h3>Preguntas de las enfermedades marcadas</h3>
+          {modulosActivos.map((m) => (
+            <RenderizadorModulo
+              key={m.id}
+              modulo={m}
+              respuestas={respuestasModulos[m.id] ?? {}}
+              onCambio={(idPregunta, valor) => cambiarRespuesta(m.id, idPregunta, valor)}
+            />
+          ))}
+        </div>
+      )}
 
       <h3>Cuestionario de sangrado (HEMSTOP)</h3>
       <p>Se hace a todos los pacientes, marque o no marque enfermedades de la sangre.</p>

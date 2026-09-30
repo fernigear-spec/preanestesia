@@ -1,0 +1,35 @@
+{
+  "id": "artritis_reumatoide",
+  "titulo": "Artritis reumatoide u otra enfermedad autoinmune",
+  "fuente": "docs/documento_fuente.md §5.8, §8.8",
+  "preguntas": [
+    {
+      "id": "enfermedad",
+      "etiqueta": "¿Qué enfermedad?",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "artritis_reumatoide", "etiqueta": "Artritis reumatoide" },
+        { "valor": "espondilitis", "etiqueta": "Espondilitis anquilosante" },
+        { "valor": "lupus", "etiqueta": "Lupus u otra conectivopatía" },
+        { "valor": "otra", "etiqueta": "Otra" }
+      ]
+    },
+    {
+      "id": "afectacion_cervical",
+      "etiqueta": "¿Afectación o limitación del cuello?",
+      "tipo": "boolean",
+      "porque": "La afectación cervical en artritis/espondilitis puede dificultar la intubación (alerta de vía aérea)."
+    },
+    {
+      "id": "indicacion_inmunosupresor",
+      "etiqueta": "Si toma inmunosupresores, ¿es por trasplante, enfermedad sistémica grave o autoinmune?",
+      "tipo": "opcion",
+      "porque": "La suspensión de los inmunosupresores clásicos depende de la indicación.",
+      "opciones": [
+        { "valor": "autoinmune", "etiqueta": "Enfermedad autoinmune" },
+        { "valor": "enfermedad_sistemica_grave", "etiqueta": "Enfermedad sistémica grave" },
+        { "valor": "trasplante", "etiqueta": "Trasplante" }
+      ]
+    }
+  ]
+}

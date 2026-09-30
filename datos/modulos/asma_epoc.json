@@ -1,0 +1,53 @@
+{
+  "id": "asma_epoc",
+  "titulo": "Asma o EPOC",
+  "fuente": "docs/documento_fuente.md §5.2",
+  "preguntas": [
+    {
+      "id": "enfermedad",
+      "etiqueta": "¿Qué enfermedad respiratoria tiene?",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "asma", "etiqueta": "Asma" },
+        { "valor": "epoc", "etiqueta": "EPOC" },
+        { "valor": "ambas", "etiqueta": "Ambas" }
+      ]
+    },
+    {
+      "id": "crisis_ultimo_mes",
+      "etiqueta": "¿Crisis o agudización en el último mes?",
+      "tipo": "boolean",
+      "porque": "Una agudización reciente puede aconsejar posponer la cirugía programada."
+    },
+    {
+      "id": "ingresos_ultimo_anio",
+      "etiqueta": "¿Ingresos o ciclos de corticoides orales en el último año?",
+      "tipo": "boolean"
+    },
+    {
+      "id": "mmrc",
+      "etiqueta": "Disnea (escala mMRC), si es EPOC",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "0", "etiqueta": "0 — solo con ejercicio intenso" },
+        { "valor": "1", "etiqueta": "1 — al andar deprisa o subir cuesta" },
+        { "valor": "2", "etiqueta": "2 — anda más despacio que otros de su edad" },
+        { "valor": "3", "etiqueta": "3 — para a los 100 m o pocos minutos" },
+        { "valor": "4", "etiqueta": "4 — no sale de casa / al vestirse" }
+      ],
+      "visibleSi": { "pregunta": "enfermedad", "enLista": ["epoc", "ambas"] }
+    },
+    {
+      "id": "oxigeno_domiciliario",
+      "etiqueta": "¿Usa oxígeno en casa?",
+      "tipo": "boolean",
+      "porque": "La oxigenoterapia domiciliaria sube la clase de riesgo del paciente."
+    },
+    {
+      "id": "sintomas_respiratorios_nuevos",
+      "etiqueta": "¿Síntomas respiratorios nuevos o empeoramiento reciente de los habituales?",
+      "tipo": "boolean",
+      "porque": "Un cambio reciente es uno de los supuestos que indican pedir radiografía de tórax."
+    }
+  ]
+}

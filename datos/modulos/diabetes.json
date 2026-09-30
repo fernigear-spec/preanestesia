@@ -1,0 +1,58 @@
+{
+  "id": "diabetes",
+  "titulo": "Diabetes",
+  "fuente": "docs/documento_fuente.md §5.3, §8.5",
+  "preguntas": [
+    {
+      "id": "tipo",
+      "etiqueta": "Tipo de diabetes",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "tipo1", "etiqueta": "Tipo 1" },
+        { "valor": "tipo2", "etiqueta": "Tipo 2" },
+        { "valor": "otra", "etiqueta": "Otra / no lo sabe" }
+      ]
+    },
+    { "id": "anios_evolucion", "etiqueta": "Años de evolución", "tipo": "numero", "min": 0, "max": 90 },
+    {
+      "id": "hba1c",
+      "etiqueta": "HbA1c más reciente",
+      "tipo": "numero",
+      "unidad": "%",
+      "min": 4,
+      "max": 20,
+      "porque": "Una HbA1c > 8,5 % indica mal control y puede aconsejar optimizar antes de una cirugía programada."
+    },
+    { "id": "hba1c_fecha", "etiqueta": "Fecha de la HbA1c", "tipo": "fecha" },
+    {
+      "id": "complicaciones",
+      "etiqueta": "Complicaciones crónicas",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        { "valor": "cardiopatia", "etiqueta": "Cardiopatía isquémica" },
+        { "valor": "nefropatia", "etiqueta": "Nefropatía" },
+        { "valor": "pie_diabetico", "etiqueta": "Pie diabético" },
+        { "valor": "vasculopatia", "etiqueta": "Vasculopatía de extremidades" },
+        { "valor": "retinopatia", "etiqueta": "Retinopatía" }
+      ]
+    },
+    {
+      "id": "gastroparesia",
+      "etiqueta": "¿Síntomas de gastroparesia (náuseas/vómitos de comida sin digerir, saciedad precoz, distensión, glucemias erráticas)?",
+      "tipo": "boolean",
+      "porque": "La gastroparesia alarga el ayuno de sólidos y aconseja premedicación con metoclopramida."
+    },
+    { "id": "hipoglucemias", "etiqueta": "¿Hipoglucemias frecuentes?", "tipo": "boolean" },
+    {
+      "id": "bomba_o_sensor",
+      "etiqueta": "¿Lleva bomba de insulina o sensor de glucosa?",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "no", "etiqueta": "No" },
+        { "valor": "bomba", "etiqueta": "Bomba de insulina" },
+        { "valor": "sensor", "etiqueta": "Sensor" },
+        { "valor": "ambos", "etiqueta": "Bomba y sensor" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "hipotiroidismo",
+  "titulo": "Tiroides",
+  "fuente": "docs/documento_fuente.md §5.3",
+  "preguntas": [
+    {
+      "id": "tipo",
+      "etiqueta": "Tipo de problema tiroideo",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "hipotiroidismo", "etiqueta": "Hipotiroidismo" },
+        { "valor": "hipertiroidismo", "etiqueta": "Hipertiroidismo" }
+      ]
+    },
+    {
+      "id": "bocio_o_cirugia",
+      "etiqueta": "¿Tiene bocio grande o le han operado del tiroides?",
+      "tipo": "boolean",
+      "porque": "El bocio grande o la cirugía tiroidea previa pueden dificultar la vía aérea (señal de alerta)."
+    },
+    { "id": "ultimo_control", "etiqueta": "Fecha del último control", "tipo": "fecha" }
+  ]
+}

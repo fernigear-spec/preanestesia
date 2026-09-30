@@ -1,0 +1,27 @@
+{
+  "id": "anticoagulacion",
+  "titulo": "Anticoagulación / antiagregación",
+  "fuente": "docs/documento_fuente.md §5.5",
+  "preguntas": [
+    {
+      "id": "indicacion",
+      "etiqueta": "¿Por qué toma el anticoagulante/antiagregante?",
+      "tipo": "opcion",
+      "porque": "La indicación determina si hay alto riesgo trombótico y si se puede suspender sin más.",
+      "opciones": [
+        { "valor": "fibrilacion_auricular", "etiqueta": "Fibrilación auricular" },
+        { "valor": "protesis_valvular", "etiqueta": "Prótesis valvular" },
+        { "valor": "tromboembolismo_venoso", "etiqueta": "Trombosis venosa / embolia (TVP/TEP)" },
+        { "valor": "trombofilia", "etiqueta": "Trombofilia" },
+        { "valor": "stent_coronario", "etiqueta": "Stent coronario" },
+        { "valor": "otra", "etiqueta": "Otra / no lo sabe" }
+      ]
+    },
+    {
+      "id": "tev_fecha",
+      "etiqueta": "Fecha de la TVP/TEP (si esa es la indicación)",
+      "tipo": "fecha",
+      "visibleSi": { "pregunta": "indicacion", "igual": "tromboembolismo_venoso" }
+    }
+  ]
+}

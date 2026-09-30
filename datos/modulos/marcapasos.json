@@ -1,0 +1,35 @@
+{
+  "id": "marcapasos",
+  "titulo": "Marcapasos o DAI",
+  "fuente": "docs/documento_fuente.md §5.1",
+  "preguntas": [
+    {
+      "id": "tipo",
+      "etiqueta": "Tipo de dispositivo",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "marcapasos", "etiqueta": "Marcapasos" },
+        { "valor": "dai", "etiqueta": "Desfibrilador (DAI)" },
+        { "valor": "trc", "etiqueta": "Resincronizador (TRC)" }
+      ]
+    },
+    { "id": "motivo", "etiqueta": "Motivo de la implantación", "tipo": "texto" },
+    {
+      "id": "dependencia",
+      "etiqueta": "¿Es dependiente del marcapasos (si se conoce)?",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "si", "etiqueta": "Sí" },
+        { "valor": "no", "etiqueta": "No" },
+        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+      ]
+    },
+    {
+      "id": "ultima_revision",
+      "etiqueta": "Fecha de la última revisión del dispositivo",
+      "tipo": "fecha",
+      "porque": "El dispositivo debe revisarse antes de la cirugía; conviene saber cuándo fue la última revisión."
+    },
+    { "id": "hospital_seguimiento", "etiqueta": "Hospital donde le siguen el dispositivo", "tipo": "texto" }
+  ]
+}

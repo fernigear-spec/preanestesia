@@ -1,0 +1,60 @@
+{
+  "id": "enfermedad_renal",
+  "titulo": "Enfermedad renal crónica",
+  "fuente": "docs/documento_fuente.md §5.4, §6.7",
+  "preguntas": [
+    {
+      "id": "estadio",
+      "etiqueta": "Estadio o filtrado conocido",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" },
+        { "valor": "leve", "etiqueta": "Leve (filtrado > 60)" },
+        { "valor": "moderada", "etiqueta": "Moderada (filtrado 30-60)" },
+        { "valor": "grave", "etiqueta": "Grave (filtrado 15-30)" },
+        { "valor": "terminal", "etiqueta": "Terminal (filtrado < 15)" }
+      ]
+    },
+    {
+      "id": "creatinina",
+      "etiqueta": "Creatinina más reciente",
+      "tipo": "numero",
+      "unidad": "mg/dL",
+      "min": 0.2,
+      "max": 20,
+      "porque": "La creatinina permite calcular el aclaramiento, del que dependen los plazos de varios anticoagulantes."
+    },
+    {
+      "id": "creatinina_fecha",
+      "etiqueta": "Fecha de esa creatinina",
+      "tipo": "fecha"
+    },
+    {
+      "id": "dialisis",
+      "etiqueta": "¿Está en diálisis?",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "no", "etiqueta": "No" },
+        { "valor": "hemodialisis", "etiqueta": "Sí, hemodiálisis" },
+        { "valor": "peritoneal", "etiqueta": "Sí, diálisis peritoneal" }
+      ]
+    },
+    {
+      "id": "dialisis_dias",
+      "etiqueta": "Días de diálisis y brazo de la fístula",
+      "tipo": "texto",
+      "visibleSi": { "pregunta": "dialisis", "enLista": ["hemodialisis", "peritoneal"] }
+    },
+    {
+      "id": "trasplante_renal",
+      "etiqueta": "¿Tiene un trasplante renal?",
+      "tipo": "boolean"
+    },
+    {
+      "id": "proteinuria",
+      "etiqueta": "¿Tiene proteinuria o nefropatía conocida?",
+      "tipo": "boolean",
+      "porque": "La proteinuria/nefropatía hace que los IECA/ARA-II se mantengan el día de la cirugía."
+    }
+  ]
+}

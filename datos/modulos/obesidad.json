@@ -1,0 +1,13 @@
+{
+  "id": "obesidad",
+  "titulo": "Obesidad",
+  "fuente": "docs/documento_fuente.md §5.3",
+  "preguntas": [
+    {
+      "id": "comentario",
+      "etiqueta": "Observaciones (el IMC se calcula con el peso y la talla del paso 2)",
+      "tipo": "texto",
+      "porque": "El grado de obesidad se obtiene del IMC; un IMC ≥ 40 es una alerta y sube la clase de riesgo."
+    }
+  ]
+}

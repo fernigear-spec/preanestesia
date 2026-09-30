@@ -1,0 +1,53 @@
+{
+  "id": "insuficiencia_cardiaca",
+  "titulo": "Insuficiencia cardiaca",
+  "fuente": "docs/documento_fuente.md §5.1",
+  "preguntas": [
+    {
+      "id": "nyha",
+      "etiqueta": "Clase funcional (NYHA)",
+      "tipo": "opcion",
+      "porque": "La clase NYHA describe cuánto le limita el corazón y sube la clase de riesgo del paciente.",
+      "opciones": [
+        { "valor": "I", "etiqueta": "I — sin síntomas con la actividad normal" },
+        { "valor": "II", "etiqueta": "II — síntomas con esfuerzos moderados" },
+        { "valor": "III", "etiqueta": "III — síntomas con pequeños esfuerzos" },
+        { "valor": "IV", "etiqueta": "IV — síntomas en reposo" }
+      ]
+    },
+    {
+      "id": "fevi",
+      "etiqueta": "Fracción de eyección (FEVI), si se conoce",
+      "tipo": "numero",
+      "unidad": "%",
+      "min": 5,
+      "max": 85,
+      "porque": "Una FEVI reducida (≤ 40 %) hace que los IECA/ARA-II se mantengan el día de la cirugía."
+    },
+    {
+      "id": "disfuncion_sistolica",
+      "etiqueta": "¿Le han dicho que tiene el corazón «débil» o con la función disminuida (disfunción sistólica)?",
+      "tipo": "boolean"
+    },
+    {
+      "id": "ultimo_ingreso",
+      "etiqueta": "Fecha del último ingreso por insuficiencia cardiaca",
+      "tipo": "fecha"
+    },
+    {
+      "id": "ortopnea",
+      "etiqueta": "¿Necesita dormir incorporado o con varias almohadas (ortopnea)?",
+      "tipo": "boolean"
+    },
+    {
+      "id": "edemas",
+      "etiqueta": "¿Tiene hinchazón de piernas (edemas)?",
+      "tipo": "boolean"
+    },
+    {
+      "id": "ecocardiograma_fecha",
+      "etiqueta": "Fecha del último ecocardiograma",
+      "tipo": "fecha"
+    }
+  ]
+}

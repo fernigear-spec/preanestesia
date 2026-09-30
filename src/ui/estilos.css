@@ -437,3 +437,41 @@ body {
 .coherencia {
   margin-top: 18px;
 }
+
+/* Módulos de patología desplegados en el paso 7 */
+.modulos-desplegados {
+  margin-top: 18px;
+}
+.modulo-patologia {
+  border: 1px solid var(--color-borde, #d0d5dd);
+  border-radius: var(--radio);
+  padding: 12px 14px;
+  margin: 12px 0;
+}
+.modulo-patologia > legend {
+  font-weight: 600;
+  color: var(--color-principal);
+  padding: 0 6px;
+}
+.campo-modulo {
+  margin: 10px 0;
+}
+.grupo-si-no {
+  display: flex;
+  gap: 8px;
+}
+.modo-guiado {
+  margin-top: 4px;
+}
+.modo-guiado .boton-enlace {
+  font-size: 0.85rem;
+}
+.porque-texto {
+  margin: 4px 0 0;
+  font-size: 0.88rem;
+  color: #475467;
+  background: var(--color-principal-claro);
+  border-left: 3px solid var(--color-principal);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
