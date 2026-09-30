@@ -58,14 +58,11 @@ export interface OpcionesSap {
   usarAbreviaturas?: boolean;
   /** Modo solo ASCII. */
   soloAscii?: boolean;
-  /** Límite de caracteres (de config.json). */
-  limiteCaracteres?: number;
 }
 
 export interface ResultadoSap {
   texto: string;
   caracteres: number;
-  excedeLimite: boolean;
 }
 
 /**
@@ -91,11 +88,7 @@ export function generarSap(bloques: BloqueSap[], opciones: OpcionesSap = {}): Re
     texto = soloAscii(texto);
   }
 
-  const caracteres = texto.length;
-  const excedeLimite =
-    opciones.limiteCaracteres !== undefined && caracteres > opciones.limiteCaracteres;
-
-  return { texto, caracteres, excedeLimite };
+  return { texto, caracteres: texto.length };
 }
 
 // —————————————————— Política de negativos (§10.1) ——————————————————

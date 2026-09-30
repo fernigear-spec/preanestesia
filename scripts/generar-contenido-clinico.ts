@@ -41,7 +41,7 @@ const DESC_TIPO: Record<string, string> = {
   antiangiogenico: 'Antiangiogénico', mantener_condicional_oftalmo: 'Mantener (aviso oftálmico)', no_catalogado: 'No catalogado',
 };
 
-interface Config { version_contenido: string; fecha_revision_clinica: string; minutos_inactividad: number; edad_pediatrica_maxima: number; limite_caracteres_sap: number; dias_validez_qr_paciente: number; dias_validez_qr_paciente_sin_fecha: number; dias_validez_qr_anestesiologo: number; [k: string]: unknown; }
+interface Config { version_contenido: string; fecha_revision_clinica: string; minutos_inactividad: number; edad_pediatrica_maxima: number; dias_validez_qr_paciente: number; dias_validez_qr_paciente_sin_fecha: number; dias_validez_qr_anestesiologo: number; [k: string]: unknown; }
 interface Regla { descripcion?: string; tipo?: string; fuente?: string; [k: string]: unknown; }
 interface ReglasFarmacos { _meta: Record<string, string>; bloqueos_profundos: string[]; tablas_seth: Record<string, Record<string, unknown>>; reglas: Record<string, Regla>; }
 interface Opioides { _meta: Record<string, string>; factores: Record<string, number>; sin_conversion: string[]; }
@@ -93,7 +93,6 @@ p('| Parámetro | Valor |');
 p('| --- | --- |');
 p(`| Borrado por inactividad | ${config.minutos_inactividad} min |`);
 p(`| Edad pediátrica máxima | ${config.edad_pediatrica_maxima} años |`);
-p(`| Límite de caracteres del texto SAP | ${config.limite_caracteres_sap} |`);
 p(`| Validez del QR del paciente (con/sin fecha) | ${config.dias_validez_qr_paciente} / ${config.dias_validez_qr_paciente_sin_fecha} días |`);
 p();
 

@@ -74,13 +74,12 @@ describe('Generador SAP §10.1', () => {
     ]);
     expect(r.texto).toBe('línea 1\nlínea 2');
   });
-  it('aplica abreviaturas y detecta exceso de límite', () => {
+  it('aplica abreviaturas', () => {
     const r = generarSap(
       [{ clave: 'a', lineas: ['Hipertension arterial en tratamiento'] }],
-      { usarAbreviaturas: true, abreviaturas: { 'Hipertension arterial': 'HTA' }, limiteCaracteres: 10 },
+      { usarAbreviaturas: true, abreviaturas: { 'Hipertension arterial': 'HTA' } },
     );
     expect(r.texto).toContain('HTA');
-    expect(r.excedeLimite).toBeTrue();
   });
   it('negativos que se escriben (§10.1)', () => {
     const l = lineasNegativos({ alergiasConocidas: false, hipertermiaMalignaFamiliar: false, antecedentesFamiliaresAnestesicos: false, mtnd4Positivo: false, hemstopPositivo: false });

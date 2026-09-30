@@ -3,7 +3,6 @@
   "telefono_contacto": "000 000 000",
   "minutos_inactividad": 30,
   "edad_pediatrica_maxima": 17,
-  "limite_caracteres_sap": 2000,
   "dias_validez_qr_paciente": 30,
   "dias_validez_qr_paciente_sin_fecha": 90,
   "dias_validez_qr_anestesiologo": 60,

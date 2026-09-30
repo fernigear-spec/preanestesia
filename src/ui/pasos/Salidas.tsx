@@ -208,34 +208,24 @@ export function Salidas({ entrevista, modalidad }: Props) {
     for (const f of plan) if (f.resultado.textoAnestesiologo) notas.push(`${f.resultado.nombreComercial}: ${f.resultado.textoAnestesiologo}`);
     if (mt?.alerta?.gravedad === 'roja') notas.push('mtND4: seguir las medidas del consenso SEDAR (evitar halogenados/TIVA, regional preferente, monitorización de profundidad, etc.).');
 
-    // Confirmaciones (§12).
-    const confirmadoPor = [...new Set((medicacion ?? []).filter((f) => f.confirmadoPor).map((f) => f.confirmadoPor as string))];
-
     // Resumen de módulos (§5.16) para el SAP.
     const resumenModulos = [...enfermedades].map((id) => resumenModulo(id, respuestas)).filter((s): s is string => s !== null);
 
-    // SAP.
+    // SAP (§10.1): SOLO antecedentes patológicos y quirúrgicos (decisión del servicio).
     const fechaTxt = intervencion.fechaHora ? fechaCorta(intervencion.fechaHora) : 'sin fecha';
+    const antecedentesQuirurgicos = (antecedentes?.intervencionesPrevias ?? []).map((iq) => {
+      const partes = [iq.procedimiento];
+      if (iq.anio) partes.push(String(iq.anio));
+      partes.push(`anestesia ${iq.tipoAnestesia.replace(/_/g, ' ')}`);
+      if (iq.incidencias.length > 0) partes.push(`incidencias: ${iq.incidencias.join(', ')}`);
+      return partes.join(', ');
+    });
     const entradaSap: EntradaSap = {
       cabecera: `VALORACION PREANESTESICA ENFERMERIA ${fechaTxt} (${modalidad})`,
-      datos: `Edad ${basicos.edadAnios} a. Peso ${basicos.pesoKg} kg. Talla ${basicos.tallaCm} cm.${imc !== null ? ` IMC ${imc}.` : ''}`,
-      alergias: alergias ? (alergias.ningunaConocida ? 'Alergias: NAMC.' : `Alergias: ${alergias.medicamentos.map((m) => m.reaccion ? `${m.farmaco} (${m.reaccion})` : m.farmaco).join(', ') || 'ver detalle'}.`) : '',
-      habitos: habitos ? `Habitos: ${habitos.tabaco === 'nunca' ? 'no fumador' : habitos.tabaco === 'activo' ? 'fumador activo' : 'exfumador'}. AUDIT-C ${audit?.puntuacion ?? 0}.` : '',
       antecedentesPatologicos: resumenModulos,
-      iqPrevias: (antecedentes?.intervencionesPrevias ?? []).map((iq) => `${iq.procedimiento}${iq.anio ? ` ${iq.anio}` : ''}`),
-      antecedentesAnestesicos: (antecedentes?.intervencionesPrevias ?? []).some((iq) => iq.incidencias.length > 0) ? 'incidencias previas (ver detalle)' : 'sin incidencias',
-      negativos: { alergiasConocidas: !!alergias && !alergias.ningunaConocida, hipertermiaMalignaFamiliar: antecedentes?.familiaresHipertermiaMaligna ?? false, antecedentesFamiliaresAnestesicos: (antecedentes?.familiaresHipertermiaMaligna || antecedentes?.familiaresDeficitPseudocolinesterasa || antecedentes?.familiaresComplicacionesGraves) ?? false, mtnd4Positivo: mt?.alerta?.gravedad === 'roja', hemstopPositivo: hemstop.positivo },
-      capacidadFuncional: habitos ? `Capacidad funcional: ${habitos.subeDosPisos === 'si' ? '>4 METs' : 'DASI evaluado'}.` : '',
-      viaAerea: viaAerea ? `Via aerea: ${escalas.filter((s) => s.nombre.startsWith('EGRI') || s.nombre === 'Langeron').map((s) => `${s.nombre} ${s.valor}`).join('; ')}.` : '',
-      escalas: `Escalas: ${escalas.map((s) => `${s.nombre} ${s.valor}`).join('; ')}.`,
-      asa: `ASA sugerido ${'I'.repeat(asa.clase)}${asa.sufijoE ? 'E' : ''}${asa.modificadoManualmente ? ' (modificado)' : ''}.`,
-      tratamientoHabitual: (medicacion ?? []).length > 0 ? `Tto habitual: ${(medicacion ?? []).map((f) => f.nombreComercial).join(', ')}.` : '',
-      plan: plan.map((f) => `${f.resultado.nombreComercial}: ${f.resultado.accion}${f.resultado.fechaHoraUltimaToma ? ` (última ${fechaCorta(f.resultado.fechaHoraUltimaToma)})` : ''}`),
-      pruebas: `Pruebas: ${rp.pruebas.map((p) => p.prueba).join(', ') || 'ninguna'}.`,
-      consentimiento: consentimiento ? `Consentimiento: ${consentimiento.estado === 'entregado' ? `entregado${consentimiento.fecha ? ` ${consentimiento.fecha}` : ''}` : consentimiento.estado === 'pendiente_entregar' ? 'se entregará el día de la intervención' : 'no procede'}.` : '',
-      confirmadoPor,
+      antecedentesQuirurgicos,
     };
-    const sap = construirSap(entradaSap, { soloAscii, usarAbreviaturas: true, abreviaturas: plantillasSap.abreviaturas, limiteCaracteres: config.limite_caracteres_sap });
+    const sap = construirSap(entradaSap, { soloAscii, usarAbreviaturas: true, abreviaturas: plantillasSap.abreviaturas });
 
     return { asa, escalas, alertas, notas, plan, pruebas: rp.pruebas, claseRiesgo: rp.clase, ayuno, sap };
   }, [intervencion, basicos, cribado, medicacion, habitos, viaAerea, consentimiento, antecedentes, mtnd4, alergias, modalidad, soloAscii, asaManual]);
@@ -311,10 +301,8 @@ export function Salidas({ entrevista, modalidad }: Props) {
           <input type="checkbox" checked={soloAscii} onChange={() => setSoloAscii((v) => !v)} /> Solo ASCII (si SAP da problemas con tildes)
         </label>
       </div>
-      <textarea className="sap-texto" readOnly rows={16} value={salida.sap.texto} aria-label="Texto para SAP" />
-      <p className={salida.sap.excedeLimite ? 'aviso aviso-atencion' : ''}>
-        {salida.sap.caracteres} caracteres{salida.sap.excedeLimite ? ` · supera el límite de ${config.limite_caracteres_sap}` : ''}.
-      </p>
+      <textarea className="sap-texto" readOnly rows={10} value={salida.sap.texto} aria-label="Texto para SAP" />
+      <p className="horas-elegidas">{salida.sap.caracteres} caracteres. Solo antecedentes patológicos y quirúrgicos; el resto se rellena con los desplegables del SAP.</p>
       <div className="acciones">
         <button type="button" className="boton-secundario" onClick={copiarSap}>{copiado ? 'Copiado ✓' : 'Copiar'}</button>
       </div>

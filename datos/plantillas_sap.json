@@ -4,30 +4,12 @@
     "version_contenido": "0.1.0",
     "fecha_revision": "2026-09-30"
   },
-  "orden_bloques": [
-    "cabecera", "datos", "alergias", "habitos", "antecedentes_patologicos",
-    "iq_previas", "antecedentes_anestesicos", "capacidad_funcional", "via_aerea",
-    "escalas", "asa", "tratamiento_habitual", "plan", "pruebas", "consentimiento", "pendientes"
-  ],
+  "orden_bloques": ["cabecera", "antecedentes_patologicos", "antecedentes_quirurgicos"],
   "abreviaturas": {
     "hipertensión arterial": "HTA",
     "diabetes mellitus": "DM2",
     "fibrilación auricular": "FA",
     "anestesia general": "AG",
-    "marcapasos": "MP",
-    "apertura bucal": "AB",
-    "distancia tiromentoniana": "DTM",
-    "hipertermia maligna": "HM",
-    "no alergias medicamentosas conocidas": "NAMC",
-    "antecedentes personales": "AP",
-    "intervenciones quirúrgicas": "IQ",
-    "tratamiento": "tto"
-  },
-  "negativos": {
-    "namc": true,
-    "hm": true,
-    "familiares_anestesicos": true,
-    "mtnd4": true,
-    "hemstop": true
+    "cardiopatía isquémica": "cardiopatia isquemica"
   }
 }
