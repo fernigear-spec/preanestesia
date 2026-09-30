@@ -29,7 +29,7 @@ function ctx(aclaramiento: number | null, p: Partial<ContextoReglas> = {}): Cont
   return {
     fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio',
     grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false,
-    riesgoTromboticoAlto: false, regimen: 'ingreso', pesoKg: 80, aclaramiento, ...p,
+    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, regimen: 'ingreso', pesoKg: 80, aclaramiento, ...p,
   };
 }
 function farmaco(idRegla: string, p: Partial<DatosFarmacoUi> & { nombreComercial: string; principiosActivos: string[] }): DatosFarmacoUi {
@@ -111,7 +111,7 @@ describe('Hechos clínicos · derivación desde módulos', () => {
   it('espacio cerrado (neurocirugía intracraneal/medular) → AAS requiere confirmación', () => {
     const hechos = derivarHechosClinicos(entrada({ espacioCerrado: true }));
     expect(hechos.neurocirugiaIntracranealOMedular).toBeTrue();
-    const r = evaluarFarmacoUi(farmaco('aas', { nombreComercial: 'Adiro', principiosActivos: ['acido_acetilsalicilico'], dosisMg: 100 }), ctx(90), hechos);
+    const r = evaluarFarmacoUi(farmaco('aas', { nombreComercial: 'Adiro', principiosActivos: ['acido_acetilsalicilico'], dosisMg: 100 }), ctx(90, { espacioCerrado: true }), hechos);
     expect(r.requiereConfirmacion).toBeTrue();
   });
 

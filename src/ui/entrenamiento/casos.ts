@@ -61,6 +61,7 @@ function hidratar(c: CasoJson): CasoEntrenamiento {
         duracionMayor30min: procedimiento.duracionMayor30min,
         riesgoTromboticoAlto: procedimiento.riesgoTromboticoAlto,
         espacioCerrado: procedimiento.espacioCerrado,
+        retina: procedimiento.retina,
         contrasteYodado: c.intervencion.contrasteYodado,
         regimen: c.intervencion.regimen,
         caracter: c.intervencion.caracter,

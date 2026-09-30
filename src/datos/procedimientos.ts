@@ -21,6 +21,8 @@ export interface Procedimiento {
   riesgoTromboticoAlto: boolean;
   /** Cirugía en espacio cerrado: intracraneal o del canal medular (§8.3). */
   espacioCerrado: boolean;
+  /** Cirugía de retina (vitrectomía, desprendimiento, cerclaje escleral): muy alto riesgo de sangrado para el AAS (§8.3). */
+  retina: boolean;
   /** Procedimiento del embarazo (cesárea, cerclaje, legrado obstétrico…). */
   obstetrico: boolean;
 }
@@ -44,6 +46,7 @@ export function cargarProcedimientos(csvTexto: string = csvProcedimientos): Proc
       duracionMayor30min: si(v.duracion_mayor_30min),
       riesgoTromboticoAlto: si(v.riesgo_trombotico_alto),
       espacioCerrado: si(v.espacio_cerrado),
+      retina: si(v.retina),
       obstetrico: si(v.obstetrico),
     };
   });

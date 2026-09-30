@@ -12,32 +12,36 @@
     "intercostal"
   ],
   "tablas_seth": {
-    "_descripcion": "Umbrales SETH para clasificar la HBPM por dosis, pauta, peso y aclaramiento (docs/documento_fuente.md §8.4). Enoxaparina se clasifica por dosis/kg/día (la profilaxis puede intensificarse por peso y el tratamiento reducirse por aclaramiento < 30). El resto usa umbrales fijos por día. Si no encaja, la aplicación pregunta. Valores del protocolo del servicio; verificar antes del uso clínico.",
+    "_descripcion": "Tablas SETH del protocolo del servicio para clasificar la HBPM por dosis, pauta, peso y aclaramiento (docs/documento_fuente.md §8.4). Terapéutica si la dosis diaria por kg está dentro de ±20 % de la de tratamiento; profiláctica si coincide (±20 %) con la de profilaxis; si no encaja, se pregunta.",
     "enoxaparina": {
       "unidad": "mg",
       "profilaxis_max_por_kg_dia": 1,
       "tratamiento_min_por_kg_dia": 1.5,
       "tratamiento_min_por_kg_dia_crcl_lt30": 1
     },
-    "bemiparina": {
-      "unidad": "UI",
-      "profilaxis_max_dia": 3500,
-      "tratamiento_min_dia": 5000
-    },
     "tinzaparina": {
       "unidad": "UI",
-      "profilaxis_max_dia": 4500,
-      "tratamiento_min_dia": 10000
+      "profilaxis_dia_bandas": { "umbral_kg": 60, "hasta": 3500, "desde": 4500 },
+      "tratamiento_por_kg_dia": 175
+    },
+    "bemiparina": {
+      "unidad": "UI",
+      "profilaxis_dia": 3500,
+      "profilaxis_crcl_lt30_dia": 2500,
+      "tratamiento_por_kg_dia": 115,
+      "tratamiento_por_kg_dia_crcl_lt30": 85
     },
     "nadroparina": {
       "unidad": "UI",
-      "profilaxis_max_dia": 3800,
-      "tratamiento_min_dia": 5700
+      "profilaxis_dia": 2850,
+      "tratamiento_por_kg_dia": 172,
+      "tratamiento_crcl_lt30_contraindicado": true
     },
     "dalteparina": {
       "unidad": "UI",
-      "profilaxis_max_dia": 5000,
-      "tratamiento_min_dia": 10000
+      "profilaxis_dia": 5000,
+      "tratamiento_por_kg_dia": 200,
+      "tratamiento_crcl_lt30_confirmar": true
     }
   },
   "reglas": {

@@ -36,7 +36,7 @@ function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
   return {
     fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio',
     grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false,
-    riesgoTromboticoAlto: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null, ...p,
+    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null, ...p,
   };
 }
 const P = (...horas: string[]) => ({ horas });
@@ -161,22 +161,22 @@ describe('Punto 4 · B heparinas: despachador == regla directa', () => {
 describe('Punto 4 · C antiagregantes: despachador == regla directa', () => {
   it('C1 AAS 100 prevención secundaria', () => {
     const c = ctx();
-    const directo = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 100, indicacionCardiovascular: false, neurocirugiaIntracranealOMedular: false }, c);
+    const directo = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 100, indicacionCardiovascular: false }, c);
     expect(evaluarFarmacoUi(d('aas', { idFarmaco: 'aas', nombreComercial: 'Adiro', principiosActivos: ['acido_acetilsalicilico'], horas: ['09:00'], dosisMg: 100 }), c, clin())).toEqual(directo);
   });
-  it('C2 AAS 100 craneotomía', () => {
-    const c = ctx();
-    const directo = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 100, indicacionCardiovascular: false, neurocirugiaIntracranealOMedular: true }, c);
+  it('C2 AAS 100 craneotomía (espacio cerrado)', () => {
+    const c = ctx({ espacioCerrado: true });
+    const directo = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 100, indicacionCardiovascular: false }, c);
     expect(evaluarFarmacoUi(d('aas', { idFarmaco: 'aas', nombreComercial: 'Adiro', principiosActivos: ['acido_acetilsalicilico'], horas: ['09:00'], dosisMg: 100 }), c, clin({ neurocirugiaIntracranealOMedular: true }))).toEqual(directo);
   });
   it('C3 AAS 300 no cardiovascular', () => {
     const c = ctx({ pautaFarmaco: P('09:00') });
-    const directo = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300, indicacionCardiovascular: false, neurocirugiaIntracranealOMedular: false }, c);
+    const directo = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300, indicacionCardiovascular: false }, c);
     expect(evaluarFarmacoUi(d('aas', { idFarmaco: 'aas', nombreComercial: 'Adiro', principiosActivos: ['acido_acetilsalicilico'], horas: ['09:00'], dosisMg: 300 }), c, clin())).toEqual(directo);
   });
   it('C4 AAS 300 cardiovascular', () => {
     const c = ctx();
-    const directo = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300, indicacionCardiovascular: true, neurocirugiaIntracranealOMedular: false }, c);
+    const directo = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300, indicacionCardiovascular: true }, c);
     expect(evaluarFarmacoUi(d('aas', { idFarmaco: 'aas', nombreComercial: 'Adiro', principiosActivos: ['acido_acetilsalicilico'], horas: ['09:00'], dosisMg: 300, indicacionCardiovascular: true }), c, clin())).toEqual(directo);
   });
   it('C6 clopidogrel + AAS, stent por SCA 14 meses (portador de stent)', () => {

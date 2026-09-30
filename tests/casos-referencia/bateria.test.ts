@@ -43,7 +43,7 @@ function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
   return {
     fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio',
     grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false,
-    riesgoTromboticoAlto: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null, ...p,
+    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null, ...p,
   };
 }
 /** fecha/hora esperada de la última toma. */
@@ -168,16 +168,43 @@ describe('Casos C · antiagregantes', () => {
     expect(reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 100 }, ctx()).accion).toBe('mantener');
   });
   it('C2 AAS 100 mg craneotomía intracraneal: confirmación', () => {
-    expect(reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 100, neurocirugiaIntracranealOMedular: true }, ctx()).requiereConfirmacion).toBeTrue();
+    expect(reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 100 }, ctx({ espacioCerrado: true })).requiereConfirmacion).toBeTrue();
   });
-  it('C3 AAS 300 mg 09:00 no cardiovascular: 7 días, última mié 07/10 09:00', () => {
+  it('C3 AAS 300 mg no cardiovascular, colecistectomía (sin muy alto riesgo ni neuroaxial): mantener', () => {
     const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300 }, ctx({ pautaFarmaco: P('09:00') }));
-    expect(esFecha(r.fechaHoraUltimaToma, 2026, 9, 7, 9, 0)).toBeTrue();
+    expect(r.accion).toBe('mantener');
   });
-  it('C4 AAS 300 mg cardiovascular: confirmación + sugerencia 100 mg', () => {
+  it('C4 AAS 300 mg cardiovascular sin necesidad de suspender: mantener, sin confirmación', () => {
     const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300, indicacionCardiovascular: true }, ctx());
+    expect(r.accion).toBe('mantener');
+    expect(r.requiereConfirmacion).toBeFalse();
+  });
+  it('C3b AAS 300 mg no cardiovascular, prótesis de rodilla con raquídea: suspender 5 días (vie 09/10 09:00)', () => {
+    const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300 }, ctx({ neuroaxial: true, pautaFarmaco: P('09:00') }));
+    expect(r.accion).toBe('suspender');
+    expect(esFecha(r.fechaHoraUltimaToma, 2026, 9, 9, 9, 0)).toBeTrue();
+  });
+  it('C4b AAS 300 mg cardiovascular, craneotomía (espacio cerrado): confirmación + sugerencia 100 mg', () => {
+    const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300, indicacionCardiovascular: true }, ctx({ espacioCerrado: true }));
     expect(r.requiereConfirmacion).toBeTrue();
     expect(r.textoAnestesiologo).toContain('100 mg');
+  });
+  it('C4c AAS 300 mg no cardiovascular, vitrectomía (retina): suspender 5 días (vie 09/10 09:00)', () => {
+    const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300 }, ctx({ retina: true, pautaFarmaco: P('09:00') }));
+    expect(r.accion).toBe('suspender');
+    expect(esFecha(r.fechaHoraUltimaToma, 2026, 9, 9, 9, 0)).toBeTrue();
+  });
+  it('A14 apixabán, vitrectomía con AG (oftalmología moderada-alta = hemorrágico alto): 72 h, adelantar lun 12/10 08:00', () => {
+    const r = reglaAcod({ idFarmaco: 'apixaban', nombreComercial: 'Eliquis', principioActivo: 'apixaban', subtipo: 'antixa' }, ctx({ grupoOftalmologico: 'riesgo_moderado_alto', riesgoHemorragico: 'alto', aclaramiento: 70, pautaFarmaco: P('09:00', '21:00') }));
+    expect(esFecha(r.fechaHoraUltimaToma, 2026, 9, 12, 8, 0)).toBeTrue();
+  });
+  it('A15 apixabán, catarata tópica (oftalmología bajo): no suspender', () => {
+    const r = reglaAcod({ idFarmaco: 'apixaban', nombreComercial: 'Eliquis', principioActivo: 'apixaban', subtipo: 'antixa' }, ctx({ grupoOftalmologico: 'riesgo_bajo', aclaramiento: 70, pautaFarmaco: P('09:00', '21:00') }));
+    expect(r.accion).toBe('mantener');
+  });
+  it('A16 apixabán, catarata peribulbar (moderada-alta): 72 h, adelantar lun 12/10 08:00', () => {
+    const r = reglaAcod({ idFarmaco: 'apixaban', nombreComercial: 'Eliquis', principioActivo: 'apixaban', subtipo: 'antixa' }, ctx({ grupoOftalmologico: 'riesgo_moderado_alto', riesgoHemorragico: 'alto', aclaramiento: 70, pautaFarmaco: P('09:00', '21:00') }));
+    expect(esFecha(r.fechaHoraUltimaToma, 2026, 9, 12, 8, 0)).toBeTrue();
   });
   it('C5 stent farmacoactivo programado 4 meses: alerta roja, confirmación, sin pauta en hoja', () => {
     const s = evaluarStent({ mesesDesdeImplante: 4, traSca: false }, ctx());

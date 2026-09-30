@@ -15,7 +15,7 @@ function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
   return {
     fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio',
     grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false,
-    riesgoTromboticoAlto: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null,
+    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null,
     // Pauta a las 08:00: plazos en horas caen en el límite exacto; plazos en días,
     // última toma el día (N+1) a las 08:00. (Fechas exactas: docs/casos_referencia.)
     pautaFarmaco: { horas: ['08:00'] },
@@ -32,6 +32,24 @@ describe('Heparinas y fondaparinux (§8.4)', () => {
     expect(clasificarHbpm({ dosisPorToma: 70, tomasDia: 2, pesoKg: 70, aclaramiento: 80 }, enox)).toBe('terapeutica');
     // 1,2 mg/kg/día con función renal normal: entre profilaxis y tratamiento → preguntar.
     expect(clasificarHbpm({ dosisPorToma: 84, tomasDia: 1, pesoKg: 70, aclaramiento: 80 }, enox)).toBe('indeterminada');
+  });
+  it('clasifica profilaxis y tratamiento de tinzaparina, bemiparina, nadroparina y dalteparina (SETH)', () => {
+    const P70 = { pesoKg: 70, aclaramiento: 80 };
+    const tinzaparina = { unidad: 'UI' as const, profilaxis_dia_bandas: { umbral_kg: 60, hasta: 3500, desde: 4500 }, tratamiento_por_kg_dia: 175 };
+    expect(clasificarHbpm({ dosisPorToma: 4500, tomasDia: 1, ...P70 }, tinzaparina)).toBe('profilactica');
+    expect(clasificarHbpm({ dosisPorToma: 175 * 70, tomasDia: 1, ...P70 }, tinzaparina)).toBe('terapeutica');
+
+    const bemiparina = { unidad: 'UI' as const, profilaxis_dia: 3500, profilaxis_crcl_lt30_dia: 2500, tratamiento_por_kg_dia: 115, tratamiento_por_kg_dia_crcl_lt30: 85 };
+    expect(clasificarHbpm({ dosisPorToma: 3500, tomasDia: 1, ...P70 }, bemiparina)).toBe('profilactica');
+    expect(clasificarHbpm({ dosisPorToma: 115 * 70, tomasDia: 1, ...P70 }, bemiparina)).toBe('terapeutica');
+
+    const nadroparina = { unidad: 'UI' as const, profilaxis_dia: 2850, tratamiento_por_kg_dia: 172 };
+    expect(clasificarHbpm({ dosisPorToma: 2850, tomasDia: 1, ...P70 }, nadroparina)).toBe('profilactica');
+    expect(clasificarHbpm({ dosisPorToma: 86 * 70, tomasDia: 2, ...P70 }, nadroparina)).toBe('terapeutica');
+
+    const dalteparina = { unidad: 'UI' as const, profilaxis_dia: 5000, tratamiento_por_kg_dia: 200 };
+    expect(clasificarHbpm({ dosisPorToma: 5000, tomasDia: 1, ...P70 }, dalteparina)).toBe('profilactica');
+    expect(clasificarHbpm({ dosisPorToma: 100 * 70, tomasDia: 2, ...P70 }, dalteparina)).toBe('terapeutica');
   });
   it('HBPM profiláctica (dosis a las 20:00) → 12 h', () => {
     const r = reglaHbpm({ idFarmaco: 'enoxaparina', nombreComercial: 'Clexane', principio: 'enoxaparina', tipo: 'profilactica' }, ctx({ pautaFarmaco: { horas: ['20:00'] } }));
@@ -199,8 +217,8 @@ describe('Otros antiagregantes (§8.3)', () => {
 });
 
 describe('AAS > 200 mg con indicación cardiovascular (§8.3)', () => {
-  it('requiere confirmación + sugerencia de 100 mg', () => {
-    const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300, indicacionCardiovascular: true }, ctx());
+  it('debe suspenderse (espacio cerrado) con indicación cardiovascular: confirmación + sugerencia de 100 mg', () => {
+    const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300, indicacionCardiovascular: true }, ctx({ espacioCerrado: true }));
     expect(r.requiereConfirmacion).toBeTrue();
     expect(r.textoAnestesiologo).toContain('100 mg');
   });

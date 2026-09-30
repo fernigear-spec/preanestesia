@@ -158,7 +158,7 @@ function evaluarRegla(d: DatosFarmacoUi, ctxPauta: ContextoReglas, clin: DatosCl
       return reglaAvk({ idFarmaco: id, nombreComercial: nc, principio: 'warfarina', altoRiesgoTromboembolico: clin.altoRiesgoTrombotico, portadorValvulaMecanicaOStent: valvulaOStent }, ctxPauta).farmaco;
 
     case 'aas':
-      return reglaAas({ idFarmaco: id, nombreComercial: nc, dosisDiariaMg: d.dosisMg ?? 100, indicacionCardiovascular: d.indicacionCardiovascular === true, neurocirugiaIntracranealOMedular: clin.neurocirugiaIntracranealOMedular }, ctxPauta);
+      return reglaAas({ idFarmaco: id, nombreComercial: nc, dosisDiariaMg: d.dosisMg ?? 100, indicacionCardiovascular: d.indicacionCardiovascular === true }, ctxPauta);
     case 'p2y12_clopidogrel':
       return reglaP2y12({ idFarmaco: id, nombreComercial: nc, principio: 'clopidogrel', monoterapia: !clin.tieneAas, portadorStent }, ctxPauta);
     case 'p2y12_prasugrel':

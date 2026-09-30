@@ -116,6 +116,7 @@ export function reglaAvk(e: EntradaAvk, ctx: ContextoReglas): ResultadoAvk {
       textoPaciente: plazo.textoPaciente,
       reglaAplicada: `AVK ${e.principio}: suspender ${dias} días (INR < 1,5 el día de la intervención)`,
       requiereConfirmacion: false,
+      textoAnestesiologo: 'INR menor de 1,5 el día de la intervención; 1,4 o menos si hay técnica neuroaxial.',
     },
   };
 }

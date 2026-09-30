@@ -62,6 +62,8 @@ export interface DatosIntervencion {
   riesgoTromboticoAlto: boolean;
   /** Cirugía en espacio cerrado: intracraneal o del canal medular (§8.3, AAS). */
   espacioCerrado: boolean;
+  /** Cirugía de retina (muy alto riesgo de sangrado para el AAS, §8.3). */
+  retina: boolean;
   /** ¿Se prevé administrar contraste yodado? (afecta a la metformina, §8.5). */
   contrasteYodado: 'si' | 'no' | 'no_se_sabe';
   regimen: Regimen;
@@ -182,6 +184,10 @@ export interface ContextoReglas {
   /** true si hay bloqueo profundo previsto. */
   bloqueoProfundo: boolean;
   riesgoTromboticoAlto: boolean;
+  /** Cirugía en espacio cerrado (intracraneal/medular). */
+  espacioCerrado: boolean;
+  /** Cirugía de retina. */
+  retina: boolean;
   regimen: Regimen;
   pesoKg: number;
   /** Aclaramiento de creatinina (mL/min) o null si no se conoce (R6.7). */

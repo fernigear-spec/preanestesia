@@ -45,7 +45,7 @@ import type { ResultadoFarmaco } from '../src/dominio/tipos.ts';
 const IV = new Date(2026, 9, 15, 8, 0);
 const IV13 = new Date(2026, 9, 15, 13, 0);
 function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
-  return { fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio', grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false, riesgoTromboticoAlto: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null, ...p };
+  return { fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio', grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false, riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null, ...p };
 }
 const P = (...horas: string[]) => ({ horas });
 const DIAS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
@@ -280,16 +280,40 @@ function add(id: string, calculado: string, textoPaciente: string, _a?: string |
   add('C1', farmacoResumen(r), r.textoPaciente, 'mantener', r.accion === 'mantener');
 }
 {
-  const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 100, neurocirugiaIntracranealOMedular: true }, ctx());
+  const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 100 }, ctx({ espacioCerrado: true }));
   add('C2', farmacoResumen(r), r.textoPaciente, 'requiere confirmación', r.requiereConfirmacion);
 }
 {
   const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300 }, ctx({ pautaFarmaco: P('09:00') }));
-  add('C3', farmacoResumen(r), r.textoPaciente, '7 días; última mié 07/10 09:00', fh(r.fechaHoraUltimaToma) === 'mié 07/10 09:00');
+  add('C3', farmacoResumen(r), r.textoPaciente, 'mantener (colecistectomía no es de muy alto riesgo de sangrado y no hay neuroaxial)', r.accion === 'mantener');
 }
 {
   const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300, indicacionCardiovascular: true }, ctx());
-  add('C4', `${farmacoResumen(r)}; nota anestesiólogo: ${r.textoAnestesiologo ?? '—'}`, textoHojaPaciente(r));
+  add('C4', `${farmacoResumen(r)}; nota anestesiólogo: ${r.textoAnestesiologo ?? '—'}`, textoHojaPaciente(r), r.accion === 'mantener' && !r.requiereConfirmacion);
+}
+{
+  const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300 }, ctx({ neuroaxial: true, pautaFarmaco: P('09:00') }));
+  add('C3b', farmacoResumen(r), r.textoPaciente, 'suspender 5 días; última viernes 09/10 09:00', fh(r.fechaHoraUltimaToma) === 'vie 09/10 09:00');
+}
+{
+  const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300, indicacionCardiovascular: true }, ctx({ espacioCerrado: true }));
+  add('C4b', `${farmacoResumen(r)}; nota anestesiólogo: ${r.textoAnestesiologo ?? '—'}`, r.textoPaciente, 'requiere confirmación; pasar a 100 mg/día', r.requiereConfirmacion && (r.textoAnestesiologo ?? '').includes('100 mg'));
+}
+{
+  const r = reglaAas({ idFarmaco: 'aas', nombreComercial: 'Adiro', dosisDiariaMg: 300 }, ctx({ retina: true, pautaFarmaco: P('09:00') }));
+  add('C4c', farmacoResumen(r), r.textoPaciente, 'suspender 5 días; última viernes 09/10 09:00', fh(r.fechaHoraUltimaToma) === 'vie 09/10 09:00');
+}
+{
+  const r = reglaAcod({ idFarmaco: 'apixaban', nombreComercial: 'Eliquis', principioActivo: 'apixaban', subtipo: 'antixa' }, ctx({ grupoOftalmologico: 'riesgo_moderado_alto', riesgoHemorragico: 'alto', aclaramiento: 70, pautaFarmaco: P('09:00', '21:00') }));
+  add('A14', farmacoResumen(r), r.textoPaciente, 'oftalmología moderada-alta como hemorrágico alto: 72 h; adelantar lun 12/10 09:00→08:00', fh(r.fechaHoraUltimaToma) === 'lun 12/10 08:00');
+}
+{
+  const r = reglaAcod({ idFarmaco: 'apixaban', nombreComercial: 'Eliquis', principioActivo: 'apixaban', subtipo: 'antixa' }, ctx({ grupoOftalmologico: 'riesgo_bajo', aclaramiento: 70, pautaFarmaco: P('09:00', '21:00') }));
+  add('A15', farmacoResumen(r), r.textoPaciente, 'catarata tópica (oftalmología bajo): no suspender', r.accion === 'mantener');
+}
+{
+  const r = reglaAcod({ idFarmaco: 'apixaban', nombreComercial: 'Eliquis', principioActivo: 'apixaban', subtipo: 'antixa' }, ctx({ grupoOftalmologico: 'riesgo_moderado_alto', riesgoHemorragico: 'alto', aclaramiento: 70, pautaFarmaco: P('09:00', '21:00') }));
+  add('A16', farmacoResumen(r), r.textoPaciente, 'catarata peribulbar (moderada-alta): 72 h; adelantar lun 12/10 09:00→08:00', fh(r.fechaHoraUltimaToma) === 'lun 12/10 08:00');
 }
 {
   const s = evaluarStent({ mesesDesdeImplante: 4, traSca: false }, ctx());

@@ -19,10 +19,17 @@ export interface EntradaAas {
   dosisDiariaMg: number;
   /** Indicación cardiovascular (para la sugerencia de bajar a 100 mg). */
   indicacionCardiovascular?: boolean;
-  /** neurocirugía intracraneal o cirugía del canal medular. */
-  neurocirugiaIntracranealOMedular?: boolean;
 }
 
+/**
+ * AAS (§8.3, decisión del servicio):
+ *  - Muy alto riesgo de sangrado = espacio cerrado (neurocirugía/canal medular) o retina.
+ *  - Dosis ≤ 200 mg: se mantiene; en espacio cerrado requiere confirmación (en retina se
+ *    mantiene según el protocolo oftalmológico).
+ *  - Dosis > 200 mg: se mantiene por defecto; solo se suspende 5 días antes si hay muy
+ *    alto riesgo de sangrado o técnica neuroaxial. Si hay que suspenderlo y la indicación
+ *    es cardiovascular, requiere confirmación con la sugerencia de pasar a 100 mg/día.
+ */
 export function reglaAas(e: EntradaAas, ctx: ContextoReglas): ResultadoFarmaco {
   const base = {
     idFarmaco: e.idFarmaco,
@@ -30,15 +37,17 @@ export function reglaAas(e: EntradaAas, ctx: ContextoReglas): ResultadoFarmaco {
     principiosActivos: ['acido_acetilsalicilico'],
     fuente: FUENTE,
   };
+  const muyAltoSangrado = ctx.espacioCerrado || ctx.retina;
+  const debeSuspender = muyAltoSangrado || ctx.neuroaxial;
 
   if (e.dosisDiariaMg <= 200) {
-    if (e.neurocirugiaIntracranealOMedular) {
+    if (ctx.espacioCerrado) {
       return {
         ...base,
         accion: 'consultar',
         textoPaciente:
           'Sobre este medicamento, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta.',
-        reglaAplicada: 'AAS ≤ 200 mg en neurocirugía intracraneal/canal medular: requiere confirmación',
+        reglaAplicada: 'AAS ≤ 200 mg en cirugía de espacio cerrado: requiere confirmación',
         requiereConfirmacion: true,
       };
     }
@@ -51,28 +60,35 @@ export function reglaAas(e: EntradaAas, ctx: ContextoReglas): ResultadoFarmaco {
     };
   }
 
-  // AAS > 200 mg: suspender 7 días; indicación cardiovascular → confirmación.
-  // Indicación cardiovascular: requiere confirmación con la sugerencia de bajar a
-  // 100 mg/día. Esto prima sobre el cálculo del plazo (va a consultar igualmente).
+  // Dosis > 200 mg.
+  if (!debeSuspender) {
+    return {
+      ...base,
+      accion: 'mantener',
+      textoPaciente: TEXTO_MANTENER,
+      reglaAplicada: 'AAS > 200 mg/día: mantener (sin muy alto riesgo de sangrado ni técnica neuroaxial)',
+      requiereConfirmacion: false,
+    };
+  }
   if (e.indicacionCardiovascular) {
     return {
       ...base,
       accion: 'consultar',
       textoPaciente:
         'Sobre este medicamento, el anestesiólogo le confirmará qué hacer. No lo cambie por su cuenta.',
-      reglaAplicada: 'AAS > 200 mg/día con indicación cardiovascular: requiere confirmación',
+      reglaAplicada: 'AAS > 200 mg/día que debe suspenderse con indicación cardiovascular: requiere confirmación',
       requiereConfirmacion: true,
       textoAnestesiologo: 'Valorar pasar a 100 mg/día.',
     };
   }
-  const plazo = plazoDesdeDias(ctx, 7);
+  const plazo = plazoDesdeDias(ctx, 5);
   if (faltaHora(plazo)) return resultadoFaltaHora(base);
   return {
     ...base,
     accion: 'suspender',
     fechaHoraUltimaToma: plazo.fechaHoraUltimaToma,
     textoPaciente: plazo.textoPaciente,
-    reglaAplicada: 'AAS > 200 mg/día: suspender 7 días',
+    reglaAplicada: 'AAS > 200 mg/día con muy alto riesgo de sangrado o neuroaxial: suspender 5 días',
     requiereConfirmacion: false,
   };
 }

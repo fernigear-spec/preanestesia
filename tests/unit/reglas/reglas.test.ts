@@ -27,7 +27,7 @@ function ctx(parcial: Partial<ContextoReglas> = {}): ContextoReglas {
     grupoOftalmologico: 'no_aplica',
     neuroaxial: false,
     bloqueoProfundo: false,
-    riesgoTromboticoAlto: false,
+    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false,
     regimen: 'ingreso',
     pesoKg: 80,
     aclaramiento: null,

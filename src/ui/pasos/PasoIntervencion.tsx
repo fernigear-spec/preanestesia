@@ -95,6 +95,7 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
       duracionMayor30min: true,
       riesgoTromboticoAlto: false,
       espacioCerrado: false,
+      retina: false,
       obstetrico: false,
     };
     const datos: DatosIntervencion = {
@@ -109,6 +110,7 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
       duracionMayor30min: proc.duracionMayor30min,
       riesgoTromboticoAlto: proc.riesgoTromboticoAlto,
       espacioCerrado: proc.espacioCerrado,
+      retina: proc.retina,
       contrasteYodado,
       regimen,
       caracter,

@@ -6,7 +6,7 @@
 > Intervención de referencia: jueves 15/10/2026 a las 08:00 (salvo A2b y A3b: 13:00).
 > Leyenda: ✅ coincide (todos los datos del esperado están en la salida) · ❓ dudoso (falta algún dato) · 👁️ revisión manual (el esperado no tiene datos comprobables).
 
-**Resultado: 40 coinciden, 5 dudosos, 39 de revisión manual (de 84).**
+**Resultado: 43 coinciden, 6 dudosos, 41 de revisión manual (de 90).**
 
 | Caso | Motor (cálculo) | Texto del paciente | Esperado (literal de casos_referencia.md) | Veredicto | Datos no encontrados |
 |---|---|---|---|---|---|
@@ -32,8 +32,14 @@
 | B5 | acción: suspender; última toma: lun 12/10 08:00 | El lunes 12 de octubre, tome la dosis a las 08:00 en lugar de a las 09:00. Será la última. Después no vuelva a tomarlo hasta que se lo indiquen. | 72 h (aclaramiento < 50). Adelantar la dosis del lunes 12/10 de las 09:00 a las 08:00; ya no ponerse más. | ✅ | — |
 | C1 | acción: mantener; última toma: — | Siga tomándolo como siempre, también el día de la intervención, con un sorbo de agua. | mantener. | 👁️ | — |
 | C2 | acción: consultar; última toma: —; requiere confirmación | Sobre este medicamento, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta. | requiere confirmación. | 👁️ | — |
-| C3 | acción: suspender; última toma: mié 07/10 09:00 | Tome la última dosis el miércoles 7 de octubre a las 09:00. Después no vuelva a tomarlo hasta que se lo indiquen. | suspender 7 días. Última toma miércoles 07/10 09:00. | ✅ | — |
-| C4 | acción: consultar; última toma: —; requiere confirmación; nota anestesiólogo: Valorar pasar a 100 mg/día. | Sobre Adiro, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta. | requiere confirmación con la sugerencia de pasar a 100 mg/día. | ✅ | — |
+| C3 | acción: mantener; última toma: — | Siga tomándolo como siempre, también el día de la intervención, con un sorbo de agua. | mantener (dosis > 200 mg, pero la colecistectomía no es de muy alto riesgo de sangrado y no hay técnica neuroaxial). | ❓ | 200mg |
+| C4 | acción: mantener; última toma: —; nota anestesiólogo: — | Siga tomándolo como siempre, también el día de la intervención, con un sorbo de agua. | mantener, sin confirmación (no hay que suspenderlo). | 👁️ | — |
+| C3b | acción: suspender; última toma: vie 09/10 09:00 | Tome la última dosis el viernes 9 de octubre a las 09:00. Después no vuelva a tomarlo hasta que se lo indiquen. | suspender 5 días. Última toma viernes 09/10 a las 09:00. | ✅ | — |
+| C4b | acción: consultar; última toma: —; requiere confirmación; nota anestesiólogo: Valorar pasar a 100 mg/día. | Sobre este medicamento, el anestesiólogo le confirmará qué hacer. No lo cambie por su cuenta. | requiere confirmación, con la sugerencia de pasar a 100 mg/día. | ✅ | — |
+| C4c | acción: suspender; última toma: vie 09/10 09:00 | Tome la última dosis el viernes 9 de octubre a las 09:00. Después no vuelva a tomarlo hasta que se lo indiquen. | suspender 5 días. Última toma viernes 09/10 a las 09:00. | ✅ | — |
+| A14 | acción: suspender; última toma: lun 12/10 08:00 | El lunes 12 de octubre, tome la dosis a las 08:00 en lugar de a las 09:00. Será la última. Después no vuelva a tomarlo hasta que se lo indiquen. | oftalmología de riesgo moderado-alto tratada como riesgo hemorrágico alto: 72 h. Adelantar la toma del lunes 12/10 de las 09:00 a las 08:00; es la última. | ✅ | — |
+| A15 | acción: mantener; última toma: — | Siga tomándolo como siempre, también el día de la intervención, con un sorbo de agua. | no suspender. | 👁️ | — |
+| A16 | acción: suspender; última toma: lun 12/10 08:00 | El lunes 12 de octubre, tome la dosis a las 08:00 en lugar de a las 09:00. Será la última. Después no vuelva a tomarlo hasta que se lo indiquen. | 72 h. Adelantar la toma del lunes 12/10 de las 09:00 a las 08:00; es la última. | ✅ | — |
 | C5 | stent reciente: true; sin pauta en hoja: true; alerta: roja | (hoja del paciente sin pauta de antiagregantes) | alerta roja «valorar diferir». Requiere confirmación. Ninguna pauta de antiagregantes en la hoja del paciente. | 👁️ | — |
 | C6 | stent reciente: false; acción: consultar; última toma: vie 09/10 09:00; requiere confirmación | Sobre Plavix, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta. | no es reciente. Mantener AAS, clopidogrel 5 días (última toma viernes 09/10 09:00), pero requiere confirmación por ser portador de stent. | ✅ | — |
 | C7 | acción: consultar; última toma: mié 07/10 09:00; requiere confirmación; nota anestesiólogo: Valorar sustituir por AAS 100 mg/día durante la retirada. | SIN confirmar: "Sobre Plavix, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta." // CONFIRMADO: "Tome la última dosis el miércoles 7 de octubre a las 09:00. Después no vuelva a tomarlo hasta que se lo indiquen." | 7 días (neuroaxial). Última toma miércoles 07/10 09:00. Requiere confirmación con la sugerencia de AAS 100 mg durante la retirada. | ✅ | — |
@@ -68,7 +74,7 @@
 | E14 | acción: mantener; última toma: — | Siga tomándolo como siempre, también el día de la intervención, con un sorbo de agua. | mantener; no activa la regla de antiangiogénicos. | 👁️ | — |
 | E15 | acción: suspender; última toma: mié 30/09 09:00 | Deje de tomarlo 14 días antes si es posible (mínimo 7). Tome la última dosis el miércoles 30 de septiembre a las 09:00. Después no vuelva a tomarlo hasta que se lo indiquen. | suspender 14 días si es posible, mínimo 7. | 👁️ | — |
 | E16 | acción: consultar; última toma: —; requiere confirmación; sugammadex: Si durante la anestesia se usa sugammadex, tenga en cuenta que equivale a olvidar una toma de su anticonceptivo: siga las instrucciones de «dosis olvidada» de su prospecto. | Sobre su anticonceptivo, el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta. | requiere confirmación; en la hoja, «Sobre su anticonceptivo, el anestesiólogo le llamará…»; sugerencia de suspensión solo en las notas. Además, la advertencia de sugammadex para anticonceptivo oral. | 👁️ | — |
-| E17 | acción: mantener; última toma: —; sugammadex: barrera 7 días=true | No cambie nada: siga con su tratamiento como siempre. | sin la regla de riesgo trombótico. Advertencia de sugammadex para anticonceptivo no oral (barrera 7 días). | 👁️ | — |
+| E17 | acción: mantener; última toma: —; sugammadex: barrera 7 días=true | No tiene que hacer nada con su implante; siga como siempre. | sin la regla de riesgo trombótico. Advertencia de sugammadex para anticonceptivo no oral (barrera 7 días). | 👁️ | — |
 | F1 | STOP-Bang 6 (alto) | — | 6, riesgo alto, alerta. | 👁️ | — |
 | F2 | STOP-Bang 2 (bajo) | — | 2, riesgo bajo. | 👁️ | — |
 | F3 | Apfel 4 (80 %) | — | 4, 80 %. | 👁️ | — |

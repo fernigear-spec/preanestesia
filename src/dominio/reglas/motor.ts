@@ -44,14 +44,21 @@ export function construirContexto(
     throw new Error('construirContexto requiere fecha de intervención; sin fecha se usa el modo margen (§8.16).');
   }
 
+  // Oftalmología de riesgo moderado-alto se trata como riesgo hemorrágico alto para
+  // los anticoagulantes (decisión del servicio, §8.1-8.3).
+  const riesgoHemorragico =
+    intervencion.grupoOftalmologico === 'riesgo_moderado_alto' ? 'alto' : intervencion.riesgoHemorragico;
+
   const ctx: ContextoReglas = {
     fechaHoraIntervencion: intervencion.fechaHora,
-    riesgoHemorragico: intervencion.riesgoHemorragico,
+    riesgoHemorragico,
     riesgoCardiovascular: intervencion.riesgoCardiovascular,
     grupoOftalmologico: intervencion.grupoOftalmologico,
     neuroaxial,
     bloqueoProfundo,
     riesgoTromboticoAlto: intervencion.riesgoTromboticoAlto,
+    espacioCerrado: intervencion.espacioCerrado,
+    retina: intervencion.retina,
     regimen: intervencion.regimen,
     pesoKg,
     aclaramiento,

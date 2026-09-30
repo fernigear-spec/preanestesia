@@ -64,6 +64,15 @@ Esperado: alerta de TVP < 3 meses. Terapia puente con enoxaparina 70 mg cada 24 
 **A13.** Acenocumarol. Catarata con bloqueo retrobulbar.
 Esperado: oftalmología de riesgo moderado-alto. Suspender según el protocolo general (3 días), no «mantener».
 
+**A14.** Apixabán 5 mg a las 09:00 y 21:00, aclaramiento 70 mL/min. Vitrectomía con anestesia general.
+Esperado: oftalmología de riesgo moderado-alto tratada como riesgo hemorrágico alto: 72 h. Adelantar la toma del lunes 12/10 de las 09:00 a las 08:00; es la última.
+
+**A15.** Apixabán 5 mg a las 09:00 y 21:00. Catarata con anestesia tópica.
+Esperado: no suspender.
+
+**A16.** Apixabán 5 mg a las 09:00 y 21:00, aclaramiento 70 mL/min. Catarata con bloqueo peribulbar.
+Esperado: 72 h. Adelantar la toma del lunes 12/10 de las 09:00 a las 08:00; es la última.
+
 ## B. Heparinas y fondaparinux
 
 **B1.** Enoxaparina 40 mg a las 18:00, 70 kg, aclaramiento > 30 (profiláctica). Raquídea.
@@ -90,10 +99,19 @@ Esperado: mantener.
 Esperado: requiere confirmación.
 
 **C3.** AAS 300 mg a las 09:00, indicación no cardiovascular.
-Esperado: suspender 7 días. Última toma miércoles 07/10 09:00.
+Esperado: mantener (dosis > 200 mg, pero la colecistectomía no es de muy alto riesgo de sangrado y no hay técnica neuroaxial).
 
 **C4.** AAS 300 mg por indicación cardiovascular.
-Esperado: requiere confirmación con la sugerencia de pasar a 100 mg/día.
+Esperado: mantener, sin confirmación (no hay que suspenderlo).
+
+**C3b.** AAS 300 mg a las 09:00, indicación no cardiovascular. Prótesis de rodilla con raquídea.
+Esperado: suspender 5 días. Última toma viernes 09/10 a las 09:00.
+
+**C4b.** AAS 300 mg por indicación cardiovascular. Craneotomía por tumor.
+Esperado: requiere confirmación, con la sugerencia de pasar a 100 mg/día.
+
+**C4c.** AAS 300 mg a las 09:00, indicación no cardiovascular. Vitrectomía.
+Esperado: suspender 5 días. Última toma viernes 09/10 a las 09:00.
 
 **C5.** AAS + clopidogrel. Stent farmacoactivo programado hace 4 meses. Hernia inguinal.
 Esperado: alerta roja «valorar diferir». Requiere confirmación. Ninguna pauta de antiagregantes en la hoja del paciente.

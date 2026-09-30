@@ -27,16 +27,20 @@ export type TipoHbpm = 'profilactica' | 'terapeutica' | 'indeterminada';
  */
 export interface TablaSeth {
   unidad?: 'mg' | 'UI';
-  /** Techo de profilaxis en unidad/kg/día (dosis ajustada al peso). */
+  // Estilo umbral por kg (enoxaparina).
   profilaxis_max_por_kg_dia?: number;
-  /** Techo de profilaxis fijo en unidad/día. */
-  profilaxis_max_dia?: number;
-  /** Mínimo de tratamiento en unidad/kg/día. */
   tratamiento_min_por_kg_dia?: number;
-  /** Mínimo de tratamiento en unidad/kg/día con aclaramiento < 30 (dosis renal reducida). */
   tratamiento_min_por_kg_dia_crcl_lt30?: number;
-  /** Mínimo de tratamiento fijo en unidad/día. */
-  tratamiento_min_dia?: number;
+  // Profilaxis fija (unidad/día) del resto de heparinas.
+  profilaxis_dia?: number;
+  profilaxis_crcl_lt30_dia?: number;
+  /** Profilaxis por bandas de peso (≤ umbral_kg → hasta; > umbral_kg → desde). */
+  profilaxis_dia_bandas?: { umbral_kg: number; hasta: number; desde: number };
+  // Objetivo de tratamiento por kg/día (se clasifica dentro de ±20 %).
+  tratamiento_por_kg_dia?: number;
+  tratamiento_por_kg_dia_crcl_lt30?: number;
+  tratamiento_crcl_lt30_contraindicado?: boolean;
+  tratamiento_crcl_lt30_confirmar?: boolean;
 }
 
 /** Datos necesarios para clasificar una HBPM (§8.4): no basta la dosis. */
@@ -62,18 +66,26 @@ export function clasificarHbpm(e: EntradaClasificacionHbpm, tabla: TablaSeth): T
   const diaria = e.dosisPorToma * e.tomasDia;
   const porKgDia = e.pesoKg > 0 ? diaria / e.pesoKg : null;
   const renal = e.aclaramiento !== null && e.aclaramiento < 30;
+  const dentro20 = (valor: number, objetivo: number): boolean => objetivo > 0 && Math.abs(valor - objetivo) <= 0.2 * objetivo;
 
-  // Tratamiento (se comprueba primero: prima la dosis terapéutica).
+  // —— Tratamiento (prima la dosis terapéutica) ——
+  // Umbral por kg (enoxaparina).
   if (renal && tabla.tratamiento_min_por_kg_dia_crcl_lt30 !== undefined && porKgDia !== null
     && porKgDia >= tabla.tratamiento_min_por_kg_dia_crcl_lt30) return 'terapeutica';
   if (tabla.tratamiento_min_por_kg_dia !== undefined && porKgDia !== null
     && porKgDia >= tabla.tratamiento_min_por_kg_dia) return 'terapeutica';
-  if (tabla.tratamiento_min_dia !== undefined && diaria >= tabla.tratamiento_min_dia) return 'terapeutica';
+  // Objetivo por kg dentro de ±20 % (resto de heparinas).
+  const objTrat = renal ? (tabla.tratamiento_por_kg_dia_crcl_lt30 ?? tabla.tratamiento_por_kg_dia) : tabla.tratamiento_por_kg_dia;
+  if (objTrat !== undefined && porKgDia !== null && dentro20(porKgDia, objTrat)) return 'terapeutica';
 
-  // Profilaxis.
+  // —— Profilaxis ——
   if (tabla.profilaxis_max_por_kg_dia !== undefined && porKgDia !== null
     && porKgDia <= tabla.profilaxis_max_por_kg_dia) return 'profilactica';
-  if (tabla.profilaxis_max_dia !== undefined && diaria <= tabla.profilaxis_max_dia) return 'profilactica';
+  let objProf: number | undefined;
+  if (renal && tabla.profilaxis_crcl_lt30_dia !== undefined) objProf = tabla.profilaxis_crcl_lt30_dia;
+  else if (tabla.profilaxis_dia_bandas) objProf = e.pesoKg <= tabla.profilaxis_dia_bandas.umbral_kg ? tabla.profilaxis_dia_bandas.hasta : tabla.profilaxis_dia_bandas.desde;
+  else objProf = tabla.profilaxis_dia;
+  if (objProf !== undefined && dentro20(diaria, objProf)) return 'profilactica';
 
   return 'indeterminada';
 }
