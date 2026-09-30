@@ -32,7 +32,9 @@ export function renderMed(instr: InstruccionPacienteEstructurada, t: TextosPacie
     case 'mantener':
       return m[`mantener_${e.mv}` as 'mantener_oral'];
     case 'texto_fijo':
-      return e.tx;
+      // El texto libre solo existe en castellano; en catalán se usa el genérico
+      // (§10.2, punto 4: la vista en catalán no muestra castellano).
+      return t.idioma === 'ca' ? m.otro : e.tx;
     case 'no_dia_iq':
       return m.no_dia_iq;
     case 'margen':

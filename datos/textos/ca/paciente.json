@@ -51,6 +51,7 @@
     "suspender_normal": "Prengui l'última dosi el {fecha} a les {hora}. Després no torni a prendre'l fins que l'hi indiquin.",
     "suspender_adelantada": "El {fecha}, prengui la dosi a les {hora} en lloc de a les {horaOriginal}. Serà l'última. Després no torni a prendre'l fins que l'hi indiquin.",
     "no_dia_iq": "No el prengui el dia de la intervenció.",
+    "otro": "Segueixi les indicacions concretes que li han donat per a aquest medicament.",
     "margen_dias": "No el prengui els {n} dies anteriors a la intervenció ni aquell mateix dia.",
     "margen_horas": "L'última presa ha de ser com a mínim {n} hores abans de l'hora de la intervenció.",
     "coletilla_dias": " (com a mínim {n} dies abans de la intervenció)",

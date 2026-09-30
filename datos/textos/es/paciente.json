@@ -50,6 +50,7 @@
     "suspender_normal": "Tome la última dosis el {fecha} a las {hora}. Después no vuelva a tomarlo hasta que se lo indiquen.",
     "suspender_adelantada": "El {fecha}, tome la dosis a las {hora} en lugar de a las {horaOriginal}. Será la última. Después no vuelva a tomarlo hasta que se lo indiquen.",
     "no_dia_iq": "No lo tome el día de la intervención.",
+    "otro": "Siga las indicaciones concretas que le han dado para este medicamento.",
     "margen_dias": "No lo tome los {n} días anteriores a la intervención ni ese mismo día.",
     "margen_horas": "Su última toma debe ser como mínimo {n} horas antes de la hora de la intervención.",
     "coletilla_dias": " (como mínimo {n} días antes de la intervención)",
