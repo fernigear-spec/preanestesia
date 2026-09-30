@@ -15,13 +15,21 @@
         { "valor": "pancreas", "etiqueta": "Páncreas" },
         { "valor": "medula", "etiqueta": "Médula ósea" },
         { "valor": "otro", "etiqueta": "Otro" }
+      ],
+      "genera": [
+        { "cuando": "= corazón", "tipo": "nota", "efecto": "corazón denervado", "fuente": "§5.16.15" },
+        { "cuando": "= riñón", "tipo": "alerta", "gravedad": "amarilla", "efecto": "evitar AINE", "fuente": "§5.16.15" },
+        { "cuando": "= pulmón", "tipo": "nota", "efecto": "reflejo tusígeno abolido", "fuente": "§5.16.15" }
       ]
     },
     {
       "id": "fecha",
       "etiqueta": "Fecha del trasplante",
       "tipo": "fecha",
-      "porque": "Un trasplante de menos de 6 meses implica inmunosupresión intensa."
+      "porque": "Un trasplante de menos de 6 meses implica inmunosupresión intensa.",
+      "genera": [
+        { "cuando": "< 6 meses", "tipo": "alerta", "gravedad": "amarilla", "efecto": "trasplante reciente", "fuente": "§5.16.15" }
+      ]
     },
     { "id": "analitica_injerto_fecha", "etiqueta": "Fecha de la última analítica del injerto", "tipo": "fecha" },
     {
@@ -56,13 +64,19 @@
         { "valor": "si", "etiqueta": "Sí" },
         { "valor": "no", "etiqueta": "No" },
         { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+      ],
+      "genera": [
+        { "cuando": "= no (fuera de rango)", "tipo": "alerta", "gravedad": "amarilla", "efecto": "niveles de inmunosupresores fuera de rango", "fuente": "§5.16.15" }
       ]
     },
     {
       "id": "infeccion_activa",
       "etiqueta": "¿Fiebre, infección reciente o antibiótico/antifúngico actual?",
       "tipo": "boolean",
-      "porque": "Una infección activa en un paciente inmunodeprimido puede aconsejar posponer la cirugía programada."
+      "porque": "Una infección activa en un paciente inmunodeprimido puede aconsejar posponer la cirugía programada.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "infección activa en inmunodeprimido: valorar posponer", "fuente": "§5.16.15" }
+      ]
     },
     { "id": "profilaxis", "etiqueta": "Profilaxis antiinfecciosa (cotrimoxazol, antivirales…)", "tipo": "texto" },
     {

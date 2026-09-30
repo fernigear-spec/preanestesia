@@ -11,6 +11,10 @@
         { "valor": "asma", "etiqueta": "Asma" },
         { "valor": "epoc", "etiqueta": "EPOC" },
         { "valor": "ambas", "etiqueta": "Ambas" }
+      ],
+      "genera": [
+        { "cuando": "= EPOC o ambas", "tipo": "clase_riesgo", "efecto": "sube la clase de riesgo del paciente a moderada", "fuente": "§5.2" },
+        { "cuando": "= EPOC o ambas", "tipo": "asa", "efecto": "ASA mínimo 3", "fuente": "§5.2" }
       ]
     },
     { "id": "ultima_crisis_fecha", "etiqueta": "Fecha de la última crisis", "tipo": "fecha" },
@@ -18,12 +22,32 @@
       "id": "crisis_ultimo_mes",
       "etiqueta": "¿Crisis o agudización en el último mes?",
       "tipo": "boolean",
-      "porque": "Una agudización reciente puede aconsejar posponer la cirugía programada; la intubación puede desencadenar broncoespasmo si no está controlada."
+      "porque": "Una agudización reciente puede aconsejar posponer la cirugía programada; la intubación puede desencadenar broncoespasmo si no está controlada.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "asma no controlada", "fuente": "§5.16.3" }
+      ]
     },
     { "id": "urgencias_anio", "etiqueta": "Visitas a urgencias o ingresos por asma/EPOC en el último año", "tipo": "numero", "min": 0, "max": 50 },
     { "id": "corticoides_orales_anio", "etiqueta": "¿Corticoides orales en el último año?", "tipo": "boolean" },
-    { "id": "ingresos_ultimo_anio", "etiqueta": "¿Ingresos en el último año?", "tipo": "boolean" },
-    { "id": "rescate_semana", "etiqueta": "Uso del inhalador de rescate (veces por semana)", "tipo": "numero", "min": 0, "max": 100, "porque": "Usar el rescate más de 2 veces por semana indica que el asma no está bien controlada." },
+    {
+      "id": "ingresos_ultimo_anio",
+      "etiqueta": "¿Ingresos en el último año?",
+      "tipo": "boolean",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "asma no controlada", "fuente": "§5.16.3" }
+      ]
+    },
+    {
+      "id": "rescate_semana",
+      "etiqueta": "Uso del inhalador de rescate (veces por semana)",
+      "tipo": "numero",
+      "min": 0,
+      "max": 100,
+      "porque": "Usar el rescate más de 2 veces por semana indica que el asma no está bien controlada.",
+      "genera": [
+        { "cuando": "> 2 veces/semana", "tipo": "alerta", "gravedad": "amarilla", "efecto": "asma no controlada", "fuente": "§5.16.3" }
+      ]
+    },
     {
       "id": "desencadenantes",
       "etiqueta": "Desencadenantes de las crisis",
@@ -37,6 +61,9 @@
         { "valor": "ejercicio", "etiqueta": "Ejercicio" },
         { "valor": "aine_aspirina", "etiqueta": "AINE o aspirina" },
         { "valor": "otros", "etiqueta": "Otros" }
+      ],
+      "genera": [
+        { "cuando": "incluye AINE/aspirina", "tipo": "alerta", "gravedad": "roja", "efecto": "asma inducida por AINE: evitar AINE perioperatorios", "fuente": "§5.16.3" }
       ]
     },
     {
@@ -56,7 +83,10 @@
       "id": "oxigeno_domiciliario",
       "etiqueta": "¿Usa oxígeno en casa?",
       "tipo": "boolean",
-      "porque": "La oxigenoterapia domiciliaria sube la clase de riesgo del paciente."
+      "porque": "La oxigenoterapia domiciliaria sube la clase de riesgo del paciente.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "clase_riesgo", "efecto": "sube la clase de riesgo del paciente a alta", "fuente": "§5.2" }
+      ]
     },
     {
       "id": "oxigeno_tipo",
@@ -74,7 +104,11 @@
       "id": "sintomas_respiratorios_nuevos",
       "etiqueta": "¿Cambio reciente en el color o la cantidad del esputo, o síntomas respiratorios nuevos?",
       "tipo": "boolean",
-      "porque": "Un cambio reciente puede indicar infección activa y es uno de los supuestos que indican pedir radiografía de tórax."
+      "porque": "Un cambio reciente puede indicar infección activa y es uno de los supuestos que indican pedir radiografía de tórax.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "posible infección respiratoria activa: valorar posponer la cirugía programada", "fuente": "§5.16.4" },
+        { "cuando": "= sí", "tipo": "prueba", "efecto": "radiografía de tórax", "fuente": "§7.3" }
+      ]
     }
   ]
 }

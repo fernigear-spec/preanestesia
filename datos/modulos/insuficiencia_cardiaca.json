@@ -13,6 +13,10 @@
         { "valor": "II", "etiqueta": "II — síntomas con esfuerzos moderados" },
         { "valor": "III", "etiqueta": "III — síntomas con pequeños esfuerzos" },
         { "valor": "IV", "etiqueta": "IV — síntomas en reposo" }
+      ],
+      "genera": [
+        { "cuando": "= III o IV", "tipo": "clase_riesgo", "efecto": "sube la clase de riesgo del paciente a alta", "fuente": "§5.1" },
+        { "cuando": "= III o IV", "tipo": "asa", "efecto": "ASA mínimo 4", "fuente": "§5.1" }
       ]
     },
     {
@@ -22,12 +26,18 @@
       "unidad": "%",
       "min": 5,
       "max": 85,
-      "porque": "Una FEVI reducida (≤ 40 %) hace que los IECA/ARA-II se mantengan el día de la cirugía."
+      "porque": "Una FEVI reducida (≤ 40 %) hace que los IECA/ARA-II se mantengan el día de la cirugía.",
+      "genera": [
+        { "cuando": "≤ 40 %", "tipo": "regla", "efecto": "los IECA/ARA-II se mantienen el día de la cirugía", "fuente": "§8" }
+      ]
     },
     {
       "id": "disfuncion_sistolica",
       "etiqueta": "¿Le han dicho que tiene el corazón «débil» o con la función disminuida (disfunción sistólica)?",
-      "tipo": "boolean"
+      "tipo": "boolean",
+      "genera": [
+        { "cuando": "= sí", "tipo": "regla", "efecto": "los IECA/ARA-II se mantienen el día de la cirugía", "fuente": "§8" }
+      ]
     },
     {
       "id": "ultimo_ingreso",

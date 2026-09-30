@@ -16,6 +16,30 @@ export interface OpcionPregunta {
   etiqueta: string;
 }
 
+/** Tipo de efecto que una respuesta puede generar (§5, §5.16). */
+export type TipoEfecto = 'alerta' | 'nota' | 'prueba' | 'clase_riesgo' | 'asa' | 'regla' | 'hecho';
+/** Gravedad de una alerta (coincide con Alerta.gravedad del dominio). */
+export type GravedadEfecto = 'roja' | 'amarilla' | 'informativa';
+
+/**
+ * Codificación del efecto clínico de una respuesta (decisión del servicio, §5.16):
+ * deja explícito, junto a la pregunta, qué alerta / nota / prueba / clase de riesgo /
+ * ASA / regla genera cada respuesta. Es documentación trazable (se muestra en
+ * CONTENIDO_CLINICO.md) y la comprueba un test de cobertura; el motor sigue
+ * calculando el efecto en su capa correspondiente.
+ */
+export interface EfectoRespuesta {
+  /** Respuesta que dispara el efecto, en lenguaje llano (p. ej. "= mal", "> 8,5 %", "= sí", "AINE/aspirina"). */
+  cuando: string;
+  tipo: TipoEfecto;
+  /** Gravedad, solo para tipo 'alerta'. */
+  gravedad?: GravedadEfecto;
+  /** Descripción llana del efecto (mensaje de la alerta/nota, prueba solicitada, clase, ASA mínimo…). */
+  efecto: string;
+  /** Sección del documento fuente que lo respalda (p. ej. "§5.16.1", "§7.3"). */
+  fuente?: string;
+}
+
 /** Condición de visibilidad de una pregunta según la respuesta a otra. */
 export interface CondicionVisible {
   /** id de la pregunta de la que depende. */
@@ -41,6 +65,8 @@ export interface PreguntaModulo {
   porque?: string;
   /** Visibilidad condicional (se muestra solo si se cumple). */
   visibleSi?: CondicionVisible;
+  /** Efectos clínicos que generan las respuestas de esta pregunta (§5.16). */
+  genera?: EfectoRespuesta[];
 }
 
 export interface ModuloPatologia {
@@ -60,6 +86,8 @@ export interface ErrorModulo {
 }
 
 const TIPOS = new Set<TipoPregunta>(['boolean', 'opcion', 'opcion_multiple', 'numero', 'fecha', 'texto']);
+const TIPOS_EFECTO = new Set<TipoEfecto>(['alerta', 'nota', 'prueba', 'clase_riesgo', 'asa', 'regla', 'hecho']);
+const GRAVEDADES_EFECTO = new Set<GravedadEfecto>(['roja', 'amarilla', 'informativa']);
 
 /** Valida un objeto de módulo ya parseado. `fichero` se usa para localizar el error. */
 export function validarModulo(obj: unknown, fichero: string): ErrorModulo[] {
@@ -112,6 +140,28 @@ export function validarModulo(obj: unknown, fichero: string): ErrorModulo[] {
       const vs = q.visibleSi as Record<string, unknown>;
       if (typeof vs?.pregunta !== 'string') {
         errores.push({ fichero, campo: `${donde}.visibleSi`, mensaje: 'visibleSi requiere "pregunta"' });
+      }
+    }
+    if (q.genera !== undefined) {
+      if (!Array.isArray(q.genera)) {
+        errores.push({ fichero, campo: `${donde}.genera`, mensaje: 'genera debe ser una lista' });
+      } else {
+        for (const [j, g] of (q.genera as unknown[]).entries()) {
+          const gg = g as Record<string, unknown>;
+          const dondeG = `${donde}.genera[${j}]`;
+          if (typeof gg?.cuando !== 'string' || gg.cuando.trim() === '') {
+            errores.push({ fichero, campo: dondeG, mensaje: 'efecto sin "cuando"' });
+          }
+          if (typeof gg?.efecto !== 'string' || gg.efecto.trim() === '') {
+            errores.push({ fichero, campo: dondeG, mensaje: 'efecto sin "efecto"' });
+          }
+          if (typeof gg?.tipo !== 'string' || !TIPOS_EFECTO.has(gg.tipo as TipoEfecto)) {
+            errores.push({ fichero, campo: `${dondeG}.tipo`, mensaje: `tipo de efecto inválido: "${String(gg?.tipo)}"` });
+          }
+          if (gg?.tipo === 'alerta' && (typeof gg?.gravedad !== 'string' || !GRAVEDADES_EFECTO.has(gg.gravedad as GravedadEfecto))) {
+            errores.push({ fichero, campo: `${dondeG}.gravedad`, mensaje: 'una alerta requiere gravedad (roja/amarilla/informativa)' });
+          }
+        }
       }
     }
   }

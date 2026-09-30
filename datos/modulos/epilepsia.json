@@ -3,7 +3,15 @@
   "titulo": "Epilepsia",
   "fuente": "docs/documento_fuente.md §5.6, §5.16.9",
   "preguntas": [
-    { "id": "ultima_crisis", "etiqueta": "Fecha aproximada de la última crisis", "tipo": "fecha", "porque": "Una crisis en el último mes indica epilepsia no bien controlada." },
+    {
+      "id": "ultima_crisis",
+      "etiqueta": "Fecha aproximada de la última crisis",
+      "tipo": "fecha",
+      "porque": "Una crisis en el último mes indica epilepsia no bien controlada.",
+      "genera": [
+        { "cuando": "crisis en el último mes", "tipo": "alerta", "gravedad": "amarilla", "efecto": "epilepsia no controlada", "fuente": "§5.16.9" }
+      ]
+    },
     {
       "id": "frecuencia",
       "etiqueta": "Frecuencia de las crisis",
@@ -47,7 +55,10 @@
       "id": "estatus_previo",
       "etiqueta": "¿Ha tenido un estatus epiléptico (crisis muy prolongada)?",
       "tipo": "boolean",
-      "porque": "Un estatus previo o crisis recientes indican epilepsia no controlada: no debe omitirse la medicación."
+      "porque": "Un estatus previo o crisis recientes indican epilepsia no controlada: no debe omitirse la medicación.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "epilepsia no controlada", "fuente": "§5.16.9" }
+      ]
     }
   ]
 }

@@ -13,6 +13,10 @@
         { "valor": "moderada", "etiqueta": "Moderada (filtrado 30-60)" },
         { "valor": "grave", "etiqueta": "Grave (filtrado 15-30)" },
         { "valor": "terminal", "etiqueta": "Terminal (filtrado < 15)" }
+      ],
+      "genera": [
+        { "cuando": "= terminal", "tipo": "clase_riesgo", "efecto": "sube la clase de riesgo del paciente a alta", "fuente": "§5.4" },
+        { "cuando": "= terminal", "tipo": "asa", "efecto": "ASA mínimo 4 (moderada/grave: mínimo 3)", "fuente": "§5.4" }
       ]
     },
     {
@@ -54,7 +58,10 @@
       "id": "proteinuria",
       "etiqueta": "¿Tiene proteinuria o nefropatía conocida?",
       "tipo": "boolean",
-      "porque": "La proteinuria/nefropatía hace que los IECA/ARA-II se mantengan el día de la cirugía."
+      "porque": "La proteinuria/nefropatía hace que los IECA/ARA-II se mantengan el día de la cirugía.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "regla", "efecto": "los IECA/ARA-II se mantienen el día de la cirugía", "fuente": "§8" }
+      ]
     }
   ]
 }

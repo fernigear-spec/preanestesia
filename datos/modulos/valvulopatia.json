@@ -24,6 +24,10 @@
         { "valor": "moderada", "etiqueta": "Moderada" },
         { "valor": "grave", "etiqueta": "Grave" },
         { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+      ],
+      "genera": [
+        { "cuando": "= moderada o grave", "tipo": "clase_riesgo", "efecto": "sube la clase de riesgo del paciente a alta", "fuente": "§5.1" },
+        { "cuando": "= grave", "tipo": "asa", "efecto": "ASA mínimo 4 (moderada: mínimo 3)", "fuente": "§5.1" }
       ]
     },
     {
@@ -35,6 +39,9 @@
         { "valor": "no", "etiqueta": "No" },
         { "valor": "mecanica", "etiqueta": "Sí, mecánica" },
         { "valor": "biologica", "etiqueta": "Sí, biológica" }
+      ],
+      "genera": [
+        { "cuando": "= mecánica", "tipo": "hecho", "efecto": "criterio de alto riesgo trombótico: coordinar anticoagulación y valorar terapia puente (§8.1)", "fuente": "§5.1" }
       ]
     },
     {
@@ -57,7 +64,10 @@
     {
       "id": "sintomas_nuevos",
       "etiqueta": "¿Síntomas nuevos (más disnea, síncope o angina)?",
-      "tipo": "boolean"
+      "tipo": "boolean",
+      "genera": [
+        { "cuando": "= sí", "tipo": "prueba", "efecto": "ecocardiograma", "fuente": "§7.3" }
+      ]
     }
   ]
 }

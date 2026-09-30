@@ -13,13 +13,19 @@
       "id": "disfagia_saliva",
       "etiqueta": "¿Dificultad para tragar o mal manejo de la saliva?",
       "tipo": "boolean",
-      "porque": "Aumenta el riesgo de aspiración durante la anestesia."
+      "porque": "Aumenta el riesgo de aspiración durante la anestesia.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "riesgo de aspiración", "fuente": "§5.16.10" }
+      ]
     },
     {
       "id": "ortostatismo",
       "etiqueta": "¿Mareo intenso al ponerse de pie?",
       "tipo": "boolean",
-      "porque": "Indica disfunción autonómica, con riesgo de bajadas graves de tensión durante la anestesia."
+      "porque": "Indica disfunción autonómica, con riesgo de bajadas graves de tensión durante la anestesia.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "disfunción autonómica (riesgo de hipotensión)", "fuente": "§5.16.10" }
+      ]
     }
   ]
 }

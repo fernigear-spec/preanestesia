@@ -32,7 +32,10 @@
       "etiqueta": "¿Ronca fuerte (se oye a través de la puerta o molesta a quien duerme al lado)?",
       "tipo": "boolean",
       "visibleSi": { "pregunta": "diagnosticado", "igual": false },
-      "porque": "Es uno de los cuatro componentes principales del STOP-Bang (§6.3)."
+      "porque": "Es uno de los cuatro componentes principales del STOP-Bang (§6.3).",
+      "genera": [
+        { "cuando": "= sí", "tipo": "hecho", "efecto": "suma un punto en el STOP-Bang; STOP-Bang ≥ 5 genera alerta de riesgo alto", "fuente": "§6.3" }
+      ]
     },
     {
       "id": "cansancio_diurno",
@@ -56,7 +59,10 @@
       "min": 20,
       "max": 70,
       "visibleSi": { "pregunta": "diagnosticado", "igual": false },
-      "porque": "Un cuello > 40 cm suma en el STOP-Bang (§6.3)."
+      "porque": "Un cuello > 40 cm suma en el STOP-Bang (§6.3).",
+      "genera": [
+        { "cuando": "> 40 cm", "tipo": "hecho", "efecto": "suma un punto en el STOP-Bang; STOP-Bang ≥ 5 genera alerta de riesgo alto", "fuente": "§6.3" }
+      ]
     }
   ]
 }

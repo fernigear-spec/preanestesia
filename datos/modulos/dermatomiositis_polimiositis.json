@@ -7,21 +7,30 @@
       "id": "debilidad_cervical_disfagia",
       "etiqueta": "¿Debilidad en el cuello o dificultad para tragar?",
       "tipo": "boolean",
-      "porque": "Aumenta el riesgo de aspiración durante la anestesia."
+      "porque": "Aumenta el riesgo de aspiración durante la anestesia.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "riesgo de aspiración", "fuente": "§5.16.13" }
+      ]
     },
     {
       "id": "disnea_fatiga",
       "etiqueta": "¿Falta de aire o fatiga inusual al caminar?",
       "tipo": "boolean",
-      "porque": "Puede indicar afectación de los músculos respiratorios o del pulmón."
+      "porque": "Puede indicar afectación de los músculos respiratorios o del pulmón.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "posible afectación respiratoria", "fuente": "§5.16.13" }
+      ]
     },
     {
       "id": "problemas_cardiacos",
       "etiqueta": "¿Problemas de corazón conocidos?",
       "tipo": "boolean",
-      "porque": "Estas enfermedades pueden inflamar el corazón (miocarditis)."
+      "porque": "Estas enfermedades pueden inflamar el corazón (miocarditis).",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "posible miocarditis", "fuente": "§5.16.13" }
+      ]
     },
-    { "id": "corticoides_3m", "etiqueta": "¿Ha tomado corticoides (cortisona) en los últimos 3 meses?", "tipo": "boolean", "porque": "Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3)." },
+    { "id": "corticoides_3m", "etiqueta": "¿Ha tomado corticoides (cortisona) en los últimos 3 meses?", "tipo": "boolean", "porque": "Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).", "genera": [ { "cuando": "≥ 5 mg/día de prednisona > 3 semanas (equivalente)", "tipo": "nota", "efecto": "valorar dosis de estrés perioperatoria", "fuente": "§5.16.14" } ] },
     { "id": "cortico_farmaco", "etiqueta": "¿Cuál?", "tipo": "opcion", "opciones": [ { "valor": "prednisona", "etiqueta": "Prednisona" }, { "valor": "prednisolona", "etiqueta": "Prednisolona" }, { "valor": "metilprednisolona", "etiqueta": "Metilprednisolona" }, { "valor": "deflazacort", "etiqueta": "Deflazacort" }, { "valor": "dexametasona", "etiqueta": "Dexametasona" }, { "valor": "hidrocortisona", "etiqueta": "Hidrocortisona" } ], "visibleSi": { "pregunta": "corticoides_3m", "igual": true } },
     { "id": "cortico_dosis_dia", "etiqueta": "Dosis diaria", "tipo": "numero", "unidad": "mg", "min": 0, "max": 200, "visibleSi": { "pregunta": "corticoides_3m", "igual": true } },
     { "id": "cortico_semanas", "etiqueta": "Duración", "tipo": "numero", "unidad": "semanas", "min": 0, "max": 260, "visibleSi": { "pregunta": "corticoides_3m", "igual": true } }

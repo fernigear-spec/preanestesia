@@ -13,25 +13,37 @@
         { "valor": "miotonica", "etiqueta": "Distrofia miotónica" },
         { "valor": "miastenia", "etiqueta": "Miastenia gravis" },
         { "valor": "otra", "etiqueta": "Otra" }
+      ],
+      "genera": [
+        { "cuando": "= Duchenne o Becker", "tipo": "nota", "efecto": "evitar succinilcolina y valorar evitar halogenados", "fuente": "§5.16.11" }
       ]
     },
     {
       "id": "insuficiencia_respiratoria",
       "etiqueta": "¿Le cuesta respirar tumbado o usa ventilación nocturna (BiPAP)?",
       "tipo": "boolean",
-      "porque": "La debilidad de los músculos respiratorios aumenta el riesgo de insuficiencia respiratoria tras la anestesia."
+      "porque": "La debilidad de los músculos respiratorios aumenta el riesgo de insuficiencia respiratoria tras la anestesia.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "roja", "efecto": "riesgo de insuficiencia respiratoria postoperatoria", "fuente": "§5.16.11" }
+      ]
     },
     {
       "id": "ecocardiograma_fecha",
       "etiqueta": "Fecha del último ecocardiograma",
       "tipo": "fecha",
-      "porque": "Muchas distrofias afectan al corazón; sin ecocardiograma en los últimos 12 meses conviene valorarlo."
+      "porque": "Muchas distrofias afectan al corazón; sin ecocardiograma en los últimos 12 meses conviene valorarlo.",
+      "genera": [
+        { "cuando": "sin ecocardiograma en 12 meses", "tipo": "nota", "efecto": "valorar ecocardiograma", "fuente": "§5.16.11" }
+      ]
     },
     {
       "id": "antecedente_anestesia_grave",
       "etiqueta": "¿Fiebre muy alta o complicaciones graves en una anestesia, en usted o su familia?",
       "tipo": "boolean",
-      "porque": "Puede indicar susceptibilidad a hipertermia maligna o a reacciones musculares graves."
+      "porque": "Puede indicar susceptibilidad a hipertermia maligna o a reacciones musculares graves.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "roja", "efecto": "sospecha de hipertermia maligna o reacción muscular grave", "fuente": "§5.16.11" }
+      ]
     }
   ]
 }

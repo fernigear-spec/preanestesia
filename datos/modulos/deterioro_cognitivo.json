@@ -14,6 +14,9 @@
         { "valor": "si", "etiqueta": "Sí" },
         { "valor": "no", "etiqueta": "No" },
         { "valor": "dudosa", "etiqueta": "Dudosa" }
+      ],
+      "genera": [
+        { "cuando": "= no o dudosa", "tipo": "alerta", "gravedad": "amarilla", "efecto": "consentimiento por representante legal", "fuente": "§5.16.5" }
       ]
     },
     {
@@ -30,7 +33,10 @@
       "id": "episodios_delirio",
       "etiqueta": "¿Episodios previos de agitación, delirio o desorientación nocturna?",
       "tipo": "boolean",
-      "porque": "Son un factor de riesgo importante de delirium después de la operación."
+      "porque": "Son un factor de riesgo importante de delirium después de la operación.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "alto riesgo de delirium postoperatorio", "fuente": "§5.16.5" }
+      ]
     }
   ]
 }

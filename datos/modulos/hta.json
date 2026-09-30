@@ -13,6 +13,9 @@
         { "valor": "bien", "etiqueta": "Bien controlada" },
         { "valor": "mal", "etiqueta": "Mal controlada" },
         { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+      ],
+      "genera": [
+        { "cuando": "= mal", "tipo": "asa", "efecto": "ASA mínimo 3 (HTA mal controlada); en otro caso, mínimo 2", "fuente": "§5.16.1" }
       ]
     },
     {
@@ -24,6 +27,9 @@
         { "valor": "cefalea", "etiqueta": "Cefalea frecuente" },
         { "valor": "acufenos", "etiqueta": "Acúfenos (pitidos en los oídos)" },
         { "valor": "vision_borrosa", "etiqueta": "Visión borrosa" }
+      ],
+      "genera": [
+        { "cuando": "alguno marcado", "tipo": "alerta", "gravedad": "amarilla", "efecto": "posible HTA mal controlada", "fuente": "§5.16.1" }
       ]
     }
   ]

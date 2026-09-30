@@ -45,7 +45,8 @@ interface Config { version_contenido: string; fecha_revision_clinica: string; mi
 interface Regla { descripcion?: string; tipo?: string; fuente?: string; [k: string]: unknown; }
 interface ReglasFarmacos { _meta: Record<string, string>; bloqueos_profundos: string[]; tablas_seth: Record<string, Record<string, unknown>>; reglas: Record<string, Regla>; }
 interface Opioides { _meta: Record<string, string>; factores: Record<string, number>; sin_conversion: string[]; }
-interface Pregunta { id: string; etiqueta: string; tipo: string; unidad?: string; porque?: string; opciones?: { valor: string; etiqueta: string }[]; }
+interface EfectoRespuesta { cuando: string; tipo: string; gravedad?: string; efecto: string; fuente?: string; }
+interface Pregunta { id: string; etiqueta: string; tipo: string; unidad?: string; porque?: string; opciones?: { valor: string; etiqueta: string }[]; genera?: EfectoRespuesta[]; }
 interface Modulo { id: string; titulo: string; fuente?: string; preguntas: Pregunta[]; }
 interface TextosPaciente { med: Record<string, string> & { insulina: Record<string, string> }; }
 
@@ -344,8 +345,12 @@ for (const e of [...porEsp.keys()].sort()) {
 // —————————————————————————————— 16. Módulos ——————————————————————————————
 p('## 16. Módulos de enfermedad (anamnesis dirigida, §5.16)');
 p();
-p('_Preguntas que se abren al marcar cada enfermedad. Las alertas que generan las respuestas se describen en las secciones de escalas (§11), reglas de medicación (§3) y ayuno (§7); por ejemplo, HbA1c > 8,5 % (diabetes), bocio grande (vía aérea), IMC ≥ 40 (obesidad) o radioterapia cervical (vía aérea) generan sus avisos._');
+p('_Preguntas que se abren al marcar cada enfermedad. Junto a cada pregunta se indica, cuando procede, qué genera cada respuesta (alerta, nota, prueba, clase de riesgo, ASA, regla o dato clínico), codificado en el propio módulo (§5.16, decisión del servicio). El motor sigue calculando el efecto en su capa; esto es la traza legible._');
 p();
+const ICONO_EFECTO: Record<string, string> = {
+  alerta: '🔔 alerta', nota: '📝 nota', prueba: '🧪 prueba',
+  clase_riesgo: '📊 clase de riesgo', asa: '🅰 ASA', regla: '💊 regla', hecho: 'ℹ dato',
+};
 for (const mod of modulos) {
   p(`### ${mod.titulo}`);
   p();
@@ -357,6 +362,12 @@ for (const mod of modulos) {
     if (preg.opciones && preg.opciones.length > 0) l += `: ${preg.opciones.map((o) => o.etiqueta).join(' / ')}`;
     p(l);
     if (preg.porque) p(`  - Por qué: ${esc(preg.porque)}`);
+    for (const g of preg.genera ?? []) {
+      const tipo = ICONO_EFECTO[g.tipo] ?? g.tipo;
+      const grav = g.gravedad ? ` ${g.gravedad}` : '';
+      const fuente = g.fuente ? ` _(${esc(g.fuente)})_` : '';
+      p(`  - Genera → ${tipo}${grav}: si ${esc(g.cuando)} → ${esc(g.efecto)}.${fuente}`);
+    }
   }
   p();
 }

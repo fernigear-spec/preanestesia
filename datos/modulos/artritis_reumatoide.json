@@ -7,19 +7,28 @@
       "id": "afectacion_cervical",
       "etiqueta": "¿Dolor, rigidez o limitación para mover el cuello?",
       "tipo": "boolean",
-      "porque": "En la artritis reumatoide puede haber inestabilidad de las vértebras del cuello: hay que evitar movimientos bruscos al dormir al paciente."
+      "porque": "En la artritis reumatoide puede haber inestabilidad de las vértebras del cuello: hay que evitar movimientos bruscos al dormir al paciente.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "roja", "efecto": "inestabilidad atloaxoidea (cuello)", "fuente": "§5.16.13" }
+      ]
     },
     {
       "id": "apertura_bucal",
       "etiqueta": "¿Dificultad para abrir la boca o problemas de la mandíbula?",
       "tipo": "boolean",
-      "porque": "Limita el acceso a la vía aérea para la intubación."
+      "porque": "Limita el acceso a la vía aérea para la intubación.",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "posible vía aérea difícil", "fuente": "§5.16.13" }
+      ]
     },
     {
       "id": "ronquera_disnea",
       "etiqueta": "¿Ronquera crónica o falta de aire?",
       "tipo": "boolean",
-      "porque": "Puede indicar afectación de las articulaciones de la laringe (cricoaritenoidea)."
+      "porque": "Puede indicar afectación de las articulaciones de la laringe (cricoaritenoidea).",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "posible afectación cricoaritenoidea", "fuente": "§5.16.13" }
+      ]
     },
     {
       "id": "indicacion_inmunosupresor",
@@ -32,7 +41,7 @@
         { "valor": "trasplante", "etiqueta": "Trasplante" }
       ]
     },
-    { "id": "corticoides_3m", "etiqueta": "¿Ha tomado corticoides (cortisona) en los últimos 3 meses?", "tipo": "boolean", "porque": "Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3)." },
+    { "id": "corticoides_3m", "etiqueta": "¿Ha tomado corticoides (cortisona) en los últimos 3 meses?", "tipo": "boolean", "porque": "Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).", "genera": [ { "cuando": "≥ 5 mg/día de prednisona > 3 semanas (equivalente)", "tipo": "nota", "efecto": "valorar dosis de estrés perioperatoria", "fuente": "§5.16.14" } ] },
     { "id": "cortico_farmaco", "etiqueta": "¿Cuál?", "tipo": "opcion", "opciones": [ { "valor": "prednisona", "etiqueta": "Prednisona" }, { "valor": "prednisolona", "etiqueta": "Prednisolona" }, { "valor": "metilprednisolona", "etiqueta": "Metilprednisolona" }, { "valor": "deflazacort", "etiqueta": "Deflazacort" }, { "valor": "dexametasona", "etiqueta": "Dexametasona" }, { "valor": "hidrocortisona", "etiqueta": "Hidrocortisona" } ], "visibleSi": { "pregunta": "corticoides_3m", "igual": true } },
     { "id": "cortico_dosis_dia", "etiqueta": "Dosis diaria", "tipo": "numero", "unidad": "mg", "min": 0, "max": 200, "visibleSi": { "pregunta": "corticoides_3m", "igual": true } },
     { "id": "cortico_semanas", "etiqueta": "Duración", "tipo": "numero", "unidad": "semanas", "min": 0, "max": 260, "visibleSi": { "pregunta": "corticoides_3m", "igual": true } }
