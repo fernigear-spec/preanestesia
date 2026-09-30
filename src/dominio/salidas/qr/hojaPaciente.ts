@@ -124,6 +124,8 @@ export interface ExtrasHojaQr {
   alcohol: boolean;
   /** Ids de las hojas anexas que aplican (§8.14 bis). */
   anexos: string[];
+  /** Estado del consentimiento (§10) para la línea de la hoja del paciente. */
+  cons?: 'entregado' | 'pendiente' | 'no_procede';
 }
 
 /** Datos del paciente que viajan en el QR (campo `d` del Payload, §8.16d). */

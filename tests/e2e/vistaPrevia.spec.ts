@@ -159,6 +159,12 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('heading', { name: /Paso 8 · Medicación/ })).toBeVisible();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
+    // Paso 9 (vía aérea) y 10 (consentimiento).
+    await expect(page.getByRole('heading', { name: /Paso 9 · Vía aérea/ })).toBeVisible();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await expect(page.getByRole('heading', { name: /Paso 10 · Consentimiento/ })).toBeVisible();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
     // Resumen.
     await expect(page.getByRole('heading', { name: /Resumen de la entrevista/ })).toBeVisible();
     await expect(page.getByText(/Hernioplastia inguinal abierta/)).toBeVisible();
@@ -196,6 +202,10 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Plavix/ }).first().click();
     await page.getByRole('button', { name: '09:00', exact: true }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Pasos 9 y 10.
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 vía aérea
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento
 
     // Resumen: hay pendiente → no se puede generar.
     await expect(page.getByText(/pendientes de confirmar/)).toBeVisible();
@@ -240,6 +250,10 @@ test.describe('Vista previa', () => {
     await page.locator('#med').fill('Adiro');
     await page.getByRole('button', { name: /Adiro/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Pasos 9 y 10.
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 vía aérea
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento
 
     // Resumen: generar la hoja del paciente y ver el QR.
     await expect(page.getByRole('heading', { name: /Resumen de la entrevista/ })).toBeVisible();

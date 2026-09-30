@@ -12,7 +12,7 @@ import { calcularAyuno } from '../../dominio/ayuno/ayuno.ts';
 import { ayunoQrDesde } from '../../dominio/salidas/qr/construirContenido.ts';
 import { calcularAuditC } from '../../dominio/escalas/auditC.ts';
 import { calcular4AT } from '../../dominio/escalas/cuatroAT.ts';
-import type { CribadoUi, DatosBasicosUi, FarmacoTomadoUi, HabitosUi } from '../estadoEntrevista.ts';
+import type { ConsentimientoUi, CribadoUi, DatosBasicosUi, FarmacoTomadoUi, HabitosUi } from '../estadoEntrevista.ts';
 import { construirPlanPaciente } from './construirPlanUi.ts';
 import { HojaPaciente } from './HojaPaciente.tsx';
 
@@ -25,10 +25,17 @@ interface Props {
   basicos: DatosBasicosUi;
   cribado: CribadoUi;
   habitos: HabitosUi | null;
+  consentimiento: ConsentimientoUi | null;
   onActualizar: (indice: number, cambios: Partial<FarmacoTomadoUi>) => void;
 }
 
-export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado, habitos, onActualizar }: Props) {
+const CONS_MAP: Record<ConsentimientoUi['estado'], 'entregado' | 'pendiente' | 'no_procede'> = {
+  entregado: 'entregado',
+  pendiente_entregar: 'pendiente',
+  no_procede: 'no_procede',
+};
+
+export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado, habitos, consentimiento, onActualizar }: Props) {
   const [nombres, setNombres] = useState<Record<number, string>>({});
   const [generar, setGenerar] = useState(false);
 
@@ -79,8 +86,9 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
       ...(basicos.edadMeses !== undefined ? { edadMeses: basicos.edadMeses } : {}),
       situacion: extrasIn.situacion,
     });
-    return { ayunoQr: ayunoQrDesde(planAyuno, extrasIn.pediatrico, extrasIn.situacion), extras: extrasIn.extras };
-  }, [basicos, cribado, habitos, sexo, intervencion.fechaHora, medicacion]);
+    const extras = consentimiento ? { ...extrasIn.extras, cons: CONS_MAP[consentimiento.estado] } : extrasIn.extras;
+    return { ayunoQr: ayunoQrDesde(planAyuno, extrasIn.pediatrico, extrasIn.situacion), extras };
+  }, [basicos, cribado, habitos, sexo, intervencion.fechaHora, medicacion, consentimiento]);
 
   const pendientes = medicacion
     .map((f, i) => ({ f, i, requiere: plan[i]?.resultado.requiereConfirmacion === true }))

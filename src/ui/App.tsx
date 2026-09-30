@@ -8,6 +8,8 @@ import { PasoAlergias } from './pasos/PasoAlergias.tsx';
 import { PasoHabitos } from './pasos/PasoHabitos.tsx';
 import { PasoCribado } from './pasos/PasoCribado.tsx';
 import { PasoMedicacion } from './pasos/PasoMedicacion.tsx';
+import { PasoViaAerea } from './pasos/PasoViaAerea.tsx';
+import { PasoConsentimiento } from './pasos/PasoConsentimiento.tsx';
 import { ESTADO_INICIAL, INCIDENCIAS_ANESTESICAS, calcularImc, type EstadoEntrevista, type IntervencionPrevia } from './estadoEntrevista.ts';
 import type { Modalidad } from '../dominio/tipos.ts';
 import { calcularHemstop } from '../dominio/escalas/hemstop.ts';
@@ -46,7 +48,7 @@ function incidenciaLegible(id: string): string {
   return INCIDENCIAS_ANESTESICAS.find((x) => x.id === id)?.etiqueta ?? id;
 }
 
-type Pantalla = 'inicio' | 'paso1' | 'paso2' | 'paso3' | 'paso4' | 'paso5' | 'paso6' | 'paso7' | 'paso8' | 'resumen';
+type Pantalla = 'inicio' | 'paso1' | 'paso2' | 'paso3' | 'paso4' | 'paso5' | 'paso6' | 'paso7' | 'paso8' | 'paso9' | 'paso10' | 'resumen';
 
 const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 function fechaLegible(d: Date): string {
@@ -78,7 +80,7 @@ export function App() {
     setPantalla('inicio');
   }
 
-  const { intervencion, procedimiento, basicos, antecedentes, mtnd4, alergias, habitos, cribado, medicacion } = entrevista;
+  const { intervencion, procedimiento, basicos, antecedentes, mtnd4, alergias, habitos, cribado, medicacion, viaAerea, consentimiento } = entrevista;
 
   return (
     <div className="app">
@@ -211,6 +213,31 @@ export function App() {
             onVolver={() => setPantalla('paso7')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, medicacion: datos }));
+              setPantalla('paso9');
+            }}
+          />
+        )}
+
+        {pantalla === 'paso9' && basicos && (
+          <PasoViaAerea
+            inicial={viaAerea}
+            telefonica={modalidad === 'telefonica'}
+            basicos={{ edadAnios: basicos.edadAnios, pesoKg: basicos.pesoKg, tallaCm: basicos.tallaCm, sexo: basicos.sexo }}
+            onVolver={() => setPantalla('paso8')}
+            onContinuar={(datos) => {
+              setEntrevista((e) => ({ ...e, viaAerea: datos }));
+              setPantalla('paso10');
+            }}
+          />
+        )}
+
+        {pantalla === 'paso10' && (
+          <PasoConsentimiento
+            inicial={consentimiento}
+            telefonica={modalidad === 'telefonica'}
+            onVolver={() => setPantalla('paso9')}
+            onContinuar={(datos) => {
+              setEntrevista((e) => ({ ...e, consentimiento: datos }));
               setPantalla('resumen');
             }}
           />
@@ -218,11 +245,8 @@ export function App() {
 
         {pantalla === 'resumen' && intervencion && procedimiento && basicos && (
           <section className="tarjeta" aria-labelledby="resumen-tit">
-            <h2 id="resumen-tit">Resumen de la entrevista (pasos 1 a 4)</h2>
-            <p>
-              Entrevista <strong>{modalidad}</strong>. Estos son los datos recogidos hasta ahora; los
-              siguientes pasos (alergias, hábitos, cribado por aparatos, medicación…) se irán añadiendo.
-            </p>
+            <h2 id="resumen-tit">Resumen de la entrevista · Resultados</h2>
+            <p>Entrevista <strong>{modalidad}</strong>. Resultados de la valoración y hoja del paciente.</p>
 
             <h3>Intervención</h3>
             <ul className="resumen-lista">
@@ -375,6 +399,16 @@ export function App() {
               );
             })()}
 
+            <h3>Vía aérea</h3>
+            <ul className="resumen-lista">
+              <li>{viaAerea ? describirViaAerea(viaAerea, modalidad === 'telefonica') : 'no recogida'}</li>
+            </ul>
+
+            <h3>Consentimiento</h3>
+            <ul className="resumen-lista">
+              <li>{describirConsentimiento(consentimiento)}</li>
+            </ul>
+
             <h3>Hoja del paciente</h3>
             {cribado && (
               <BloqueHojaPaciente
@@ -383,6 +417,7 @@ export function App() {
                 basicos={basicos}
                 cribado={cribado}
                 habitos={habitos}
+                consentimiento={consentimiento}
                 onActualizar={(i, cambios) =>
                   setEntrevista((e) => ({
                     ...e,
@@ -408,6 +443,24 @@ export function App() {
       </footer>
     </div>
   );
+}
+
+function describirViaAerea(v: import('./estadoEntrevista.ts').DatosViaAereaUi, telefonica: boolean): string {
+  const partes: string[] = [];
+  if (v.mallampati) partes.push(`Mallampati ${'I'.repeat(v.mallampati)}`);
+  if (v.intubacionDificilPrevia && v.intubacionDificilPrevia !== 'no') partes.push(`intubación difícil previa ${v.intubacionDificilPrevia}`);
+  if (v.radioterapiaCervical) partes.push('radioterapia cervical');
+  if (v.tumorCabezaCuello) partes.push('tumor de cabeza y cuello');
+  if (v.limitacionCervicalReumatologica) partes.push('limitación cervical');
+  const base = partes.length > 0 ? partes.join(', ') : 'sin hallazgos reseñables';
+  return telefonica ? `${base} · exploración pendiente (telefónica)` : base;
+}
+
+function describirConsentimiento(c: import('./estadoEntrevista.ts').ConsentimientoUi | null): string {
+  if (!c) return 'no recogido';
+  if (c.estado === 'entregado') return `entregado y explicado${c.fecha ? ` (${c.fecha})` : ''}`;
+  if (c.estado === 'pendiente_entregar') return 'pendiente de entregar (se entregará el día de la intervención)';
+  return 'no procede';
 }
 
 function describirMtnd4(m: import('../dominio/mtnd4/mtnd4.ts').EntradaMtnd4): string {

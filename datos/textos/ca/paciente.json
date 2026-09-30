@@ -19,6 +19,11 @@
   "que_traer_inhaladores": "Els seus inhaladors",
   "que_traer_delirium": "Les seves ulleres i audiòfons; vingui acompanyat d'un familiar",
   "consentimiento_titulo": "Consentiment",
+  "consentimiento_textos": {
+    "entregado": "Ja ha signat i li han explicat el consentiment de l'anestèsia.",
+    "pendiente": "Li lliurarem i li explicarem el consentiment de l'anestèsia el dia de la intervenció.",
+    "no_procede": ""
+  },
   "cuando_llamar_titulo": "Quan ha de trucar",
   "cuando_llamar_items": [
     "Si té febre o un refredat els dies previs",

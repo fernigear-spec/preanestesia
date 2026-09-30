@@ -130,6 +130,31 @@ export interface FarmacoTomadoUi {
   leLlamaremos?: boolean;
 }
 
+/** Vía aérea del paso 9 (§6.2). Todos opcionales; en telefónica solo anamnesis. */
+export interface DatosViaAereaUi {
+  mallampati?: 1 | 2 | 3 | 4;
+  aperturaBucal?: 'ge_4' | 'lt_4';
+  distanciaTiromentoniana?: 'gt_6_5' | '6_a_6_5' | 'lt_6';
+  movilidadCervical?: 'gt_90' | '80_a_90' | 'lt_80';
+  puedeProtruir?: boolean;
+  denticion?: 'completa' | 'piezas_moviles' | 'protesis_removible' | 'protesis_fija' | 'edentulo';
+  cuelloCortoGrueso?: boolean;
+  perimetroCuello?: number;
+  barba?: boolean;
+  intubacionDificilPrevia?: 'no' | 'dudoso' | 'confirmado';
+  radioterapiaCervical?: boolean;
+  tumorCabezaCuello?: boolean;
+  limitacionCervicalReumatologica?: boolean;
+  ronquido?: boolean;
+}
+
+/** Consentimiento del paso 10 (§10, R3.2.28). */
+export interface ConsentimientoUi {
+  estado: 'entregado' | 'pendiente_entregar' | 'no_procede';
+  /** Fecha (ISO) si está entregado. */
+  fecha?: string;
+}
+
 export interface EstadoEntrevista {
   intervencion: DatosIntervencion | null;
   procedimiento: Procedimiento | null;
@@ -140,6 +165,8 @@ export interface EstadoEntrevista {
   habitos: HabitosUi | null;
   cribado: CribadoUi | null;
   medicacion: FarmacoTomadoUi[] | null;
+  viaAerea: DatosViaAereaUi | null;
+  consentimiento: ConsentimientoUi | null;
 }
 
 /** Horas más habituales para los botones rápidos del paso 8 (tablet). */
@@ -166,6 +193,8 @@ export const ESTADO_INICIAL: EstadoEntrevista = {
   habitos: null,
   cribado: null,
   medicacion: null,
+  viaAerea: null,
+  consentimiento: null,
 };
 
 /** HEMSTOP vacío (todas las respuestas en «no»). */

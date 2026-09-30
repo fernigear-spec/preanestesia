@@ -83,6 +83,13 @@ export function CuerpoHoja({ instrucciones, ay, ex, fecha, t }: Props) {
       <h2>{t.cuando_llamar_titulo}</h2>
       <ul>{t.cuando_llamar_items.map((it, k) => <li key={k}>{it}</li>)}</ul>
 
+      {ex?.cons && ex.cons !== 'no_procede' && (
+        <>
+          <h2>{t.consentimiento_titulo}</h2>
+          <p>{t.consentimiento_textos[ex.cons]}</p>
+        </>
+      )}
+
       <h2>{t.telefono_titulo}</h2>
       <p><strong>{config.telefono_contacto}</strong></p>
 

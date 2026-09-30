@@ -18,6 +18,11 @@
   "que_traer_inhaladores": "Sus inhaladores",
   "que_traer_delirium": "Sus gafas y audífonos; venga acompañado por un familiar",
   "consentimiento_titulo": "Consentimiento",
+  "consentimiento_textos": {
+    "entregado": "Ya ha firmado y le han explicado el consentimiento de la anestesia.",
+    "pendiente": "Le entregaremos y le explicaremos el consentimiento de la anestesia el día de la intervención.",
+    "no_procede": ""
+  },
   "cuando_llamar_titulo": "Cuándo debe llamar",
   "cuando_llamar_items": [
     "Si tiene fiebre o un catarro en los días previos",
