@@ -494,6 +494,22 @@ test.describe('Vista previa', () => {
     await expect(page.getByText(/7 días/)).toBeVisible();
   });
 
+  test('§14.4 guía imprimible: se genera desde los módulos con casillas en blanco', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Guía imprimible' }).click();
+    await expect(page.getByRole('heading', { name: 'Guía imprimible en blanco' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Diabetes', exact: true })).toBeVisible();
+    await expect(page.getByText(/Cuestionario de sangrado \(HEMSTOP\)/)).toBeVisible();
+    await expect(page.getByRole('button', { name: /Guardar como PDF/ })).toBeVisible();
+  });
+
+  test('§14.3 cuadro de mando: sin entrevistas registradas en un dispositivo nuevo', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Cuadro de mando de uso' }).click();
+    await expect(page.getByRole('heading', { name: 'Cuadro de mando de uso' })).toBeVisible();
+    await expect(page.getByText(/Todavía no hay entrevistas registradas/)).toBeVisible();
+  });
+
   test('panel de administración (§14.1): editar tabla, validar en vivo y descargar', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Administración de contenido' }).click();

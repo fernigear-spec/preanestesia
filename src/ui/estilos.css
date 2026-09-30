@@ -615,3 +615,20 @@ body {
 .admin-diff .diff-quitada { color: #ffa198; }
 .admin-ayuda { margin-top: 14px; }
 .admin-ayuda ol { font-size: 0.9rem; line-height: 1.5; }
+
+/* Guía imprimible en blanco (§14.4) */
+.guia-contenido h2 { margin-top: 18px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+.guia-modulo { break-inside: avoid; margin-bottom: 10px; }
+.guia-lista { list-style: none; padding-left: 0; }
+.guia-lista li { padding: 4px 0; line-height: 1.6; }
+.guia-opciones { display: block; color: #333; margin-top: 2px; }
+.guia-linea { display: inline-block; min-width: 120px; border-bottom: 1px solid #888; }
+.guia-nota { font-size: 0.85rem; opacity: 0.7; }
+
+/* Cuadro de mando de uso (§14.3) */
+.mando-resumen { background: var(--color-principal-claro); border-radius: var(--radio); padding: 10px 14px; }
+.mando-barras { list-style: none; padding-left: 0; }
+.mando-barras li { display: flex; align-items: center; gap: 8px; padding: 2px 0; font-size: 0.85rem; }
+.mando-barra-etq { min-width: 90px; }
+.mando-barra { display: inline-block; height: 14px; background: var(--color-principal); border-radius: 3px; min-width: 2px; }
+.mando-barra-num { min-width: 24px; text-align: right; }

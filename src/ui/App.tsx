@@ -1,7 +1,10 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import config from '../../datos/config.json';
 import { BandaPrueba } from './BandaPrueba.tsx';
 import { useInactividad, useAvisoSalida } from './privacidad.ts';
+import { registrarUso, type TipoPaciente } from './herramientas/registroUso.ts';
+import { GuiaImprimible } from './herramientas/GuiaImprimible.tsx';
+import { CuadroMando } from './herramientas/CuadroMando.tsx';
 import { PasoIntervencion } from './pasos/PasoIntervencion.tsx';
 import { PasoBasicos } from './pasos/PasoBasicos.tsx';
 import { PasoAntecedentes } from './pasos/PasoAntecedentes.tsx';
@@ -49,13 +52,25 @@ export function App() {
     const h = typeof window !== 'undefined' ? window.location.hash : '';
     return h.startsWith('#p=') ? h.slice(3) : null;
   });
-  const [admin, setAdmin] = useState<boolean>(() => typeof window !== 'undefined' && window.location.hash === '#admin');
+  type Herramienta = 'admin' | 'guia' | 'uso' | null;
+  const [herramienta, setHerramienta] = useState<Herramienta>(() => {
+    const h = typeof window !== 'undefined' ? window.location.hash : '';
+    if (h === '#admin') return 'admin';
+    if (h === '#guia') return 'guia';
+    if (h === '#uso') return 'uso';
+    return null;
+  });
+  // Contador de uso (§14.3): inicio de la entrevista y marca de "ya registrada".
+  const inicioRef = useRef<number | null>(null);
+  const registradoRef = useRef(false);
 
   // Reinicia la entrevista (borra todo de la memoria y vuelve al inicio).
   const nuevoPaciente = useCallback(() => {
     setModalidad(null);
     setEntrevista(ESTADO_INICIAL);
     setPantalla('inicio');
+    inicioRef.current = null;
+    registradoRef.current = false;
   }, []);
 
   // Privacidad (§2): temporizador de inactividad y aviso al salir. Solo cuando hay
@@ -73,21 +88,43 @@ export function App() {
     );
   }
 
-  if (admin) {
+  if (herramienta) {
+    const salir = () => {
+      setHerramienta(null);
+      if (typeof window !== 'undefined' && window.location.hash) {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    };
     return (
       <div className="app">
         <BandaPrueba />
-        <PanelAdmin onSalir={() => {
-          setAdmin(false);
-          if (typeof window !== 'undefined' && window.location.hash === '#admin') {
-            window.history.replaceState(null, '', window.location.pathname + window.location.search);
-          }
-        }} />
+        {herramienta === 'admin' && <PanelAdmin onSalir={salir} />}
+        {herramienta === 'guia' && <GuiaImprimible onSalir={salir} />}
+        {herramienta === 'uso' && <CuadroMando onSalir={salir} />}
       </div>
     );
   }
 
   const { intervencion, procedimiento, basicos, antecedentes, mtnd4, alergias, habitos, cribado, medicacion, viaAerea, consentimiento } = entrevista;
+
+  /** Registra la entrevista en el contador de uso (§14.3), una sola vez y sin datos clínicos. */
+  function registrarUsoSiProcede() {
+    if (registradoRef.current || inicioRef.current === null || !basicos || !intervencion) return;
+    const tipoPaciente: TipoPaciente =
+      basicos.moduloObstetrico || basicos.embarazada ? 'obstetrica'
+        : basicos.edadAnios <= config.edad_pediatrica_maxima ? 'pediatrico'
+          : 'adulto';
+    const inicio = new Date(inicioRef.current);
+    registrarUso({
+      fecha: `${inicio.getFullYear()}-${String(inicio.getMonth() + 1).padStart(2, '0')}-${String(inicio.getDate()).padStart(2, '0')}`,
+      horaInicio: `${String(inicio.getHours()).padStart(2, '0')}:${String(inicio.getMinutes()).padStart(2, '0')}`,
+      duracionSeg: Math.round((Date.now() - inicioRef.current) / 1000),
+      modalidad: modalidad ?? 'presencial',
+      tipoPaciente,
+      riesgoQuirurgico: intervencion.riesgoCardiovascular,
+    });
+    registradoRef.current = true;
+  }
 
   return (
     <div className="app">
@@ -141,7 +178,7 @@ export function App() {
               type="button"
               className="boton-primario"
               disabled={modalidad === null}
-              onClick={() => setPantalla('paso1')}
+              onClick={() => { inicioRef.current = Date.now(); registradoRef.current = false; setPantalla('paso1'); }}
             >
               Comenzar
             </button>
@@ -263,6 +300,7 @@ export function App() {
             onVolver={() => setPantalla('paso9')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, consentimiento: datos }));
+              registrarUsoSiProcede();
               setPantalla('resumen');
             }}
           />
@@ -435,7 +473,11 @@ export function App() {
           final por el anestesiólogo.
         </p>
         <p className="pie-admin">
-          <button type="button" className="boton-enlace" onClick={() => setAdmin(true)}>Administración de contenido</button>
+          <button type="button" className="boton-enlace" onClick={() => setHerramienta('admin')}>Administración de contenido</button>
+          {' · '}
+          <button type="button" className="boton-enlace" onClick={() => setHerramienta('guia')}>Guía imprimible</button>
+          {' · '}
+          <button type="button" className="boton-enlace" onClick={() => setHerramienta('uso')}>Cuadro de mando de uso</button>
         </p>
       </footer>
     </div>
