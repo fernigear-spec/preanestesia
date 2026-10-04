@@ -72,7 +72,10 @@
           "cuando": "sin ecocardiograma en 12 meses",
           "tipo": "nota",
           "efecto": "valorar ecocardiograma",
-          "fuente": "§5.16.11"
+          "fuente": "§5.16.11",
+          "si": {
+            "sinFechaRecienteMeses": 12
+          }
         }
       ]
     },

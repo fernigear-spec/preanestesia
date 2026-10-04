@@ -35,6 +35,12 @@ function valorQueSatisface(cond: CondicionEfecto): unknown {
     // Una fecha dentro de la ventana: hoy (siempre reciente respecto a la IQ).
     return IV.toISOString().slice(0, 10);
   }
+  if (cond.sinFechaRecienteMeses !== undefined) {
+    // Se cumple si NO hay fecha reciente: devolvemos una fecha claramente antigua.
+    const antigua = new Date(IV.getTime());
+    antigua.setMonth(antigua.getMonth() - cond.sinFechaRecienteMeses - 2);
+    return antigua.toISOString().slice(0, 10);
+  }
   return null;
 }
 
@@ -119,6 +125,38 @@ describe('Ejecución de efectos de módulos (§5.16)', () => {
     });
     const alerta = out.alertas.find((a) => a.mensaje.includes('TVP o TEP de menos de 3 meses'));
     expect(alerta?.gravedad).toBe('amarilla');
+  });
+
+  it('sinFechaRecienteMeses: distrofia activa sin fecha de ecocardiograma → nota "valorar ecocardiograma"', () => {
+    const out = emitirEfectosModulos({
+      modulos,
+      respuestas: { distrofia_muscular: {} }, // sin ecocardiograma_fecha
+      activos: new Set(['distrofia_muscular']),
+      fechaIntervencion: IV,
+    });
+    expect(out.notas.some((n) => n.texto === 'valorar ecocardiograma')).toBeTrue();
+  });
+
+  it('sinFechaRecienteMeses: ecocardiograma reciente (hace 2 meses) → NO emite la nota', () => {
+    const hace2meses = new Date(2026, 7, 15).toISOString().slice(0, 10);
+    const out = emitirEfectosModulos({
+      modulos,
+      respuestas: { distrofia_muscular: { ecocardiograma_fecha: hace2meses } },
+      activos: new Set(['distrofia_muscular']),
+      fechaIntervencion: IV,
+    });
+    expect(out.notas.some((n) => n.texto === 'valorar ecocardiograma')).toBeFalse();
+  });
+
+  it('sinFechaRecienteMeses: ecocardiograma antiguo (hace 14 meses) → emite la nota', () => {
+    const hace14meses = new Date(2025, 7, 15).toISOString().slice(0, 10);
+    const out = emitirEfectosModulos({
+      modulos,
+      respuestas: { distrofia_muscular: { ecocardiograma_fecha: hace14meses } },
+      activos: new Set(['distrofia_muscular']),
+      fechaIntervencion: IV,
+    });
+    expect(out.notas.some((n) => n.texto === 'valorar ecocardiograma')).toBeTrue();
   });
 
   it('sin fecha de intervención, la recencia se mide respecto a hoy', () => {

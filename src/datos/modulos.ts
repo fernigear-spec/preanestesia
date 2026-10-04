@@ -47,6 +47,13 @@ export interface CondicionEfecto {
   mayorIgualQue?: number;
   /** La respuesta (fecha ISO) está dentro de los últimos N meses respecto a la intervención (o "hoy"). */
   recienteMeses?: number;
+  /**
+   * La respuesta (fecha ISO) está AUSENTE o es anterior a N meses respecto a la
+   * intervención (o "hoy"): es decir, NO hay una fecha reciente. Pensado para notas
+   * del tipo "sin ecocardiograma en los últimos N meses". Solo se evalúa cuando el
+   * módulo está activo (lo garantiza `emitirEfectosModulos`).
+   */
+  sinFechaRecienteMeses?: number;
 }
 
 export interface EfectoRespuesta {
@@ -193,7 +200,7 @@ export function validarModulo(obj: unknown, fichero: string): ErrorModulo[] {
             if (typeof gg.si !== 'object' || gg.si === null) {
               errores.push({ fichero, campo: `${dondeG}.si`, mensaje: 'si debe ser un objeto de condición' });
             } else {
-              const ops = ['igual', 'enLista', 'contieneAlguno', 'mayorQue', 'mayorIgualQue', 'recienteMeses'];
+              const ops = ['igual', 'enLista', 'contieneAlguno', 'mayorQue', 'mayorIgualQue', 'recienteMeses', 'sinFechaRecienteMeses'];
               const presentes = ops.filter((k) => (gg.si as Record<string, unknown>)[k] !== undefined);
               if (presentes.length !== 1) {
                 errores.push({ fichero, campo: `${dondeG}.si`, mensaje: `una condición requiere exactamente un operador (tiene ${presentes.length})` });

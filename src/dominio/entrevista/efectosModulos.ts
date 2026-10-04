@@ -88,6 +88,14 @@ export function evaluarCondicion(
     // Reciente = la fecha del evento es posterior al límite (está dentro de la ventana).
     return f.getTime() >= limite.getTime();
   }
+  if (cond.sinFechaRecienteMeses !== undefined) {
+    // Se cumple si NO hay fecha reciente: ausente o anterior al límite.
+    const f = fechaDesde(valor);
+    if (f === null) return true;
+    const limite = new Date(fechaReferencia.getTime());
+    limite.setMonth(limite.getMonth() - cond.sinFechaRecienteMeses);
+    return f.getTime() < limite.getTime();
+  }
   return false;
 }
 

@@ -1448,7 +1448,7 @@ _Fuente: docs/documento_fuente.md §5.6, §5.16.11_
   - Genera → 🔔 alerta roja: si = sí → riesgo de insuficiencia respiratoria postoperatoria. _(§5.16.11)_ **[se emite]**
 - **Fecha del último ecocardiograma** — _fecha_
   - Por qué: Muchas distrofias afectan al corazón; sin ecocardiograma en los últimos 12 meses conviene valorarlo.
-  - Genera → 📝 nota: si sin ecocardiograma en 12 meses → valorar ecocardiograma. _(§5.16.11)_
+  - Genera → 📝 nota: si sin ecocardiograma en 12 meses → valorar ecocardiograma. _(§5.16.11)_ **[se emite]**
 - **¿Fiebre muy alta o complicaciones graves en una anestesia, en usted o su familia?** — _boolean_
   - Por qué: Puede indicar susceptibilidad a hipertermia maligna o a reacciones musculares graves.
   - Genera → 🔔 alerta roja: si = sí → sospecha de hipertermia maligna o reacción muscular grave. _(§5.16.11)_ **[se emite]**
