@@ -27,6 +27,13 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('heading', { name: /Nueva entrevista/ })).toBeVisible();
   });
 
+  test('Bloque III-B: el pie muestra el aviso de copyright de AnesHealth', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await expect(
+      page.getByText('© 2026 AnesHealth. Todos los derechos reservados. Uso restringido al Servicio de Anestesiología del Hospital Vithas Barcelona.'),
+    ).toBeVisible();
+  });
+
   test('permite elegir modalidad y comenzar (lleva al paso 1)', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Presencial' }).click();

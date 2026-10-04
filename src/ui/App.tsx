@@ -573,6 +573,9 @@ export function App() {
           {' · '}
           <button type="button" className="boton-enlace" onClick={() => setHerramienta('entrenamiento')}>Modo entrenamiento</button>
         </p>
+        <p className="pie-copyright">
+          © 2026 AnesHealth. Todos los derechos reservados. Uso restringido al Servicio de Anestesiología del Hospital Vithas Barcelona.
+        </p>
       </footer>
     </div>
   );

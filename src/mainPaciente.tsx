@@ -1,6 +1,11 @@
+/*!
+ * © 2026 AnesHealth. Todos los derechos reservados.
+ * Uso restringido al Servicio de Anestesiología del Hospital Vithas Barcelona.
+ * Véase el fichero LICENSE.
+ */
 /**
  * Punto de entrada de la VISTA DEL PACIENTE como aplicación independiente (§8.16,
- * Bloque III-A). Es un segundo "build" de Vite (ver paciente.html + vite.config.ts)
+ * Bloque III-A). Es un segundo "build" de Vite (ver paciente/index.html + vite.config.ts)
  * que se publica en la ruta «/paciente/» y SOLO contiene la hoja del paciente:
  * su hoja, el cambio de idioma, el PDF, los anexos y el recálculo de fechas.
  *

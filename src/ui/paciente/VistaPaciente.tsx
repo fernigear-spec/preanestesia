@@ -111,6 +111,9 @@ export function VistaPaciente({ cadena }: Props) {
           <p>{t.pie}</p>
           <p>{config.nombre_centro} · v{config.version_contenido} ({config.fecha_revision_clinica})</p>
           <p>Válido hasta {caducidad.toLocaleDateString('es-ES')}.</p>
+          <p className="pie-copyright">
+            © 2026 AnesHealth. Todos los derechos reservados. Uso restringido al Servicio de Anestesiología del Hospital Vithas Barcelona.
+          </p>
         </footer>
       </section>
     </main>

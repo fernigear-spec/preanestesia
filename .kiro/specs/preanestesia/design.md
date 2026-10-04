@@ -372,6 +372,30 @@ ningún dato clínico embebido:
 - Prueba E2E (`vistaPrevia.spec.ts`): genera el QR desde el resumen, comprueba que el
   enlace apunta a `/paciente/#p=…` y abre la hoja en la nueva ruta.
 
+### Protección del código: ofuscación y copyright (Bloque III-B, 2026-10-04)
+
+- **Ofuscación** con `vite-plugin-javascript-obfuscator`, activada **solo en el build
+  de producción** (`npm run build:prod`, variable `OFUSCAR=1`). El build de la vista
+  previa (`npm run build`, rama desarrollo) y el E2E no ofuscan, para que sean rápidos
+  y depurables.
+- **Perfil deliberadamente LIGERO** (`vite.config.ts`, `opcionesOfuscacion`): renombra
+  identificadores a hexadecimal y agrupa las cadenas en un `stringArray` **sin**
+  codificación base64. Se evitan a propósito `controlFlowFlattening`,
+  `deadCodeInjection`, `selfDefending`, `debugProtection` y la codificación de cadenas,
+  que son las opciones que penalizan el rendimiento en una tablet. El objetivo es
+  dificultar la lectura/copia del código, no blindarlo.
+- **Impacto en tablet medido** (`scripts/bench-ofuscacion.mjs`, Chromium con CPU 4×
+  más lenta, media de 5 cargas): carga inicial 159→180 ms (1.13×, +21 ms) y
+  flujo+motor de reglas 225→235 ms (1.05×, +10 ms). Despreciable: la app sigue fluida.
+  Tamaño: enfermería 517→589 KB (+14 %). Los 26 E2E pasan también sobre el build
+  ofuscado.
+- **Sin source maps publicados** (`build.sourcemap: false`).
+- **Copyright**: fichero `LICENSE` (licencia propietaria), banner en todos los JS
+  compilados (`build.rollupOptions.output.banner`), cabecera en los puntos de entrada
+  (`main.tsx`, `mainPaciente.tsx`) y pie visible en la app de enfermería y en la vista
+  del paciente, con el texto: «© 2026 AnesHealth. Todos los derechos reservados. Uso
+  restringido al Servicio de Anestesiología del Hospital Vithas Barcelona.»
+
 ---
 
 ## Versionado de textos del paciente (histórico)

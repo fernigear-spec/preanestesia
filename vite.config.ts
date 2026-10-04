@@ -11,14 +11,52 @@ import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import obfuscator from 'vite-plugin-javascript-obfuscator';
 
 const raiz = import.meta.dirname;
+
+// Ofuscación activable por variable de entorno (Bloque III-B, protección del código).
+// Se desactiva por defecto para que la vista previa (rama desarrollo) y el E2E sean
+// rápidos y legibles; en el build de PRODUCCIÓN se activa con OFUSCAR=1.
+const ofuscar = process.env.OFUSCAR === '1';
+
+/**
+ * Ofuscación LIGERA (Bloque III-B, 2026-10-04). Se evitan a propósito las opciones
+ * que más penalizan el rendimiento en una tablet —`controlFlowFlattening`,
+ * `deadCodeInjection`, `selfDefending`, `debugProtection`—, de modo que la app siga
+ * siendo fluida. El objetivo es dificultar la lectura/copia del código, no blindarlo.
+ */
+const opcionesOfuscacion = {
+  compact: true,
+  controlFlowFlattening: false,
+  deadCodeInjection: false,
+  debugProtection: false,
+  selfDefending: false,
+  disableConsoleOutput: false,
+  identifierNamesGenerator: 'hexadecimal' as const,
+  renameGlobals: false,
+  // `stringArray` sin codificación: agrupa las cadenas (dificulta leerlas) pero NO
+  // las codifica en base64, que es lo que más ralentizaba el ARRANQUE en tablet
+  // (había que decodificar todas las cadenas al cargar). Umbral moderado.
+  stringArray: true,
+  stringArrayEncoding: ['none' as const],
+  stringArrayThreshold: 0.5,
+  splitStrings: false,
+  numbersToExpressions: false,
+  simplify: true,
+  transformObjectKeys: false,
+  unicodeEscapeSequence: false,
+};
 
 // El base path depende del repositorio en GitHub Pages: /preanestesia/
 export default defineConfig({
   base: '/preanestesia/',
   plugins: [
     react(),
+    // La ofuscación se aplica al bundle final (solo en producción con OFUSCAR=1).
+    ...(ofuscar
+      ? [obfuscator({ apply: 'build', options: opcionesOfuscacion })]
+      : []),
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
@@ -51,6 +89,10 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     rollupOptions: {
+      // Aviso de copyright en el código compilado (se conserva en producción).
+      output: {
+        banner: '/*! © 2026 AnesHealth. Todos los derechos reservados. Uso restringido al Servicio de Anestesiología del Hospital Vithas Barcelona. */',
+      },
       // Dos "builds" independientes (§8.16, Bloque III-A):
       //  - la app de enfermería (index.html → src/main.tsx),
       //  - la vista del paciente (paciente.html → src/mainPaciente.tsx), que se
