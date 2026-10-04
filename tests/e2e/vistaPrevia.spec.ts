@@ -260,6 +260,46 @@ test.describe('Vista previa', () => {
     await expect(page.getByText(/Sobre Plavix, el anestesiólogo le llamará/)).toHaveCount(0);
   });
 
+  test('§8.3/§12.7 stent reciente + neuroaxial → alerta roja de diferir y amarilla de técnica en el resumen', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    // Paso 1: artroplastia de rodilla (técnica neuroaxial probable). Fecha fija.
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('Artroplastia total de rodilla');
+    await page.getByRole('button', { name: /Artroplastia total de rodilla/i }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    await pasoAlergiasSinAlergias(page);
+    await page.locator('#edad').fill('64'); // < 65 para no exigir CFS/4AT en el paso 5
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('80');
+    await page.locator('#talla').fill('170');
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
+
+    // Paso 6: cardiopatía isquémica con stent programado reciente (hace ~2 meses).
+    await page.getByRole('checkbox', { name: 'Cardiopatía isquémica / infarto' }).check();
+    await page.getByRole('group', { name: /stent \(muelle\)/i }).getByRole('button', { name: 'Sí' }).click();
+    await page.locator('#cardiopatia_isquemica-stent_fecha').fill('2026-09-05');
+    await page.locator('#cardiopatia_isquemica-stent_motivo').selectOption('programado');
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 -> 7 técnica
+
+    // Paso 7: técnica neuroaxial (dispara también la alerta amarilla del stent + técnica).
+    await page.getByRole('radio', { name: /Neuroaxial/ }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
+    await pasoMtnd4NoVenezolana(page); // 11 -> resumen
+
+    // Las dos alertas del stent aparecen en el resumen del anestesiólogo.
+    await expect(page.getByText(/Stent reciente: valorar diferir la cirugía programada/)).toBeVisible();
+    await expect(page.getByText(/neuroaxial\/bloqueo profundo prevista con stent reciente/)).toBeVisible();
+  });
+
   test('genera la hoja del paciente con su QR desde el resumen', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Presencial' }).click();

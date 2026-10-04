@@ -16,6 +16,8 @@ import { emitirEfectosModulos } from '../../dominio/entrevista/efectosModulos.ts
 import { derivarHojaExtras } from '../../dominio/entrevista/hojaExtras.ts';
 import { derivarRiesgoYPruebas } from '../../dominio/entrevista/riesgoYPruebas.ts';
 import { construirPlanPaciente } from '../paciente/construirPlanUi.ts';
+import { construirContexto } from '../../dominio/reglas/motor.ts';
+import { evaluarStent } from '../../dominio/reglas/antiagregantes.ts';
 import { calcularAyuno } from '../../dominio/ayuno/ayuno.ts';
 import { calcularEgri, EGRI_UMBRAL_RIESGO } from '../../dominio/escalas/egri.ts';
 import { calcularLangeron } from '../../dominio/escalas/langeron.ts';
@@ -246,6 +248,17 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco }: Props) {
     if ((morfina && morfina.mgDia >= 50) || (enfermedades.has('dolor_cronico') && riesgoIntAlto)) {
       alertas.push({ gravedad: 'informativa', mensaje: 'Valorar inclusión en el circuito de dolor transicional de la Unidad Integral del Dolor.' });
     }
+    // Stent reciente (§8.3, R12.7): alerta roja de valorar diferir y, con técnica
+    // neuroaxial/bloqueo profundo, la amarilla adicional. Se evalúa desde los hechos
+    // clínicos (fecha y motivo del stent) con el contexto de la técnica efectiva.
+    if (clin.stent && clin.stent.mesesDesdeImplante !== null) {
+      const refFecha = intervencion.fechaHora ?? new Date(Date.now() + 90 * 86_400_000);
+      const ctxStent = construirContexto({ ...intervencion, fechaHora: refFecha, fechaDesconocida: false }, basicos.pesoKg, clin.aclaramiento);
+      // Si no se conoce el motivo del stent, se usa la ventana más conservadora (SCA, 12 meses).
+      const stentEval = evaluarStent({ mesesDesdeImplante: clin.stent.mesesDesdeImplante, traSca: clin.stent.traSca ?? true }, ctxStent);
+      for (const a of stentEval.alertas) alertas.push({ gravedad: a.gravedad, mensaje: a.mensaje });
+    }
+
     // Alertas y notas codificadas en los módulos (§5.16): se EJECUTAN aquí, no
     // están escritas a mano. Incluye ictus/AIT < 3 meses (roja), TVP/TEP < 3 meses
     // (amarilla), asma no controlada, trasplante reciente, etc.

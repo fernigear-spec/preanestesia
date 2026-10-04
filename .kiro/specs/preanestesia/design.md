@@ -327,7 +327,7 @@ Hasta la Fase 1 el campo `genera` era solo descriptivo. Ahora cada efecto de tip
 - Una sola vista de la aplicación para todos los usuarios; la separación es de **salida**, no de rol.
 - Pie común en todas las salidas con versión y fecha de revisión (R12.4).
 - **Prehabilitación (Decisión 13):** el apartado de prehabilitación se renderiza **solo si** `config.prehabilitacion_activa === true`. Con el interruptor apagado no aparece ni en la hoja del paciente ni en las notas del anestesiólogo, aunque se cumplan los criterios clínicos. La URL de PreHabilítame es un valor configurable en `config.json`.
-- **Stent reciente + neuroaxial (Decisión 3):** el ordenador de alertas coloca la alerta del stent primero y en rojo; el generador de la hoja del paciente suprime toda pauta de antiagregantes mientras el punto esté pendiente de confirmación.
+- **Stent reciente + neuroaxial (Decisión 3):** `evaluarStent` se evalúa en el resumen (`Salidas.tsx`) desde los hechos clínicos (`clin.stent`) y emite la alerta roja «valorar diferir» y, con técnica neuroaxial/bloqueo profundo, la amarilla adicional (2026-10-04, antes estaba calculada pero sin conectar). El stent reciente es además un punto de validación «valorar posponer» (§13 bis, Fase 4). La supresión de la pauta de antiagregantes en la hoja (`suprimirPautaAntiagregantesEnHoja`) queda cubierta por el mecanismo de «requiere confirmación» (frase única de §12) mientras no se confirme.
 
 ---
 
