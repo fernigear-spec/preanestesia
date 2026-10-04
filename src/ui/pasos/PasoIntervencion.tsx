@@ -11,6 +11,7 @@ import {
   cargarProcedimientos,
   buscarProcedimientos,
   type Procedimiento,
+  type ZonaDispositivo,
 } from '../../datos/procedimientos.ts';
 
 interface Props {
@@ -36,6 +37,7 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
   const [otroCv, setOtroCv] = useState<RiesgoCardiovascular | ''>('');
   const [otroHemo, setOtroHemo] = useState<RiesgoHemorragico | ''>('');
   const [otroNeuroaxial, setOtroNeuroaxial] = useState(false);
+  const [otroZona, setOtroZona] = useState<ZonaDispositivo | ''>('');
 
   const resultados = useMemo(
     () => (elegido ? [] : buscarProcedimientos(procedimientos, consulta)),
@@ -73,6 +75,7 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
       espacioCerrado: false,
       retina: false,
       obstetrico: false,
+      ...(otroZona !== '' ? { zonaDispositivo: otroZona } : {}),
     };
     const datos: DatosIntervencion = {
       fechaHora,
@@ -89,6 +92,7 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
       retina: proc.retina,
       contrasteYodado,
       tecnica: 'no_se_sabe',
+      ...(proc.zonaDispositivo ? { zonaDispositivo: proc.zonaDispositivo } : {}),
     };
     onContinuar(datos, proc);
   }
@@ -211,6 +215,20 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
             <input type="checkbox" checked={otroNeuroaxial} onChange={() => setOtroNeuroaxial(!otroNeuroaxial)} />
             Técnica neuroaxial o bloqueo profundo probable
           </label>
+          <div className="campo">
+            <label htmlFor="otro-zona">Zona respecto a un marcapasos/DAI (§5.1 bis)</label>
+            <select id="otro-zona" value={otroZona} onChange={(e) => setOtroZona(e.target.value as ZonaDispositivo | '')}>
+              <option value="">— elija (si el paciente lleva dispositivo) —</option>
+              <option value="supraumbilical">Supraumbilical (tórax, mama, cuello, abdomen superior)</option>
+              <option value="infraumbilical">Infraumbilical (pelvis, extremidades)</option>
+              <option value="cardiaca">Cardiaca</option>
+              <option value="ocular">Ocular</option>
+              <option value="endoscopia">Endoscopia</option>
+              <option value="dental">Dental</option>
+              <option value="litotricia">Litotricia</option>
+              <option value="neurocirugia">Neurocirugía</option>
+            </select>
+          </div>
         </div>
       )}
 

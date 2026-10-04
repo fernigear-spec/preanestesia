@@ -25,6 +25,7 @@
 - 14. Conversión de opioides
 - 15. Procedimientos
 - 16. Módulos de enfermedad
+- 16 ter. Dispositivos cardiacos implantables
 - 16 bis. Puntos de validación clínica
 - 17. Pendiente de revisión por el servicio
 
@@ -1677,16 +1678,28 @@ _Fuente: docs/documento_fuente.md §5.8, §5.16.13_
 - **Dosis diaria** (mg) — _numero_
 - **Duración** (semanas) — _numero_
 
-### Marcapasos o DAI
+### Marcapasos o DAI (dispositivo cardiaco implantable)
 
-_Fuente: docs/documento_fuente.md §5.1_
+_Fuente: docs/documento_fuente.md §5.1 bis (British Heart Rhythm Society, Thomas et al., Anaesthesia 2022;77:808-17)_
 
-- **Tipo de dispositivo** — _opcion_: Marcapasos / Desfibrilador (DAI) / Resincronizador (TRC)
-- **Motivo de la implantación** — _texto_
-- **¿Es dependiente del marcapasos (si se conoce)?** — _opcion_: Sí / No / No lo sabe
+- **Tipo de dispositivo** — _opcion_: Marcapasos convencional / Marcapasos sin cables (tipo Micra) / Desfibrilador automático (DAI) / DAI subcutáneo (S-ICD) / Resincronizador sin desfibrilador (TRC-P) / Resincronizador con desfibrilador (TRC-D) / Holter implantable o registrador de eventos / No lo sabe
+  - Por qué: El tipo de dispositivo determina las precauciones perioperatorias y la respuesta al imán.
+- **Motivo del implante** — _opcion_: Bloqueo cardiaco / Ritmo lento o enfermedad del seno / Ablación del nodo AV / Insuficiencia cardiaca (resincronización) / Arritmia ventricular o riesgo de muerte súbita / Estudio de síncope o palpitaciones (Holter) / No lo sabe
+  - Por qué: El motivo ayuda a estimar si el paciente puede ser dependiente del marcapasos (p. ej. bloqueo o ablación del nodo AV).
+- **Fabricante** — _opcion_: Medtronic / Boston Scientific / Biotronik / Abbott (St. Jude) / MicroPort (LivaNova/Sorin) / Otro / No lo sabe
+  - Por qué: La colocación del imán y su efecto dependen del fabricante. Suele figurar en la tarjeta del dispositivo que lleva el paciente.
+- **Localización del generador** — _opcion_: Debajo de la clavícula izquierda / Debajo de la clavícula derecha / Lateral del tórax o axila (S-ICD) / Abdomen / Otra
+- **Hospital donde le implantaron el dispositivo** — _texto_
+- **Hospital donde le hacen el seguimiento** — _texto_
 - **Fecha de la última revisión del dispositivo** — _fecha_
-  - Por qué: El dispositivo debe revisarse antes de la cirugía; conviene saber cuándo fue la última revisión.
-- **Hospital donde le siguen el dispositivo** — _texto_
+  - Por qué: El dispositivo debe estar revisado antes de la cirugía: marcapasos en los últimos 12 meses, DAI o resincronizador en los últimos 6 meses. La revisión a distancia cuenta igual.
+- **¿La última revisión fue a distancia (telemonitorización)?** — _boolean_
+- **¿Le han dicho que la batería se está agotando o que hay que cambiarlo pronto?** — _opcion_: No / Sí / No lo sabe
+  - Por qué: Una batería próxima a agotarse puede alterar la respuesta del dispositivo durante la cirugía.
+- **¿El dispositivo forma parte de un ensayo clínico?** — _boolean_
+  - Por qué: Un dispositivo en ensayo clínico puede comportarse de forma no estándar; conviene coordinar con la unidad de arritmias.
+- **¿Le han dicho en la consulta de marcapasos que es dependiente del marcapasos?** — _opcion_: Sí / No / No lo sabe
+  - Por qué: La dependencia del marcapasos cambia las precauciones (riesgo de interferencia del bisturí eléctrico). Solo la confirma la consulta que sigue el dispositivo.
 
 ### Miocardiopatía
 
@@ -1837,9 +1850,35 @@ _Fuente: docs/documento_fuente.md §5.1_
   - Por qué: La estenosis aórtica grave sintomática es una valvulopatía de alto riesgo: puede aconsejar posponer la cirugía programada.
   - Genera → 🔔 alerta roja: si = sí → valvulopatía grave sintomática (estenosis aórtica grave sintomática): valorar posponer la cirugía programada. _(§5.1 (ESC 2022))_ **[se emite]**
 
+## 16 ter. Dispositivos cardiacos implantables (§5.1 bis)
+
+_Recomendaciones según el tipo de dispositivo, la dependencia y la zona del procedimiento (British Heart Rhythm Society, Thomas et al., Anaesthesia 2022;77:808-17). La zona sale de la columna `zona_dispositivo` de `procedimientos.csv`. Las notas y los puntos de validación los calcula `src/dominio/reglas/dispositivosCardiacos.ts`._
+
+| Dispositivo | Zona | Recomendación |
+| --- | --- | --- |
+| Holter / registrador | cualquiera | Sin precauciones (opcional: revisar antes y borrar memoria después). |
+| Marcapasos (no dependiente) | supraumbilical | Monitorizar sin reprogramar. |
+| Marcapasos (dependiente) | supraumbilical | Considerar modo asíncrono (frecuencia fija) con bisturí prolongado. |
+| Marcapasos | infraumbilical | Monitorizar sin reprogramar; si dependiente, imán disponible. |
+| DAI / TRC-D | supraumbilical / ocular / endoscopia | Desactivar terapias (programador o imán); si dependiente, frecuencia fija. |
+| DAI / TRC-D | infraumbilical | Monitorizar; razonable no desactivar; imán disponible. |
+| Marcapasos / DAI | cardiaca | Reprogramación (marcapasos) / desactivación del DAI. |
+| Marcapasos / DAI | dental | Nada salvo bisturí eléctrico. |
+| Marcapasos | litotricia | Revisar en el mes siguiente; no enfocar la onda cerca del generador. |
+| DAI | litotricia | Desactivar o imán durante la sesión. |
+| DAI | neurocirugia | Preferir desactivación con programador al imán. |
+| Marcapasos sin cables | cualquiera | No responde al imán; requiere su programador. |
+| DAI subcutáneo (S-ICD) | cualquiera | No estimula; imán en la axila. |
+
+**Colocación del imán por fabricante:** Medtronic, Boston Scientific y Biotronik, centrado sobre el generador (Biotronik pierde efecto a las 8 h: retirar y recolocar); Abbott (St. Jude), desplazado con el borde del anillo sobre el extremo del generador; MicroPort (LivaNova/Sorin), descentrado evitando la cabeza del dispositivo.
+
+**Precauciones generales** (función de marcapasos o DAI): ECG desde el inicio (comprobar pulso/oximetría); desfibrilador externo y marcapasos transcutáneo disponibles; parches anteroposteriores lejos del generador; bisturí bipolar en ráfagas cortas; placa de retorno con el trayecto lejos del generador; evitar paños magnéticos sobre el tórax. DAI desactivado: monitorización continua, desfibrilador con parches, reactivar en recuperación (responsabilidad del equipo quirúrgico).
+
+**Puntos de validación (§13 bis, amarillos):** DAI/TRC-D en supraumbilical, cardiaca, ocular, endoscopia o litotricia; marcapasos dependiente («sí»/«no lo sabe») en supraumbilical, cardiaca o endoscopia; revisión > 12 meses (marcapasos) / > 6 meses (DAI/TRC) o desconocida; batería agotándose o «no lo sabe»; dispositivo en ensayo clínico. Coordinar con la unidad de arritmias o la consulta de dispositivos.
+
 ## 16 bis. Puntos de validación clínica (§13 bis)
 
-_Mecanismo distinto de las alertas: condiciones que el anestesiólogo revisa al principio de su resumen, de dos tipos. No bloquean nada; cada una se resuelve con «Validado por [nombre]» o «Posponer o derivar». Mientras quede alguna sin validar, la hoja del paciente indica que el anestesiólogo revisará su caso. Se definen en `datos/validaciones.json` (editable desde el panel de administración)._
+_Mecanismo distinto de las alertas: condiciones que el anestesiólogo revisa al principio de su resumen, de dos tipos. No bloquean nada; cada una se resuelve con «Validado por [nombre]» o «Posponer o derivar». Mientras quede alguna sin validar, la hoja del paciente indica que el anestesiólogo revisará su caso. Se definen en `datos/validaciones.json` (editable desde el panel de administración). Los dispositivos cardiacos implantables añaden además puntos propios según tipo/zona/dependencia (§16 ter)._
 
 **🔴 Valorar posponer la cirugía programada**
 

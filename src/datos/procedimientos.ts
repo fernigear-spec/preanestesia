@@ -8,6 +8,21 @@ import type { RiesgoCardiovascular, RiesgoHemorragico, GrupoOftalmologico } from
 // El CSV vive fuera de src/; Vite lo carga como cadena con el sufijo ?raw.
 import csvProcedimientos from '../../datos/procedimientos.csv?raw';
 
+/** Zona del procedimiento respecto a un dispositivo cardiaco implantable (§5.1 bis). */
+export type ZonaDispositivo =
+  | 'supraumbilical'
+  | 'infraumbilical'
+  | 'cardiaca'
+  | 'ocular'
+  | 'endoscopia'
+  | 'dental'
+  | 'litotricia'
+  | 'neurocirugia';
+
+export const ZONAS_DISPOSITIVO: ZonaDispositivo[] = [
+  'supraumbilical', 'infraumbilical', 'cardiaca', 'ocular', 'endoscopia', 'dental', 'litotricia', 'neurocirugia',
+];
+
 export interface Procedimiento {
   id: string;
   nombre: string;
@@ -25,6 +40,8 @@ export interface Procedimiento {
   retina: boolean;
   /** Procedimiento del embarazo (cesárea, cerclaje, legrado obstétrico…). */
   obstetrico: boolean;
+  /** Zona respecto a un dispositivo cardiaco implantable (§5.1 bis). */
+  zonaDispositivo?: ZonaDispositivo;
 }
 
 function si(v: string | undefined): boolean {
@@ -48,6 +65,9 @@ export function cargarProcedimientos(csvTexto: string = csvProcedimientos): Proc
       espacioCerrado: si(v.espacio_cerrado),
       retina: si(v.retina),
       obstetrico: si(v.obstetrico),
+      ...(v.zona_dispositivo && (ZONAS_DISPOSITIVO as string[]).includes(v.zona_dispositivo.trim())
+        ? { zonaDispositivo: v.zona_dispositivo.trim() as ZonaDispositivo }
+        : {}),
     };
   });
 }

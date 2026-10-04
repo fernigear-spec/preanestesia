@@ -67,6 +67,8 @@ export interface DatosIntervencion {
   contrasteYodado: 'si' | 'no' | 'no_se_sabe';
   /** Técnica anestésica prevista (se elige en el paso 7). */
   tecnica: TecnicaAnestesica;
+  /** Zona del procedimiento respecto a un dispositivo cardiaco implantable (§5.1 bis). */
+  zonaDispositivo?: 'supraumbilical' | 'infraumbilical' | 'cardiaca' | 'ocular' | 'endoscopia' | 'dental' | 'litotricia' | 'neurocirugia';
 }
 
 export type Sexo = 'hombre' | 'mujer';

@@ -64,6 +64,7 @@ function hidratar(c: CasoJson): CasoEntrenamiento {
         retina: procedimiento.retina,
         contrasteYodado: c.intervencion.contrasteYodado,
         tecnica: c.intervencion.tecnica,
+        ...(procedimiento.zonaDispositivo ? { zonaDispositivo: procedimiento.zonaDispositivo } : {}),
       }
     : null;
 

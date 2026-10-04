@@ -1,0 +1,46 @@
+{
+  "id": "dai_colecistectomia",
+  "titulo": "DAI en colecistectomía · dispositivo cardiaco (§5.1 bis)",
+  "descripcion": "Varón de 70 años portador de un desfibrilador automático (DAI) de Medtronic, no dependiente del marcapasos, para una colecistectomía laparoscópica (zona supraumbilical). Pensado para ver las notas técnicas del dispositivo y el punto de validación de desactivar/reprogramar el DAI.",
+  "modalidad": "presencial",
+  "esperado": [
+    "Notas técnicas del dispositivo cardiaco: desactivar las terapias del DAI (programador o imán).",
+    "Precauciones generales: ECG desde el inicio, desfibrilador externo disponible, bisturí bipolar, imán centrado sobre el generador (Medtronic).",
+    "Nota de reactivar el DAI en recuperación (responsabilidad del equipo quirúrgico).",
+    "Punto de validación (amarillo): DAI en cirugía con interferencia probable → coordinar con la unidad de arritmias.",
+    "La hoja del paciente añade a «qué traer»: la tarjeta de su marcapasos o desfibrilador."
+  ],
+  "intervencion": {
+    "procedimientoId": "cgd_colecistectomia_lap",
+    "fecha": "2026-11-05",
+    "hora": "08:00",
+    "tecnica": "general",
+    "contrasteYodado": "no"
+  },
+  "basicos": {
+    "edadAnios": 70,
+    "sexo": "hombre",
+    "pesoKg": 84,
+    "tallaCm": 174,
+    "embarazada": false
+  },
+  "cribado": {
+    "ningunaConocida": false,
+    "enfermedades": ["marcapasos"],
+    "respuestasModulos": {
+      "marcapasos": {
+        "tipo": "dai",
+        "motivo": "arritmia_ventricular",
+        "fabricante": "medtronic",
+        "localizacion": "clavicula_izquierda",
+        "ultima_revision": "2026-09-15",
+        "revision_a_distancia": true,
+        "bateria_agotandose": "no",
+        "ensayo_clinico": false,
+        "dependiente": "no"
+      }
+    }
+  },
+  "medicacion": [],
+  "consentimiento": { "estado": "pendiente_entregar" }
+}

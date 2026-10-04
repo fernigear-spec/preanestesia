@@ -65,6 +65,7 @@ export function derivarHojaExtras(e: EntradaHojaExtras): ResultadoHojaExtras {
   const extras: ExtrasHojaQr = {
     cpap: saos.cpap === true || e.enfermedades.has('saos'),
     inhaladores: e.enfermedades.has('asma_epoc'),
+    ...(e.enfermedades.has('marcapasos') ? { tarjetaDispositivo: true } : {}),
     delirium,
     tabaco: e.tabacoActivo,
     alcohol: e.auditPositivo,

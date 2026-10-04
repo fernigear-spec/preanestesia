@@ -59,6 +59,9 @@ const COLUMNAS_PROCEDIMIENTOS = [
 const RIESGO_CV = new Set(['bajo', 'intermedio', 'alto']);
 const RIESGO_HEMO = new Set(['minimo', 'bajo', 'alto']);
 const GRUPO_OFTALMO = new Set(['no_aplica', 'riesgo_bajo', 'riesgo_moderado_alto']);
+const ZONA_DISPOSITIVO = new Set([
+  'supraumbilical', 'infraumbilical', 'cardiaca', 'ocular', 'endoscopia', 'dental', 'litotricia', 'neurocirugia',
+]);
 
 /**
  * Valida farmacos.csv contra las reglas conocidas.
@@ -148,6 +151,10 @@ export function validarProcedimientos(csvTexto: string): ResultadoValidacion {
     // espacio_cerrado es opcional (por defecto "no"); si viene, debe ser si/no.
     if (v.espacio_cerrado !== undefined && v.espacio_cerrado !== '' && !SI_NO.has(v.espacio_cerrado)) {
       errores.push({ fichero, fila: fila.numeroFila, columna: 'espacio_cerrado', mensaje: `valor fuera de lista (si/no): "${v.espacio_cerrado}"` });
+    }
+    // zona_dispositivo es opcional (§5.1 bis); si viene, debe ser una zona válida.
+    if (v.zona_dispositivo !== undefined && v.zona_dispositivo !== '' && !ZONA_DISPOSITIVO.has(v.zona_dispositivo)) {
+      errores.push({ fichero, fila: fila.numeroFila, columna: 'zona_dispositivo', mensaje: `valor fuera de lista: "${v.zona_dispositivo}"` });
     }
   }
 

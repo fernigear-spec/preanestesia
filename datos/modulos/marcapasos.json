@@ -1,35 +1,123 @@
 {
   "id": "marcapasos",
-  "titulo": "Marcapasos o DAI",
-  "fuente": "docs/documento_fuente.md §5.1",
+  "titulo": "Marcapasos o DAI (dispositivo cardiaco implantable)",
+  "fuente": "docs/documento_fuente.md §5.1 bis (British Heart Rhythm Society, Thomas et al., Anaesthesia 2022;77:808-17)",
   "preguntas": [
     {
       "id": "tipo",
       "etiqueta": "Tipo de dispositivo",
       "tipo": "opcion",
+      "porque": "El tipo de dispositivo determina las precauciones perioperatorias y la respuesta al imán.",
       "opciones": [
-        { "valor": "marcapasos", "etiqueta": "Marcapasos" },
-        { "valor": "dai", "etiqueta": "Desfibrilador (DAI)" },
-        { "valor": "trc", "etiqueta": "Resincronizador (TRC)" }
-      ]
+        { "valor": "marcapasos", "etiqueta": "Marcapasos convencional" },
+        { "valor": "marcapasos_sin_cables", "etiqueta": "Marcapasos sin cables (tipo Micra)" },
+        { "valor": "dai", "etiqueta": "Desfibrilador automático (DAI)" },
+        { "valor": "dai_subcutaneo", "etiqueta": "DAI subcutáneo (S-ICD)" },
+        { "valor": "trc_p", "etiqueta": "Resincronizador sin desfibrilador (TRC-P)" },
+        { "valor": "trc_d", "etiqueta": "Resincronizador con desfibrilador (TRC-D)" },
+        { "valor": "holter", "etiqueta": "Holter implantable o registrador de eventos" },
+        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+      ],
+      "etiquetaSap": "dispositivo cardiaco"
     },
-    { "id": "motivo", "etiqueta": "Motivo de la implantación", "tipo": "texto" },
     {
-      "id": "dependencia",
-      "etiqueta": "¿Es dependiente del marcapasos (si se conoce)?",
+      "id": "motivo",
+      "etiqueta": "Motivo del implante",
       "tipo": "opcion",
+      "porque": "El motivo ayuda a estimar si el paciente puede ser dependiente del marcapasos (p. ej. bloqueo o ablación del nodo AV).",
       "opciones": [
-        { "valor": "si", "etiqueta": "Sí" },
-        { "valor": "no", "etiqueta": "No" },
+        { "valor": "bloqueo", "etiqueta": "Bloqueo cardiaco" },
+        { "valor": "seno", "etiqueta": "Ritmo lento o enfermedad del seno" },
+        { "valor": "ablacion_nodo_av", "etiqueta": "Ablación del nodo AV" },
+        { "valor": "insuficiencia_cardiaca", "etiqueta": "Insuficiencia cardiaca (resincronización)" },
+        { "valor": "arritmia_ventricular", "etiqueta": "Arritmia ventricular o riesgo de muerte súbita" },
+        { "valor": "sincope_palpitaciones", "etiqueta": "Estudio de síncope o palpitaciones (Holter)" },
         { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
       ]
+    },
+    {
+      "id": "fabricante",
+      "etiqueta": "Fabricante",
+      "tipo": "opcion",
+      "porque": "La colocación del imán y su efecto dependen del fabricante. Suele figurar en la tarjeta del dispositivo que lleva el paciente.",
+      "opciones": [
+        { "valor": "medtronic", "etiqueta": "Medtronic" },
+        { "valor": "boston", "etiqueta": "Boston Scientific" },
+        { "valor": "biotronik", "etiqueta": "Biotronik" },
+        { "valor": "abbott", "etiqueta": "Abbott (St. Jude)" },
+        { "valor": "microport", "etiqueta": "MicroPort (LivaNova/Sorin)" },
+        { "valor": "otro", "etiqueta": "Otro" },
+        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+      ]
+    },
+    {
+      "id": "localizacion",
+      "etiqueta": "Localización del generador",
+      "tipo": "opcion",
+      "opciones": [
+        { "valor": "clavicula_izquierda", "etiqueta": "Debajo de la clavícula izquierda" },
+        { "valor": "clavicula_derecha", "etiqueta": "Debajo de la clavícula derecha" },
+        { "valor": "lateral_axila", "etiqueta": "Lateral del tórax o axila (S-ICD)" },
+        { "valor": "abdomen", "etiqueta": "Abdomen" },
+        { "valor": "otra", "etiqueta": "Otra" }
+      ]
+    },
+    {
+      "id": "hospital_implante",
+      "etiqueta": "Hospital donde le implantaron el dispositivo",
+      "tipo": "texto"
+    },
+    {
+      "id": "hospital_seguimiento",
+      "etiqueta": "Hospital donde le hacen el seguimiento",
+      "tipo": "texto"
     },
     {
       "id": "ultima_revision",
       "etiqueta": "Fecha de la última revisión del dispositivo",
       "tipo": "fecha",
-      "porque": "El dispositivo debe revisarse antes de la cirugía; conviene saber cuándo fue la última revisión."
+      "porque": "El dispositivo debe estar revisado antes de la cirugía: marcapasos en los últimos 12 meses, DAI o resincronizador en los últimos 6 meses. La revisión a distancia cuenta igual."
     },
-    { "id": "hospital_seguimiento", "etiqueta": "Hospital donde le siguen el dispositivo", "tipo": "texto" }
+    {
+      "id": "revision_a_distancia",
+      "etiqueta": "¿La última revisión fue a distancia (telemonitorización)?",
+      "tipo": "boolean",
+      "etiquetaSap": "revisión a distancia"
+    },
+    {
+      "id": "bateria_agotandose",
+      "etiqueta": "¿Le han dicho que la batería se está agotando o que hay que cambiarlo pronto?",
+      "tipo": "opcion",
+      "porque": "Una batería próxima a agotarse puede alterar la respuesta del dispositivo durante la cirugía.",
+      "opciones": [
+        { "valor": "no", "etiqueta": "No" },
+        { "valor": "si", "etiqueta": "Sí" },
+        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+      ]
+    },
+    {
+      "id": "ensayo_clinico",
+      "etiqueta": "¿El dispositivo forma parte de un ensayo clínico?",
+      "tipo": "boolean",
+      "porque": "Un dispositivo en ensayo clínico puede comportarse de forma no estándar; conviene coordinar con la unidad de arritmias.",
+      "etiquetaSap": "dispositivo en ensayo clínico"
+    },
+    {
+      "id": "dependiente",
+      "etiqueta": "¿Le han dicho en la consulta de marcapasos que es dependiente del marcapasos?",
+      "tipo": "opcion",
+      "porque": "La dependencia del marcapasos cambia las precauciones (riesgo de interferencia del bisturí eléctrico). Solo la confirma la consulta que sigue el dispositivo.",
+      "ayuda": "Ser dependiente del marcapasos significa que el corazón del paciente no late por sí solo, o lo hace demasiado despacio, sin la ayuda del dispositivo. Si el marcapasos dejara de estimular aunque fuera unos segundos (por ejemplo, por interferencias del bisturí eléctrico), el paciente podría marearse, perder el conocimiento o sufrir una parada. Tener un marcapasos no significa ser dependiente: la mayoría de los portadores no lo son. Ver espigas del marcapasos en el electrocardiograma tampoco lo demuestra. Solo puede confirmarlo la consulta que hace el seguimiento del dispositivo. Si el paciente no lo sabe, márquelo como «no lo sabe»; es más probable si se lo pusieron por un bloqueo cardiaco o tras una ablación del nodo AV.",
+      "visibleSi": {
+        "pregunta": "tipo",
+        "enLista": ["marcapasos", "marcapasos_sin_cables", "dai", "trc_p", "trc_d", "no_lo_sabe"]
+      },
+      "opciones": [
+        { "valor": "si", "etiqueta": "Sí" },
+        { "valor": "no", "etiqueta": "No" },
+        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+      ],
+      "etiquetaSap": "dependiente del marcapasos"
+    }
   ]
 }

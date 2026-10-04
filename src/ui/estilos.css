@@ -550,6 +550,9 @@ body {
 .pendiente-controles { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
 .lista-ayuno { margin: 8px 0; }
 
+/* Explicación fija junto a una pregunta de módulo (§5.1 bis) */
+.ayuda-pregunta { margin: 4px 0 8px; padding: 8px 10px; background: #eef4ff; border-left: 4px solid #0027c2; border-radius: 6px; font-size: 0.9rem; color: #333; }
+
 /* Puntos de validación clínica (§13 bis) */
 .validaciones { margin: 8px 0 16px; }
 .lista-validaciones { list-style: none; padding: 0; margin: 8px 0; }

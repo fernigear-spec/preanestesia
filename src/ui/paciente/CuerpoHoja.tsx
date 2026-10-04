@@ -66,6 +66,7 @@ export function CuerpoHoja({ instrucciones, ay, ex, fecha, t }: Props) {
         {t.que_traer_items.map((it, k) => <li key={k}>{it}</li>)}
         {ex?.cpap && <li>{t.que_traer_cpap}</li>}
         {ex?.inhaladores && <li>{t.que_traer_inhaladores}</li>}
+        {ex?.tarjetaDispositivo && <li>{t.que_traer_tarjeta_dispositivo}</li>}
         {ex?.delirium && <li>{t.que_traer_delirium}</li>}
       </ul>
 

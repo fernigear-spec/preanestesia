@@ -102,6 +102,12 @@ export interface PreguntaModulo {
   /** Texto del modo guiado (§5b.4): "¿Por qué preguntamos esto?". */
   porque?: string;
   /**
+   * Explicación fija SIEMPRE visible junto a la pregunta (no solo en «¿Por qué
+   * preguntamos esto?»). Para preguntas que la enfermera debe entender para
+   * contestarlas bien (p. ej. la dependencia del marcapasos, §5.1 bis).
+   */
+  ayuda?: string;
+  /**
    * Etiqueta breve para el texto de SAP (§10.1, 2026-10-04). En preguntas booleanas:
    * la palabra o expresión corta (p. ej. "ortopnea", "CPAP"); sí = la palabra, no =
    * "no " + la palabra. Es obligatoria en toda pregunta booleana (lo vigila un test).

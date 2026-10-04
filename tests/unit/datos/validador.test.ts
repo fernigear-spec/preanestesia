@@ -77,6 +77,16 @@ describe('Validador de datos iniciales', () => {
     if (!r.ok) console.error(r.errores);
     expect(r.ok).toBeTrue();
   });
+
+  it('§5.1 bis: zona_dispositivo inválida se detecta; válida y ausente se aceptan', () => {
+    const cab = 'id;procedimiento;especialidad;riesgo_cardiovascular;riesgo_hemorragico;grupo_oftalmologico;neuroaxial_o_bloqueo_profundo_probable;duracion_mayor_30min;riesgo_trombotico_alto;zona_dispositivo';
+    const base = 'p1;Proc;cirugia_general;intermedio;bajo;no_aplica;no;si;no';
+    expect(validarProcedimientos(`${cab}\n${base};supraumbilical`).ok).toBeTrue();
+    expect(validarProcedimientos(`${cab}\n${base};`).ok).toBeTrue();
+    const malo = validarProcedimientos(`${cab}\n${base};zona_inventada`);
+    expect(malo.ok).toBeFalse();
+    expect(malo.errores.some((e) => e.columna === 'zona_dispositivo')).toBeTrue();
+  });
 });
 
 describe('Caso 21 §15: regla inexistente', () => {

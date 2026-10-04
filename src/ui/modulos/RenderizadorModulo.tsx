@@ -51,6 +51,8 @@ function CampoPregunta({
     <div className="campo campo-modulo">
       <label htmlFor={idCampo}>{p.etiqueta}{p.unidad ? ` (${p.unidad})` : ''}</label>
 
+      {p.ayuda && <p className="ayuda-pregunta">{p.ayuda}</p>}
+
       {p.tipo === 'boolean' && (
         <div className="grupo-si-no" role="group" aria-label={p.etiqueta}>
           <button type="button" className={`chip-hora ${valor === true ? 'seleccionado' : ''}`} onClick={() => onCambio(p.id, valor === true ? null : true)} aria-pressed={valor === true}>Sí</button>

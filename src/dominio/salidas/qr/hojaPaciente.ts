@@ -117,6 +117,8 @@ export interface ExtrasHojaQr {
   cpap: boolean;
   /** Traer los inhaladores (asma/EPOC). */
   inhaladores: boolean;
+  /** Traer la tarjeta del marcapasos/DAI (§5.1 bis). */
+  tarjetaDispositivo?: boolean;
   /** Recomendaciones de prevención del delirium (§6.10). */
   delirium: boolean;
   /** Consejo de tabaco. */

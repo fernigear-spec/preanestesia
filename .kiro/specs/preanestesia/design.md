@@ -285,6 +285,19 @@ Mecanismo **distinto de las alertas**. El catálogo `datos/validaciones.json` **
 - **Panel admin** (`validar.ts`): valida la estructura de `validaciones.json` (recogido automáticamente por el glob de `contenido.ts`). **CONTENIDO_CLINICO.md** incluye la §16 bis con los dos grupos.
 - **Pruebas**: `tests/unit/dominio2/puntosValidacion.test.ts` (coherencia de orígenes + disparo de cada condición con su tipo + stent + orden), `tests/unit/datos/validaciones.test.ts` (cargador/validador), aviso en la hoja (`anexosYAyuno.test.ts`) y E2E con el caso de entrenamiento `validaciones_multiples.json`.
 
+### Lista aprobada y generalización de orígenes (rev. servicio, 2026-10-04)
+
+- La lista de puntos la fija el servicio (guía ESC 2022); `datos/validaciones.json` la refleja. Un `origen` puede ser **«moduloId.preguntaId»** (condición de módulo que emite alerta con `si`) o un **hecho con nombre** (escala, hecho clínico, dato del paso 1, alergias, antecedentes o vía aérea). `derivarPuntosValidacion` distingue ambos: los de módulo via `emitirEfectosModulos`, los hechos via el `Record<string,boolean>` que calcula `src/ui/pasos/hechosValidacionUi.ts` (`construirHechosValidacion`), compartido por el resumen y la hoja del paciente.
+- Operadores de condición añadidos: `recienteDias` y `menorQue` (`CondicionEfecto`).
+- Preguntas opcionales nuevas: módulos (IC `ultimo_ingreso`/`empeoramiento_reciente`, valvulopatía `estenosis_aortica_grave_sintomatica`, HTA `tension_consulta`, FA `sincope_palpitaciones_reciente`/`bloqueo_sin_marcapasos`) y UI (`basicos.rechazaHemoderivados`, `habitos.cocainaUltimaSemana`).
+- **Estado de validación en la entrevista** (`entrevista.validaciones`): lo escribe `Salidas` (prop `onValidarPunto`) y lo lee `BloqueHojaPaciente`; el aviso de la hoja aparece solo mientras quede algún punto SIN validar (los pospuestos lo mantienen). Los controles llevan `no-print`; el estado (validado/posponer/pendiente) sale en el PDF.
+
+### Dispositivos cardiacos implantables (§5.1 bis, BHRS 2022)
+
+- Módulo `marcapasos.json` ampliado (tipo, motivo, fabricante, localización, revisión, batería, ensayo, dependencia con explicación fija `ayuda`). Nueva columna `zona_dispositivo` en `procedimientos.csv` (clasificado el catálogo; en «otro» la elige la enfermera; propagada a `DatosIntervencion`).
+- `src/dominio/reglas/dispositivosCardiacos.ts` (`evaluarDispositivoCardiaco`, pura) produce **notas técnicas** (tabla 1 + precauciones generales + colocación del imán por fabricante) y **puntos de validación** amarillos (DAI/marcapasos dependiente por zona, revisión atrasada, batería, ensayo). `Salidas` vuelca las notas en «Notas técnicas» y añade los puntos a la sección de validación (sustituyen a la antigua alerta genérica de marcapasos). La hoja del paciente añade «La tarjeta de su marcapasos o desfibrilador» a «qué traer» (es/ca).
+- Pruebas: `tests/unit/reglas/dispositivosCardiacos.test.ts` (una por fila de la tabla + imán por fabricante + puntos) y caso de entrenamiento `dai_colecistectomia.json` con su E2E.
+
 ### Pruebas complementarias: BNP y vigencia (§7.3/§7.4, 2026-10-04)
 
 `tablaPruebas.decidirPruebas` admite la prueba `bnp` (nota **: cirugía intermedia/alta + comorbilidad CV significativa / fragilidad / capacidad reducida) y un parámetro de vigencia que **descuenta** las pruebas aún vigentes. `riesgoYPruebas` deriva la comorbilidad CV del conjunto de enfermedades (la HTA aislada no cuenta), la fragilidad/capacidad de las escalas, y la vigencia de las fechas del apartado «Pruebas recientes» del paso 6 (comparadas con la fecha de la intervención o «hoy»).

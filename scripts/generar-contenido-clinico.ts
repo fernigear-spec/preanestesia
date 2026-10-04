@@ -88,7 +88,8 @@ p();
   '9. Cribado mitocondrial mtND4', '10. ASA sugerido', '11. Escalas y cálculos',
   '12. Clase de riesgo del paciente y pruebas complementarias', '13. Catálogo de fármacos',
   '14. Conversión de opioides', '15. Procedimientos', '16. Módulos de enfermedad',
-  '16 bis. Puntos de validación clínica', '17. Pendiente de revisión por el servicio',
+  '16 ter. Dispositivos cardiacos implantables', '16 bis. Puntos de validación clínica',
+  '17. Pendiente de revisión por el servicio',
 ].forEach((s) => p(`- ${s}`));
 p();
 
@@ -424,10 +425,40 @@ for (const mod of modulos) {
   p();
 }
 
+// —————————————————————————————— 16 ter. Dispositivos cardiacos ——————————————————————————————
+p('## 16 ter. Dispositivos cardiacos implantables (§5.1 bis)');
+p();
+p('_Recomendaciones según el tipo de dispositivo, la dependencia y la zona del procedimiento (British Heart Rhythm Society, Thomas et al., Anaesthesia 2022;77:808-17). La zona sale de la columna `zona_dispositivo` de `procedimientos.csv`. Las notas y los puntos de validación los calcula `src/dominio/reglas/dispositivosCardiacos.ts`._');
+p();
+p('| Dispositivo | Zona | Recomendación |');
+p('| --- | --- | --- |');
+[
+  ['Holter / registrador', 'cualquiera', 'Sin precauciones (opcional: revisar antes y borrar memoria después).'],
+  ['Marcapasos (no dependiente)', 'supraumbilical', 'Monitorizar sin reprogramar.'],
+  ['Marcapasos (dependiente)', 'supraumbilical', 'Considerar modo asíncrono (frecuencia fija) con bisturí prolongado.'],
+  ['Marcapasos', 'infraumbilical', 'Monitorizar sin reprogramar; si dependiente, imán disponible.'],
+  ['DAI / TRC-D', 'supraumbilical / ocular / endoscopia', 'Desactivar terapias (programador o imán); si dependiente, frecuencia fija.'],
+  ['DAI / TRC-D', 'infraumbilical', 'Monitorizar; razonable no desactivar; imán disponible.'],
+  ['Marcapasos / DAI', 'cardiaca', 'Reprogramación (marcapasos) / desactivación del DAI.'],
+  ['Marcapasos / DAI', 'dental', 'Nada salvo bisturí eléctrico.'],
+  ['Marcapasos', 'litotricia', 'Revisar en el mes siguiente; no enfocar la onda cerca del generador.'],
+  ['DAI', 'litotricia', 'Desactivar o imán durante la sesión.'],
+  ['DAI', 'neurocirugia', 'Preferir desactivación con programador al imán.'],
+  ['Marcapasos sin cables', 'cualquiera', 'No responde al imán; requiere su programador.'],
+  ['DAI subcutáneo (S-ICD)', 'cualquiera', 'No estimula; imán en la axila.'],
+].forEach((f) => p(`| ${f.join(' | ')} |`));
+p();
+p('**Colocación del imán por fabricante:** Medtronic, Boston Scientific y Biotronik, centrado sobre el generador (Biotronik pierde efecto a las 8 h: retirar y recolocar); Abbott (St. Jude), desplazado con el borde del anillo sobre el extremo del generador; MicroPort (LivaNova/Sorin), descentrado evitando la cabeza del dispositivo.');
+p();
+p('**Precauciones generales** (función de marcapasos o DAI): ECG desde el inicio (comprobar pulso/oximetría); desfibrilador externo y marcapasos transcutáneo disponibles; parches anteroposteriores lejos del generador; bisturí bipolar en ráfagas cortas; placa de retorno con el trayecto lejos del generador; evitar paños magnéticos sobre el tórax. DAI desactivado: monitorización continua, desfibrilador con parches, reactivar en recuperación (responsabilidad del equipo quirúrgico).');
+p();
+p('**Puntos de validación (§13 bis, amarillos):** DAI/TRC-D en supraumbilical, cardiaca, ocular, endoscopia o litotricia; marcapasos dependiente («sí»/«no lo sabe») en supraumbilical, cardiaca o endoscopia; revisión > 12 meses (marcapasos) / > 6 meses (DAI/TRC) o desconocida; batería agotándose o «no lo sabe»; dispositivo en ensayo clínico. Coordinar con la unidad de arritmias o la consulta de dispositivos.');
+p();
+
 // —————————————————————————————— 16 bis. Puntos de validación ——————————————————————————————
 p('## 16 bis. Puntos de validación clínica (§13 bis)');
 p();
-p('_Mecanismo distinto de las alertas: condiciones que el anestesiólogo revisa al principio de su resumen, de dos tipos. No bloquean nada; cada una se resuelve con «Validado por [nombre]» o «Posponer o derivar». Mientras quede alguna sin validar, la hoja del paciente indica que el anestesiólogo revisará su caso. Se definen en `datos/validaciones.json` (editable desde el panel de administración)._');
+p('_Mecanismo distinto de las alertas: condiciones que el anestesiólogo revisa al principio de su resumen, de dos tipos. No bloquean nada; cada una se resuelve con «Validado por [nombre]» o «Posponer o derivar». Mientras quede alguna sin validar, la hoja del paciente indica que el anestesiólogo revisará su caso. Se definen en `datos/validaciones.json` (editable desde el panel de administración). Los dispositivos cardiacos implantables añaden además puntos propios según tipo/zona/dependencia (§16 ter)._');
 p();
 p('**🔴 Valorar posponer la cirugía programada**');
 p();

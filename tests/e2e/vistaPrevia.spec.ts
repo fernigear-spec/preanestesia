@@ -7,6 +7,13 @@ import { test, expect, type Page } from '@playwright/test';
  * 10 consentimiento · 11 mtND4 · 12 resultados.
  */
 
+/** Abre un caso de entrenamiento por su título (robusto al orden de la lista). */
+async function abrirCasoEntrenamiento(page: Page, tituloRegex: RegExp) {
+  await page.getByRole('button', { name: 'Modo entrenamiento' }).click();
+  const tarjeta = page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: tituloRegex }) });
+  await tarjeta.getByRole('button', { name: 'Abrir este caso' }).click();
+}
+
 /** Paso 2 · Alergias: sin marcar «Alergias conocidas» = sin alergias conocidas. */
 async function pasoAlergiasSinAlergias(page: Page) {
   await expect(page.getByRole('heading', { name: /Paso 2 · Alergias/ })).toBeVisible();
@@ -750,9 +757,7 @@ test.describe('Vista previa', () => {
 
   test('§13 bis: el caso de entrenamiento con varias condiciones muestra los puntos de validación y permite validar/posponer', async ({ page }) => {
     await page.goto('/preanestesia/');
-    await page.getByRole('button', { name: 'Modo entrenamiento' }).click();
-    // Abrir el caso de validaciones múltiples (botón del caso por su título).
-    await page.getByRole('button', { name: 'Abrir este caso' }).nth(1).click();
+    await abrirCasoEntrenamiento(page, /Varios puntos de validación/);
     await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
 
     // Sección de puntos de validación clínica al principio del resumen.
@@ -784,8 +789,7 @@ test.describe('Vista previa', () => {
 
   test('§13 bis: al validar TODOS los puntos, la hoja del paciente deja de mostrar el aviso de revisión', async ({ page }) => {
     await page.goto('/preanestesia/');
-    await page.getByRole('button', { name: 'Modo entrenamiento' }).click();
-    await page.getByRole('button', { name: 'Abrir este caso' }).nth(1).click();
+    await abrirCasoEntrenamiento(page, /Varios puntos de validación/);
     await expect(page.getByRole('heading', { name: /Puntos de validación clínica/ })).toBeVisible();
 
     // Validar todos los puntos: rellenar cada nombre y pulsar Validar hasta que no queden.
@@ -802,6 +806,29 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
     await expect(page.getByRole('img', { name: /Código QR/ })).toBeVisible();
     await expect(page.getByText('Antes de la intervención, el anestesiólogo revisará su caso y, si es necesario, se pondrá en contacto con usted.')).toHaveCount(0);
+  });
+
+  test('§5.1 bis: caso de DAI en colecistectomía muestra notas del dispositivo y su punto de validación', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await abrirCasoEntrenamiento(page, /DAI en colecistectomía/);
+    await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
+
+    // Punto de validación del dispositivo (amarillo) en la sección de validación.
+    const seccion = page.locator('section.validaciones');
+    await expect(seccion.getByText(/DAI o TRC-D en cirugía con interferencia electromagnética probable/)).toBeVisible();
+
+    // Notas técnicas del dispositivo (desplegar «Notas técnicas»). Se buscan las
+    // notas con el prefijo «Dispositivo cardiaco:» para no confundir con el texto
+    // de «Resultado esperado» del modo entrenamiento.
+    await page.getByRole('button', { name: /Notas técnicas/ }).click();
+    await expect(page.getByText(/Dispositivo cardiaco: DAI\/TRC-D .*desactivar las terapias del DAI/)).toBeVisible();
+    await expect(page.getByText(/Dispositivo cardiaco:.*centrado sobre el generador/)).toBeVisible();
+
+    // La hoja del paciente añade la tarjeta del dispositivo a «qué traer».
+    await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
+    await expect(
+      page.locator('section.hoja-paciente').getByText('La tarjeta de su marcapasos o desfibrilador'),
+    ).toBeVisible();
   });
 
   test('§14.4 guía imprimible: se genera desde los módulos con casillas en blanco', async ({ page }) => {

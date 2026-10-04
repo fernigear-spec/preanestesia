@@ -21,6 +21,7 @@ import { derivarRiesgoYPruebas } from '../../dominio/entrevista/riesgoYPruebas.t
 import { construirPlanPaciente } from '../paciente/construirPlanUi.ts';
 import { construirContexto } from '../../dominio/reglas/motor.ts';
 import { evaluarStent } from '../../dominio/reglas/antiagregantes.ts';
+import { evaluarDispositivoCardiaco } from '../../dominio/reglas/dispositivosCardiacos.ts';
 import { calcularAyuno } from '../../dominio/ayuno/ayuno.ts';
 import { calcularEgri, EGRI_UMBRAL_RIESGO } from '../../dominio/escalas/egri.ts';
 import { calcularLangeron } from '../../dominio/escalas/langeron.ts';
@@ -252,7 +253,8 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     else if (cuatroAt && cuatroAt.puntuacion >= 1) alertas.push({ gravedad: 'amarilla', mensaje: '4AT 1-3: riesgo de delirium.' });
     if (habitos?.cfs !== undefined && habitos.cfs >= 5) alertas.push({ gravedad: 'amarilla', mensaje: 'Fragilidad (CFS ≥ 5).' });
     if (audit?.riesgoAbstinencia) alertas.push({ gravedad: 'amarilla', mensaje: 'AUDIT-C ≥ 8: riesgo de síndrome de abstinencia.' });
-    if (enfermedades.has('marcapasos')) alertas.push({ gravedad: 'amarilla', mensaje: 'Marcapasos/DAI: revisar dispositivo.' });
+    // (El marcapasos/DAI ya no genera una alerta genérica: §5.1 bis lo trata con
+    //  notas técnicas específicas y puntos de validación según tipo/zona/dependencia.)
     if (stopBang?.alto) alertas.push({ gravedad: 'amarilla', mensaje: `STOP-Bang ${stopBang.puntuacion} (riesgo alto): posible SAOS no diagnosticado.` });
     if (stbur && stbur.puntuacion >= 5) alertas.push({ gravedad: 'roja', mensaje: 'STBUR 5: riesgo alto de eventos respiratorios perioperatorios.' });
     else if (stbur && stbur.puntuacion >= 3) alertas.push({ gravedad: 'amarilla', mensaje: `STBUR ${stbur.puntuacion}: riesgo aumentado de eventos respiratorios perioperatorios.` });
@@ -293,9 +295,25 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
 
     alertas.sort((a, b) => ORDEN_GRAVEDAD[a.gravedad] - ORDEN_GRAVEDAD[b.gravedad]);
 
+    // Dispositivos cardiacos implantables (§5.1 bis): notas técnicas y puntos de
+    // validación propios (amarillos), según tipo, dependencia, zona y fabricante.
+    const mp = respuestas['marcapasos'] ?? {};
+    const dispositivo = enfermedades.has('marcapasos')
+      ? evaluarDispositivoCardiaco({
+          ...(typeof mp['tipo'] === 'string' ? { tipo: mp['tipo'] as never } : {}),
+          ...(typeof mp['dependiente'] === 'string' ? { dependiente: mp['dependiente'] as never } : {}),
+          ...(intervencion.zonaDispositivo ? { zona: intervencion.zonaDispositivo } : {}),
+          ...(typeof mp['fabricante'] === 'string' ? { fabricante: mp['fabricante'] as never } : {}),
+          ultimaRevision: (mp['ultima_revision'] as string | undefined) ?? null,
+          ...(typeof mp['bateria_agotandose'] === 'string' ? { bateriaAgotandose: mp['bateria_agotandose'] as never } : {}),
+          ensayoClinico: mp['ensayo_clinico'] === true,
+        }, hoy)
+      : { notas: [], puntos: [] };
+
     // Notas técnicas.
     const notas: string[] = [...ayuno.notasAnestesiologo];
     for (const n of efectosMod.notas) notas.push(n.texto);
+    for (const n of dispositivo.notas) notas.push(`Dispositivo cardiaco: ${n}`);
     for (const f of plan) if (f.resultado.textoAnestesiologo) notas.push(`${f.resultado.nombreComercial}: ${f.resultado.textoAnestesiologo}`);
     if (mt?.alerta?.gravedad === 'roja') notas.push('mtND4: seguir las medidas del consenso SEDAR (evitar halogenados/TIVA, regional preferente, monitorización de profundidad, etc.).');
 
@@ -331,6 +349,10 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
       fechaIntervencion: intervencion.fechaHora ?? null, fechaReferencia: hoy,
       hechos: construirHechosValidacion(entrevista, hoy),
     });
+    // Puntos de validación propios del dispositivo cardiaco (§5.1 bis, amarillos).
+    for (const p of dispositivo.puntos) {
+      puntosValidacion.push({ id: p.id, tipo: 'validar', motivo: p.motivo, origen: 'dispositivo_cardiaco', ...(p.fuente ? { fuente: p.fuente } : {}) });
+    }
 
     return { asa, escalas, alertas, notas, plan, pruebas: rp.pruebas, claseRiesgo: rp.clase, ayuno, sap, puntosValidacion };
   }, [intervencion, basicos, cribado, medicacion, habitos, viaAerea, consentimiento, antecedentes, mtnd4, alergias, modalidad, soloAscii, asaManual, fechaReferencia]);

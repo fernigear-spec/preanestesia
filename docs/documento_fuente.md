@@ -114,11 +114,35 @@ Cada módulo define preguntas clave, datos a registrar, efecto sobre ASA sugerid
 - Insuficiencia cardiaca: clase NYHA (con descripción de cada clase para preguntarla), fracción de eyección si se conoce, último ingreso, ortopnea, edemas, ecocardiograma (fecha).
 - Valvulopatía: válvula, tipo, gravedad, prótesis (biológica o mecánica; posición mitral, aórtica o tricúspide), último ecocardiograma (fecha), síntomas nuevos (disnea, síncope, angina).
 - Fibrilación auricular y otras arritmias: tipo, anticoagulación, ictus o AIT previo (fecha). Activa CHA2DS2-VA.
-- Marcapasos o DAI: tipo, motivo, dependencia si se conoce, última revisión (fecha), hospital de seguimiento. Alerta siempre.
+- Marcapasos o DAI: dispositivo cardiaco implantable, desarrollado en §5.1 bis (tipo, motivo, fabricante, localización, dependencia, revisión, batería, ensayo). Ya no genera una alerta genérica: notas técnicas y puntos de validación según tipo/zona/dependencia.
 - Miocardiopatía (casilla propia, 2026-10-04): tipo, último ecocardiograma, síntomas recientes (disnea, síncope, palpitaciones). Síntomas recientes: alerta. Cuenta como comorbilidad cardiovascular para el BNP (§7.3).
 - Enfermedad arterial periférica, aneurisma de aorta (casillas propias, 2026-10-04): cuentan como enfermedad vascular en CHA2DS2-VA (§6.5) y como comorbilidad cardiovascular para el BNP (§7.3).
 - Ictus o AIT: fecha, secuelas. Menos de 3 meses: alerta roja (valorar posponer la cirugía programada, ESC 2022).
 - TVP o TEP: fecha, anticoagulación actual. Menos de 3 meses: alerta amarilla (valorar antes de la intervención).
+
+### 5.1 bis. Dispositivos cardiacos implantables (British Heart Rhythm Society, Thomas et al., Anaesthesia 2022;77:808-17)
+
+El módulo «Marcapasos o DAI» recoge: **tipo** (marcapasos convencional, marcapasos sin cables tipo Micra, DAI, DAI subcutáneo S-ICD, resincronizador sin desfibrilador TRC-P, resincronizador con desfibrilador TRC-D, Holter implantable, no lo sabe); **motivo** del implante; **fabricante** (Medtronic, Boston Scientific, Biotronik, Abbott/St. Jude, MicroPort/LivaNova/Sorin, otro, no lo sabe; suele figurar en la tarjeta del dispositivo); **localización** del generador; **hospital** de implante y de seguimiento; **fecha de la última revisión** y si fue a distancia (cuenta igual); si la **batería** se está agotando; si está en **ensayo clínico**; y la **dependencia del marcapasos** (sí/no/no lo sabe), con una explicación fija para la enfermera (ser dependiente significa que el corazón no late por sí solo sin el dispositivo; tener un marcapasos no implica ser dependiente; solo lo confirma la consulta de seguimiento; más probable tras bloqueo o ablación del nodo AV).
+
+**Zona del procedimiento** (`zona_dispositivo` en `procedimientos.csv`): supraumbilical, infraumbilical, cardiaca, ocular, endoscopia, dental, litotricia, neurocirugía. En «otro procedimiento» la elige la enfermera.
+
+**Recomendaciones para el anestesiólogo** (notas técnicas del resumen y PDF), según tipo, dependencia y zona (tabla 1 de la guía):
+- **Holter/registrador:** sin precauciones especiales (opcional: revisar antes y borrar la memoria después).
+- **Marcapasos, supraumbilical:** si no es dependiente, monitorizar sin reprogramar; si es dependiente, considerar modo asíncrono (frecuencia fija) con bisturí eléctrico prolongado.
+- **Marcapasos, infraumbilical:** monitorizar sin reprogramar; si es dependiente, imán disponible.
+- **DAI/TRC-D, supraumbilical:** desactivar las terapias (programador o imán); si es dependiente, desactivar y considerar frecuencia fija (el imán solo si no hay bisturí prolongado).
+- **DAI/TRC-D, infraumbilical:** monitorizar; es razonable no desactivar; imán disponible.
+- **Cardiaca:** reprogramación probable (marcapasos); desactivación del DAI con reprogramación.
+- **Ocular:** como supraumbilical si hay bisturí monopolar. **Endoscopia:** como supraumbilical si se prevé bisturí/argón prolongado. **Odontología:** nada salvo bisturí eléctrico.
+- **Litotricia:** marcapasos, revisar en el mes siguiente; DAI, desactivar o imán; no enfocar la onda cerca del generador.
+- **Neurocirugía con DAI:** preferir la desactivación con programador al imán.
+- **Marcapasos sin cables:** no responde al imán. **DAI subcutáneo:** no estimula; imán en la axila.
+- **Imán por fabricante:** Medtronic/Boston/Biotronik centrado sobre el generador (Biotronik pierde efecto a las 8 h: retirar y recolocar); Abbott desplazado (borde del anillo sobre el extremo del generador); MicroPort descentrado.
+- **Precauciones generales** (siempre que haya función de marcapasos o DAI): ECG desde el inicio (comprobar pulso/oximetría); desfibrilador externo y marcapasos transcutáneo disponibles; parches de desfibrilación lejos del generador, anteroposteriores, nunca encima; bisturí bipolar en ráfagas cortas; placa de retorno con el trayecto de corriente lejos del generador; evitar paños magnéticos sobre el tórax; si se usa imán, fijarlo. Si se desactiva el DAI: monitorización continua y desfibrilador con parches hasta reactivarlo; reactivar en recuperación cuanto antes; nunca dar el alta sin reactivarlo (responsabilidad del equipo quirúrgico).
+
+**Puntos de validación** (§13 bis, amarillos, «coordinar con la unidad de arritmias o la consulta de dispositivos»): DAI/TRC-D en supraumbilical, cardiaca, ocular, endoscopia o litotricia; marcapasos con dependencia «sí» o «no lo sabe» en supraumbilical, cardiaca o endoscopia; última revisión > 12 meses (marcapasos) o > 6 meses (DAI/TRC) o desconocida; batería agotándose o «no lo sabe»; dispositivo en ensayo clínico. Sustituyen al punto genérico «portador de marcapasos o DAI»: un marcapasos no dependiente en cirugía infraumbilical con la revisión al día no genera punto, solo notas.
+
+**Hoja del paciente:** si lleva dispositivo, se añade a «qué traer»: «La tarjeta de su marcapasos o desfibrilador» (castellano y catalán).
 
 ### 5.2 Respiratorio
 - Asma: frecuencia de síntomas, inhaladores, ingresos o corticoides orales en el último año, crisis en el último mes. En la hoja del paciente: traer los inhaladores.
