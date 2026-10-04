@@ -3,19 +3,43 @@
   "titulo": "Hipertensión arterial",
   "fuente": "docs/documento_fuente.md §5.1, §5.16.1",
   "preguntas": [
-    { "id": "anios_evolucion", "etiqueta": "Años de evolución", "tipo": "numero", "min": 0, "max": 90 },
-    { "id": "cifras_habituales", "etiqueta": "Cifras habituales en casa (p. ej. 130/80)", "tipo": "texto" },
+    {
+      "id": "anios_evolucion",
+      "etiqueta": "Años de evolución",
+      "tipo": "numero",
+      "min": 0,
+      "max": 90
+    },
+    {
+      "id": "cifras_habituales",
+      "etiqueta": "Cifras habituales en casa (p. ej. 130/80)",
+      "tipo": "texto"
+    },
     {
       "id": "control",
       "etiqueta": "¿Está bien controlada?",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "bien", "etiqueta": "Bien controlada" },
-        { "valor": "mal", "etiqueta": "Mal controlada" },
-        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+        {
+          "valor": "bien",
+          "etiqueta": "Bien controlada"
+        },
+        {
+          "valor": "mal",
+          "etiqueta": "Mal controlada"
+        },
+        {
+          "valor": "no_lo_sabe",
+          "etiqueta": "No lo sabe"
+        }
       ],
       "genera": [
-        { "cuando": "= mal", "tipo": "asa", "efecto": "ASA mínimo 3 (HTA mal controlada); en otro caso, mínimo 2", "fuente": "§5.16.1" }
+        {
+          "cuando": "= mal",
+          "tipo": "asa",
+          "efecto": "ASA mínimo 3 (HTA mal controlada); en otro caso, mínimo 2",
+          "fuente": "§5.16.1"
+        }
       ]
     },
     {
@@ -24,12 +48,34 @@
       "tipo": "opcion_multiple",
       "porque": "Cefalea, acúfenos o visión borrosa pueden indicar que la tensión no está bien controlada.",
       "opciones": [
-        { "valor": "cefalea", "etiqueta": "Cefalea frecuente" },
-        { "valor": "acufenos", "etiqueta": "Acúfenos (pitidos en los oídos)" },
-        { "valor": "vision_borrosa", "etiqueta": "Visión borrosa" }
+        {
+          "valor": "cefalea",
+          "etiqueta": "Cefalea frecuente"
+        },
+        {
+          "valor": "acufenos",
+          "etiqueta": "Acúfenos (pitidos en los oídos)"
+        },
+        {
+          "valor": "vision_borrosa",
+          "etiqueta": "Visión borrosa"
+        }
       ],
       "genera": [
-        { "cuando": "alguno marcado", "tipo": "alerta", "gravedad": "amarilla", "efecto": "posible HTA mal controlada", "fuente": "§5.16.1" }
+        {
+          "cuando": "alguno marcado",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "posible HTA mal controlada",
+          "fuente": "§5.16.1",
+          "si": {
+            "contieneAlguno": [
+              "cefalea",
+              "acufenos",
+              "vision_borrosa"
+            ]
+          }
+        }
       ]
     }
   ]

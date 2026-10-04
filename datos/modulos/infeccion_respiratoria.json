@@ -9,16 +9,49 @@
       "tipo": "opcion_multiple",
       "porque": "Una infección respiratoria activa aumenta el riesgo de complicaciones y puede aconsejar posponer la cirugía programada.",
       "opciones": [
-        { "valor": "fiebre", "etiqueta": "Fiebre" },
-        { "valor": "dolor_garganta", "etiqueta": "Dolor de garganta" },
-        { "valor": "malestar", "etiqueta": "Malestar general" },
-        { "valor": "mucosidad", "etiqueta": "Mucosidad abundante" },
-        { "valor": "tos_productiva", "etiqueta": "Tos productiva" }
+        {
+          "valor": "fiebre",
+          "etiqueta": "Fiebre"
+        },
+        {
+          "valor": "dolor_garganta",
+          "etiqueta": "Dolor de garganta"
+        },
+        {
+          "valor": "malestar",
+          "etiqueta": "Malestar general"
+        },
+        {
+          "valor": "mucosidad",
+          "etiqueta": "Mucosidad abundante"
+        },
+        {
+          "valor": "tos_productiva",
+          "etiqueta": "Tos productiva"
+        }
       ],
       "genera": [
-        { "cuando": "fiebre o tos productiva (infección activa)", "tipo": "alerta", "gravedad": "amarilla", "efecto": "infección respiratoria activa: valorar posponer la cirugía programada (§5.2, §5.12)", "fuente": "§5.16.8" }
+        {
+          "cuando": "fiebre o tos productiva (infección activa)",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "infección respiratoria activa: valorar posponer la cirugía programada (§5.2, §5.12)",
+          "fuente": "§5.16.8",
+          "si": {
+            "contieneAlguno": [
+              "fiebre",
+              "tos_productiva"
+            ]
+          }
+        }
       ]
     },
-    { "id": "dias_evolucion", "etiqueta": "Días de evolución", "tipo": "numero", "min": 0, "max": 60 }
+    {
+      "id": "dias_evolucion",
+      "etiqueta": "Días de evolución",
+      "tipo": "numero",
+      "min": 0,
+      "max": 60
+    }
   ]
 }

@@ -9,7 +9,16 @@
       "tipo": "fecha",
       "porque": "Una crisis en el último mes indica epilepsia no bien controlada.",
       "genera": [
-        { "cuando": "crisis en el último mes", "tipo": "alerta", "gravedad": "amarilla", "efecto": "epilepsia no controlada", "fuente": "§5.16.9" }
+        {
+          "cuando": "crisis en el último mes",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "epilepsia no controlada",
+          "fuente": "§5.16.9",
+          "si": {
+            "recienteMeses": 1
+          }
+        }
       ]
     },
     {
@@ -17,11 +26,26 @@
       "etiqueta": "Frecuencia de las crisis",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "diaria", "etiqueta": "Diaria" },
-        { "valor": "semanal", "etiqueta": "Semanal" },
-        { "valor": "mensual", "etiqueta": "Mensual" },
-        { "valor": "anual", "etiqueta": "Anual" },
-        { "valor": "menos_anual", "etiqueta": "Menos de una al año" }
+        {
+          "valor": "diaria",
+          "etiqueta": "Diaria"
+        },
+        {
+          "valor": "semanal",
+          "etiqueta": "Semanal"
+        },
+        {
+          "valor": "mensual",
+          "etiqueta": "Mensual"
+        },
+        {
+          "valor": "anual",
+          "etiqueta": "Anual"
+        },
+        {
+          "valor": "menos_anual",
+          "etiqueta": "Menos de una al año"
+        }
       ]
     },
     {
@@ -29,26 +53,66 @@
       "etiqueta": "Tipo de crisis",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "generalizada_tc", "etiqueta": "Generalizada tónico-clónica" },
-        { "valor": "focal_con", "etiqueta": "Focal con pérdida de conciencia" },
-        { "valor": "focal_sin", "etiqueta": "Focal sin pérdida de conciencia" },
-        { "valor": "ausencias", "etiqueta": "Ausencias" },
-        { "valor": "desconocido", "etiqueta": "Desconocido" }
+        {
+          "valor": "generalizada_tc",
+          "etiqueta": "Generalizada tónico-clónica"
+        },
+        {
+          "valor": "focal_con",
+          "etiqueta": "Focal con pérdida de conciencia"
+        },
+        {
+          "valor": "focal_sin",
+          "etiqueta": "Focal sin pérdida de conciencia"
+        },
+        {
+          "valor": "ausencias",
+          "etiqueta": "Ausencias"
+        },
+        {
+          "valor": "desconocido",
+          "etiqueta": "Desconocido"
+        }
       ]
     },
-    { "id": "aura", "etiqueta": "¿Tiene aura o pródromos antes de la crisis?", "tipo": "boolean" },
+    {
+      "id": "aura",
+      "etiqueta": "¿Tiene aura o pródromos antes de la crisis?",
+      "tipo": "boolean"
+    },
     {
       "id": "desencadenantes",
       "etiqueta": "Desencadenantes",
       "tipo": "opcion_multiple",
       "opciones": [
-        { "valor": "falta_sueno", "etiqueta": "Falta de sueño" },
-        { "valor": "estres", "etiqueta": "Estrés" },
-        { "valor": "fiebre", "etiqueta": "Fiebre" },
-        { "valor": "luces", "etiqueta": "Luces parpadeantes" },
-        { "valor": "alcohol", "etiqueta": "Alcohol" },
-        { "valor": "olvido_medicacion", "etiqueta": "Olvido de la medicación" },
-        { "valor": "otros", "etiqueta": "Otros" }
+        {
+          "valor": "falta_sueno",
+          "etiqueta": "Falta de sueño"
+        },
+        {
+          "valor": "estres",
+          "etiqueta": "Estrés"
+        },
+        {
+          "valor": "fiebre",
+          "etiqueta": "Fiebre"
+        },
+        {
+          "valor": "luces",
+          "etiqueta": "Luces parpadeantes"
+        },
+        {
+          "valor": "alcohol",
+          "etiqueta": "Alcohol"
+        },
+        {
+          "valor": "olvido_medicacion",
+          "etiqueta": "Olvido de la medicación"
+        },
+        {
+          "valor": "otros",
+          "etiqueta": "Otros"
+        }
       ]
     },
     {
@@ -57,7 +121,16 @@
       "tipo": "boolean",
       "porque": "Un estatus previo o crisis recientes indican epilepsia no controlada: no debe omitirse la medicación.",
       "genera": [
-        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "epilepsia no controlada", "fuente": "§5.16.9" }
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "epilepsia no controlada",
+          "fuente": "§5.16.9",
+          "si": {
+            "igual": true
+          }
+        }
       ]
     }
   ]

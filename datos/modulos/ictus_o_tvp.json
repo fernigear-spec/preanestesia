@@ -9,7 +9,10 @@
       "etiqueta": "Fecha del ictus/AIT",
       "tipo": "fecha",
       "porque": "Menos de 3 meses desde el ictus/AIT es una señal de alerta.",
-      "visibleSi": { "pregunta": "ictus_ait", "igual": true }
+      "visibleSi": { "pregunta": "ictus_ait", "igual": true },
+      "genera": [
+        { "cuando": "ictus/AIT en los últimos 3 meses", "tipo": "alerta", "gravedad": "roja", "efecto": "ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada", "fuente": "§5.1 (ESC 2022)", "si": { "recienteMeses": 3 } }
+      ]
     },
     { "id": "secuelas", "etiqueta": "Secuelas", "tipo": "texto", "visibleSi": { "pregunta": "ictus_ait", "igual": true } },
     { "id": "tvp_tep", "etiqueta": "¿Ha tenido una trombosis venosa (TVP) o una embolia de pulmón (TEP)?", "tipo": "boolean" },
@@ -18,7 +21,10 @@
       "etiqueta": "Fecha de la TVP/TEP",
       "tipo": "fecha",
       "porque": "Una TVP/TEP de menos de 3 meses es criterio de alto riesgo trombótico (posible terapia puente).",
-      "visibleSi": { "pregunta": "tvp_tep", "igual": true }
+      "visibleSi": { "pregunta": "tvp_tep", "igual": true },
+      "genera": [
+        { "cuando": "TVP/TEP en los últimos 3 meses", "tipo": "alerta", "gravedad": "amarilla", "efecto": "TVP o TEP de menos de 3 meses: valorar antes de la intervención", "fuente": "§5.1", "si": { "recienteMeses": 3 } }
+      ]
     }
   ]
 }

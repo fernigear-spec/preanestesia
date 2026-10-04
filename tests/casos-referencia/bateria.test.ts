@@ -31,7 +31,7 @@ import { calcularMorfinaEquivalente } from '../../src/dominio/escalas/morfinaEqu
 import { calcularAuditC } from '../../src/dominio/escalas/auditC.ts';
 import { calcularHemstop } from '../../src/dominio/escalas/hemstop.ts';
 import { reglaInsulinaBasal, reglaInsulinaNph, reglaInsulinaPremezclada } from '../../src/dominio/reglas/insulinas.ts';
-import { decidirPruebas, pruebaVigente, type FactoresPruebas } from '../../src/dominio/pruebas/tablaPruebas.ts';
+import { derivarRiesgoYPruebas, type EntradaRiesgoPruebas } from '../../src/dominio/entrevista/riesgoYPruebas.ts';
 import { calcularAyuno } from '../../src/dominio/ayuno/ayuno.ts';
 import { evaluarMtnd4 } from '../../src/dominio/mtnd4/mtnd4.ts';
 import { tarjetaFarmacoAEnfermedad, tarjetasEnfermedadAFarmaco } from '../../src/dominio/coherencia/coherencia.ts';
@@ -458,23 +458,67 @@ describe('Casos F · escalas', () => {
 });
 
 // ————————————————————— G. Pruebas complementarias —————————————————————
+// Se ejecutan por el MOTOR completo (derivarRiesgoYPruebas): clase del paciente,
+// factores (incluida la comorbilidad CV para el BNP, §7.3 nota **) y vigencia de
+// pruebas recientes (§7.4) salen de los datos del caso, no se fijan a mano.
 describe('Casos G · pruebas complementarias', () => {
-  const sinF: FactoresPruebas = { anemiaOHbBaja: false, trastornoCoagulacionOAnticoagulante: false, anestesiaRegionalPosible: false, sangradoPrevisible: false, hemstopPositivo: false, supuestoRxTorax: false, supuestoEcocardiograma: false };
-  const nombres = (ps: { prueba: string }[]) => ps.map((p) => p.prueba).sort();
-  it('G1 varón 70 HTA, METs≥4, prótesis rodilla (intermedio), paciente bajo-moderado: hemograma, coag, bioquímica, ECG; sin Rx', () => {
-    const r = decidirPruebas('intermedio', 'bajo-moderado', sinF);
+  function baseRp(p: Partial<EntradaRiesgoPruebas> = {}): EntradaRiesgoPruebas {
+    return {
+      respuestas: {}, enfermedades: new Set(), edadAnios: 40, imc: 24, hemstopPositivo: false,
+      medicacionGrupos: new Set(), riesgoCardiovascular: 'intermedio', riesgoHemorragico: 'bajo',
+      neuroaxialProbable: false, tecnica: 'general', fechaIntervencion: IV, ...p,
+    };
+  }
+  const nombres = (r: ReturnType<typeof derivarRiesgoYPruebas>) => r.pruebas.map((p) => p.prueba).sort();
+
+  it('G1 varón 70 HTA, METs≥4, prótesis rodilla (intermedio): clase bajo-moderado → hemograma, coag, bioquímica, ECG; sin Rx; sin BNP', () => {
+    const r = derivarRiesgoYPruebas(baseRp({ edadAnios: 70, enfermedades: new Set(['hta']) }));
+    expect(r.clase.clase).toBe('bajo-moderado');
     expect(nombres(r)).toEqual(['bioquimica', 'coagulacion', 'ecg', 'hemograma']);
   });
-  it('G2 mujer 40 sana, colecistectomía (intermedio), paciente bajo: hemograma y coagulación', () => {
-    const r = decidirPruebas('intermedio', 'bajo', sinF);
+
+  it('G1b HTA aislada NO cuenta como comorbilidad CV: no se pide BNP', () => {
+    const r = derivarRiesgoYPruebas(baseRp({ edadAnios: 70, enfermedades: new Set(['hta']) }));
+    expect(nombres(r)).not.toContain('bnp');
+  });
+
+  it('G2 mujer 40 sana, colecistectomía (intermedio): clase bajo → hemograma y coagulación', () => {
+    const r = derivarRiesgoYPruebas(baseRp());
+    expect(r.clase.clase).toBe('bajo');
     expect(nombres(r)).toEqual(['coagulacion', 'hemograma']);
   });
-  it('G3 varón 60 IC NYHA III, colectomía (intermedio), paciente alto: +Rx; ECG vigente no se repite; coag caducada sí', () => {
-    const r = decidirPruebas('intermedio', 'alto', sinF);
-    expect(nombres(r)).toContain('rx_torax');
-    // ECG de hace 2 meses vigente (90 días), coagulación de hace 20 días caducada (14 días)
-    expect(pruebaVigente('ecg', new Date(2026, 7, 15), IV)).toBeTrue();
-    expect(pruebaVigente('coagulacion', new Date(2026, 8, 25), IV)).toBeFalse();
+
+  it('G3 varón 60 IC NYHA III, colectomía (intermedio), ECG 2 meses y coagulación 20 días: alto; +Rx; +BNP; ECG vigente no se repite; coagulación caducada sí', () => {
+    const r = derivarRiesgoYPruebas(baseRp({
+      edadAnios: 60, enfermedades: new Set(['insuficiencia_cardiaca']),
+      respuestas: { insuficiencia_cardiaca: { nyha: 'III' } },
+      pruebasRecientes: { ecg: new Date(2026, 7, 15), coagulacion: new Date(2026, 8, 25) },
+    }));
+    expect(r.clase.clase).toBe('alto');
+    const n = nombres(r);
+    expect(n).toContain('rx_torax');
+    expect(n).toContain('bnp'); // comorbilidad CV significativa (IC) + cirugía intermedia
+    expect(n).toContain('coagulacion'); // caducada (14 días): se pide
+    expect(n).not.toContain('ecg'); // vigente (90 días): no se repite
+    expect(r.vigencia.ecg).toBeTrue();
+    expect(r.vigencia.coagulacion).not.toBeTrue();
+  });
+
+  it('G3b BNP por fragilidad en cirugía intermedia aunque no haya comorbilidad CV', () => {
+    const r = derivarRiesgoYPruebas(baseRp({ edadAnios: 80, fragilidad: true }));
+    expect(nombres(r)).toContain('bnp');
+  });
+
+  it('G3c sin fecha de intervención, usa "hoy": una coagulación de hace 20 días está caducada y se pide', () => {
+    const hace20dias = new Date(Date.now() - 20 * 86_400_000);
+    const r = derivarRiesgoYPruebas(baseRp({
+      edadAnios: 60, enfermedades: new Set(['insuficiencia_cardiaca']),
+      respuestas: { insuficiencia_cardiaca: { nyha: 'III' } },
+      fechaIntervencion: null,
+      pruebasRecientes: { coagulacion: hace20dias },
+    }));
+    expect(nombres(r)).toContain('coagulacion');
+    expect(r.vigencia.coagulacion).not.toBeTrue();
   });
 });
 

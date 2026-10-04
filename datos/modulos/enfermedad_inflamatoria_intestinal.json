@@ -8,8 +8,14 @@
       "etiqueta": "Tipo",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "crohn", "etiqueta": "Enfermedad de Crohn" },
-        { "valor": "colitis_ulcerosa", "etiqueta": "Colitis ulcerosa" }
+        {
+          "valor": "crohn",
+          "etiqueta": "Enfermedad de Crohn"
+        },
+        {
+          "valor": "colitis_ulcerosa",
+          "etiqueta": "Colitis ulcerosa"
+        }
       ]
     },
     {
@@ -18,13 +24,91 @@
       "tipo": "opcion",
       "porque": "La suspensión de los inmunosupresores clásicos depende de la indicación.",
       "opciones": [
-        { "valor": "autoinmune", "etiqueta": "Enfermedad autoinmune" },
-        { "valor": "enfermedad_sistemica_grave", "etiqueta": "Enfermedad sistémica grave" }
+        {
+          "valor": "autoinmune",
+          "etiqueta": "Enfermedad autoinmune"
+        },
+        {
+          "valor": "enfermedad_sistemica_grave",
+          "etiqueta": "Enfermedad sistémica grave"
+        }
       ]
     },
-    { "id": "corticoides_3m", "etiqueta": "¿Ha tomado corticoides (cortisona) en los últimos 3 meses?", "tipo": "boolean", "porque": "Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).", "genera": [ { "cuando": "≥ 5 mg/día de prednisona > 3 semanas (equivalente)", "tipo": "nota", "efecto": "valorar dosis de estrés perioperatoria", "fuente": "§5.16.14" } ] },
-    { "id": "cortico_farmaco", "etiqueta": "¿Cuál?", "tipo": "opcion", "opciones": [ { "valor": "prednisona", "etiqueta": "Prednisona" }, { "valor": "prednisolona", "etiqueta": "Prednisolona" }, { "valor": "metilprednisolona", "etiqueta": "Metilprednisolona" }, { "valor": "deflazacort", "etiqueta": "Deflazacort" }, { "valor": "dexametasona", "etiqueta": "Dexametasona" }, { "valor": "hidrocortisona", "etiqueta": "Hidrocortisona" } ], "visibleSi": { "pregunta": "corticoides_3m", "igual": true } },
-    { "id": "cortico_dosis_dia", "etiqueta": "Dosis diaria", "tipo": "numero", "unidad": "mg", "min": 0, "max": 200, "visibleSi": { "pregunta": "corticoides_3m", "igual": true } },
-    { "id": "cortico_semanas", "etiqueta": "Duración", "tipo": "numero", "unidad": "semanas", "min": 0, "max": 260, "visibleSi": { "pregunta": "corticoides_3m", "igual": true } }
+    {
+      "id": "corticoides_3m",
+      "etiqueta": "¿Ha tomado corticoides (cortisona) en los últimos 3 meses?",
+      "tipo": "boolean",
+      "porque": "Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).",
+      "genera": [
+        {
+          "cuando": "≥ 5 mg/día de prednisona > 3 semanas (equivalente)",
+          "tipo": "nota",
+          "efecto": "valorar dosis de estrés perioperatoria",
+          "fuente": "§5.16.14",
+          "si": {
+            "igual": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "cortico_farmaco",
+      "etiqueta": "¿Cuál?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "prednisona",
+          "etiqueta": "Prednisona"
+        },
+        {
+          "valor": "prednisolona",
+          "etiqueta": "Prednisolona"
+        },
+        {
+          "valor": "metilprednisolona",
+          "etiqueta": "Metilprednisolona"
+        },
+        {
+          "valor": "deflazacort",
+          "etiqueta": "Deflazacort"
+        },
+        {
+          "valor": "dexametasona",
+          "etiqueta": "Dexametasona"
+        },
+        {
+          "valor": "hidrocortisona",
+          "etiqueta": "Hidrocortisona"
+        }
+      ],
+      "visibleSi": {
+        "pregunta": "corticoides_3m",
+        "igual": true
+      }
+    },
+    {
+      "id": "cortico_dosis_dia",
+      "etiqueta": "Dosis diaria",
+      "tipo": "numero",
+      "unidad": "mg",
+      "min": 0,
+      "max": 200,
+      "visibleSi": {
+        "pregunta": "corticoides_3m",
+        "igual": true
+      }
+    },
+    {
+      "id": "cortico_semanas",
+      "etiqueta": "Duración",
+      "tipo": "numero",
+      "unidad": "semanas",
+      "min": 0,
+      "max": 260,
+      "visibleSi": {
+        "pregunta": "corticoides_3m",
+        "igual": true
+      }
+    }
   ]
 }

@@ -1,0 +1,22 @@
+{
+  "id": "hipertension_pulmonar",
+  "titulo": "Hipertensión pulmonar",
+  "fuente": "docs/documento_fuente.md §5.2",
+  "preguntas": [
+    {
+      "id": "confirmada",
+      "etiqueta": "¿Tiene diagnóstico de hipertensión pulmonar?",
+      "tipo": "boolean",
+      "porque": "La hipertensión pulmonar aumenta mucho el riesgo anestésico y es una señal de alerta (§5.2). Cuenta como comorbilidad cardiovascular para pedir BNP o NT-proBNP (§7.3).",
+      "genera": [
+        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "hipertensión pulmonar: valorar antes de la intervención", "fuente": "§5.2", "si": { "igual": true } }
+      ]
+    },
+    {
+      "id": "tratamiento",
+      "etiqueta": "Tratamiento específico (si lo tiene)",
+      "tipo": "texto",
+      "visibleSi": { "pregunta": "confirmada", "igual": true }
+    }
+  ]
+}

@@ -51,6 +51,12 @@ const RESPUESTAS_CON_EFECTO: Record<string, string[]> = {
   enfermedad_renal: ['estadio', 'proteinuria'],
   anemia: ['hemoglobina'],
   saos: ['ronquido_fuerte', 'perimetro_cuello'],
+  // Ictus/AIT y TVP/TEP < 3 meses (§5.1): alertas ejecutables añadidas en Fase 1.
+  ictus_o_tvp: ['ictus_fecha', 'tvp_tep_fecha'],
+  fibrilacion_auricular: ['ictus_ait_fecha'],
+  // Condiciones de §5.1/§5.2 que faltaban como pregunta (Fase 1).
+  miocardiopatia: ['sintomas'],
+  hipertension_pulmonar: ['confirmada'],
 };
 
 function indexar(modulos: ModuloPatologia[]): Map<string, Map<string, PreguntaModulo>> {

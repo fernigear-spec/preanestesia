@@ -45,7 +45,7 @@ interface Config { version_contenido: string; fecha_revision_clinica: string; mi
 interface Regla { descripcion?: string; tipo?: string; fuente?: string; [k: string]: unknown; }
 interface ReglasFarmacos { _meta: Record<string, string>; bloqueos_profundos: string[]; tablas_seth: Record<string, Record<string, unknown>>; reglas: Record<string, Regla>; }
 interface Opioides { _meta: Record<string, string>; factores: Record<string, number>; sin_conversion: string[]; }
-interface EfectoRespuesta { cuando: string; tipo: string; gravedad?: string; efecto: string; fuente?: string; }
+interface EfectoRespuesta { cuando: string; tipo: string; gravedad?: string; efecto: string; fuente?: string; si?: unknown; }
 interface Pregunta { id: string; etiqueta: string; tipo: string; unidad?: string; porque?: string; opciones?: { valor: string; etiqueta: string }[]; genera?: EfectoRespuesta[]; }
 interface Modulo { id: string; titulo: string; fuente?: string; preguntas: Pregunta[]; }
 interface TextosPaciente { med: Record<string, string> & { insulina: Record<string, string> }; }
@@ -326,7 +326,9 @@ p('| --- | --- | --- | --- | --- | --- |');
 p();
 p('\\* Bajo/bajo: hemograma y coagulación solo si sospecha de anemia, trastorno de coagulación/anticoagulante, anestesia regional posible, sangrado previsible o HEMSTOP positivo. \\*** Rx de tórax solo ante sospecha o cambio de enfermedad cardiopulmonar (la aplicación pregunta).');
 p();
-p('**Validez:** hemograma 30 días, bioquímica 30 días, coagulación 14 días, ECG 3 meses, Rx tórax 3 meses, ecocardiograma 12 meses (18 si la función ventricular es conocida y estable). La aplicación compara la fecha de la prueba con la de la intervención: si sigue vigente ese día, no se repite.');
+p('**BNP o NT-proBNP (nota \\*\\*):** solo en cirugía de riesgo intermedio o alto y si hay comorbilidad cardiovascular significativa, fragilidad (CFS ≥ 5) o capacidad funcional reducida (< 4 METs). Cuenta como comorbilidad cardiovascular significativa: cardiopatía isquémica, insuficiencia cardiaca, valvulopatía moderada o grave, fibrilación auricular u otra arritmia, arteriopatía periférica o aneurisma de aorta, ictus o AIT previo, miocardiopatía e hipertensión pulmonar. La hipertensión arterial aislada **no** cuenta (decisión del servicio, 2026-10-04).');
+p();
+p('**Validez:** hemograma 30 días, bioquímica 30 días, coagulación 14 días, ECG 3 meses, Rx tórax 3 meses, ecocardiograma 12 meses (18 si la función ventricular es conocida y estable). El apartado «Pruebas recientes» del paso de enfermedades recoge la fecha de cada prueba; la aplicación la compara con la de la intervención (o con hoy si aún no hay fecha, indicándolo) y **descuenta** las que sigan vigentes ese día. El BNP/NT-proBNP se pide por indicación y no se descuenta por fecha.');
 p();
 
 // —————————————————————————————— 13. Catálogo ——————————————————————————————
@@ -410,7 +412,8 @@ for (const mod of modulos) {
       const tipo = ICONO_EFECTO[g.tipo] ?? g.tipo;
       const grav = g.gravedad ? ` ${g.gravedad}` : '';
       const fuente = g.fuente ? ` _(${esc(g.fuente)})_` : '';
-      p(`  - Genera → ${tipo}${grav}: si ${esc(g.cuando)} → ${esc(g.efecto)}.${fuente}`);
+      const ejecutable = g.si !== undefined ? ' **[se emite]**' : '';
+      p(`  - Genera → ${tipo}${grav}: si ${esc(g.cuando)} → ${esc(g.efecto)}.${fuente}${ejecutable}`);
     }
   }
   p();

@@ -28,6 +28,27 @@ export type GravedadEfecto = 'roja' | 'amarilla' | 'informativa';
  * CONTENIDO_CLINICO.md) y la comprueba un test de cobertura; el motor sigue
  * calculando el efecto en su capa correspondiente.
  */
+/**
+ * Condición estructurada y evaluable de un efecto (§5.16). El texto `cuando` sigue
+ * siendo la traza legible (CONTENIDO_CLINICO.md); `si` es la forma que el motor
+ * ejecuta para decidir si el efecto se dispara. Se evalúa sobre la respuesta de la
+ * pregunta a la que pertenece el efecto. Un solo operador por condición.
+ */
+export interface CondicionEfecto {
+  /** La respuesta (opción/boolean) es igual a este valor. */
+  igual?: string | number | boolean;
+  /** La respuesta (opción) está en esta lista. */
+  enLista?: Array<string | number | boolean>;
+  /** La respuesta (opción_multiple) contiene alguna de estas opciones. */
+  contieneAlguno?: string[];
+  /** La respuesta (número) es estrictamente mayor que este umbral. */
+  mayorQue?: number;
+  /** La respuesta (número) es mayor o igual que este umbral. */
+  mayorIgualQue?: number;
+  /** La respuesta (fecha ISO) está dentro de los últimos N meses respecto a la intervención (o "hoy"). */
+  recienteMeses?: number;
+}
+
 export interface EfectoRespuesta {
   /** Respuesta que dispara el efecto, en lenguaje llano (p. ej. "= mal", "> 8,5 %", "= sí", "AINE/aspirina"). */
   cuando: string;
@@ -38,6 +59,12 @@ export interface EfectoRespuesta {
   efecto: string;
   /** Sección del documento fuente que lo respalda (p. ej. "§5.16.1", "§7.3"). */
   fuente?: string;
+  /**
+   * Condición estructurada evaluable (§5.16). Si está presente en un efecto de tipo
+   * 'alerta' o 'nota', el motor emite el efecto cuando se cumple. Si falta, el efecto
+   * es solo descriptivo (lo calcula otra capa). El texto `cuando` es siempre la traza.
+   */
+  si?: CondicionEfecto;
 }
 
 /** Condición de visibilidad de una pregunta según la respuesta a otra. */
@@ -160,6 +187,18 @@ export function validarModulo(obj: unknown, fichero: string): ErrorModulo[] {
           }
           if (gg?.tipo === 'alerta' && (typeof gg?.gravedad !== 'string' || !GRAVEDADES_EFECTO.has(gg.gravedad as GravedadEfecto))) {
             errores.push({ fichero, campo: `${dondeG}.gravedad`, mensaje: 'una alerta requiere gravedad (roja/amarilla/informativa)' });
+          }
+          // Condición estructurada opcional (`si`): exactamente un operador (§5.16).
+          if (gg?.si !== undefined) {
+            if (typeof gg.si !== 'object' || gg.si === null) {
+              errores.push({ fichero, campo: `${dondeG}.si`, mensaje: 'si debe ser un objeto de condición' });
+            } else {
+              const ops = ['igual', 'enLista', 'contieneAlguno', 'mayorQue', 'mayorIgualQue', 'recienteMeses'];
+              const presentes = ops.filter((k) => (gg.si as Record<string, unknown>)[k] !== undefined);
+              if (presentes.length !== 1) {
+                errores.push({ fichero, campo: `${dondeG}.si`, mensaje: `una condición requiere exactamente un operador (tiene ${presentes.length})` });
+              }
+            }
           }
         }
       }

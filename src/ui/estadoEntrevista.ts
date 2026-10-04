@@ -99,6 +99,30 @@ export interface HabitosUi {
 import type { EntradaHemstop } from '../dominio/escalas/hemstop.ts';
 import type { RespuestasModulos } from '../datos/modulos.ts';
 
+/**
+ * Pruebas recientes del paciente (§7.4): fecha (ISO yyyy-mm-dd) de la última de
+ * cada tipo. Todas opcionales. El motor descuenta las que sigan vigentes el día de
+ * la intervención (o, sin fecha, las que sigan vigentes hoy).
+ */
+export interface PruebasRecientesUi {
+  hemograma?: string;
+  coagulacion?: string;
+  bioquimica?: string;
+  ecg?: string;
+  rx_torax?: string;
+  ecocardiograma?: string;
+}
+
+/** Tipos de prueba reciente con fecha, para la UI del paso 6. */
+export const PRUEBAS_RECIENTES: Array<{ id: keyof PruebasRecientesUi; etiqueta: string }> = [
+  { id: 'hemograma', etiqueta: 'Hemograma' },
+  { id: 'coagulacion', etiqueta: 'Coagulación' },
+  { id: 'bioquimica', etiqueta: 'Bioquímica' },
+  { id: 'ecg', etiqueta: 'ECG' },
+  { id: 'rx_torax', etiqueta: 'Radiografía de tórax' },
+  { id: 'ecocardiograma', etiqueta: 'Ecocardiograma' },
+];
+
 /** Cribado por aparatos del paso 7 (R3.2.21–R3.2.23). */
 export interface CribadoUi {
   /** «Ninguna enfermedad conocida» marcado explícitamente (R3.2.22). */
@@ -111,6 +135,8 @@ export interface CribadoUi {
   hemstop: EntradaHemstop;
   /** Condiciones especiales (§5.15): hipertermia maligna y pseudocolinesterasa. */
   condicionesEspeciales: CondicionesEspeciales;
+  /** Pruebas recientes y su fecha (§7.4), para descontar las vigentes. Opcional. */
+  pruebasRecientes?: PruebasRecientesUi;
 }
 
 /** Un fármaco que el paciente toma, recogido en el paso 8. */
@@ -274,6 +300,9 @@ export const APARATOS: Array<{ aparato: string; enfermedades: Array<{ id: string
       { id: 'stent_o_infarto', etiqueta: 'Stent coronario' },
       { id: 'protesis_mecanica', etiqueta: 'Prótesis valvular mecánica' },
       { id: 'valvulopatia', etiqueta: 'Valvulopatía' },
+      { id: 'miocardiopatia', etiqueta: 'Miocardiopatía' },
+      { id: 'arteriopatia_periferica', etiqueta: 'Arteriopatía periférica' },
+      { id: 'aneurisma_aorta', etiqueta: 'Aneurisma de aorta' },
       { id: 'marcapasos', etiqueta: 'Marcapasos o DAI' },
     ],
   },
@@ -282,6 +311,7 @@ export const APARATOS: Array<{ aparato: string; enfermedades: Array<{ id: string
     enfermedades: [
       { id: 'asma_epoc', etiqueta: 'Asma o EPOC' },
       { id: 'saos', etiqueta: 'Apnea del sueño (SAOS)' },
+      { id: 'hipertension_pulmonar', etiqueta: 'Hipertensión pulmonar' },
       { id: 'infeccion_respiratoria', etiqueta: 'Infección respiratoria reciente' },
     ],
   },

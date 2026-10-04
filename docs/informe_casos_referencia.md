@@ -88,9 +88,9 @@
 | F11 | 140 mg/día (alerta_alta) | — | 60 + 80 = 140 mg/día, alerta alta, alerta de dolor transicional. | ✅ | — |
 | F12 | AUDIT-C 3 (positivo) | — | positivo, consejo breve y hoja de alcohol; sin alerta de abstinencia. | 👁️ | — |
 | F13 | HEMSTOP 2 (positivo (≥ 2)); pedir coagulación: true; alerta: amarilla | — | se pide coagulación (y hemograma) aunque la tabla no lo pida; alerta. | 👁️ | — |
-| G1 | pruebas: bioquimica, coagulacion, ecg, hemograma | — | paciente bajo-moderado. Hemograma y coagulación, bioquímica, ECG. Sin Rx de tórax. Sin BNP. | 👁️ | — |
-| G2 | pruebas: coagulacion, hemograma | — | hemograma y coagulación. Sin bioquímica, sin ECG, sin Rx. | 👁️ | — |
-| G3 | pruebas: bioquimica, coagulacion, ecg, hemograma, rx_torax; ECG vigente: true; coagulación vigente: false | — | paciente alto. Hemograma y coagulación (la coagulación caduca antes de la intervención), bioquímica con BNP o NT-proBNP, Rx de tórax. ECG vigente el día de la intervención: no se repite. | 👁️ | — |
+| G1 | clase: bajo-moderado; pruebas: bioquimica, coagulacion, ecg, hemograma | — | paciente bajo-moderado. Hemograma y coagulación, bioquímica, ECG. Sin Rx de tórax. Sin BNP. | 👁️ | — |
+| G2 | clase: bajo; pruebas: coagulacion, hemograma | — | hemograma y coagulación. Sin bioquímica, sin ECG, sin Rx. | 👁️ | — |
+| G3 | clase: alto; pruebas: bioquimica, bnp, coagulacion, hemograma, rx_torax; ECG vigente (descontado): true; coagulación vigente: false | — | paciente alto. Hemograma y coagulación (la coagulación caduca antes de la intervención), bioquímica con BNP o NT-proBNP, Rx de tórax. ECG vigente el día de la intervención: no se repite. | 👁️ | — |
 | H1 | comida copiosa 00:00; comida ligera 02:00; líquidos claros libres hasta 04:00; máx. 400 mL entre 4 y 2 h y nada desde las 06:00 (salvo medicación con un sorbo); bebida de carbohidratos 05:00–06:00 | — | comida copiosa hasta las 00:00; comida ligera hasta las 02:00; líquidos claros libres hasta las 04:00; entre 04:00 y 06:00, máximo 400 mL; bebida de carbohidratos entre las 05:00 y las 06:00; nada desde las 06:00 salvo la medicación con un sorbo de agua. | ✅ | — |
 | H2 | fórmula/sólidos 02:00; materna 05:00; claros 07:00 | — | fórmula y sólidos hasta las 02:00; leche materna hasta las 05:00; líquidos claros hasta las 07:00. | ✅ | — |
 | H3 | fórmula 04:00; aviso hipoglucemia true | — | fórmula hasta las 04:00; aviso de riesgo de hipoglucemia. | ✅ | — |

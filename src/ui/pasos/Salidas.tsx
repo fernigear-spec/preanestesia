@@ -9,8 +9,9 @@ import config from '../../../datos/config.json';
 import plantillasSap from '../../../datos/plantillas_sap.json';
 import type { GravedadAlerta } from '../../dominio/tipos.ts';
 import { calcularImc, type EstadoEntrevista } from '../estadoEntrevista.ts';
-import { MODULO_POR_ID } from '../../datos/modulosDatos.ts';
+import { MODULO_POR_ID, MODULOS } from '../../datos/modulosDatos.ts';
 import { derivarHechosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
+import { emitirEfectosModulos } from '../../dominio/entrevista/efectosModulos.ts';
 import { derivarHojaExtras } from '../../dominio/entrevista/hojaExtras.ts';
 import { derivarRiesgoYPruebas } from '../../dominio/entrevista/riesgoYPruebas.ts';
 import { construirPlanPaciente } from '../paciente/construirPlanUi.ts';
@@ -43,6 +44,16 @@ interface AlertaVista { gravedad: GravedadAlerta; mensaje: string; }
 interface EscalaVista { nombre: string; valor: string; componentes: string[]; }
 
 const ORDEN_GRAVEDAD: Record<GravedadAlerta, number> = { roja: 0, amarilla: 1, informativa: 2 };
+/** Etiquetas legibles de cada prueba complementaria para las salidas. */
+const ETIQUETA_PRUEBA: Record<string, string> = {
+  hemograma: 'Hemograma',
+  coagulacion: 'Coagulación',
+  bioquimica: 'Bioquímica',
+  ecg: 'ECG',
+  rx_torax: 'Radiografía de tórax',
+  ecocardiograma: 'Ecocardiograma',
+  bnp: 'BNP o NT-proBNP',
+};
 function fechaCorta(d: Date): string {
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 }
@@ -72,12 +83,37 @@ export function Salidas({ entrevista, modalidad }: Props) {
     const cuatroAt = habitos?.cuatroAt ? calcular4AT(habitos.cuatroAt) : null;
     const hemstop = calcularHemstop(cribado.hemstop);
 
+    // Capacidad funcional reducida (< 4 METs o DASI ≤ 34, §6.6) para la nota ** del BNP.
+    const dasiCapacidad = habitos && habitos.subeDosPisos !== 'si' && habitos.itemsDasi.length > 0
+      ? calcularDasi(habitos.itemsDasi as never[])
+      : null;
+    const capacidadFuncionalReducida = habitos?.subeDosPisos === 'no' || (dasiCapacidad?.capacidadReducida ?? false);
+    // Fechas de pruebas recientes (§7.4): ISO yyyy-mm-dd → Date (mediodía local, evita desfases de zona).
+    const pr = cribado.pruebasRecientes ?? {};
+    const fechaPrueba = (iso?: string): Date | undefined => {
+      if (!iso) return undefined;
+      const d = new Date(`${iso}T12:00:00`);
+      return Number.isNaN(d.getTime()) ? undefined : d;
+    };
+    const ecoFecha = fechaPrueba(pr.ecocardiograma);
+
     const rp = derivarRiesgoYPruebas({
       respuestas, enfermedades, edadAnios: basicos.edadAnios, imc,
       hemstopPositivo: hemstop.positivo,
       medicacionGrupos: new Set((medicacion ?? []).map((f) => grupoAntitrombotico(f.idRegla)).filter((g): g is string => g !== null)),
       riesgoCardiovascular: intervencion.riesgoCardiovascular, riesgoHemorragico: intervencion.riesgoHemorragico,
       neuroaxialProbable: intervencion.neuroaxialProbable, tecnica: intervencion.tecnica,
+      fragilidad: habitos?.cfs !== undefined && habitos.cfs >= 5,
+      capacidadFuncionalReducida,
+      fechaIntervencion: intervencion.fechaHora ?? null,
+      pruebasRecientes: {
+        ...(fechaPrueba(pr.hemograma) ? { hemograma: fechaPrueba(pr.hemograma)! } : {}),
+        ...(fechaPrueba(pr.coagulacion) ? { coagulacion: fechaPrueba(pr.coagulacion)! } : {}),
+        ...(fechaPrueba(pr.bioquimica) ? { bioquimica: fechaPrueba(pr.bioquimica)! } : {}),
+        ...(fechaPrueba(pr.ecg) ? { ecg: fechaPrueba(pr.ecg)! } : {}),
+        ...(fechaPrueba(pr.rx_torax) ? { rx_torax: fechaPrueba(pr.rx_torax)! } : {}),
+        ...(ecoFecha ? { ecocardiograma: ecoFecha } : {}),
+      },
     });
 
     const extras = derivarHojaExtras({
@@ -106,7 +142,7 @@ export function Salidas({ entrevista, modalidad }: Props) {
     }
     if (enfermedades.has('fibrilacion_auricular')) {
       const fa = respuestas['fibrilacion_auricular'] ?? {};
-      const cha = calcularCha2ds2va({ insuficienciaCardiaca: enfermedades.has('insuficiencia_cardiaca'), hta: enfermedades.has('hta'), edadAnios: basicos.edadAnios, diabetes: enfermedades.has('diabetes'), ictusAitTromboembolismo: fa.ictus_ait_previo === true, enfermedadVascular: enfermedades.has('cardiopatia_isquemica') || enfermedades.has('stent_o_infarto') });
+      const cha = calcularCha2ds2va({ insuficienciaCardiaca: enfermedades.has('insuficiencia_cardiaca'), hta: enfermedades.has('hta'), edadAnios: basicos.edadAnios, diabetes: enfermedades.has('diabetes'), ictusAitTromboembolismo: fa.ictus_ait_previo === true, enfermedadVascular: enfermedades.has('cardiopatia_isquemica') || enfermedades.has('stent_o_infarto') || enfermedades.has('arteriopatia_periferica') || enfermedades.has('aneurisma_aorta') });
       escalas.push({ nombre: 'CHA2DS2-VA', valor: String(cha.puntuacion), componentes: cha.componentes });
     }
     const nvpoAntecedente = (antecedentes?.intervencionesPrevias ?? []).some((iq) => iq.incidencias.includes('nvpo'));
@@ -201,10 +237,19 @@ export function Salidas({ entrevista, modalidad }: Props) {
     if ((morfina && morfina.mgDia >= 50) || (enfermedades.has('dolor_cronico') && riesgoIntAlto)) {
       alertas.push({ gravedad: 'informativa', mensaje: 'Valorar inclusión en el circuito de dolor transicional de la Unidad Integral del Dolor.' });
     }
+    // Alertas y notas codificadas en los módulos (§5.16): se EJECUTAN aquí, no
+    // están escritas a mano. Incluye ictus/AIT < 3 meses (roja), TVP/TEP < 3 meses
+    // (amarilla), asma no controlada, trasplante reciente, etc.
+    const efectosMod = emitirEfectosModulos({
+      modulos: MODULOS, respuestas, activos: enfermedades,
+      fechaIntervencion: intervencion.fechaHora ?? null,
+    });
+    for (const a of efectosMod.alertas) alertas.push({ gravedad: a.gravedad, mensaje: a.mensaje });
     alertas.sort((a, b) => ORDEN_GRAVEDAD[a.gravedad] - ORDEN_GRAVEDAD[b.gravedad]);
 
     // Notas técnicas.
     const notas: string[] = [...ayuno.notasAnestesiologo];
+    for (const n of efectosMod.notas) notas.push(n.texto);
     for (const f of plan) if (f.resultado.textoAnestesiologo) notas.push(`${f.resultado.nombreComercial}: ${f.resultado.textoAnestesiologo}`);
     if (mt?.alerta?.gravedad === 'roja') notas.push('mtND4: seguir las medidas del consenso SEDAR (evitar halogenados/TIVA, regional preferente, monitorización de profundidad, etc.).');
 
@@ -277,7 +322,7 @@ export function Salidas({ entrevista, modalidad }: Props) {
       <h4>Pruebas complementarias</h4>
       <ul className="resumen-lista">
         {salida.pruebas.length === 0 ? <li>Ninguna.</li> : salida.pruebas.map((p: PruebaSolicitada, i: number) => (
-          <li key={i}><strong>{p.prueba}:</strong> {p.motivo}</li>
+          <li key={i}><strong>{ETIQUETA_PRUEBA[p.prueba] ?? p.prueba}:</strong> {p.motivo}</li>
         ))}
       </ul>
 

@@ -8,14 +8,40 @@
       "etiqueta": "Tipo",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "duchenne", "etiqueta": "Distrofia de Duchenne" },
-        { "valor": "becker", "etiqueta": "Distrofia de Becker" },
-        { "valor": "miotonica", "etiqueta": "Distrofia miotónica" },
-        { "valor": "miastenia", "etiqueta": "Miastenia gravis" },
-        { "valor": "otra", "etiqueta": "Otra" }
+        {
+          "valor": "duchenne",
+          "etiqueta": "Distrofia de Duchenne"
+        },
+        {
+          "valor": "becker",
+          "etiqueta": "Distrofia de Becker"
+        },
+        {
+          "valor": "miotonica",
+          "etiqueta": "Distrofia miotónica"
+        },
+        {
+          "valor": "miastenia",
+          "etiqueta": "Miastenia gravis"
+        },
+        {
+          "valor": "otra",
+          "etiqueta": "Otra"
+        }
       ],
       "genera": [
-        { "cuando": "= Duchenne o Becker", "tipo": "nota", "efecto": "evitar succinilcolina y valorar evitar halogenados", "fuente": "§5.16.11" }
+        {
+          "cuando": "= Duchenne o Becker",
+          "tipo": "nota",
+          "efecto": "evitar succinilcolina y valorar evitar halogenados",
+          "fuente": "§5.16.11",
+          "si": {
+            "enLista": [
+              "duchenne",
+              "becker"
+            ]
+          }
+        }
       ]
     },
     {
@@ -24,7 +50,16 @@
       "tipo": "boolean",
       "porque": "La debilidad de los músculos respiratorios aumenta el riesgo de insuficiencia respiratoria tras la anestesia.",
       "genera": [
-        { "cuando": "= sí", "tipo": "alerta", "gravedad": "roja", "efecto": "riesgo de insuficiencia respiratoria postoperatoria", "fuente": "§5.16.11" }
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "roja",
+          "efecto": "riesgo de insuficiencia respiratoria postoperatoria",
+          "fuente": "§5.16.11",
+          "si": {
+            "igual": true
+          }
+        }
       ]
     },
     {
@@ -33,7 +68,12 @@
       "tipo": "fecha",
       "porque": "Muchas distrofias afectan al corazón; sin ecocardiograma en los últimos 12 meses conviene valorarlo.",
       "genera": [
-        { "cuando": "sin ecocardiograma en 12 meses", "tipo": "nota", "efecto": "valorar ecocardiograma", "fuente": "§5.16.11" }
+        {
+          "cuando": "sin ecocardiograma en 12 meses",
+          "tipo": "nota",
+          "efecto": "valorar ecocardiograma",
+          "fuente": "§5.16.11"
+        }
       ]
     },
     {
@@ -42,7 +82,16 @@
       "tipo": "boolean",
       "porque": "Puede indicar susceptibilidad a hipertermia maligna o a reacciones musculares graves.",
       "genera": [
-        { "cuando": "= sí", "tipo": "alerta", "gravedad": "roja", "efecto": "sospecha de hipertermia maligna o reacción muscular grave", "fuente": "§5.16.11" }
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "roja",
+          "efecto": "sospecha de hipertermia maligna o reacción muscular grave",
+          "fuente": "§5.16.11",
+          "si": {
+            "igual": true
+          }
+        }
       ]
     }
   ]

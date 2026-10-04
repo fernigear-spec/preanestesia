@@ -532,7 +532,9 @@ Cada escala muestra la puntuación, la categoría y los componentes que suman.
 
 \* Bajo/bajo: hemograma y coagulación solo si sospecha de anemia, trastorno de coagulación/anticoagulante, anestesia regional posible, sangrado previsible o HEMSTOP positivo. \*** Rx de tórax solo ante sospecha o cambio de enfermedad cardiopulmonar (la aplicación pregunta).
 
-**Validez:** hemograma 30 días, bioquímica 30 días, coagulación 14 días, ECG 3 meses, Rx tórax 3 meses, ecocardiograma 12 meses (18 si la función ventricular es conocida y estable). La aplicación compara la fecha de la prueba con la de la intervención: si sigue vigente ese día, no se repite.
+**BNP o NT-proBNP (nota \*\*):** solo en cirugía de riesgo intermedio o alto y si hay comorbilidad cardiovascular significativa, fragilidad (CFS ≥ 5) o capacidad funcional reducida (< 4 METs). Cuenta como comorbilidad cardiovascular significativa: cardiopatía isquémica, insuficiencia cardiaca, valvulopatía moderada o grave, fibrilación auricular u otra arritmia, arteriopatía periférica o aneurisma de aorta, ictus o AIT previo, miocardiopatía e hipertensión pulmonar. La hipertensión arterial aislada **no** cuenta (decisión del servicio, 2026-10-04).
+
+**Validez:** hemograma 30 días, bioquímica 30 días, coagulación 14 días, ECG 3 meses, Rx tórax 3 meses, ecocardiograma 12 meses (18 si la función ventricular es conocida y estable). El apartado «Pruebas recientes» del paso de enfermedades recoge la fecha de cada prueba; la aplicación la compara con la de la intervención (o con hoy si aún no hay fecha, indicándolo) y **descuenta** las que sigan vigentes ese día. El BNP/NT-proBNP se pide por indicación y no se descuenta por fecha.
 
 ## 13. Catálogo de fármacos
 
@@ -1277,18 +1279,18 @@ _Fuente: docs/documento_fuente.md §5.8, §5.16.13_
 
 - **¿Dolor, rigidez o limitación para mover el cuello?** — _boolean_
   - Por qué: En la artritis reumatoide puede haber inestabilidad de las vértebras del cuello: hay que evitar movimientos bruscos al dormir al paciente.
-  - Genera → 🔔 alerta roja: si = sí → inestabilidad atloaxoidea (cuello). _(§5.16.13)_
+  - Genera → 🔔 alerta roja: si = sí → inestabilidad atloaxoidea (cuello). _(§5.16.13)_ **[se emite]**
 - **¿Dificultad para abrir la boca o problemas de la mandíbula?** — _boolean_
   - Por qué: Limita el acceso a la vía aérea para la intubación.
-  - Genera → 🔔 alerta amarilla: si = sí → posible vía aérea difícil. _(§5.16.13)_
+  - Genera → 🔔 alerta amarilla: si = sí → posible vía aérea difícil. _(§5.16.13)_ **[se emite]**
 - **¿Ronquera crónica o falta de aire?** — _boolean_
   - Por qué: Puede indicar afectación de las articulaciones de la laringe (cricoaritenoidea).
-  - Genera → 🔔 alerta amarilla: si = sí → posible afectación cricoaritenoidea. _(§5.16.13)_
+  - Genera → 🔔 alerta amarilla: si = sí → posible afectación cricoaritenoidea. _(§5.16.13)_ **[se emite]**
 - **Si toma inmunosupresores, ¿por qué motivo?** — _opcion_: Enfermedad autoinmune / Enfermedad sistémica grave / Trasplante
   - Por qué: La suspensión de los inmunosupresores clásicos depende de la indicación.
 - **¿Ha tomado corticoides (cortisona) en los últimos 3 meses?** — _boolean_
   - Por qué: Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).
-  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_
+  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_ **[se emite]**
 - **¿Cuál?** — _opcion_: Prednisona / Prednisolona / Metilprednisolona / Deflazacort / Dexametasona / Hidrocortisona
 - **Dosis diaria** (mg) — _numero_
 - **Duración** (semanas) — _numero_
@@ -1303,17 +1305,17 @@ _Fuente: docs/documento_fuente.md §5.2, §5.16.3, §5.16.4_
 - **Fecha de la última crisis** — _fecha_
 - **¿Crisis o agudización en el último mes?** — _boolean_
   - Por qué: Una agudización reciente puede aconsejar posponer la cirugía programada; la intubación puede desencadenar broncoespasmo si no está controlada.
-  - Genera → 🔔 alerta amarilla: si = sí → asma no controlada. _(§5.16.3)_
+  - Genera → 🔔 alerta amarilla: si = sí → asma no controlada. _(§5.16.3)_ **[se emite]**
 - **Visitas a urgencias o ingresos por asma/EPOC en el último año** — _numero_
 - **¿Corticoides orales en el último año?** — _boolean_
 - **¿Ingresos en el último año?** — _boolean_
-  - Genera → 🔔 alerta amarilla: si = sí → asma no controlada. _(§5.16.3)_
+  - Genera → 🔔 alerta amarilla: si = sí → asma no controlada. _(§5.16.3)_ **[se emite]**
 - **Uso del inhalador de rescate (veces por semana)** — _numero_
   - Por qué: Usar el rescate más de 2 veces por semana indica que el asma no está bien controlada.
-  - Genera → 🔔 alerta amarilla: si > 2 veces/semana → asma no controlada. _(§5.16.3)_
+  - Genera → 🔔 alerta amarilla: si > 2 veces/semana → asma no controlada. _(§5.16.3)_ **[se emite]**
 - **Desencadenantes de las crisis** — _opcion_multiple_: Infecciones / Frío / Estrés / Alergias / Ejercicio / AINE o aspirina / Otros
   - Por qué: Si los AINE o la aspirina desencadenan crisis, deben evitarse en el perioperatorio (alerta).
-  - Genera → 🔔 alerta roja: si incluye AINE/aspirina → asma inducida por AINE: evitar AINE perioperatorios. _(§5.16.3)_
+  - Genera → 🔔 alerta roja: si incluye AINE/aspirina → asma inducida por AINE: evitar AINE perioperatorios. _(§5.16.3)_ **[se emite]**
 - **Disnea (escala mMRC), si es EPOC** — _opcion_: 0 — solo con ejercicio intenso / 1 — al andar deprisa o subir cuesta / 2 — anda más despacio que otros de su edad / 3 — para a los 100 m o pocos minutos / 4 — no sale de casa / al vestirse
 - **¿Usa oxígeno en casa?** — _boolean_
   - Por qué: La oxigenoterapia domiciliaria sube la clase de riesgo del paciente.
@@ -1323,7 +1325,7 @@ _Fuente: docs/documento_fuente.md §5.2, §5.16.3, §5.16.4_
 - **¿Tos con expectoración habitual?** — _boolean_
 - **¿Cambio reciente en el color o la cantidad del esputo, o síntomas respiratorios nuevos?** — _boolean_
   - Por qué: Un cambio reciente puede indicar infección activa y es uno de los supuestos que indican pedir radiografía de tórax.
-  - Genera → 🔔 alerta amarilla: si = sí → posible infección respiratoria activa: valorar posponer la cirugía programada. _(§5.16.4)_
+  - Genera → 🔔 alerta amarilla: si = sí → posible infección respiratoria activa: valorar posponer la cirugía programada. _(§5.16.4)_ **[se emite]**
   - Genera → 🧪 prueba: si = sí → radiografía de tórax. _(§7.3)_
 
 ### Cáncer en tratamiento
@@ -1360,7 +1362,7 @@ _Fuente: docs/documento_fuente.md §5.1_
   - Genera → 🅰 ASA: si = mínimos esfuerzos o reposo → ASA mínimo 4 (angina activa). _(§5.1)_
 - **¿La angina ha cambiado (más frecuente o más intensa) en las últimas semanas?** — _boolean_
   - Por qué: Una angina que cambia recientemente puede indicar isquemia inestable: es una señal de alerta.
-  - Genera → 🔔 alerta roja: si = sí → posible isquemia inestable. _(§5.1)_
+  - Genera → 🔔 alerta roja: si = sí → posible isquemia inestable. _(§5.1)_ **[se emite]**
 - **Última prueba de esfuerzo o de detección de isquemia** — _opcion_: No se ha hecho / Negativa / Positiva / No concluyente
 - **Fecha de la prueba de isquemia** — _fecha_
 - **Fecha del último ecocardiograma** — _fecha_
@@ -1381,16 +1383,16 @@ _Fuente: docs/documento_fuente.md §5.8, §5.16.13_
 
 - **¿Debilidad en el cuello o dificultad para tragar?** — _boolean_
   - Por qué: Aumenta el riesgo de aspiración durante la anestesia.
-  - Genera → 🔔 alerta amarilla: si = sí → riesgo de aspiración. _(§5.16.13)_
+  - Genera → 🔔 alerta amarilla: si = sí → riesgo de aspiración. _(§5.16.13)_ **[se emite]**
 - **¿Falta de aire o fatiga inusual al caminar?** — _boolean_
   - Por qué: Puede indicar afectación de los músculos respiratorios o del pulmón.
-  - Genera → 🔔 alerta amarilla: si = sí → posible afectación respiratoria. _(§5.16.13)_
+  - Genera → 🔔 alerta amarilla: si = sí → posible afectación respiratoria. _(§5.16.13)_ **[se emite]**
 - **¿Problemas de corazón conocidos?** — _boolean_
   - Por qué: Estas enfermedades pueden inflamar el corazón (miocarditis).
-  - Genera → 🔔 alerta amarilla: si = sí → posible miocarditis. _(§5.16.13)_
+  - Genera → 🔔 alerta amarilla: si = sí → posible miocarditis. _(§5.16.13)_ **[se emite]**
 - **¿Ha tomado corticoides (cortisona) en los últimos 3 meses?** — _boolean_
   - Por qué: Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).
-  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_
+  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_ **[se emite]**
 - **¿Cuál?** — _opcion_: Prednisona / Prednisolona / Metilprednisolona / Deflazacort / Dexametasona / Hidrocortisona
 - **Dosis diaria** (mg) — _numero_
 - **Duración** (semanas) — _numero_
@@ -1403,11 +1405,11 @@ _Fuente: docs/documento_fuente.md §5.6, §5.16.5_
 - **Representante legal** — _texto_
 - **¿Puede otorgar el consentimiento?** — _opcion_: Sí / No / Dudosa
   - Por qué: Si no puede consentir, el consentimiento lo firma su representante legal.
-  - Genera → 🔔 alerta amarilla: si = no o dudosa → consentimiento por representante legal. _(§5.16.5)_
+  - Genera → 🔔 alerta amarilla: si = no o dudosa → consentimiento por representante legal. _(§5.16.5)_ **[se emite]**
 - **Nivel de dependencia** — _opcion_: Independiente / Dependencia parcial / Dependencia total
 - **¿Episodios previos de agitación, delirio o desorientación nocturna?** — _boolean_
   - Por qué: Son un factor de riesgo importante de delirium después de la operación.
-  - Genera → 🔔 alerta amarilla: si = sí → alto riesgo de delirium postoperatorio. _(§5.16.5)_
+  - Genera → 🔔 alerta amarilla: si = sí → alto riesgo de delirium postoperatorio. _(§5.16.5)_ **[se emite]**
 
 ### Diabetes
 
@@ -1423,15 +1425,15 @@ _Fuente: docs/documento_fuente.md §5.3, §5.16.2, §8.5_
 - **Tratamiento** — _opcion_: Solo dieta / Pastillas / Insulina / Pastillas e insulina
 - **Frecuencia de hipoglucemias (bajadas de azúcar)** — _opcion_: Nunca / Alguna al mes / Alguna a la semana / A diario
   - Por qué: El ayuno y los ajustes de insulina aumentan el riesgo de hipoglucemia; conviene conocer su frecuencia.
-  - Genera → 🔔 alerta amarilla: si = semanal o diaria → hipoglucemias frecuentes o inadvertidas. _(§5.16.2)_
+  - Genera → 🔔 alerta amarilla: si = semanal o diaria → hipoglucemias frecuentes o inadvertidas. _(§5.16.2)_ **[se emite]**
 - **¿Nota cuándo le baja el azúcar?** — _boolean_
   - Por qué: Las hipoglucemias inadvertidas son especialmente peligrosas en el ayuno perioperatorio.
-  - Genera → 🔔 alerta amarilla: si = no (no las detecta) → hipoglucemias frecuentes o inadvertidas. _(§5.16.2)_
+  - Genera → 🔔 alerta amarilla: si = no (no las detecta) → hipoglucemias frecuentes o inadvertidas. _(§5.16.2)_ **[se emite]**
 - **Complicaciones crónicas** — _opcion_multiple_: Cardiopatía isquémica / Nefropatía / Pie diabético / Vasculopatía de extremidades / Retinopatía
   - Genera → 🧪 prueba: si incluye nefropatía → cuenta como proteinuria/nefropatía: apoya pedir bioquímica renal. _(§7.3)_
 - **¿Síntomas de gastroparesia (náuseas/vómitos de comida sin digerir, saciedad precoz, distensión, glucemias erráticas)?** — _boolean_
   - Por qué: La gastroparesia alarga el ayuno de sólidos y aconseja premedicación con metoclopramida.
-  - Genera → 📝 nota: si = sí → alarga el ayuno de sólidos; valorar premedicación con metoclopramida. _(§5.3)_
+  - Genera → 📝 nota: si = sí → alarga el ayuno de sólidos; valorar premedicación con metoclopramida. _(§5.3)_ **[se emite]**
 - **¿Hipoglucemias frecuentes?** — _boolean_
 - **¿Lleva bomba de insulina o sensor de glucosa?** — _opcion_: No / Bomba de insulina / Sensor / Bomba y sensor
 
@@ -1440,16 +1442,16 @@ _Fuente: docs/documento_fuente.md §5.3, §5.16.2, §8.5_
 _Fuente: docs/documento_fuente.md §5.6, §5.16.11_
 
 - **Tipo** — _opcion_: Distrofia de Duchenne / Distrofia de Becker / Distrofia miotónica / Miastenia gravis / Otra
-  - Genera → 📝 nota: si = Duchenne o Becker → evitar succinilcolina y valorar evitar halogenados. _(§5.16.11)_
+  - Genera → 📝 nota: si = Duchenne o Becker → evitar succinilcolina y valorar evitar halogenados. _(§5.16.11)_ **[se emite]**
 - **¿Le cuesta respirar tumbado o usa ventilación nocturna (BiPAP)?** — _boolean_
   - Por qué: La debilidad de los músculos respiratorios aumenta el riesgo de insuficiencia respiratoria tras la anestesia.
-  - Genera → 🔔 alerta roja: si = sí → riesgo de insuficiencia respiratoria postoperatoria. _(§5.16.11)_
+  - Genera → 🔔 alerta roja: si = sí → riesgo de insuficiencia respiratoria postoperatoria. _(§5.16.11)_ **[se emite]**
 - **Fecha del último ecocardiograma** — _fecha_
   - Por qué: Muchas distrofias afectan al corazón; sin ecocardiograma en los últimos 12 meses conviene valorarlo.
   - Genera → 📝 nota: si sin ecocardiograma en 12 meses → valorar ecocardiograma. _(§5.16.11)_
 - **¿Fiebre muy alta o complicaciones graves en una anestesia, en usted o su familia?** — _boolean_
   - Por qué: Puede indicar susceptibilidad a hipertermia maligna o a reacciones musculares graves.
-  - Genera → 🔔 alerta roja: si = sí → sospecha de hipertermia maligna o reacción muscular grave. _(§5.16.11)_
+  - Genera → 🔔 alerta roja: si = sí → sospecha de hipertermia maligna o reacción muscular grave. _(§5.16.11)_ **[se emite]**
 
 ### Dolor crónico
 
@@ -1483,7 +1485,7 @@ _Fuente: docs/documento_fuente.md §5b, §5.16.14, §8.8_
   - Por qué: La suspensión de los inmunosupresores clásicos depende de la indicación.
 - **¿Ha tomado corticoides (cortisona) en los últimos 3 meses?** — _boolean_
   - Por qué: Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).
-  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_
+  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_ **[se emite]**
 - **¿Cuál?** — _opcion_: Prednisona / Prednisolona / Metilprednisolona / Deflazacort / Dexametasona / Hidrocortisona
 - **Dosis diaria** (mg) — _numero_
 - **Duración** (semanas) — _numero_
@@ -1511,14 +1513,14 @@ _Fuente: docs/documento_fuente.md §5.6, §5.16.9_
 
 - **Fecha aproximada de la última crisis** — _fecha_
   - Por qué: Una crisis en el último mes indica epilepsia no bien controlada.
-  - Genera → 🔔 alerta amarilla: si crisis en el último mes → epilepsia no controlada. _(§5.16.9)_
+  - Genera → 🔔 alerta amarilla: si crisis en el último mes → epilepsia no controlada. _(§5.16.9)_ **[se emite]**
 - **Frecuencia de las crisis** — _opcion_: Diaria / Semanal / Mensual / Anual / Menos de una al año
 - **Tipo de crisis** — _opcion_: Generalizada tónico-clónica / Focal con pérdida de conciencia / Focal sin pérdida de conciencia / Ausencias / Desconocido
 - **¿Tiene aura o pródromos antes de la crisis?** — _boolean_
 - **Desencadenantes** — _opcion_multiple_: Falta de sueño / Estrés / Fiebre / Luces parpadeantes / Alcohol / Olvido de la medicación / Otros
 - **¿Ha tenido un estatus epiléptico (crisis muy prolongada)?** — _boolean_
   - Por qué: Un estatus previo o crisis recientes indican epilepsia no controlada: no debe omitirse la medicación.
-  - Genera → 🔔 alerta amarilla: si = sí → epilepsia no controlada. _(§5.16.9)_
+  - Genera → 🔔 alerta amarilla: si = sí → epilepsia no controlada. _(§5.16.9)_ **[se emite]**
 
 ### Esclerosis múltiple
 
@@ -1526,17 +1528,17 @@ _Fuente: docs/documento_fuente.md §5.6, §5.16.12_
 
 - **Fecha del último brote** — _fecha_
   - Por qué: Un brote en los últimos 3 meses es una señal de alerta.
-  - Genera → 🔔 alerta amarilla: si brote en los últimos 3 meses → brote reciente de esclerosis múltiple. _(§5.16.12)_
+  - Genera → 🔔 alerta amarilla: si brote en los últimos 3 meses → brote reciente de esclerosis múltiple. _(§5.16.12)_ **[se emite]**
 - **Síntomas del último brote** — _texto_
 - **Movilidad habitual** — _opcion_: Camina sin ayuda / Camina con ayuda / Silla de ruedas / Encamado
   - Por qué: La movilidad y la debilidad basales deben quedar documentadas para comparar tras la anestesia.
 - **Debilidad basal (descripción)** — _texto_
 - **¿Empeora con el calor (fenómeno de Uhthoff)?** — _boolean_
   - Por qué: Si empeora con el calor, conviene mantener una normotermia estricta durante la cirugía.
-  - Genera → 📝 nota: si = sí → mantener normotermia estricta. _(§5.16.12)_
+  - Genera → 📝 nota: si = sí → mantener normotermia estricta. _(§5.16.12)_ **[se emite]**
 - **¿Ha tomado corticoides (cortisona) en los últimos 3 meses?** — _boolean_
   - Por qué: Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).
-  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_
+  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_ **[se emite]**
 - **¿Cuál?** — _opcion_: Prednisona / Prednisolona / Metilprednisolona / Deflazacort / Dexametasona / Hidrocortisona
 - **Dosis diaria** (mg) — _numero_
 - **Duración** (semanas) — _numero_
@@ -1549,6 +1551,17 @@ _Fuente: docs/documento_fuente.md §5.1, §6.5_
 - **¿Ha tenido un ictus, un AIT o una embolia?** — _boolean_
   - Por qué: Un ictus/AIT reciente (menos de 3 meses) con FA es criterio de alto riesgo y puede requerir terapia puente.
 - **Fecha del ictus/AIT/embolia** — _fecha_
+  - Por qué: Un ictus/AIT de menos de 3 meses es alerta roja (valorar posponer la cirugía programada).
+  - Genera → 🔔 alerta roja: si ictus/AIT en los últimos 3 meses → ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada. _(§5.1 (ESC 2022))_ **[se emite]**
+
+### Hipertensión pulmonar
+
+_Fuente: docs/documento_fuente.md §5.2_
+
+- **¿Tiene diagnóstico de hipertensión pulmonar?** — _boolean_
+  - Por qué: La hipertensión pulmonar aumenta mucho el riesgo anestésico y es una señal de alerta (§5.2). Cuenta como comorbilidad cardiovascular para pedir BNP o NT-proBNP (§7.3).
+  - Genera → 🔔 alerta amarilla: si = sí → hipertensión pulmonar: valorar antes de la intervención. _(§5.2)_ **[se emite]**
+- **Tratamiento específico (si lo tiene)** — _texto_
 
 ### Tiroides
 
@@ -1569,7 +1582,7 @@ _Fuente: docs/documento_fuente.md §5.1, §5.16.1_
   - Genera → 🅰 ASA: si = mal → ASA mínimo 3 (HTA mal controlada); en otro caso, mínimo 2. _(§5.16.1)_
 - **Síntomas de mal control** — _opcion_multiple_: Cefalea frecuente / Acúfenos (pitidos en los oídos) / Visión borrosa
   - Por qué: Cefalea, acúfenos o visión borrosa pueden indicar que la tensión no está bien controlada.
-  - Genera → 🔔 alerta amarilla: si alguno marcado → posible HTA mal controlada. _(§5.16.1)_
+  - Genera → 🔔 alerta amarilla: si alguno marcado → posible HTA mal controlada. _(§5.16.1)_ **[se emite]**
 
 ### Ictus/AIT y trombosis venosa (TVP/TEP)
 
@@ -1578,10 +1591,12 @@ _Fuente: docs/documento_fuente.md §5.1_
 - **¿Ha tenido un ictus o un AIT?** — _boolean_
 - **Fecha del ictus/AIT** — _fecha_
   - Por qué: Menos de 3 meses desde el ictus/AIT es una señal de alerta.
+  - Genera → 🔔 alerta roja: si ictus/AIT en los últimos 3 meses → ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada. _(§5.1 (ESC 2022))_ **[se emite]**
 - **Secuelas** — _texto_
 - **¿Ha tenido una trombosis venosa (TVP) o una embolia de pulmón (TEP)?** — _boolean_
 - **Fecha de la TVP/TEP** — _fecha_
   - Por qué: Una TVP/TEP de menos de 3 meses es criterio de alto riesgo trombótico (posible terapia puente).
+  - Genera → 🔔 alerta amarilla: si TVP/TEP en los últimos 3 meses → TVP o TEP de menos de 3 meses: valorar antes de la intervención. _(§5.1)_ **[se emite]**
 
 ### Infección respiratoria reciente
 
@@ -1589,7 +1604,7 @@ _Fuente: docs/documento_fuente.md §5.2, §5.12, §5.16.8_
 
 - **Síntomas actuales** — _opcion_multiple_: Fiebre / Dolor de garganta / Malestar general / Mucosidad abundante / Tos productiva
   - Por qué: Una infección respiratoria activa aumenta el riesgo de complicaciones y puede aconsejar posponer la cirugía programada.
-  - Genera → 🔔 alerta amarilla: si fiebre o tos productiva (infección activa) → infección respiratoria activa: valorar posponer la cirugía programada (§5.2, §5.12). _(§5.16.8)_
+  - Genera → 🔔 alerta amarilla: si fiebre o tos productiva (infección activa) → infección respiratoria activa: valorar posponer la cirugía programada (§5.2, §5.12). _(§5.16.8)_ **[se emite]**
 - **Días de evolución** — _numero_
 
 ### Insuficiencia cardiaca
@@ -1616,17 +1631,17 @@ _Fuente: docs/documento_fuente.md §5.8, §5.16.13_
 
 - **Órganos afectados** — _opcion_multiple_: Riñón / Corazón / Pulmón / Sistema nervioso / Hematológico / Piel y articulaciones
   - Por qué: La afectación de riñón, corazón o pulmón cambia las pruebas y el riesgo.
-  - Genera → 📝 nota: si incluye riñón → valorar creatinina y sedimento urinario. _(§5.16.13)_
+  - Genera → 📝 nota: si incluye riñón → valorar creatinina y sedimento urinario. _(§5.16.13)_ **[se emite]**
 - **¿Trombosis previa o síndrome antifosfolípido?** — _boolean_
   - Por qué: El síndrome antifosfolípido es criterio de alto riesgo trombótico; márquelo también en el módulo de trombofilia.
   - Genera → ℹ dato: si = sí → criterio de alto riesgo trombótico (enlaza con trombofilia §8.1). _(§5.16.13)_
 - **¿Anemia o plaquetas bajas recientes?** — _boolean_
   - Por qué: Motiva hemograma y coagulación aunque la tabla no los pida.
-  - Genera → 🔔 alerta amarilla: si = sí → anemia o plaquetopenia recientes. _(§5.16.13)_
+  - Genera → 🔔 alerta amarilla: si = sí → anemia o plaquetopenia recientes. _(§5.16.13)_ **[se emite]**
   - Genera → 🧪 prueba: si = sí → hemograma y coagulación. _(§5.16.13)_
 - **¿Ha tomado corticoides (cortisona) en los últimos 3 meses?** — _boolean_
   - Por qué: Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).
-  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_
+  - Genera → 📝 nota: si ≥ 5 mg/día de prednisona > 3 semanas (equivalente) → valorar dosis de estrés perioperatoria. _(§5.16.14)_ **[se emite]**
 - **¿Cuál?** — _opcion_: Prednisona / Prednisolona / Metilprednisolona / Deflazacort / Dexametasona / Hidrocortisona
 - **Dosis diaria** (mg) — _numero_
 - **Duración** (semanas) — _numero_
@@ -1641,6 +1656,16 @@ _Fuente: docs/documento_fuente.md §5.1_
 - **Fecha de la última revisión del dispositivo** — _fecha_
   - Por qué: El dispositivo debe revisarse antes de la cirugía; conviene saber cuándo fue la última revisión.
 - **Hospital donde le siguen el dispositivo** — _texto_
+
+### Miocardiopatía
+
+_Fuente: docs/documento_fuente.md §5.1_
+
+- **Tipo de miocardiopatía (si lo conoce)** — _opcion_: Dilatada / Hipertrófica / Restrictiva / Otra o no la sabe
+- **Fecha del último ecocardiograma** — _fecha_
+- **¿Disnea, síncope o palpitaciones recientes?** — _boolean_
+  - Por qué: La miocardiopatía cuenta como comorbilidad cardiovascular para pedir BNP o NT-proBNP (§7.3). Los síntomas recientes aconsejan valorarla antes de la intervención.
+  - Genera → 🔔 alerta amarilla: si = sí → miocardiopatía sintomática: valorar antes de la intervención. _(§5.1)_ **[se emite]**
 
 ### Obesidad
 
@@ -1657,10 +1682,10 @@ _Fuente: docs/documento_fuente.md §5.6, §5.16.10_
   - Por qué: La levodopa no se suspende; conviene conocer su horario para no interrumpirla.
 - **¿Dificultad para tragar o mal manejo de la saliva?** — _boolean_
   - Por qué: Aumenta el riesgo de aspiración durante la anestesia.
-  - Genera → 🔔 alerta amarilla: si = sí → riesgo de aspiración. _(§5.16.10)_
+  - Genera → 🔔 alerta amarilla: si = sí → riesgo de aspiración. _(§5.16.10)_ **[se emite]**
 - **¿Mareo intenso al ponerse de pie?** — _boolean_
   - Por qué: Indica disfunción autonómica, con riesgo de bajadas graves de tensión durante la anestesia.
-  - Genera → 🔔 alerta amarilla: si = sí → disfunción autonómica (riesgo de hipotensión). _(§5.16.10)_
+  - Genera → 🔔 alerta amarilla: si = sí → disfunción autonómica (riesgo de hipotensión). _(§5.16.10)_ **[se emite]**
 
 ### Pediatría
 
@@ -1728,12 +1753,12 @@ _Fuente: docs/documento_fuente.md §5.2, §6.3_
 _Fuente: docs/documento_fuente.md §5.10, §5.16.15, §8.8_
 
 - **Órgano trasplantado** — _opcion_: Riñón / Hígado / Corazón / Pulmón / Páncreas / Médula ósea / Otro
-  - Genera → 📝 nota: si = corazón → corazón denervado. _(§5.16.15)_
-  - Genera → 🔔 alerta amarilla: si = riñón → evitar AINE. _(§5.16.15)_
-  - Genera → 📝 nota: si = pulmón → reflejo tusígeno abolido. _(§5.16.15)_
+  - Genera → 📝 nota: si = corazón → corazón denervado. _(§5.16.15)_ **[se emite]**
+  - Genera → 🔔 alerta amarilla: si = riñón → evitar AINE. _(§5.16.15)_ **[se emite]**
+  - Genera → 📝 nota: si = pulmón → reflejo tusígeno abolido. _(§5.16.15)_ **[se emite]**
 - **Fecha del trasplante** — _fecha_
   - Por qué: Un trasplante de menos de 6 meses implica inmunosupresión intensa.
-  - Genera → 🔔 alerta amarilla: si < 6 meses → trasplante reciente. _(§5.16.15)_
+  - Genera → 🔔 alerta amarilla: si < 6 meses → trasplante reciente. _(§5.16.15)_ **[se emite]**
 - **Fecha de la última analítica del injerto** — _fecha_
 - **Creatinina más reciente (si es trasplante renal)** (mg/dL) — _numero_
   - Por qué: En el trasplante renal, la creatinina permite calcular el aclaramiento.
@@ -1743,10 +1768,10 @@ _Fuente: docs/documento_fuente.md §5.10, §5.16.15, §8.8_
 - **¿Aporta informe del equipo de trasplante?** — _boolean_
 - **¿Los niveles de los inmunosupresores están en rango?** — _opcion_: Sí / No / No lo sabe
   - Por qué: Niveles fuera de rango pueden requerir ajuste antes de la cirugía.
-  - Genera → 🔔 alerta amarilla: si = no (fuera de rango) → niveles de inmunosupresores fuera de rango. _(§5.16.15)_
+  - Genera → 🔔 alerta amarilla: si = no (fuera de rango) → niveles de inmunosupresores fuera de rango. _(§5.16.15)_ **[se emite]**
 - **¿Fiebre, infección reciente o antibiótico/antifúngico actual?** — _boolean_
   - Por qué: Una infección activa en un paciente inmunodeprimido puede aconsejar posponer la cirugía programada.
-  - Genera → 🔔 alerta amarilla: si = sí → infección activa en inmunodeprimido: valorar posponer. _(§5.16.15)_
+  - Genera → 🔔 alerta amarilla: si = sí → infección activa en inmunodeprimido: valorar posponer. _(§5.16.15)_ **[se emite]**
 - **Profilaxis antiinfecciosa (cotrimoxazol, antivirales…)** — _texto_
 - **Según el órgano: fatiga o falta de aire (corazón/pulmón), tos (pulmón), medicamentos sin receta (riñón)** — _texto_
   - Por qué: El corazón trasplantado puede tener isquemia indolora; en el riñón hay que evitar AINE; en el pulmón hay riesgo de retención de secreciones.
@@ -1792,4 +1817,4 @@ _Fuente: docs/documento_fuente.md §5.1_
   - `ths_vaginal` — terapia hormonal sustitutiva vaginal\|THS vaginal (no)
 
 ---
-_Generado el 2026-09-30._
+_Generado el 2026-10-04._

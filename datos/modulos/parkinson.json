@@ -15,7 +15,16 @@
       "tipo": "boolean",
       "porque": "Aumenta el riesgo de aspiración durante la anestesia.",
       "genera": [
-        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "riesgo de aspiración", "fuente": "§5.16.10" }
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "riesgo de aspiración",
+          "fuente": "§5.16.10",
+          "si": {
+            "igual": true
+          }
+        }
       ]
     },
     {
@@ -24,7 +33,16 @@
       "tipo": "boolean",
       "porque": "Indica disfunción autonómica, con riesgo de bajadas graves de tensión durante la anestesia.",
       "genera": [
-        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "disfunción autonómica (riesgo de hipotensión)", "fuente": "§5.16.10" }
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "disfunción autonómica (riesgo de hipotensión)",
+          "fuente": "§5.16.10",
+          "si": {
+            "igual": true
+          }
+        }
       ]
     }
   ]

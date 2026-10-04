@@ -33,7 +33,7 @@ import { calcularLangeron } from '../src/dominio/escalas/langeron.ts';
 import { calcularMorfinaEquivalente } from '../src/dominio/escalas/morfinaEquivalente.ts';
 import { calcularAuditC } from '../src/dominio/escalas/auditC.ts';
 import { calcularHemstop } from '../src/dominio/escalas/hemstop.ts';
-import { decidirPruebas, pruebaVigente, type FactoresPruebas } from '../src/dominio/pruebas/tablaPruebas.ts';
+import { derivarRiesgoYPruebas, type EntradaRiesgoPruebas } from '../src/dominio/entrevista/riesgoYPruebas.ts';
 import { calcularAyuno } from '../src/dominio/ayuno/ayuno.ts';
 import { evaluarMtnd4 } from '../src/dominio/mtnd4/mtnd4.ts';
 import { tarjetaFarmacoAEnfermedad, tarjetasEnfermedadAFarmaco } from '../src/dominio/coherencia/coherencia.ts';
@@ -534,21 +534,42 @@ function add(id: string, calculado: string, textoPaciente: string, _a?: string |
 }
 
 // ————————————————————— G —————————————————————
-const sinF: FactoresPruebas = { anemiaOHbBaja: false, trastornoCoagulacionOAnticoagulante: false, anestesiaRegionalPosible: false, sangradoPrevisible: false, hemstopPositivo: false, supuestoRxTorax: false, supuestoEcocardiograma: false };
+// Los casos G se ejecutan por el MOTOR completo (derivarRiesgoYPruebas): la clase
+// del paciente, los factores (incluida la comorbilidad CV para el BNP) y la vigencia
+// de pruebas recientes se derivan de los datos del caso, no se fijan a mano.
 const nombres = (ps: { prueba: string }[]) => ps.map((p) => p.prueba).sort().join(', ');
-{
-  const r = decidirPruebas('intermedio', 'bajo-moderado', sinF);
-  add('G1', `pruebas: ${nombres(r)}`, '—', 'hemograma, coagulación, bioquímica, ECG; sin Rx', nombres(r) === 'bioquimica, coagulacion, ecg, hemograma');
+function baseRp(p: Partial<EntradaRiesgoPruebas> = {}): EntradaRiesgoPruebas {
+  return {
+    respuestas: {}, enfermedades: new Set(), edadAnios: 40, imc: 24, hemstopPositivo: false,
+    medicacionGrupos: new Set(), riesgoCardiovascular: 'intermedio', riesgoHemorragico: 'bajo',
+    neuroaxialProbable: false, tecnica: 'general', fechaIntervencion: IV,
+    ...p,
+  };
 }
 {
-  const r = decidirPruebas('intermedio', 'bajo', sinF);
-  add('G2', `pruebas: ${nombres(r)}`, '—', 'hemograma y coagulación', nombres(r) === 'coagulacion, hemograma');
+  // G1: varón 70 años, HTA controlada, METs ≥ 4, prótesis de rodilla (intermedio).
+  // Clase bajo-moderado por edad ≥ 65 + HTA; sin comorbilidad CV significativa → sin BNP.
+  const rp = derivarRiesgoYPruebas(baseRp({ edadAnios: 70, enfermedades: new Set(['hta']) }));
+  add('G1', `clase: ${rp.clase.clase}; pruebas: ${nombres(rp.pruebas)}`, '—', 'hemograma, coagulación, bioquímica, ECG; sin Rx; sin BNP', nombres(rp.pruebas) === 'bioquimica, coagulacion, ecg, hemograma');
 }
 {
-  const r = decidirPruebas('intermedio', 'alto', sinF);
-  const ecgVig = pruebaVigente('ecg', new Date(2026, 7, 15), IV);
-  const coagVig = pruebaVigente('coagulacion', new Date(2026, 8, 25), IV);
-  add('G3', `pruebas: ${nombres(r)}; ECG vigente: ${ecgVig}; coagulación vigente: ${coagVig}`, '—', '+Rx; ECG vigente no se repite; coagulación caducada sí', r.some((p) => p.prueba === 'rx_torax') && ecgVig && !coagVig);
+  // G2: mujer 40 años sana, colecistectomía (intermedio). Clase bajo → solo hemograma y coagulación.
+  const rp = derivarRiesgoYPruebas(baseRp());
+  add('G2', `clase: ${rp.clase.clase}; pruebas: ${nombres(rp.pruebas)}`, '—', 'hemograma y coagulación', nombres(rp.pruebas) === 'coagulacion, hemograma');
+}
+{
+  // G3: varón 60 años, IC NYHA III, colectomía (intermedio). ECG de hace 2 meses (vigente),
+  // coagulación de hace 20 días (caducada). Clase alto → +Rx y +BNP (comorbilidad CV);
+  // ECG vigente se descuenta, coagulación caducada se pide.
+  const ecgFecha = new Date(2026, 7, 15); // 15/08: ~2 meses antes de la IQ (15/10)
+  const coagFecha = new Date(2026, 8, 25); // 25/09: 20 días antes
+  const rp = derivarRiesgoYPruebas(baseRp({
+    edadAnios: 60, enfermedades: new Set(['insuficiencia_cardiaca']),
+    respuestas: { insuficiencia_cardiaca: { nyha: 'III' } },
+    pruebasRecientes: { ecg: ecgFecha, coagulacion: coagFecha },
+  }));
+  const pide = (p: string) => rp.pruebas.some((x) => x.prueba === p);
+  add('G3', `clase: ${rp.clase.clase}; pruebas: ${nombres(rp.pruebas)}; ECG vigente (descontado): ${rp.vigencia.ecg === true}; coagulación vigente: ${rp.vigencia.coagulacion === true}`, '—', 'paciente alto; +Rx; +BNP; ECG vigente no se repite; coagulación caducada sí', rp.clase.clase === 'alto' && pide('rx_torax') && pide('bnp') && pide('coagulacion') && !pide('ecg'));
 }
 
 // ————————————————————— H —————————————————————

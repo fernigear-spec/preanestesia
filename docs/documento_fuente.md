@@ -115,9 +115,10 @@ Cada módulo define preguntas clave, datos a registrar, efecto sobre ASA sugerid
 - Valvulopatía: válvula, tipo, gravedad, prótesis (biológica o mecánica; posición mitral, aórtica o tricúspide), último ecocardiograma (fecha), síntomas nuevos (disnea, síncope, angina).
 - Fibrilación auricular y otras arritmias: tipo, anticoagulación, ictus o AIT previo (fecha). Activa CHA2DS2-VA.
 - Marcapasos o DAI: tipo, motivo, dependencia si se conoce, última revisión (fecha), hospital de seguimiento. Alerta siempre.
-- Enfermedad arterial periférica, aneurisma de aorta.
-- Ictus o AIT: fecha, secuelas. Menos de 3 meses: alerta.
-- TVP o TEP: fecha, anticoagulación actual. Menos de 3 meses: alerta.
+- Miocardiopatía (casilla propia, 2026-10-04): tipo, último ecocardiograma, síntomas recientes (disnea, síncope, palpitaciones). Síntomas recientes: alerta. Cuenta como comorbilidad cardiovascular para el BNP (§7.3).
+- Enfermedad arterial periférica, aneurisma de aorta (casillas propias, 2026-10-04): cuentan como enfermedad vascular en CHA2DS2-VA (§6.5) y como comorbilidad cardiovascular para el BNP (§7.3).
+- Ictus o AIT: fecha, secuelas. Menos de 3 meses: alerta roja (valorar posponer la cirugía programada, ESC 2022).
+- TVP o TEP: fecha, anticoagulación actual. Menos de 3 meses: alerta amarilla (valorar antes de la intervención).
 
 ### 5.2 Respiratorio
 - Asma: frecuencia de síntomas, inhaladores, ingresos o corticoides orales en el último año, crisis en el último mes. En la hoja del paciente: traer los inhaladores.
@@ -125,7 +126,8 @@ Cada módulo define preguntas clave, datos a registrar, efecto sobre ASA sugerid
 - SAOS diagnosticado: CPAP o BiPAP, cumplimiento, presión si la sabe. Con diagnóstico no se calcula STOP-Bang. En la hoja del paciente: traer la CPAP.
 - Sin diagnóstico de SAOS: STOP-Bang (6.3).
 - Infección respiratoria en las últimas 4 semanas: fiebre, tos productiva, tratamiento. Alerta.
-- Otras: fibrosis pulmonar, bronquiectasias, hipertensión pulmonar (alerta), neumotórax previo.
+- Hipertensión pulmonar (casilla propia, 2026-10-04): diagnóstico y tratamiento específico. Alerta. Cuenta como comorbilidad cardiovascular para el BNP (§7.3).
+- Otras: fibrosis pulmonar, bronquiectasias, neumotórax previo.
 
 ### 5.3 Endocrino y metabolismo
 - Diabetes (protocolo de preanestesia en diabéticos): tipo, años de evolución, complicaciones crónicas (cardiopatía isquémica, nefropatía, pie diabético, vasculopatía de extremidades inferiores, retinopatía), HbA1c con fecha, hipoglucemias frecuentes, síntomas de gastroparesia (náuseas y vómitos crónicos, sobre todo de comida sin digerir horas después de comer, saciedad precoz, distensión abdominal, glucemias que varían sin explicación), bomba de insulina o sensor. HbA1c > 8,5 %: alerta «control glucémico deficiente, valorar optimización antes de cirugía programada» (guía CPOC).
@@ -212,7 +214,7 @@ Se recogen en el paso 6 (enfermedades y hemostasia), no en antecedentes (decisi�
 
 Decisión del servicio (30/09/2026). Amplía las preguntas de algunos módulos de §5. Reglas: solo preguntas y su motivo (las pautas de medicación salen siempre de §8); opciones cerradas cuando la respuesta genera alerta o alimenta una regla, texto libre corto cuando solo describe; cada pregunta lleva su «¿Por qué preguntamos esto?»; las respuestas relevantes se resumen en el texto de SAP y las alertas en el resumen del anestesiólogo; no se duplican preguntas ya existentes.
 
-**Codificación del efecto por respuesta (decisión del servicio, 30/09/2026).** Cada respuesta que genera un efecto clínico lo declara de forma explícita en el propio módulo (`datos/modulos/*.json`), en el campo `genera` de la pregunta: tipo de efecto (alerta, nota, prueba, clase de riesgo, ASA, regla o dato), gravedad de la alerta, condición que lo dispara y sección del documento fuente que lo respalda. Esta codificación se muestra por pregunta en `CONTENIDO_CLINICO.md` (§16) y la vigila un test de cobertura, que falla si una respuesta de §5/§5.16 que genera un efecto pierde su declaración. El motor sigue calculando el efecto en su capa; la codificación es la traza legible que mantiene sincronizados documento, contenido y comportamiento.
+**Codificación del efecto por respuesta (decisión del servicio, 30/09/2026; ejecución añadida 2026-10-04).** Cada respuesta que genera un efecto clínico lo declara de forma explícita en el propio módulo (`datos/modulos/*.json`), en el campo `genera` de la pregunta: tipo de efecto (alerta, nota, prueba, clase de riesgo, ASA, regla o dato), gravedad de la alerta, condición que lo dispara (`cuando`, texto legible) y sección del documento fuente que lo respalda. Esta codificación se muestra por pregunta en `CONTENIDO_CLINICO.md` (§16) y la vigila un test de cobertura. **Las alertas y las notas se ejecutan**: cada una lleva además una condición estructurada `si` que el motor evalúa contra las respuestas y, cuando se cumple, emite la alerta o la nota en el resumen del anestesiólogo (función `emitirEfectosModulos`); un test recorre todos los módulos y comprueba que cada efecto declarado se emite. Los demás tipos (prueba, clase de riesgo, ASA, regla, dato) los sigue calculando su capa correspondiente; su `genera` es la traza legible que mantiene sincronizados documento, contenido y comportamiento.
 
 - **5.16.1 Hipertensión:** cifras habituales en casa (texto); síntomas de mal control (cefalea frecuente, acúfenos, visión borrosa). Alguno marcado: alerta amarilla «posible HTA mal controlada».
 - **5.16.2 Diabetes:** tratamiento (orales, insulina, ambos, dieta); frecuencia de hipoglucemias (nunca, mensual, semanal, diaria); si las detecta. «No las detecta» o frecuencia semanal/diaria: alerta amarilla «hipoglucemias frecuentes o inadvertidas».
@@ -337,13 +339,13 @@ La más alta de las que asignen los módulos:
 
 \* Paciente de bajo riesgo con cirugía de bajo riesgo: hemograma y coagulación si hay sospecha o antecedente de anemia (Hb < 13 g/dL), trastorno de la coagulación o anticoagulante, posibilidad de anestesia regional (neuroaxial o bloqueo periférico), sangrado importante previsible o HEMSTOP positivo.
 
-\** Bioquímica: creatinina, filtrado glomerular estimado, sodio, potasio, cloro, HbA1c y albúmina. Añadir GOT, GPT y bilirrubina si hay hepatopatía conocida o sospecha de disfunción hepática; ferritina si se sospecha ferropenia, ha habido sangrado reciente o hay alerta de anemia (5.5). BNP o NT-proBNP si la cirugía es de riesgo intermedio o alto y hay comorbilidad cardiovascular significativa, fragilidad o capacidad funcional reducida. Nota para el anestesiólogo: si son normales se sigue sin más pruebas; si están elevados (BNP > 92 ng/L o NT-proBNP > 300 a 400 ng/L según laboratorio), completar estudio (ecocardiograma, prueba de estrés o angio-TC coronario) con manejo multidisciplinar.
+\** Bioquímica: creatinina, filtrado glomerular estimado, sodio, potasio, cloro, HbA1c y albúmina. Añadir GOT, GPT y bilirrubina si hay hepatopatía conocida o sospecha de disfunción hepática; ferritina si se sospecha ferropenia, ha habido sangrado reciente o hay alerta de anemia (5.5). BNP o NT-proBNP **solo** en cirugía de riesgo intermedio o alto y si hay alguno de: comorbilidad cardiovascular significativa, fragilidad (CFS ≥ 5) o capacidad funcional reducida (< 4 METs). Cuenta como comorbilidad cardiovascular significativa (decisión del servicio, 2026-10-04): cardiopatía isquémica, insuficiencia cardiaca, valvulopatía moderada o grave, fibrilación auricular u otra arritmia, arteriopatía periférica o aneurisma de aorta, ictus o AIT previo, miocardiopatía e hipertensión pulmonar. La **hipertensión arterial aislada no cuenta**. Nota para el anestesiólogo: si son normales se sigue sin más pruebas; si están elevados (BNP > 92 ng/L o NT-proBNP > 300 a 400 ng/L según laboratorio), completar estudio (ecocardiograma, prueba de estrés o angio-TC coronario) con manejo multidisciplinar.
 
 \*** Rx de tórax solo si hay sospecha de enfermedad pulmonar nueva, síntomas respiratorios nuevos o cambio reciente de los previos, o empeoramiento documentado de enfermedad cardiopulmonar conocida. La aplicación pregunta estos supuestos.
 
 Ecocardiograma: sospecha de valvulopatía nueva, valvulopatía conocida sin ecocardiograma en los últimos 12 meses o empeoramiento clínico de una valvulopatía conocida (más disnea, síncope o presíncope, angina).
 
-Validez: hemograma 30 días, bioquímica 30 días, coagulación 14 días, ECG 3 meses, Rx de tórax 3 meses, ecocardiograma 12 meses (18 si la función ventricular es conocida y estable). La aplicación pregunta por pruebas recientes y su fecha y las compara con la fecha de la intervención: si siguen vigentes ese día, no se piden; si caducan antes, se indica.
+Validez: hemograma 30 días, bioquímica 30 días, coagulación 14 días, ECG 3 meses, Rx de tórax 3 meses, ecocardiograma 12 meses (18 si la función ventricular es conocida y estable). En el paso de enfermedades, el apartado opcional «Pruebas recientes» recoge la fecha de la última de cada prueba. La aplicación compara esa fecha con la de la intervención (o, si aún no hay fecha, con el día de hoy, y lo indica): si la prueba sigue vigente ese día, **no se pide** (se descuenta de la lista); si caduca antes, se pide. El BNP o NT-proBNP se pide por indicación (nota **), no tiene ventana de validez y no se descuenta por fecha.
 
 Recordatorio en la salida: la valoración debería hacerse idealmente entre 2 y 4 semanas antes de la cirugía programada.
 

@@ -8,18 +8,64 @@
       "etiqueta": "Órgano trasplantado",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "renal", "etiqueta": "Riñón" },
-        { "valor": "hepatico", "etiqueta": "Hígado" },
-        { "valor": "cardiaco", "etiqueta": "Corazón" },
-        { "valor": "pulmonar", "etiqueta": "Pulmón" },
-        { "valor": "pancreas", "etiqueta": "Páncreas" },
-        { "valor": "medula", "etiqueta": "Médula ósea" },
-        { "valor": "otro", "etiqueta": "Otro" }
+        {
+          "valor": "renal",
+          "etiqueta": "Riñón"
+        },
+        {
+          "valor": "hepatico",
+          "etiqueta": "Hígado"
+        },
+        {
+          "valor": "cardiaco",
+          "etiqueta": "Corazón"
+        },
+        {
+          "valor": "pulmonar",
+          "etiqueta": "Pulmón"
+        },
+        {
+          "valor": "pancreas",
+          "etiqueta": "Páncreas"
+        },
+        {
+          "valor": "medula",
+          "etiqueta": "Médula ósea"
+        },
+        {
+          "valor": "otro",
+          "etiqueta": "Otro"
+        }
       ],
       "genera": [
-        { "cuando": "= corazón", "tipo": "nota", "efecto": "corazón denervado", "fuente": "§5.16.15" },
-        { "cuando": "= riñón", "tipo": "alerta", "gravedad": "amarilla", "efecto": "evitar AINE", "fuente": "§5.16.15" },
-        { "cuando": "= pulmón", "tipo": "nota", "efecto": "reflejo tusígeno abolido", "fuente": "§5.16.15" }
+        {
+          "cuando": "= corazón",
+          "tipo": "nota",
+          "efecto": "corazón denervado",
+          "fuente": "§5.16.15",
+          "si": {
+            "igual": "cardiaco"
+          }
+        },
+        {
+          "cuando": "= riñón",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "evitar AINE",
+          "fuente": "§5.16.15",
+          "si": {
+            "igual": "renal"
+          }
+        },
+        {
+          "cuando": "= pulmón",
+          "tipo": "nota",
+          "efecto": "reflejo tusígeno abolido",
+          "fuente": "§5.16.15",
+          "si": {
+            "igual": "pulmonar"
+          }
+        }
       ]
     },
     {
@@ -28,10 +74,23 @@
       "tipo": "fecha",
       "porque": "Un trasplante de menos de 6 meses implica inmunosupresión intensa.",
       "genera": [
-        { "cuando": "< 6 meses", "tipo": "alerta", "gravedad": "amarilla", "efecto": "trasplante reciente", "fuente": "§5.16.15" }
+        {
+          "cuando": "< 6 meses",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "trasplante reciente",
+          "fuente": "§5.16.15",
+          "si": {
+            "recienteMeses": 6
+          }
+        }
       ]
     },
-    { "id": "analitica_injerto_fecha", "etiqueta": "Fecha de la última analítica del injerto", "tipo": "fecha" },
+    {
+      "id": "analitica_injerto_fecha",
+      "etiqueta": "Fecha de la última analítica del injerto",
+      "tipo": "fecha"
+    },
     {
       "id": "creatinina",
       "etiqueta": "Creatinina más reciente (si es trasplante renal)",
@@ -40,33 +99,79 @@
       "min": 0.2,
       "max": 20,
       "porque": "En el trasplante renal, la creatinina permite calcular el aclaramiento.",
-      "visibleSi": { "pregunta": "organo", "igual": "renal" }
+      "visibleSi": {
+        "pregunta": "organo",
+        "igual": "renal"
+      }
     },
-    { "id": "creatinina_fecha", "etiqueta": "Fecha de esa creatinina", "tipo": "fecha", "visibleSi": { "pregunta": "organo", "igual": "renal" } },
+    {
+      "id": "creatinina_fecha",
+      "etiqueta": "Fecha de esa creatinina",
+      "tipo": "fecha",
+      "visibleSi": {
+        "pregunta": "organo",
+        "igual": "renal"
+      }
+    },
     {
       "id": "rechazo",
       "etiqueta": "Episodios de rechazo",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "nunca", "etiqueta": "Nunca" },
-        { "valor": "pasado", "etiqueta": "En el pasado" },
-        { "valor": "reciente", "etiqueta": "En los últimos 6 meses" }
+        {
+          "valor": "nunca",
+          "etiqueta": "Nunca"
+        },
+        {
+          "valor": "pasado",
+          "etiqueta": "En el pasado"
+        },
+        {
+          "valor": "reciente",
+          "etiqueta": "En los últimos 6 meses"
+        }
       ]
     },
-    { "id": "ultima_revision", "etiqueta": "Fecha de la última revisión con el equipo de trasplante", "tipo": "fecha" },
-    { "id": "aporta_informe", "etiqueta": "¿Aporta informe del equipo de trasplante?", "tipo": "boolean" },
+    {
+      "id": "ultima_revision",
+      "etiqueta": "Fecha de la última revisión con el equipo de trasplante",
+      "tipo": "fecha"
+    },
+    {
+      "id": "aporta_informe",
+      "etiqueta": "¿Aporta informe del equipo de trasplante?",
+      "tipo": "boolean"
+    },
     {
       "id": "niveles_en_rango",
       "etiqueta": "¿Los niveles de los inmunosupresores están en rango?",
       "tipo": "opcion",
       "porque": "Niveles fuera de rango pueden requerir ajuste antes de la cirugía.",
       "opciones": [
-        { "valor": "si", "etiqueta": "Sí" },
-        { "valor": "no", "etiqueta": "No" },
-        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+        {
+          "valor": "si",
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": "no",
+          "etiqueta": "No"
+        },
+        {
+          "valor": "no_lo_sabe",
+          "etiqueta": "No lo sabe"
+        }
       ],
       "genera": [
-        { "cuando": "= no (fuera de rango)", "tipo": "alerta", "gravedad": "amarilla", "efecto": "niveles de inmunosupresores fuera de rango", "fuente": "§5.16.15" }
+        {
+          "cuando": "= no (fuera de rango)",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "niveles de inmunosupresores fuera de rango",
+          "fuente": "§5.16.15",
+          "si": {
+            "igual": "no"
+          }
+        }
       ]
     },
     {
@@ -75,10 +180,23 @@
       "tipo": "boolean",
       "porque": "Una infección activa en un paciente inmunodeprimido puede aconsejar posponer la cirugía programada.",
       "genera": [
-        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "infección activa en inmunodeprimido: valorar posponer", "fuente": "§5.16.15" }
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "infección activa en inmunodeprimido: valorar posponer",
+          "fuente": "§5.16.15",
+          "si": {
+            "igual": true
+          }
+        }
       ]
     },
-    { "id": "profilaxis", "etiqueta": "Profilaxis antiinfecciosa (cotrimoxazol, antivirales…)", "tipo": "texto" },
+    {
+      "id": "profilaxis",
+      "etiqueta": "Profilaxis antiinfecciosa (cotrimoxazol, antivirales…)",
+      "tipo": "texto"
+    },
     {
       "id": "sintomas_organo",
       "etiqueta": "Según el órgano: fatiga o falta de aire (corazón/pulmón), tos (pulmón), medicamentos sin receta (riñón)",

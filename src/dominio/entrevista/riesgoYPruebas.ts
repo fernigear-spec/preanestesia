@@ -12,9 +12,26 @@ import {
   type AsignacionRiesgo,
   type ResultadoClaseRiesgo,
 } from '../riesgo/claseRiesgoPaciente.ts';
-import { decidirPruebas, type FactoresPruebas, type PruebaSolicitada } from '../pruebas/tablaPruebas.ts';
+import {
+  decidirPruebas,
+  pruebaVigente,
+  type FactoresPruebas,
+  type PruebaSolicitada,
+  type PruebaConVigencia,
+  type VigenciaPruebas,
+} from '../pruebas/tablaPruebas.ts';
 
 type Resp = Record<string, Record<string, unknown>>;
+
+/** Fechas de pruebas recientes del paciente (ISO yyyy-mm-dd o Date), opcionales (§7.4). */
+export interface FechasPruebasRecientes {
+  hemograma?: Date;
+  coagulacion?: Date;
+  bioquimica?: Date;
+  ecg?: Date;
+  rx_torax?: Date;
+  ecocardiograma?: Date;
+}
 
 export interface EntradaRiesgoPruebas {
   respuestas: Resp;
@@ -28,13 +45,41 @@ export interface EntradaRiesgoPruebas {
   riesgoHemorragico: RiesgoHemorragico;
   neuroaxialProbable: boolean;
   tecnica: TecnicaAnestesica;
+  /** Fragilidad (CFS ≥ 5), para la nota ** del BNP. Opcional. */
+  fragilidad?: boolean;
+  /** Capacidad funcional reducida (< 4 METs o DASI ≤ 34), para la nota ** del BNP. Opcional. */
+  capacidadFuncionalReducida?: boolean;
+  /** Fecha prevista de la intervención; sin ella, se usa "hoy" para la vigencia (§7.4, §8.16). */
+  fechaIntervencion?: Date | null;
+  /** Fechas de pruebas recientes para descontar las vigentes (§7.4). */
+  pruebasRecientes?: FechasPruebasRecientes;
+  /** Ecocardiograma con función ventricular conocida y estable (18 meses de validez). */
+  ecocardiogramaEstable?: boolean;
 }
 
 export interface ResultadoRiesgoPruebas {
   clase: ResultadoClaseRiesgo;
   factores: FactoresPruebas;
   pruebas: PruebaSolicitada[];
+  /** Vigencia aplicada (§7.4): true = prueba vigente, descontada de la lista. */
+  vigencia: VigenciaPruebas;
 }
+
+/**
+ * Enfermedades que cuentan como "comorbilidad cardiovascular significativa" para
+ * la nota ** del BNP (§7.3). La HTA aislada NO cuenta (decisión del servicio).
+ */
+const COMORBILIDAD_CV_SIGNIFICATIVA = new Set([
+  'cardiopatia_isquemica',
+  'stent_o_infarto',
+  'insuficiencia_cardiaca',
+  'fibrilacion_auricular',
+  'arteriopatia_periferica',
+  'aneurisma_aorta',
+  'ictus_o_tvp',
+  'miocardiopatia',
+  'hipertension_pulmonar',
+]);
 
 /** Clase de riesgo del paciente (§7.2) a partir de los módulos, la edad y el IMC. */
 export function derivarClaseRiesgo(e: EntradaRiesgoPruebas): ResultadoClaseRiesgo {
@@ -93,6 +138,23 @@ export function derivarClaseRiesgo(e: EntradaRiesgoPruebas): ResultadoClaseRiesg
   return calcularClaseRiesgoPaciente(a);
 }
 
+/**
+ * ¿Hay comorbilidad cardiovascular significativa (nota ** del BNP)? La valvulopatía
+ * solo cuenta si es moderada o grave; el resto, por presencia de la enfermedad.
+ * La HTA aislada NO cuenta (decisión del servicio).
+ */
+function tieneComorbilidadCvSignificativa(e: EntradaRiesgoPruebas): boolean {
+  for (const id of e.enfermedades) {
+    if (id === 'valvulopatia' || id === 'protesis_mecanica') {
+      const grav = str((e.respuestas['valvulopatia'] ?? {}).gravedad);
+      if (grav === 'moderada' || grav === 'grave') return true;
+      continue;
+    }
+    if (COMORBILIDAD_CV_SIGNIFICATIVA.has(id)) return true;
+  }
+  return false;
+}
+
 /** Factores para las excepciones de la tabla de pruebas (§7.3). */
 export function derivarFactoresPruebas(e: EntradaRiesgoPruebas): FactoresPruebas {
   const r = e.respuestas;
@@ -127,15 +189,39 @@ export function derivarFactoresPruebas(e: EntradaRiesgoPruebas): FactoresPruebas
     hemstopPositivo: e.hemstopPositivo,
     supuestoRxTorax,
     supuestoEcocardiograma,
+    comorbilidadCardiovascularSignificativa: tieneComorbilidadCvSignificativa(e),
+    fragilidad: e.fragilidad === true,
+    capacidadFuncionalReducida: e.capacidadFuncionalReducida === true,
   };
 }
 
-/** Clase de riesgo + factores + pruebas propuestas (§7). */
+/**
+ * Vigencia de cada prueba datable (§7.4): compara la fecha de la prueba reciente
+ * con la fecha de la intervención (o "hoy" si no hay fecha, §8.16). Solo marca
+ * `true` las que siguen vigentes; las demás quedan sin marcar y se piden.
+ */
+export function derivarVigenciaPruebas(e: EntradaRiesgoPruebas): VigenciaPruebas {
+  const recientes = e.pruebasRecientes ?? {};
+  const referencia = e.fechaIntervencion ?? new Date();
+  const vig: VigenciaPruebas = {};
+  const pruebas: PruebaConVigencia[] = ['hemograma', 'coagulacion', 'bioquimica', 'ecg', 'rx_torax', 'ecocardiograma'];
+  for (const p of pruebas) {
+    const fecha = recientes[p];
+    if (fecha instanceof Date && !Number.isNaN(fecha.getTime())) {
+      const estable = p === 'ecocardiograma' && e.ecocardiogramaEstable === true;
+      if (pruebaVigente(p, fecha, referencia, estable)) vig[p] = true;
+    }
+  }
+  return vig;
+}
+
+/** Clase de riesgo + factores + pruebas propuestas (§7), descontando las vigentes (§7.4). */
 export function derivarRiesgoYPruebas(e: EntradaRiesgoPruebas): ResultadoRiesgoPruebas {
   const clase = derivarClaseRiesgo(e);
   const factores = derivarFactoresPruebas(e);
-  const pruebas = decidirPruebas(e.riesgoCardiovascular, clase.clase, factores);
-  return { clase, factores, pruebas };
+  const vigencia = derivarVigenciaPruebas(e);
+  const pruebas = decidirPruebas(e.riesgoCardiovascular, clase.clase, factores, vigencia);
+  return { clase, factores, pruebas, vigencia };
 }
 
 function num(v: unknown): number | null {

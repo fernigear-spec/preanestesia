@@ -308,6 +308,13 @@ body {
   flex: 0 0 auto;
 }
 
+/* Rejilla de fechas de "Pruebas recientes" (§7.4) */
+.grupo-fechas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
 /* Bloque "añadir intervención previa" con fondo tenue */
 .bloque-anadir {
   background: #f7f8fc;

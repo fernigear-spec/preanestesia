@@ -8,12 +8,27 @@
       "etiqueta": "Tipo de diabetes",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "tipo1", "etiqueta": "Tipo 1" },
-        { "valor": "tipo2", "etiqueta": "Tipo 2" },
-        { "valor": "otra", "etiqueta": "Otra / no lo sabe" }
+        {
+          "valor": "tipo1",
+          "etiqueta": "Tipo 1"
+        },
+        {
+          "valor": "tipo2",
+          "etiqueta": "Tipo 2"
+        },
+        {
+          "valor": "otra",
+          "etiqueta": "Otra / no lo sabe"
+        }
       ]
     },
-    { "id": "anios_evolucion", "etiqueta": "Años de evolución", "tipo": "numero", "min": 0, "max": 90 },
+    {
+      "id": "anios_evolucion",
+      "etiqueta": "Años de evolución",
+      "tipo": "numero",
+      "min": 0,
+      "max": 90
+    },
     {
       "id": "hba1c",
       "etiqueta": "HbA1c más reciente",
@@ -23,20 +38,46 @@
       "max": 20,
       "porque": "Una HbA1c > 8,5 % indica mal control y puede aconsejar optimizar antes de una cirugía programada.",
       "genera": [
-        { "cuando": "> 8,5 %", "tipo": "clase_riesgo", "efecto": "sube la clase de riesgo del paciente a moderada", "fuente": "§5.3" },
-        { "cuando": "> 8,5 %", "tipo": "asa", "efecto": "ASA mínimo 3; en otro caso, mínimo 2", "fuente": "§5.3" }
+        {
+          "cuando": "> 8,5 %",
+          "tipo": "clase_riesgo",
+          "efecto": "sube la clase de riesgo del paciente a moderada",
+          "fuente": "§5.3"
+        },
+        {
+          "cuando": "> 8,5 %",
+          "tipo": "asa",
+          "efecto": "ASA mínimo 3; en otro caso, mínimo 2",
+          "fuente": "§5.3"
+        }
       ]
     },
-    { "id": "hba1c_fecha", "etiqueta": "Fecha de la HbA1c", "tipo": "fecha" },
+    {
+      "id": "hba1c_fecha",
+      "etiqueta": "Fecha de la HbA1c",
+      "tipo": "fecha"
+    },
     {
       "id": "tratamiento",
       "etiqueta": "Tratamiento",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "dieta", "etiqueta": "Solo dieta" },
-        { "valor": "orales", "etiqueta": "Pastillas" },
-        { "valor": "insulina", "etiqueta": "Insulina" },
-        { "valor": "ambos", "etiqueta": "Pastillas e insulina" }
+        {
+          "valor": "dieta",
+          "etiqueta": "Solo dieta"
+        },
+        {
+          "valor": "orales",
+          "etiqueta": "Pastillas"
+        },
+        {
+          "valor": "insulina",
+          "etiqueta": "Insulina"
+        },
+        {
+          "valor": "ambos",
+          "etiqueta": "Pastillas e insulina"
+        }
       ]
     },
     {
@@ -45,13 +86,37 @@
       "tipo": "opcion",
       "porque": "El ayuno y los ajustes de insulina aumentan el riesgo de hipoglucemia; conviene conocer su frecuencia.",
       "opciones": [
-        { "valor": "nunca", "etiqueta": "Nunca" },
-        { "valor": "mensual", "etiqueta": "Alguna al mes" },
-        { "valor": "semanal", "etiqueta": "Alguna a la semana" },
-        { "valor": "diaria", "etiqueta": "A diario" }
+        {
+          "valor": "nunca",
+          "etiqueta": "Nunca"
+        },
+        {
+          "valor": "mensual",
+          "etiqueta": "Alguna al mes"
+        },
+        {
+          "valor": "semanal",
+          "etiqueta": "Alguna a la semana"
+        },
+        {
+          "valor": "diaria",
+          "etiqueta": "A diario"
+        }
       ],
       "genera": [
-        { "cuando": "= semanal o diaria", "tipo": "alerta", "gravedad": "amarilla", "efecto": "hipoglucemias frecuentes o inadvertidas", "fuente": "§5.16.2" }
+        {
+          "cuando": "= semanal o diaria",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "hipoglucemias frecuentes o inadvertidas",
+          "fuente": "§5.16.2",
+          "si": {
+            "enLista": [
+              "semanal",
+              "diaria"
+            ]
+          }
+        }
       ]
     },
     {
@@ -60,7 +125,16 @@
       "tipo": "boolean",
       "porque": "Las hipoglucemias inadvertidas son especialmente peligrosas en el ayuno perioperatorio.",
       "genera": [
-        { "cuando": "= no (no las detecta)", "tipo": "alerta", "gravedad": "amarilla", "efecto": "hipoglucemias frecuentes o inadvertidas", "fuente": "§5.16.2" }
+        {
+          "cuando": "= no (no las detecta)",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "hipoglucemias frecuentes o inadvertidas",
+          "fuente": "§5.16.2",
+          "si": {
+            "igual": false
+          }
+        }
       ]
     },
     {
@@ -68,14 +142,34 @@
       "etiqueta": "Complicaciones crónicas",
       "tipo": "opcion_multiple",
       "opciones": [
-        { "valor": "cardiopatia", "etiqueta": "Cardiopatía isquémica" },
-        { "valor": "nefropatia", "etiqueta": "Nefropatía" },
-        { "valor": "pie_diabetico", "etiqueta": "Pie diabético" },
-        { "valor": "vasculopatia", "etiqueta": "Vasculopatía de extremidades" },
-        { "valor": "retinopatia", "etiqueta": "Retinopatía" }
+        {
+          "valor": "cardiopatia",
+          "etiqueta": "Cardiopatía isquémica"
+        },
+        {
+          "valor": "nefropatia",
+          "etiqueta": "Nefropatía"
+        },
+        {
+          "valor": "pie_diabetico",
+          "etiqueta": "Pie diabético"
+        },
+        {
+          "valor": "vasculopatia",
+          "etiqueta": "Vasculopatía de extremidades"
+        },
+        {
+          "valor": "retinopatia",
+          "etiqueta": "Retinopatía"
+        }
       ],
       "genera": [
-        { "cuando": "incluye nefropatía", "tipo": "prueba", "efecto": "cuenta como proteinuria/nefropatía: apoya pedir bioquímica renal", "fuente": "§7.3" }
+        {
+          "cuando": "incluye nefropatía",
+          "tipo": "prueba",
+          "efecto": "cuenta como proteinuria/nefropatía: apoya pedir bioquímica renal",
+          "fuente": "§7.3"
+        }
       ]
     },
     {
@@ -84,19 +178,43 @@
       "tipo": "boolean",
       "porque": "La gastroparesia alarga el ayuno de sólidos y aconseja premedicación con metoclopramida.",
       "genera": [
-        { "cuando": "= sí", "tipo": "nota", "efecto": "alarga el ayuno de sólidos; valorar premedicación con metoclopramida", "fuente": "§5.3" }
+        {
+          "cuando": "= sí",
+          "tipo": "nota",
+          "efecto": "alarga el ayuno de sólidos; valorar premedicación con metoclopramida",
+          "fuente": "§5.3",
+          "si": {
+            "igual": true
+          }
+        }
       ]
     },
-    { "id": "hipoglucemias", "etiqueta": "¿Hipoglucemias frecuentes?", "tipo": "boolean" },
+    {
+      "id": "hipoglucemias",
+      "etiqueta": "¿Hipoglucemias frecuentes?",
+      "tipo": "boolean"
+    },
     {
       "id": "bomba_o_sensor",
       "etiqueta": "¿Lleva bomba de insulina o sensor de glucosa?",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "no", "etiqueta": "No" },
-        { "valor": "bomba", "etiqueta": "Bomba de insulina" },
-        { "valor": "sensor", "etiqueta": "Sensor" },
-        { "valor": "ambos", "etiqueta": "Bomba y sensor" }
+        {
+          "valor": "no",
+          "etiqueta": "No"
+        },
+        {
+          "valor": "bomba",
+          "etiqueta": "Bomba de insulina"
+        },
+        {
+          "valor": "sensor",
+          "etiqueta": "Sensor"
+        },
+        {
+          "valor": "ambos",
+          "etiqueta": "Bomba y sensor"
+        }
       ]
     }
   ]

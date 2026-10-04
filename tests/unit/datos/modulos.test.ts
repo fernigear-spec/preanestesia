@@ -25,12 +25,16 @@ describe('Módulos de patología · cargador y validador', () => {
     expect(modulos.length).toBeGreaterThan(20);
   });
 
-  it('cada casilla del paso 7 abre un módulo existente', () => {
+  it('cada casilla del paso 7 abre un módulo existente (salvo las de solo presencia)', () => {
     const modulos = cargarModulos(leerModulos());
     const ids = new Set(modulos.map((m) => m.id));
+    // Casillas que son solo "presencia" (§5.1): no abren preguntas, solo alimentan la
+    // clase de riesgo, la comorbilidad CV para el BNP (§7.3) y CHA2DS2-VA (enf. vascular).
+    const SOLO_PRESENCIA = new Set(['arteriopatia_periferica', 'aneurisma_aorta']);
     const sinModulo: string[] = [];
     for (const grupo of APARATOS) {
       for (const e of grupo.enfermedades) {
+        if (SOLO_PRESENCIA.has(e.id)) continue;
         if (!ids.has(moduloDeEnfermedad(e.id))) sinModulo.push(e.id);
       }
     }

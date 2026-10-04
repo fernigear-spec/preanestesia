@@ -3,33 +3,150 @@
   "titulo": "Esclerosis múltiple",
   "fuente": "docs/documento_fuente.md §5.6, §5.16.12",
   "preguntas": [
-    { "id": "ultimo_brote_fecha", "etiqueta": "Fecha del último brote", "tipo": "fecha", "porque": "Un brote en los últimos 3 meses es una señal de alerta.", "genera": [ { "cuando": "brote en los últimos 3 meses", "tipo": "alerta", "gravedad": "amarilla", "efecto": "brote reciente de esclerosis múltiple", "fuente": "§5.16.12" } ] },
-    { "id": "sintomas_brote", "etiqueta": "Síntomas del último brote", "tipo": "texto" },
+    {
+      "id": "ultimo_brote_fecha",
+      "etiqueta": "Fecha del último brote",
+      "tipo": "fecha",
+      "porque": "Un brote en los últimos 3 meses es una señal de alerta.",
+      "genera": [
+        {
+          "cuando": "brote en los últimos 3 meses",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "brote reciente de esclerosis múltiple",
+          "fuente": "§5.16.12",
+          "si": {
+            "recienteMeses": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "sintomas_brote",
+      "etiqueta": "Síntomas del último brote",
+      "tipo": "texto"
+    },
     {
       "id": "movilidad_basal",
       "etiqueta": "Movilidad habitual",
       "tipo": "opcion",
       "porque": "La movilidad y la debilidad basales deben quedar documentadas para comparar tras la anestesia.",
       "opciones": [
-        { "valor": "sin_ayuda", "etiqueta": "Camina sin ayuda" },
-        { "valor": "con_ayuda", "etiqueta": "Camina con ayuda" },
-        { "valor": "silla", "etiqueta": "Silla de ruedas" },
-        { "valor": "encamado", "etiqueta": "Encamado" }
+        {
+          "valor": "sin_ayuda",
+          "etiqueta": "Camina sin ayuda"
+        },
+        {
+          "valor": "con_ayuda",
+          "etiqueta": "Camina con ayuda"
+        },
+        {
+          "valor": "silla",
+          "etiqueta": "Silla de ruedas"
+        },
+        {
+          "valor": "encamado",
+          "etiqueta": "Encamado"
+        }
       ]
     },
-    { "id": "debilidad_basal", "etiqueta": "Debilidad basal (descripción)", "tipo": "texto" },
+    {
+      "id": "debilidad_basal",
+      "etiqueta": "Debilidad basal (descripción)",
+      "tipo": "texto"
+    },
     {
       "id": "intolerancia_calor",
       "etiqueta": "¿Empeora con el calor (fenómeno de Uhthoff)?",
       "tipo": "boolean",
       "porque": "Si empeora con el calor, conviene mantener una normotermia estricta durante la cirugía.",
       "genera": [
-        { "cuando": "= sí", "tipo": "nota", "efecto": "mantener normotermia estricta", "fuente": "§5.16.12" }
+        {
+          "cuando": "= sí",
+          "tipo": "nota",
+          "efecto": "mantener normotermia estricta",
+          "fuente": "§5.16.12",
+          "si": {
+            "igual": true
+          }
+        }
       ]
     },
-    { "id": "corticoides_3m", "etiqueta": "¿Ha tomado corticoides (cortisona) en los últimos 3 meses?", "tipo": "boolean", "porque": "Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).", "genera": [ { "cuando": "≥ 5 mg/día de prednisona > 3 semanas (equivalente)", "tipo": "nota", "efecto": "valorar dosis de estrés perioperatoria", "fuente": "§5.16.14" } ] },
-    { "id": "cortico_farmaco", "etiqueta": "¿Cuál?", "tipo": "opcion", "opciones": [ { "valor": "prednisona", "etiqueta": "Prednisona" }, { "valor": "prednisolona", "etiqueta": "Prednisolona" }, { "valor": "metilprednisolona", "etiqueta": "Metilprednisolona" }, { "valor": "deflazacort", "etiqueta": "Deflazacort" }, { "valor": "dexametasona", "etiqueta": "Dexametasona" }, { "valor": "hidrocortisona", "etiqueta": "Hidrocortisona" } ], "visibleSi": { "pregunta": "corticoides_3m", "igual": true } },
-    { "id": "cortico_dosis_dia", "etiqueta": "Dosis diaria", "tipo": "numero", "unidad": "mg", "min": 0, "max": 200, "visibleSi": { "pregunta": "corticoides_3m", "igual": true } },
-    { "id": "cortico_semanas", "etiqueta": "Duración", "tipo": "numero", "unidad": "semanas", "min": 0, "max": 260, "visibleSi": { "pregunta": "corticoides_3m", "igual": true } }
+    {
+      "id": "corticoides_3m",
+      "etiqueta": "¿Ha tomado corticoides (cortisona) en los últimos 3 meses?",
+      "tipo": "boolean",
+      "porque": "Una pauta prolongada de corticoides puede requerir una dosis de estrés perioperatoria (§5.3).",
+      "genera": [
+        {
+          "cuando": "≥ 5 mg/día de prednisona > 3 semanas (equivalente)",
+          "tipo": "nota",
+          "efecto": "valorar dosis de estrés perioperatoria",
+          "fuente": "§5.16.14",
+          "si": {
+            "igual": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "cortico_farmaco",
+      "etiqueta": "¿Cuál?",
+      "tipo": "opcion",
+      "opciones": [
+        {
+          "valor": "prednisona",
+          "etiqueta": "Prednisona"
+        },
+        {
+          "valor": "prednisolona",
+          "etiqueta": "Prednisolona"
+        },
+        {
+          "valor": "metilprednisolona",
+          "etiqueta": "Metilprednisolona"
+        },
+        {
+          "valor": "deflazacort",
+          "etiqueta": "Deflazacort"
+        },
+        {
+          "valor": "dexametasona",
+          "etiqueta": "Dexametasona"
+        },
+        {
+          "valor": "hidrocortisona",
+          "etiqueta": "Hidrocortisona"
+        }
+      ],
+      "visibleSi": {
+        "pregunta": "corticoides_3m",
+        "igual": true
+      }
+    },
+    {
+      "id": "cortico_dosis_dia",
+      "etiqueta": "Dosis diaria",
+      "tipo": "numero",
+      "unidad": "mg",
+      "min": 0,
+      "max": 200,
+      "visibleSi": {
+        "pregunta": "corticoides_3m",
+        "igual": true
+      }
+    },
+    {
+      "id": "cortico_semanas",
+      "etiqueta": "Duración",
+      "tipo": "numero",
+      "unidad": "semanas",
+      "min": 0,
+      "max": 260,
+      "visibleSi": {
+        "pregunta": "corticoides_3m",
+        "igual": true
+      }
+    }
   ]
 }

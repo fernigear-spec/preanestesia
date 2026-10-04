@@ -25,7 +25,11 @@
       "id": "ictus_ait_fecha",
       "etiqueta": "Fecha del ictus/AIT/embolia",
       "tipo": "fecha",
-      "visibleSi": { "pregunta": "ictus_ait_previo", "igual": true }
+      "porque": "Un ictus/AIT de menos de 3 meses es alerta roja (valorar posponer la cirugía programada).",
+      "visibleSi": { "pregunta": "ictus_ait_previo", "igual": true },
+      "genera": [
+        { "cuando": "ictus/AIT en los últimos 3 meses", "tipo": "alerta", "gravedad": "roja", "efecto": "ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada", "fuente": "§5.1 (ESC 2022)", "si": { "recienteMeses": 3 } }
+      ]
     }
   ]
 }

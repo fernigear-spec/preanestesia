@@ -13,16 +13,28 @@
       "id": "infarto_fecha",
       "etiqueta": "Fecha del infarto o síndrome coronario agudo",
       "tipo": "fecha",
-      "visibleSi": { "pregunta": "infarto_previo", "igual": true }
+      "visibleSi": {
+        "pregunta": "infarto_previo",
+        "igual": true
+      }
     },
     {
       "id": "revascularizacion",
       "etiqueta": "¿Le han revascularizado las arterias del corazón?",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "ninguna", "etiqueta": "No" },
-        { "valor": "percutanea", "etiqueta": "Sí, con cateterismo (angioplastia/stent)" },
-        { "valor": "quirurgica", "etiqueta": "Sí, con cirugía (bypass)" }
+        {
+          "valor": "ninguna",
+          "etiqueta": "No"
+        },
+        {
+          "valor": "percutanea",
+          "etiqueta": "Sí, con cateterismo (angioplastia/stent)"
+        },
+        {
+          "valor": "quirurgica",
+          "etiqueta": "Sí, con cirugía (bypass)"
+        }
       ]
     },
     {
@@ -30,11 +42,26 @@
       "etiqueta": "¿La revascularización fue completa o incompleta?",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "completa", "etiqueta": "Completa" },
-        { "valor": "incompleta", "etiqueta": "Incompleta" },
-        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+        {
+          "valor": "completa",
+          "etiqueta": "Completa"
+        },
+        {
+          "valor": "incompleta",
+          "etiqueta": "Incompleta"
+        },
+        {
+          "valor": "no_lo_sabe",
+          "etiqueta": "No lo sabe"
+        }
       ],
-      "visibleSi": { "pregunta": "revascularizacion", "enLista": ["percutanea", "quirurgica"] }
+      "visibleSi": {
+        "pregunta": "revascularizacion",
+        "enLista": [
+          "percutanea",
+          "quirurgica"
+        ]
+      }
     },
     {
       "id": "portador_stent",
@@ -42,35 +69,64 @@
       "tipo": "boolean",
       "porque": "El tipo de stent y el tiempo desde su colocación determinan si se puede suspender la antiagregación.",
       "genera": [
-        { "cuando": "= sí", "tipo": "hecho", "efecto": "stent coronario: condiciona la antiagregación y puede obligar a diferir la cirugía (§8)", "fuente": "§5.1" }
+        {
+          "cuando": "= sí",
+          "tipo": "hecho",
+          "efecto": "stent coronario: condiciona la antiagregación y puede obligar a diferir la cirugía (§8)",
+          "fuente": "§5.1"
+        }
       ]
     },
     {
       "id": "stent_fecha",
       "etiqueta": "Fecha del stent",
       "tipo": "fecha",
-      "visibleSi": { "pregunta": "portador_stent", "igual": true }
+      "visibleSi": {
+        "pregunta": "portador_stent",
+        "igual": true
+      }
     },
     {
       "id": "stent_tipo",
       "etiqueta": "Tipo de stent",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "farmacoactivo", "etiqueta": "Farmacoactivo (liberador de fármaco)" },
-        { "valor": "convencional", "etiqueta": "Convencional (metálico)" },
-        { "valor": "desconocido", "etiqueta": "Desconocido" }
+        {
+          "valor": "farmacoactivo",
+          "etiqueta": "Farmacoactivo (liberador de fármaco)"
+        },
+        {
+          "valor": "convencional",
+          "etiqueta": "Convencional (metálico)"
+        },
+        {
+          "valor": "desconocido",
+          "etiqueta": "Desconocido"
+        }
       ],
-      "visibleSi": { "pregunta": "portador_stent", "igual": true }
+      "visibleSi": {
+        "pregunta": "portador_stent",
+        "igual": true
+      }
     },
     {
       "id": "stent_motivo",
       "etiqueta": "Motivo del stent",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "programado", "etiqueta": "Programado (procedimiento electivo)" },
-        { "valor": "sca", "etiqueta": "Por síndrome coronario agudo (infarto/angina inestable)" }
+        {
+          "valor": "programado",
+          "etiqueta": "Programado (procedimiento electivo)"
+        },
+        {
+          "valor": "sca",
+          "etiqueta": "Por síndrome coronario agudo (infarto/angina inestable)"
+        }
       ],
-      "visibleSi": { "pregunta": "portador_stent", "igual": true }
+      "visibleSi": {
+        "pregunta": "portador_stent",
+        "igual": true
+      }
     },
     {
       "id": "angina_residual",
@@ -82,15 +138,40 @@
       "etiqueta": "¿Con qué esfuerzo le aparece la angina?",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "grandes", "etiqueta": "Solo con grandes esfuerzos" },
-        { "valor": "moderados", "etiqueta": "Con esfuerzos moderados" },
-        { "valor": "minimos", "etiqueta": "Con mínimos esfuerzos" },
-        { "valor": "reposo", "etiqueta": "En reposo" }
+        {
+          "valor": "grandes",
+          "etiqueta": "Solo con grandes esfuerzos"
+        },
+        {
+          "valor": "moderados",
+          "etiqueta": "Con esfuerzos moderados"
+        },
+        {
+          "valor": "minimos",
+          "etiqueta": "Con mínimos esfuerzos"
+        },
+        {
+          "valor": "reposo",
+          "etiqueta": "En reposo"
+        }
       ],
-      "visibleSi": { "pregunta": "angina_residual", "igual": true },
+      "visibleSi": {
+        "pregunta": "angina_residual",
+        "igual": true
+      },
       "genera": [
-        { "cuando": "= mínimos esfuerzos o reposo", "tipo": "clase_riesgo", "efecto": "sube la clase de riesgo del paciente a alta (angina activa)", "fuente": "§5.1" },
-        { "cuando": "= mínimos esfuerzos o reposo", "tipo": "asa", "efecto": "ASA mínimo 4 (angina activa)", "fuente": "§5.1" }
+        {
+          "cuando": "= mínimos esfuerzos o reposo",
+          "tipo": "clase_riesgo",
+          "efecto": "sube la clase de riesgo del paciente a alta (angina activa)",
+          "fuente": "§5.1"
+        },
+        {
+          "cuando": "= mínimos esfuerzos o reposo",
+          "tipo": "asa",
+          "efecto": "ASA mínimo 4 (angina activa)",
+          "fuente": "§5.1"
+        }
       ]
     },
     {
@@ -98,9 +179,21 @@
       "etiqueta": "¿La angina ha cambiado (más frecuente o más intensa) en las últimas semanas?",
       "tipo": "boolean",
       "porque": "Una angina que cambia recientemente puede indicar isquemia inestable: es una señal de alerta.",
-      "visibleSi": { "pregunta": "angina_residual", "igual": true },
+      "visibleSi": {
+        "pregunta": "angina_residual",
+        "igual": true
+      },
       "genera": [
-        { "cuando": "= sí", "tipo": "alerta", "gravedad": "roja", "efecto": "posible isquemia inestable", "fuente": "§5.1" }
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "roja",
+          "efecto": "posible isquemia inestable",
+          "fuente": "§5.1",
+          "si": {
+            "igual": true
+          }
+        }
       ]
     },
     {
@@ -108,17 +201,36 @@
       "etiqueta": "Última prueba de esfuerzo o de detección de isquemia",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "no", "etiqueta": "No se ha hecho" },
-        { "valor": "negativa", "etiqueta": "Negativa" },
-        { "valor": "positiva", "etiqueta": "Positiva" },
-        { "valor": "no_concluyente", "etiqueta": "No concluyente" }
+        {
+          "valor": "no",
+          "etiqueta": "No se ha hecho"
+        },
+        {
+          "valor": "negativa",
+          "etiqueta": "Negativa"
+        },
+        {
+          "valor": "positiva",
+          "etiqueta": "Positiva"
+        },
+        {
+          "valor": "no_concluyente",
+          "etiqueta": "No concluyente"
+        }
       ]
     },
     {
       "id": "prueba_isquemia_fecha",
       "etiqueta": "Fecha de la prueba de isquemia",
       "tipo": "fecha",
-      "visibleSi": { "pregunta": "prueba_isquemia", "enLista": ["negativa", "positiva", "no_concluyente"] }
+      "visibleSi": {
+        "pregunta": "prueba_isquemia",
+        "enLista": [
+          "negativa",
+          "positiva",
+          "no_concluyente"
+        ]
+      }
     },
     {
       "id": "ecocardiograma_fecha",

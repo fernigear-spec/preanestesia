@@ -11,6 +11,9 @@ const SIN_FACTORES: FactoresPruebas = {
   hemstopPositivo: false,
   supuestoRxTorax: false,
   supuestoEcocardiograma: false,
+  comorbilidadCardiovascularSignificativa: false,
+  fragilidad: false,
+  capacidadFuncionalReducida: false,
 };
 const IV = new Date(2026, 9, 15, 8, 0);
 const nombres = (ps: { prueba: string }[]) => ps.map((p) => p.prueba).sort();
@@ -54,6 +57,37 @@ describe('Tabla de pruebas §7 (caso 11)', () => {
   it('ecocardiograma por supuesto §7.3', () => {
     const r = decidirPruebas('bajo', 'bajo', { ...SIN_FACTORES, supuestoEcocardiograma: true });
     expect(nombres(r)).toContain('ecocardiograma');
+  });
+
+  // —— BNP o NT-proBNP (§7.3 nota **) ——
+  it('BNP: cirugía intermedia + comorbilidad CV significativa → se pide', () => {
+    const r = decidirPruebas('intermedio', 'bajo-moderado', { ...SIN_FACTORES, comorbilidadCardiovascularSignificativa: true });
+    expect(nombres(r)).toContain('bnp');
+  });
+  it('BNP: cirugía intermedia + fragilidad → se pide', () => {
+    const r = decidirPruebas('intermedio', 'bajo-moderado', { ...SIN_FACTORES, fragilidad: true });
+    expect(nombres(r)).toContain('bnp');
+  });
+  it('BNP: cirugía intermedia + capacidad funcional reducida → se pide', () => {
+    const r = decidirPruebas('intermedio', 'bajo-moderado', { ...SIN_FACTORES, capacidadFuncionalReducida: true });
+    expect(nombres(r)).toContain('bnp');
+  });
+  it('BNP NO en cirugía de bajo riesgo aunque haya comorbilidad CV', () => {
+    const r = decidirPruebas('bajo', 'bajo-moderado', { ...SIN_FACTORES, comorbilidadCardiovascularSignificativa: true });
+    expect(nombres(r)).not.toContain('bnp');
+  });
+  it('BNP NO sin ninguno de los tres factores aunque la cirugía sea alta', () => {
+    const r = decidirPruebas('alto', 'alto', SIN_FACTORES);
+    expect(nombres(r)).not.toContain('bnp');
+  });
+
+  // —— Descuento de pruebas vigentes (§7.4) ——
+  it('vigencia: una coagulación vigente se descuenta de la lista', () => {
+    const base = decidirPruebas('intermedio', 'bajo', SIN_FACTORES);
+    expect(nombres(base)).toContain('coagulacion');
+    const conVigente = decidirPruebas('intermedio', 'bajo', SIN_FACTORES, { coagulacion: true });
+    expect(nombres(conVigente)).not.toContain('coagulacion');
+    expect(nombres(conVigente)).toContain('hemograma'); // el resto sigue
   });
 });
 

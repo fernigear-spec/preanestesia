@@ -359,7 +359,7 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
 
     // Paso 6: HTA + apnea del sueño (sin diagnóstico), con las preguntas del STOP-Bang.
-    await page.getByRole('checkbox', { name: 'Hipertensión' }).check();
+    await page.getByRole('checkbox', { name: 'Hipertensión', exact: true }).check();
     await page.getByRole('checkbox', { name: 'Apnea del sueño (SAOS)' }).check();
     await page.getByRole('group', { name: /diagnóstico confirmado de apnea/ }).getByRole('button', { name: 'No' }).click();
     await page.getByRole('group', { name: /Ronca fuerte/ }).getByRole('button', { name: 'Sí' }).click();
@@ -463,6 +463,42 @@ test.describe('Vista previa', () => {
     await expect(morfina).toContainText('140');
     await expect(page.getByText(/Dosis alta de opioides/)).toBeVisible();
     await expect(page.getByText(/dolor transicional/)).toBeVisible();
+  });
+
+  test('§5.16: alerta de módulo ejecutada — ictus/AIT reciente → alerta roja en el resumen', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    await page.locator('#edad').fill('62');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('80');
+    await page.locator('#talla').fill('175');
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
+
+    // Paso 6: marcar "Ictus o AIT" y poner una fecha reciente (menos de 3 meses antes del 05/11).
+    await page.getByRole('checkbox', { name: 'Ictus o AIT' }).check();
+    await page.getByRole('group', { name: /ictus o un AIT/ }).getByRole('button', { name: 'Sí' }).click();
+    await page.locator('#ictus_o_tvp-ictus_fecha').fill('2026-10-01');
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 -> 7
+
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 -> resumen
+
+    await expect(page.getByText(/ictus o AIT de menos de 3 meses/)).toBeVisible();
   });
 
   test('E17: implante anticonceptivo → nota de sugammadex (barrera 7 días) en el resumen', async ({ page }) => {

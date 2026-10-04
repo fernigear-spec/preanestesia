@@ -3,20 +3,49 @@
   "titulo": "Demencia o deterioro cognitivo",
   "fuente": "docs/documento_fuente.md §5.6, §5.16.5",
   "preguntas": [
-    { "id": "cuidador", "etiqueta": "Cuidador principal", "tipo": "texto" },
-    { "id": "representante_legal", "etiqueta": "Representante legal", "tipo": "texto" },
+    {
+      "id": "cuidador",
+      "etiqueta": "Cuidador principal",
+      "tipo": "texto"
+    },
+    {
+      "id": "representante_legal",
+      "etiqueta": "Representante legal",
+      "tipo": "texto"
+    },
     {
       "id": "capacidad_consentir",
       "etiqueta": "¿Puede otorgar el consentimiento?",
       "tipo": "opcion",
       "porque": "Si no puede consentir, el consentimiento lo firma su representante legal.",
       "opciones": [
-        { "valor": "si", "etiqueta": "Sí" },
-        { "valor": "no", "etiqueta": "No" },
-        { "valor": "dudosa", "etiqueta": "Dudosa" }
+        {
+          "valor": "si",
+          "etiqueta": "Sí"
+        },
+        {
+          "valor": "no",
+          "etiqueta": "No"
+        },
+        {
+          "valor": "dudosa",
+          "etiqueta": "Dudosa"
+        }
       ],
       "genera": [
-        { "cuando": "= no o dudosa", "tipo": "alerta", "gravedad": "amarilla", "efecto": "consentimiento por representante legal", "fuente": "§5.16.5" }
+        {
+          "cuando": "= no o dudosa",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "consentimiento por representante legal",
+          "fuente": "§5.16.5",
+          "si": {
+            "enLista": [
+              "no",
+              "dudosa"
+            ]
+          }
+        }
       ]
     },
     {
@@ -24,9 +53,18 @@
       "etiqueta": "Nivel de dependencia",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "independiente", "etiqueta": "Independiente" },
-        { "valor": "parcial", "etiqueta": "Dependencia parcial" },
-        { "valor": "total", "etiqueta": "Dependencia total" }
+        {
+          "valor": "independiente",
+          "etiqueta": "Independiente"
+        },
+        {
+          "valor": "parcial",
+          "etiqueta": "Dependencia parcial"
+        },
+        {
+          "valor": "total",
+          "etiqueta": "Dependencia total"
+        }
       ]
     },
     {
@@ -35,7 +73,16 @@
       "tipo": "boolean",
       "porque": "Son un factor de riesgo importante de delirium después de la operación.",
       "genera": [
-        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "alto riesgo de delirium postoperatorio", "fuente": "§5.16.5" }
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "alto riesgo de delirium postoperatorio",
+          "fuente": "§5.16.5",
+          "si": {
+            "igual": true
+          }
+        }
       ]
     }
   ]
