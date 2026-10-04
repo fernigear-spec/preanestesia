@@ -27,6 +27,8 @@ interface CasoJson {
   cribado?: { ningunaConocida?: boolean; enfermedades?: string[]; respuestasModulos?: RespuestasModulos };
   medicacion?: FarmacoTomadoUi[];
   consentimiento?: EstadoEntrevista['consentimiento'];
+  habitos?: EstadoEntrevista['habitos'];
+  viaAerea?: EstadoEntrevista['viaAerea'];
 }
 
 export interface CasoEntrenamiento {
@@ -72,7 +74,6 @@ function hidratar(c: CasoJson): CasoEntrenamiento {
     antecedentes: null,
     mtnd4: null,
     alergias: null,
-    habitos: null,
     cribado: {
       ningunaConocida: c.cribado?.ningunaConocida ?? true,
       enfermedades: c.cribado?.enfermedades ?? [],
@@ -81,8 +82,10 @@ function hidratar(c: CasoJson): CasoEntrenamiento {
       condicionesEspeciales: { ...CONDICIONES_ESPECIALES_VACIO },
     },
     medicacion: c.medicacion ?? [],
-    viaAerea: null,
+    viaAerea: c.viaAerea ?? null,
     consentimiento: c.consentimiento ?? null,
+    habitos: c.habitos ?? null,
+    validaciones: {},
   };
 
   return { id: c.id, titulo: c.titulo, descripcion: c.descripcion, esperado: c.esperado, modalidad: c.modalidad, entrevista };

@@ -8,13 +8,14 @@ import { useMemo, useState } from 'react';
 import config from '../../../datos/config.json';
 import plantillasSap from '../../../datos/plantillas_sap.json';
 import type { GravedadAlerta } from '../../dominio/tipos.ts';
-import { calcularImc, type EstadoEntrevista } from '../estadoEntrevista.ts';
+import { calcularImc, type EstadoEntrevista, type EstadoPuntoValidacion } from '../estadoEntrevista.ts';
 import { MODULO_POR_ID, MODULOS } from '../../datos/modulosDatos.ts';
 import type { RespuestasModulos } from '../../datos/modulos.ts';
 import { derivarHechosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
 import { emitirEfectosModulos } from '../../dominio/entrevista/efectosModulos.ts';
 import { derivarPuntosValidacion } from '../../dominio/entrevista/puntosValidacion.ts';
 import { VALIDACIONES } from '../../datos/validacionesDatos.ts';
+import { construirHechosValidacion } from './hechosValidacionUi.ts';
 import { derivarHojaExtras } from '../../dominio/entrevista/hojaExtras.ts';
 import { derivarRiesgoYPruebas } from '../../dominio/entrevista/riesgoYPruebas.ts';
 import { construirPlanPaciente } from '../paciente/construirPlanUi.ts';
@@ -46,6 +47,10 @@ interface Props {
   modalidad: string;
   /** Confirma o marca «le llamaremos» un fármaco pendiente (§12), por su índice en la medicación. */
   onConfirmarFarmaco?: (indice: number, cambios: { confirmadoPor?: string; leLlamaremos?: boolean }) => void;
+  /** Estado de los puntos de validación (§13 bis), elevado al estado de la entrevista. */
+  validaciones?: Record<string, EstadoPuntoValidacion>;
+  /** Resuelve un punto de validación: con nombre (validado) o posponer/derivar; null lo deshace. */
+  onValidarPunto?: (id: string, estado: EstadoPuntoValidacion | null) => void;
   /** "Hoy" para los cálculos con fecha actual (plazo no alcanzable, vigencia sin fecha). La UI pasa la real; el modo entrenamiento, una fija. */
   fechaReferencia?: Date;
 }
@@ -68,14 +73,15 @@ function fechaCorta(d: Date): string {
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 }
 
-export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, fechaReferencia }: Props) {
+export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validaciones, onValidarPunto, fechaReferencia }: Props) {
   const { intervencion, procedimiento, basicos, antecedentes, mtnd4, alergias, habitos, cribado, medicacion, viaAerea, consentimiento } = entrevista;
   const [soloAscii, setSoloAscii] = useState(false);
   const [asaManual, setAsaManual] = useState<ClaseAsa | ''>('');
   const [nombresPend, setNombresPend] = useState<Record<number, string>>({});
-  // Estado de los puntos de validación (§13 bis): por id, nombre tecleado, validado o pospuesto.
+  // Nombre tecleado para validar cada punto (transitorio). El estado resuelto vive
+  // en la entrevista (prop `validaciones`), para que lo use también la hoja del paciente.
   const [valNombre, setValNombre] = useState<Record<string, string>>({});
-  const [valEstado, setValEstado] = useState<Record<string, { validadoPor?: string; posponer?: boolean }>>({});
+  const valEstado = validaciones ?? {};
   const [notasAbiertas, setNotasAbiertas] = useState(false);
   const [copiado, setCopiado] = useState(false);
 
@@ -260,15 +266,14 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, fechaRefere
     // Stent reciente (§8.3, R12.7): alerta roja de valorar diferir y, con técnica
     // neuroaxial/bloqueo profundo, la amarilla adicional. Se evalúa desde los hechos
     // clínicos (fecha y motivo del stent) con el contexto de la técnica efectiva.
-    let stentReciente = false;
     if (clin.stent && clin.stent.mesesDesdeImplante !== null) {
       const refFecha = intervencion.fechaHora ?? new Date(hoy.getTime() + 90 * 86_400_000);
       const ctxStent = construirContexto({ ...intervencion, fechaHora: refFecha, fechaDesconocida: false }, basicos.pesoKg, clin.aclaramiento, undefined, hoy);
       // Si no se conoce el motivo del stent, se usa la ventana más conservadora (SCA, 12 meses).
       const stentEval = evaluarStent({ mesesDesdeImplante: clin.stent.mesesDesdeImplante, traSca: clin.stent.traSca ?? true }, ctxStent);
       for (const a of stentEval.alertas) alertas.push({ gravedad: a.gravedad, mensaje: a.mensaje });
-      // El stent reciente es también un punto de validación «posponer» (§13 bis).
-      stentReciente = stentEval.recienteRequiereConfirmacion;
+      // El stent reciente es también un punto de validación «posponer» (§13 bis),
+      // que se calcula en construirHechosValidacion (abajo).
     }
 
     // Alertas y notas codificadas en los módulos (§5.16): se EJECUTAN aquí, no
@@ -319,10 +324,12 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, fechaRefere
     const sap = construirSap(entradaSap, { soloAscii, usarAbreviaturas: true, abreviaturas: plantillasSap.abreviaturas });
 
     // Puntos de validación clínica (§13 bis): mecanismo distinto de las alertas.
+    // Los "hechos" (escalas, hechos clínicos, paso 1, alergias, antecedentes y vía
+    // aérea) los calcula un ayudante puro compartido con la hoja del paciente.
     const puntosValidacion = derivarPuntosValidacion({
       catalogo: VALIDACIONES, modulos: MODULOS, respuestas, activos: enfermedades,
       fechaIntervencion: intervencion.fechaHora ?? null, fechaReferencia: hoy,
-      hechosEspeciales: { stentReciente },
+      hechos: construirHechosValidacion(entrevista, hoy),
     });
 
     return { asa, escalas, alertas, notas, plan, pruebas: rp.pruebas, claseRiesgo: rp.clase, ayuno, sap, puntosValidacion };
@@ -343,7 +350,7 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, fechaRefere
       {salida.puntosValidacion.length > 0 && (
         <section className="validaciones" aria-labelledby="val-tit">
           <h4 id="val-tit">Puntos de validación clínica</h4>
-          <p className="aviso aviso-info">
+          <p className="aviso aviso-info no-print">
             Revise estos puntos antes de la intervención. No impiden continuar: puede validarlos
             con su nombre o marcar que hay que posponer o derivar. Mientras alguno siga sin validar,
             la hoja del paciente le indicará que su caso será revisado.
@@ -358,18 +365,21 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, fechaRefere
                     <strong>{rojo ? '🔴 Valorar posponer la cirugía programada' : '🟡 Validar antes de la intervención'}:</strong>{' '}
                     {pv.motivo}{pv.fuente ? <em> ({pv.fuente})</em> : null}
                   </p>
+                  {/* Estado permanente (sale también en el PDF). */}
                   {estado?.validadoPor ? (
                     <p className="validacion-resuelta">✓ Validado por {estado.validadoPor}
-                      {' · '}
-                      <button type="button" className="boton-enlace" onClick={() => setValEstado((s) => { const n = { ...s }; delete n[pv.id]; return n; })}>deshacer</button>
+                      <button type="button" className="boton-enlace no-print" onClick={() => onValidarPunto?.(pv.id, null)}> · deshacer</button>
                     </p>
                   ) : estado?.posponer ? (
-                    <p className="validacion-resuelta">⏸ Marcado para posponer o derivar
-                      {' · '}
-                      <button type="button" className="boton-enlace" onClick={() => setValEstado((s) => { const n = { ...s }; delete n[pv.id]; return n; })}>deshacer</button>
+                    <p className="validacion-resuelta">⏸ Posponer o derivar
+                      <button type="button" className="boton-enlace no-print" onClick={() => onValidarPunto?.(pv.id, null)}> · deshacer</button>
                     </p>
                   ) : (
-                    <div className="validacion-controles">
+                    <p className="validacion-pendiente">⚠ Pendiente de validar</p>
+                  )}
+                  {/* Controles (no se imprimen). */}
+                  {!estado?.validadoPor && !estado?.posponer && (
+                    <div className="validacion-controles no-print">
                       <input
                         type="text"
                         placeholder="Nombre del anestesiólogo"
@@ -381,14 +391,14 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, fechaRefere
                         type="button"
                         className="boton-secundario"
                         disabled={!(valNombre[pv.id] ?? '').trim()}
-                        onClick={() => setValEstado((s) => ({ ...s, [pv.id]: { validadoPor: (valNombre[pv.id] ?? '').trim() } }))}
+                        onClick={() => onValidarPunto?.(pv.id, { validadoPor: (valNombre[pv.id] ?? '').trim() })}
                       >
                         Validar
                       </button>
                       <button
                         type="button"
                         className="boton-secundario"
-                        onClick={() => setValEstado((s) => ({ ...s, [pv.id]: { posponer: true } }))}
+                        onClick={() => onValidarPunto?.(pv.id, { posponer: true })}
                       >
                         Posponer o derivar
                       </button>

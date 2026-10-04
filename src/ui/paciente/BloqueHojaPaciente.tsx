@@ -11,8 +11,8 @@ import { derivarHojaExtras } from '../../dominio/entrevista/hojaExtras.ts';
 import { derivarPuntosValidacion } from '../../dominio/entrevista/puntosValidacion.ts';
 import { VALIDACIONES } from '../../datos/validacionesDatos.ts';
 import { MODULOS } from '../../datos/modulosDatos.ts';
-import { construirContexto } from '../../dominio/reglas/motor.ts';
-import { evaluarStent } from '../../dominio/reglas/antiagregantes.ts';
+import { construirHechosValidacion } from '../pasos/hechosValidacionUi.ts';
+import type { EstadoEntrevista, EstadoPuntoValidacion } from '../estadoEntrevista.ts';
 import { calcularAyuno } from '../../dominio/ayuno/ayuno.ts';
 import { ayunoQrDesde } from '../../dominio/salidas/qr/construirContenido.ts';
 import { calcularAuditC } from '../../dominio/escalas/auditC.ts';
@@ -31,6 +31,10 @@ interface Props {
   cribado: CribadoUi;
   habitos: HabitosUi | null;
   consentimiento: ConsentimientoUi | null;
+  /** Entrevista completa (para calcular los puntos de validación activos, §13 bis). */
+  entrevista: EstadoEntrevista;
+  /** Estado de los puntos de validación (§13 bis): resueltos no cuentan como pendientes. */
+  validaciones: Record<string, EstadoPuntoValidacion>;
   /** "Hoy" para el plazo no alcanzable; la UI pasa la real, el modo entrenamiento una fija. */
   fechaReferencia?: Date;
 }
@@ -41,7 +45,7 @@ const CONS_MAP: Record<ConsentimientoUi['estado'], 'entregado' | 'pendiente' | '
   no_procede: 'no_procede',
 };
 
-export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado, habitos, consentimiento, fechaReferencia }: Props) {
+export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado, habitos, consentimiento, entrevista, validaciones, fechaReferencia }: Props) {
   const [generar, setGenerar] = useState(false);
   const hoy = fechaReferencia ?? new Date();
 
@@ -66,22 +70,21 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
     [medicacion, intervencion, clin, basicos.pesoKg, hoy],
   );
 
-  // Puntos de validación clínica (§13 bis): si hay alguno activo, la hoja del paciente
-  // muestra el aviso de que el anestesiólogo revisará su caso (revisionPendiente).
+  // Puntos de validación clínica (§13 bis): la hoja del paciente muestra el aviso de
+  // revisión solo mientras quede algún punto SIN validar (ni validado ni pospuesto;
+  // los marcados «posponer o derivar» mantienen el aviso, porque siguen abiertos).
   const revisionPendiente = useMemo(() => {
-    let stentReciente = false;
-    if (clin.stent && clin.stent.mesesDesdeImplante !== null) {
-      const refFecha = intervencion.fechaHora ?? new Date(hoy.getTime() + 90 * MS_DIA);
-      const ctxStent = construirContexto({ ...intervencion, fechaHora: refFecha, fechaDesconocida: false }, basicos.pesoKg, clin.aclaramiento, undefined, hoy);
-      stentReciente = evaluarStent({ mesesDesdeImplante: clin.stent.mesesDesdeImplante, traSca: clin.stent.traSca ?? true }, ctxStent).recienteRequiereConfirmacion;
-    }
     const puntos = derivarPuntosValidacion({
       catalogo: VALIDACIONES, modulos: MODULOS, respuestas: cribado.respuestasModulos, activos: new Set(cribado.enfermedades),
       fechaIntervencion: intervencion.fechaHora ?? null, fechaReferencia: hoy,
-      hechosEspeciales: { stentReciente },
+      hechos: construirHechosValidacion(entrevista, hoy),
     });
-    return puntos.length > 0;
-  }, [clin, cribado, intervencion, basicos.pesoKg, hoy]);
+    return puntos.some((p) => {
+      const est = validaciones[p.id];
+      // Un punto validado por nombre ya no cuenta; uno pospuesto/derivar SÍ mantiene el aviso.
+      return !(est && est.validadoPor);
+    });
+  }, [entrevista, cribado, intervencion, hoy, validaciones]);
 
   // Ayuno (§8.14) y condicionales de la hoja (§10.2).
   const { ayunoQr, extras } = useMemo(() => {

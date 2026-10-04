@@ -525,6 +525,8 @@ export function App() {
                 cribado={cribado}
                 habitos={habitos}
                 consentimiento={consentimiento}
+                entrevista={entrevista}
+                validaciones={entrevista.validaciones}
                 {...(entrenamiento ? { fechaReferencia: FECHA_REFERENCIA_ENTRENAMIENTO } : {})}
               />
             )}
@@ -543,6 +545,15 @@ export function App() {
               entrevista={entrevista}
               modalidad={modalidad ?? 'presencial'}
               {...(entrenamiento ? { fechaReferencia: FECHA_REFERENCIA_ENTRENAMIENTO } : {})}
+              validaciones={entrevista.validaciones}
+              onValidarPunto={(id, estado) =>
+                setEntrevista((e) => {
+                  const v = { ...e.validaciones };
+                  if (estado === null) delete v[id];
+                  else v[id] = estado;
+                  return { ...e, validaciones: v };
+                })
+              }
               onConfirmarFarmaco={(i, cambios) =>
                 setEntrevista((e) => ({
                   ...e,

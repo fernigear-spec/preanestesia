@@ -77,6 +77,27 @@
           }
         }
       ]
+    },
+    {
+      "id": "tension_consulta",
+      "etiqueta": "Tensión medida hoy en la consulta",
+      "tipo": "opcion",
+      "porque": "Una tensión ≥ 180/110 en la consulta aconseja validar el control antes de la intervención.",
+      "opciones": [
+        { "valor": "menor_180_110", "etiqueta": "Menor de 180/110" },
+        { "valor": "ge_180_110", "etiqueta": "180/110 o más" },
+        { "valor": "no_medida", "etiqueta": "No medida" }
+      ],
+      "genera": [
+        {
+          "cuando": "= 180/110 o más",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "tensión arterial ≥ 180/110 en la consulta: validar antes de la intervención",
+          "fuente": "§5.16.1",
+          "si": { "igual": "ge_180_110" }
+        }
+      ]
     }
   ]
 }

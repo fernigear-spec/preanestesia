@@ -31,8 +31,12 @@ function valorQueSatisface(cond: CondicionEfecto): unknown {
   if (cond.contieneAlguno !== undefined) return [cond.contieneAlguno[0]];
   if (cond.mayorQue !== undefined) return cond.mayorQue + 1;
   if (cond.mayorIgualQue !== undefined) return cond.mayorIgualQue;
+  if (cond.menorQue !== undefined) return cond.menorQue - 1;
   if (cond.recienteMeses !== undefined) {
     // Una fecha dentro de la ventana: hoy (siempre reciente respecto a la IQ).
+    return IV.toISOString().slice(0, 10);
+  }
+  if (cond.recienteDias !== undefined) {
     return IV.toISOString().slice(0, 10);
   }
   if (cond.sinFechaRecienteMeses !== undefined) {

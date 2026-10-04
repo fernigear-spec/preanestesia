@@ -1,16 +1,17 @@
 {
   "id": "validaciones_multiples",
-  "titulo": "Varios puntos de validación · stent + ictus + diabetes + asma",
-  "descripcion": "Varón de 68 años con stent reciente (hace 2 meses), ictus reciente (hace 1 mes), diabetes con hipoglucemias inadvertidas y asma no controlada. Pensado para ver juntos los puntos de validación clínica (§13 bis): dos de «valorar posponer» (rojo) y dos de «validar antes» (amarillo).",
+  "titulo": "Varios puntos de validación · stent + infarto + 4AT + EGRI + diabetes",
+  "descripcion": "Varón de 68 años con stent reciente (hace 2 meses), infarto reciente (hace 40 días), 4AT alterado (posible delirium), diabetes con hipoglucemias inadvertidas y una vía aérea de riesgo (EGRI ≥ 4). Pensado para ver juntos los puntos de validación clínica (§13 bis), incluidos los que salen de ESCALAS (4AT y EGRI), no solo de módulos: tres de «valorar posponer» (rojo) y varios de «validar antes» (amarillo).",
   "modalidad": "presencial",
   "esperado": [
     "Puntos de validación clínica al principio del resumen (§13 bis).",
-    "🔴 Valorar posponer: stent reciente.",
-    "🔴 Valorar posponer: ictus o AIT de menos de 3 meses.",
+    "🔴 Valorar posponer: stent coronario reciente.",
+    "🔴 Valorar posponer: infarto de miocardio hace menos de 60 días.",
+    "🔴 Valorar posponer: 4AT ≥ 4 (posible delirium actual).",
     "🟡 Validar antes: hipoglucemias inadvertidas (no las detecta).",
-    "🟡 Validar antes: asma no controlada (crisis en el último mes).",
+    "🟡 Validar antes: EGRI ≥ 4 (vía aérea difícil).",
     "Cada punto se resuelve con «Validar» (nombre) o «Posponer o derivar»; no bloquean la hoja.",
-    "La hoja del paciente muestra el aviso de que el anestesiólogo revisará su caso."
+    "Mientras quede alguno sin validar, la hoja del paciente avisa de que el anestesiólogo revisará el caso."
   ],
   "intervencion": {
     "procedimientoId": "cgd_colecistectomia_lap",
@@ -26,29 +27,35 @@
     "tallaCm": 172,
     "embarazada": false
   },
+  "habitos": {
+    "tabaco": "nunca",
+    "subeDosPisos": "si",
+    "itemsDasi": [],
+    "cfs": 4,
+    "cuatroAt": { "alerta": "alterado", "amt4": "0_errores", "meses": "7_o_mas", "cambioAgudo": "no" }
+  },
+  "viaAerea": {
+    "aperturaBucal": "lt_4",
+    "distanciaTiromentoniana": "lt_6",
+    "mallampati": 3
+  },
   "cribado": {
     "ningunaConocida": false,
-    "enfermedades": ["cardiopatia_isquemica", "ictus_o_tvp", "diabetes", "asma_epoc"],
+    "enfermedades": ["cardiopatia_isquemica", "diabetes"],
     "respuestasModulos": {
       "cardiopatia_isquemica": {
+        "infarto_previo": true,
+        "infarto_fecha": "2026-09-26",
         "portador_stent": true,
         "stent_fecha": "2026-09-05",
         "stent_tipo": "farmacoactivo",
         "stent_motivo": "programado"
-      },
-      "ictus_o_tvp": {
-        "ictus_ait": true,
-        "ictus_fecha": "2026-10-05"
       },
       "diabetes": {
         "tipo": "tipo2",
         "tratamiento": "insulina",
         "frecuencia_hipoglucemias": "mensual",
         "detecta_hipoglucemias": false
-      },
-      "asma_epoc": {
-        "enfermedad": "asma",
-        "crisis_ultimo_mes": true
       }
     }
   },

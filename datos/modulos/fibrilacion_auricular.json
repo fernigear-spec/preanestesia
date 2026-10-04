@@ -58,6 +58,40 @@
           }
         }
       ]
+    },
+    {
+      "id": "sincope_palpitaciones_reciente",
+      "etiqueta": "¿Palpitaciones o síncope (desmayo) recientes?",
+      "tipo": "boolean",
+      "porque": "Las palpitaciones o síncopes recientes con una arritmia aconsejan validar el control del ritmo antes de la intervención.",
+      "etiquetaSap": "palpitaciones/síncope recientes",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "arritmia con palpitaciones o síncope recientes: validar antes de la intervención",
+          "fuente": "§5.1",
+          "si": { "igual": true }
+        }
+      ]
+    },
+    {
+      "id": "bloqueo_sin_marcapasos",
+      "etiqueta": "¿Bloqueo cardiaco conocido sin marcapasos?",
+      "tipo": "boolean",
+      "porque": "Un bloqueo cardiaco conocido sin marcapasos aconseja validar antes de la intervención.",
+      "etiquetaSap": "bloqueo cardiaco sin marcapasos",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "bloqueo cardiaco conocido sin marcapasos: validar antes de la intervención",
+          "fuente": "§5.1",
+          "si": { "igual": true }
+        }
+      ]
     }
   ]
 }

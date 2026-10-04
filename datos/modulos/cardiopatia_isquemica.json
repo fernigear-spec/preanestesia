@@ -14,10 +14,21 @@
       "id": "infarto_fecha",
       "etiqueta": "Fecha del infarto o síndrome coronario agudo",
       "tipo": "fecha",
+      "porque": "Un infarto de menos de 60 días aconseja posponer la cirugía programada.",
       "visibleSi": {
         "pregunta": "infarto_previo",
         "igual": true
-      }
+      },
+      "genera": [
+        {
+          "cuando": "infarto hace menos de 60 días",
+          "tipo": "alerta",
+          "gravedad": "roja",
+          "efecto": "infarto de miocardio hace menos de 60 días: valorar posponer la cirugía programada",
+          "fuente": "§5.1 (ESC 2022)",
+          "si": { "recienteDias": 60 }
+        }
+      ]
     },
     {
       "id": "revascularizacion",
@@ -174,6 +185,14 @@
           "tipo": "asa",
           "efecto": "ASA mínimo 4 (angina activa)",
           "fuente": "§5.1"
+        },
+        {
+          "cuando": "= mínimos esfuerzos o reposo",
+          "tipo": "alerta",
+          "gravedad": "roja",
+          "efecto": "angina con mínimos esfuerzos o en reposo: valorar posponer la cirugía programada",
+          "fuente": "§5.1 (ESC 2022)",
+          "si": { "enLista": ["minimos", "reposo"] }
         }
       ]
     },

@@ -41,6 +41,14 @@
           "tipo": "asa",
           "efecto": "ASA mínimo 4 (moderada/grave: mínimo 3)",
           "fuente": "§5.4"
+        },
+        {
+          "cuando": "= terminal (filtrado < 15)",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "enfermedad renal terminal (filtrado < 15): validar antes de la intervención",
+          "fuente": "§5.4",
+          "si": { "igual": "terminal" }
         }
       ]
     },
@@ -62,6 +70,7 @@
       "id": "dialisis",
       "etiqueta": "¿Está en diálisis?",
       "tipo": "opcion",
+      "porque": "La enfermedad renal en diálisis aconseja validar el momento y la coordinación con nefrología antes de la intervención.",
       "opciones": [
         {
           "valor": "no",
@@ -74,6 +83,16 @@
         {
           "valor": "peritoneal",
           "etiqueta": "Sí, diálisis peritoneal"
+        }
+      ],
+      "genera": [
+        {
+          "cuando": "= en hemodiálisis o peritoneal",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "enfermedad renal en diálisis: validar antes de la intervención",
+          "fuente": "§5.4",
+          "si": { "enLista": ["hemodialisis", "peritoneal"] }
         }
       ]
     },

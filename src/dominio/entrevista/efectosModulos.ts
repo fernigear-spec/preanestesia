@@ -82,12 +82,21 @@ export function evaluarCondicion(
   if (cond.mayorIgualQue !== undefined) {
     return typeof valor === 'number' && !Number.isNaN(valor) && valor >= cond.mayorIgualQue;
   }
+  if (cond.menorQue !== undefined) {
+    return typeof valor === 'number' && !Number.isNaN(valor) && valor < cond.menorQue;
+  }
   if (cond.recienteMeses !== undefined) {
     const f = fechaDesde(valor);
     if (f === null) return false;
     const limite = new Date(fechaReferencia.getTime());
     limite.setMonth(limite.getMonth() - cond.recienteMeses);
     // Reciente = la fecha del evento es posterior al límite (está dentro de la ventana).
+    return f.getTime() >= limite.getTime();
+  }
+  if (cond.recienteDias !== undefined) {
+    const f = fechaDesde(valor);
+    if (f === null) return false;
+    const limite = new Date(fechaReferencia.getTime() - cond.recienteDias * 86_400_000);
     return f.getTime() >= limite.getTime();
   }
   if (cond.sinFechaRecienteMeses !== undefined) {

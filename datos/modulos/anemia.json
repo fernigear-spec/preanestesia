@@ -75,6 +75,14 @@
           "tipo": "prueba",
           "efecto": "apoya pedir hemograma y ferritina; valorar optimizar la anemia",
           "fuente": "§7.3"
+        },
+        {
+          "cuando": "< 10 g/dL",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "hemoglobina < 10 g/dL: validar antes de la intervención (optimizar la anemia)",
+          "fuente": "§7.3",
+          "si": { "menorQue": 10 }
         }
       ]
     },

@@ -448,7 +448,7 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
     await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
 
-    const stopBang = page.getByRole('listitem').filter({ hasText: 'STOP-Bang' });
+    const stopBang = page.getByRole('listitem').filter({ hasText: /^STOP-Bang:/ });
     await expect(stopBang).toContainText('6');
     await expect(stopBang).toContainText('riesgo alto');
     await expect(page.getByText(/STOP-Bang 6 \(riesgo alto\)/)).toBeVisible();
@@ -490,7 +490,7 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
     await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
 
-    const stopBang = page.getByRole('listitem').filter({ hasText: 'STOP-Bang' });
+    const stopBang = page.getByRole('listitem').filter({ hasText: /^STOP-Bang:/ });
     await expect(stopBang).toContainText('2');
     await expect(stopBang).toContainText('riesgo bajo');
   });
@@ -756,12 +756,15 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
 
     // Sección de puntos de validación clínica al principio del resumen.
-    await expect(page.getByRole('heading', { name: /Puntos de validación clínica/ })).toBeVisible();
-    // Dos de posponer (rojo) y dos de validar (amarillo).
-    await expect(page.getByText(/Stent coronario reciente/)).toBeVisible();
-    await expect(page.getByText(/Ictus o AIT de menos de 3 meses/)).toBeVisible();
-    await expect(page.getByText(/Hipoglucemias inadvertidas/)).toBeVisible();
-    await expect(page.getByText(/Asma no controlada \(crisis en el último mes\)/)).toBeVisible();
+    const seccion = page.locator('section.validaciones');
+    await expect(seccion.getByRole('heading', { name: /Puntos de validación clínica/ })).toBeVisible();
+    // Posponer (rojo): stent reciente, infarto reciente, 4AT ≥ 4 (origen de escala).
+    await expect(seccion.getByText(/Stent coronario reciente/)).toBeVisible();
+    await expect(seccion.getByText(/Infarto de miocardio hace menos de 60 días/)).toBeVisible();
+    await expect(seccion.getByText(/4AT ≥ 4/)).toBeVisible();
+    // Validar (amarillo): hipoglucemias inadvertidas y EGRI ≥ 4 (origen de escala).
+    await expect(seccion.getByText(/Hipoglucemias inadvertidas/)).toBeVisible();
+    await expect(seccion.getByText(/EGRI ≥ 4/)).toBeVisible();
 
     // Validar el primer punto con un nombre.
     const primerNombre = page.getByRole('textbox', { name: /Nombre del anestesiólogo para validar/ }).first();
@@ -771,12 +774,34 @@ test.describe('Vista previa', () => {
 
     // Marcar otro como posponer o derivar.
     await page.getByRole('button', { name: 'Posponer o derivar' }).first().click();
-    await expect(page.getByText(/⏸ Marcado para posponer o derivar/)).toBeVisible();
+    await expect(page.getByText(/⏸ Posponer o derivar/)).toBeVisible();
 
-    // No bloquea: la hoja del paciente se puede generar igualmente, y como hay puntos
-    // de validación activos, la hoja incluye el aviso de que el anestesiólogo revisará el caso.
+    // No bloquea: la hoja del paciente se puede generar igualmente, y como quedan puntos
+    // sin validar, la hoja incluye el aviso de que el anestesiólogo revisará el caso.
     await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
     await expect(page.getByText('Antes de la intervención, el anestesiólogo revisará su caso y, si es necesario, se pondrá en contacto con usted.')).toBeVisible();
+  });
+
+  test('§13 bis: al validar TODOS los puntos, la hoja del paciente deja de mostrar el aviso de revisión', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Modo entrenamiento' }).click();
+    await page.getByRole('button', { name: 'Abrir este caso' }).nth(1).click();
+    await expect(page.getByRole('heading', { name: /Puntos de validación clínica/ })).toBeVisible();
+
+    // Validar todos los puntos: rellenar cada nombre y pulsar Validar hasta que no queden.
+    let guardia = 0;
+    while (await page.getByRole('button', { name: 'Validar', exact: true }).count() > 0 && guardia < 30) {
+      const input = page.getByRole('textbox', { name: /Nombre del anestesiólogo para validar/ }).first();
+      await input.fill('Dr. Pérez');
+      await page.getByRole('button', { name: 'Validar', exact: true }).first().click();
+      guardia++;
+    }
+    await expect(page.getByRole('button', { name: 'Validar', exact: true })).toHaveCount(0);
+
+    // Con todo validado, la hoja del paciente NO muestra el aviso de revisión.
+    await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
+    await expect(page.getByRole('img', { name: /Código QR/ })).toBeVisible();
+    await expect(page.getByText('Antes de la intervención, el anestesiólogo revisará su caso y, si es necesario, se pondrá en contacto con usted.')).toHaveCount(0);
   });
 
   test('§14.4 guía imprimible: se genera desde los módulos con casillas en blanco', async ({ page }) => {

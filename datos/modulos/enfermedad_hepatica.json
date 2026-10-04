@@ -37,19 +37,52 @@
       "id": "ascitis",
       "etiqueta": "¿Ascitis (líquido en el abdomen)?",
       "tipo": "boolean",
-      "etiquetaSap": "ascitis"
+      "porque": "La cirrosis con ascitis es hepatopatía descompensada: aconseja validar antes de la intervención.",
+      "etiquetaSap": "ascitis",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "cirrosis con ascitis, varices o encefalopatía: validar antes de la intervención",
+          "fuente": "§5.4",
+          "si": { "igual": true }
+        }
+      ]
     },
     {
       "id": "varices",
       "etiqueta": "¿Varices esofágicas conocidas?",
       "tipo": "boolean",
-      "etiquetaSap": "varices esofágicas"
+      "porque": "La cirrosis con varices es hepatopatía descompensada: aconseja validar antes de la intervención.",
+      "etiquetaSap": "varices esofágicas",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "cirrosis con ascitis, varices o encefalopatía: validar antes de la intervención",
+          "fuente": "§5.4",
+          "si": { "igual": true }
+        }
+      ]
     },
     {
       "id": "encefalopatia",
       "etiqueta": "¿Episodios de encefalopatía (confusión)?",
       "tipo": "boolean",
-      "etiquetaSap": "encefalopatía"
+      "porque": "La cirrosis con encefalopatía es hepatopatía descompensada: aconseja validar antes de la intervención.",
+      "etiquetaSap": "encefalopatía",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "cirrosis con ascitis, varices o encefalopatía: validar antes de la intervención",
+          "fuente": "§5.4",
+          "si": { "igual": true }
+        }
+      ]
     },
     {
       "id": "plaquetas_bajas",

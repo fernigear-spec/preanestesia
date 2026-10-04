@@ -30,6 +30,7 @@ export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Prop
   const [talla, setTalla] = useState(inicial ? String(inicial.tallaCm) : '');
   const [posibleEmbarazo, setPosibleEmbarazo] = useState<boolean | undefined>(inicial?.posibleEmbarazo);
   const [fechaUltimaRegla, setFechaUltimaRegla] = useState(inicial?.fechaUltimaRegla ?? '');
+  const [rechazaHemoderivados, setRechazaHemoderivados] = useState(inicial?.rechazaHemoderivados ?? false);
   const [semanas, setSemanas] = useState(inicial?.semanasGestacion !== undefined ? String(inicial.semanasGestacion) : '');
 
   const edadNum = Number(edad);
@@ -66,6 +67,7 @@ export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Prop
     // Edad en meses solo en menores de 2 años (§4, paso 2): el ayuno con fórmula
     // es de 4 h en menores de 6 meses y la edad posconcepcional depende de ella.
     if (menorDe2 && meses !== '') datos.edadMeses = mesesNum;
+    if (rechazaHemoderivados) datos.rechazaHemoderivados = true;
     if (obstetrico) {
       datos.moduloObstetrico = true;
       if (semanas !== '') datos.semanasGestacion = semanasNum;
@@ -172,6 +174,17 @@ export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Prop
           )}
         </fieldset>
       )}
+
+      <div className="campo">
+        <label className="radio-tarjeta">
+          <input
+            type="checkbox"
+            checked={rechazaHemoderivados}
+            onChange={(e) => setRechazaHemoderivados(e.target.checked)}
+          />
+          Testigo de Jehová o rechazo de transfusiones/hemoderivados
+        </label>
+      </div>
 
       <div className="acciones">
         <button type="button" className="boton-secundario" onClick={onVolver}>Volver</button>

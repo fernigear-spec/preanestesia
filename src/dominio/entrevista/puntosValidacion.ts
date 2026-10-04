@@ -1,14 +1,20 @@
 /**
  * Puntos de validación clínica (§13 bis). Mecanismo DISTINTO de las alertas: a
- * partir de las condiciones ya codificadas en los módulos (campo `genera`/`si`) y de
- * ciertos hechos clínicos evaluados en código (hoy, el stent reciente), selecciona
- * las que el catálogo `datos/validaciones.json` marca como puntos de validación y
- * las devuelve con su tipo (posponer/validar), motivo y fuente.
+ * partir de condiciones ya evaluadas por el programa, selecciona las que el catálogo
+ * `datos/validaciones.json` marca como puntos de validación y las devuelve con su
+ * tipo (posponer/validar), motivo y fuente.
+ *
+ * Un punto se dispara según su `origen`, que puede ser de dos clases:
+ *   - «moduloId.preguntaId»: una condición codificada en datos/modulos/*.json
+ *     (campo `genera`/`si`); el punto se activa si ese efecto se emite.
+ *   - un HECHO con nombre (p. ej. `stent_reciente`, `cuatro_at_alto`, `egri_alto`,
+ *     `riesgo_quirurgico_alto`, `alergia_latex`, `intubacion_dificil_previa`…): el
+ *     punto se activa si el flag correspondiente (ya calculado por la UI a partir de
+ *     escalas, hechos clínicos, paso 1, alergias, antecedentes o vía aérea) es true.
  *
  * Es PURO y testeable. La UI (resumen del anestesiólogo) decide el estado de cada
  * punto («Validado por [nombre]» o «Posponer o derivar»); aquí solo se derivan los
- * puntos ACTIVOS. Que haya puntos activos sin validar es lo que hace que la hoja del
- * paciente muestre el aviso de revisión.
+ * puntos ACTIVOS.
  */
 import type { CatalogoValidaciones, PuntoValidacionDef, TipoValidacion } from '../../datos/validaciones.ts';
 import type { ModuloPatologia, RespuestasModulos } from '../../datos/modulos.ts';
@@ -20,9 +26,12 @@ export interface PuntoValidacion {
   tipo: TipoValidacion;
   motivo: string;
   fuente?: string;
-  /** Origen que lo disparó («moduloId.preguntaId» o un hecho especial). */
+  /** Origen que lo disparó («moduloId.preguntaId» o un nombre de hecho). */
   origen: string;
 }
+
+/** Flags de hechos (escalas, hechos clínicos, paso 1, alergias, antecedentes, vía aérea). */
+export type HechosValidacion = Record<string, boolean>;
 
 export interface EntradaPuntosValidacion {
   catalogo: CatalogoValidaciones;
@@ -33,26 +42,25 @@ export interface EntradaPuntosValidacion {
   fechaIntervencion?: Date | null;
   fechaReferencia?: Date;
   /**
-   * Hechos especiales que no salen de una condición de módulo, ya evaluados en código.
-   * Hoy solo el stent reciente (true si `evaluarStent` lo considera reciente).
+   * Hechos ya evaluados en código (ids → true/false). Un `origen` del catálogo que
+   * no sea «moduloId.preguntaId» de un módulo activo se busca aquí.
    */
-  hechosEspeciales?: {
-    stentReciente?: boolean;
-  };
+  hechos?: HechosValidacion;
 }
 
 /** Orden de presentación: primero los de posponer (rojo), luego los de validar (amarillo). */
 const ORDEN_TIPO: Record<TipoValidacion, number> = { posponer: 0, validar: 1 };
 
 /**
- * Deriva los puntos de validación activos. Un punto está activo cuando su `origen`
- * se dispara: para los orígenes «moduloId.preguntaId», cuando el efecto del módulo
- * se emite; para los hechos especiales, cuando el flag correspondiente es true.
+ * Deriva los puntos de validación activos. Para los orígenes «moduloId.preguntaId»
+ * se consulta si el efecto del módulo se emite; para el resto (hechos con nombre),
+ * si su flag es true.
  */
 export function derivarPuntosValidacion(e: EntradaPuntosValidacion): PuntoValidacion[] {
   const defs: PuntoValidacionDef[] = [...e.catalogo.posponer, ...e.catalogo.validar];
+  const hechos = e.hechos ?? {};
 
-  // Conjunto de orígenes «moduloId.preguntaId» que se disparan en esta entrevista.
+  // Orígenes «moduloId.preguntaId» que se disparan en esta entrevista.
   const efectos = emitirEfectosModulos({
     modulos: e.modulos,
     respuestas: e.respuestas,
@@ -62,10 +70,15 @@ export function derivarPuntosValidacion(e: EntradaPuntosValidacion): PuntoValida
   });
   const origenesModulo = new Set(efectos.alertas.map((a) => a.origen));
 
-  const activo = (origen: string): boolean => {
-    if (origen === 'stent_reciente') return e.hechosEspeciales?.stentReciente === true;
-    return origenesModulo.has(origen);
+  // Ids de módulo conocidos, para distinguir «origen de módulo» de «hecho con nombre».
+  const idsModulo = new Set(e.modulos.map((m) => m.id));
+  const esOrigenDeModulo = (origen: string): boolean => {
+    const i = origen.indexOf('.');
+    return i > 0 && idsModulo.has(origen.slice(0, i));
   };
+
+  const activo = (origen: string): boolean =>
+    esOrigenDeModulo(origen) ? origenesModulo.has(origen) : hechos[origen] === true;
 
   const puntos: PuntoValidacion[] = [];
   const vistos = new Set<string>();

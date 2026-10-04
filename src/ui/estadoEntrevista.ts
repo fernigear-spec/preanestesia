@@ -16,6 +16,8 @@ export interface DatosBasicosUi extends DatosBasicos {
   semanasGestacion?: number;
   /** Módulo obstétrico activo (procedimiento obstétrico o embarazo confirmado). */
   moduloObstetrico?: boolean;
+  /** Testigo de Jehová o rechazo de hemoderivados (§5.8). Pregunta opcional. */
+  rechazaHemoderivados?: boolean;
 }
 
 /** Una intervención previa (paso 3, R3.2.10). */
@@ -92,6 +94,8 @@ export interface HabitosUi {
   subeDosPisos: 'si' | 'no' | 'dudoso';
   /** Ítems DASI positivos (solo si no sube dos pisos con claridad). */
   itemsDasi: string[];
+  /** Consumo de cocaína en la última semana (§5.7). Pregunta opcional. */
+  cocainaUltimaSemana?: boolean;
   /** Solo si edad >= 65: CFS 1-9 y 4AT. */
   cfs?: number;
   cuatroAt?: {
@@ -226,6 +230,18 @@ export interface EstadoEntrevista {
   medicacion: FarmacoTomadoUi[] | null;
   viaAerea: DatosViaAereaUi | null;
   consentimiento: ConsentimientoUi | null;
+  /**
+   * Estado de los puntos de validación clínica (§13 bis): por id de punto, si lo ha
+   * validado (nombre) o se ha marcado para posponer/derivar. Lo escribe el resumen
+   * del anestesiólogo y lo lee la hoja del paciente (aviso de revisión pendiente).
+   */
+  validaciones: Record<string, EstadoPuntoValidacion>;
+}
+
+/** Resolución de un punto de validación en la UI (§13 bis). */
+export interface EstadoPuntoValidacion {
+  validadoPor?: string;
+  posponer?: boolean;
 }
 
 /** Horas más habituales para los botones rápidos del paso 8 (tablet). */
@@ -254,6 +270,7 @@ export const ESTADO_INICIAL: EstadoEntrevista = {
   medicacion: null,
   viaAerea: null,
   consentimiento: null,
+  validaciones: {},
 };
 
 /** HEMSTOP vacío (todas las respuestas en «no»). */

@@ -49,6 +49,14 @@
           "tipo": "asa",
           "efecto": "ASA mínimo 3; en otro caso, mínimo 2",
           "fuente": "§5.3"
+        },
+        {
+          "cuando": "> 8,5 %",
+          "tipo": "alerta",
+          "gravedad": "roja",
+          "efecto": "HbA1c > 8,5 % (mal control): valorar posponer la cirugía programada para optimizar",
+          "fuente": "§5.3 (ESC 2022)",
+          "si": { "mayorQue": 8.5 }
         }
       ]
     },

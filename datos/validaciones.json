@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "descripcion": "Puntos de validación clínica (§13 bis). Mecanismo DISTINTO de las alertas: cada condición genera un punto que el anestesiólogo revisa al principio de su resumen. Dos tipos: 'posponer' (rojo, «valorar posponer la cirugía programada») y 'validar' (amarillo, «validar antes de la intervención»). No bloquean nada. Mientras quede alguno sin validar, la hoja del paciente incluye el aviso de revisión. El campo 'origen' identifica la condición que lo dispara: 'modulo.pregunta' (una condición ya codificada en datos/modulos/*.json, campo genera/si) o un hecho especial evaluado en código (p. ej. 'stent_reciente'). El 'motivo' y la 'fuente' que se muestran salen de aquí (editables).",
+    "descripcion": "Puntos de validación clínica (§13 bis). Mecanismo DISTINTO de las alertas: cada condición genera un punto que el anestesiólogo revisa al principio de su resumen. Dos tipos: 'posponer' (rojo, «valorar posponer la cirugía programada») y 'validar' (amarillo, «validar antes de la intervención»). No bloquean nada. Mientras quede alguno sin validar, la hoja del paciente incluye el aviso de revisión. El 'origen' identifica la condición que lo dispara: «moduloId.preguntaId» (condición codificada en datos/modulos/*.json, campo genera/si) o un HECHO con nombre (escala, hecho clínico calculado, dato del paso 1, de alergias, de antecedentes o de la vía aérea), evaluado en código y pasado al motor. Lista aprobada por el servicio; fuente principal: guía ESC 2022 de cirugía no cardiaca y docs/documento_fuente.md.",
     "version_contenido": "0.1.0",
     "fecha_revision": "2026-09-29",
     "tipos": {
@@ -11,9 +11,45 @@
 
   "posponer": [
     {
+      "id": "ic_descompensada_nyha",
+      "origen": "insuficiencia_cardiaca.nyha",
+      "motivo": "Insuficiencia cardiaca muy sintomática (NYHA III-IV): valorar posponer la cirugía programada.",
+      "fuente": "§5.1 (ESC 2022)"
+    },
+    {
+      "id": "ic_ingreso_reciente",
+      "origen": "insuficiencia_cardiaca.ultimo_ingreso",
+      "motivo": "Ingreso por insuficiencia cardiaca en los últimos 3 meses: valorar posponer la cirugía programada.",
+      "fuente": "§5.1 (ESC 2022)"
+    },
+    {
+      "id": "ic_empeoramiento",
+      "origen": "insuficiencia_cardiaca.empeoramiento_reciente",
+      "motivo": "Empeoramiento reciente de la insuficiencia cardiaca: valorar posponer la cirugía programada.",
+      "fuente": "§5.1 (ESC 2022)"
+    },
+    {
+      "id": "angina_inestable",
+      "origen": "cardiopatia_isquemica.angina_cambio_reciente",
+      "motivo": "Angina inestable o de reciente cambio: valorar posponer la cirugía programada.",
+      "fuente": "§5.1 (ESC 2022)"
+    },
+    {
+      "id": "angina_minimos_reposo",
+      "origen": "cardiopatia_isquemica.angina_esfuerzo",
+      "motivo": "Angina con mínimos esfuerzos o en reposo: valorar posponer la cirugía programada.",
+      "fuente": "§5.1 (ESC 2022)"
+    },
+    {
+      "id": "infarto_reciente",
+      "origen": "cardiopatia_isquemica.infarto_fecha",
+      "motivo": "Infarto de miocardio hace menos de 60 días: valorar posponer la cirugía programada.",
+      "fuente": "§5.1 (ESC 2022)"
+    },
+    {
       "id": "stent_reciente",
       "origen": "stent_reciente",
-      "motivo": "Stent coronario reciente: valorar diferir la cirugía programada; no suspender la doble antiagregación sin consultar con cardiología.",
+      "motivo": "Stent coronario reciente (< 6 meses programado, < 12 meses por SCA): valorar diferir la cirugía programada; no suspender la doble antiagregación sin consultar con cardiología.",
       "fuente": "§8.3 (ESC 2022)"
     },
     {
@@ -29,15 +65,15 @@
       "fuente": "§5.1 (ESC 2022)"
     },
     {
-      "id": "isquemia_inestable",
-      "origen": "cardiopatia_isquemica.angina_cambio_reciente",
-      "motivo": "Posible isquemia miocárdica inestable (angina de reciente comienzo o cambiante): valorar posponer la cirugía programada.",
+      "id": "valvulopatia_grave_sintomatica",
+      "origen": "valvulopatia.estenosis_aortica_grave_sintomatica",
+      "motivo": "Valvulopatía grave sintomática (en especial estenosis aórtica grave): valorar posponer la cirugía programada.",
       "fuente": "§5.1 (ESC 2022)"
     },
     {
       "id": "infeccion_respiratoria_activa",
       "origen": "infeccion_respiratoria.sintomas",
-      "motivo": "Infección respiratoria activa: valorar posponer la cirugía programada.",
+      "motivo": "Infección respiratoria activa o reciente (fiebre, tos productiva o cambio del esputo): valorar posponer la cirugía programada.",
       "fuente": "§5.2, §5.12"
     },
     {
@@ -47,16 +83,40 @@
       "fuente": "§5.16.4"
     },
     {
-      "id": "asma_aine",
-      "origen": "asma_epoc.desencadenantes",
-      "motivo": "Asma inducida por AINE/aspirina: evitar AINE perioperatorios; valorar posponer si hay crisis reciente.",
+      "id": "asma_epoc_agudizacion_crisis",
+      "origen": "asma_epoc.crisis_ultimo_mes",
+      "motivo": "EPOC o asma con agudización en el último mes: valorar posponer la cirugía programada.",
       "fuente": "§5.16.3"
     },
     {
-      "id": "trasplante_infeccion_activa",
+      "id": "asma_epoc_agudizacion_ingreso",
+      "origen": "asma_epoc.ingresos_ultimo_anio",
+      "motivo": "EPOC o asma con agudización reciente (ingreso): valorar posponer la cirugía programada.",
+      "fuente": "§5.16.3"
+    },
+    {
+      "id": "hba1c_alta",
+      "origen": "diabetes.hba1c",
+      "motivo": "HbA1c > 8,5 % (mal control): valorar posponer la cirugía programada para optimizar.",
+      "fuente": "§5.3 (ESC 2022)"
+    },
+    {
+      "id": "cuatro_at_alto",
+      "origen": "cuatro_at_alto",
+      "motivo": "4AT ≥ 4: posible delirium actual. Valorar posponer la cirugía programada.",
+      "fuente": "§6.10"
+    },
+    {
+      "id": "trasplante_rechazo_infeccion",
       "origen": "trasplante.infeccion_activa",
-      "motivo": "Infección activa en paciente inmunodeprimido (trasplante): valorar posponer la cirugía programada.",
+      "motivo": "Trasplante con infección activa (o rechazo reciente): valorar posponer la cirugía programada.",
       "fuente": "§5.16.15"
+    },
+    {
+      "id": "mtnd4_rojo",
+      "origen": "mtnd4_rojo",
+      "motivo": "mtND4: variante positiva o factores de riesgo, con procedimiento diferible y test disponible. Valorar diferir para el estudio genético.",
+      "fuente": "§9 (SEDAR 2026)"
     }
   ],
 
@@ -68,16 +128,58 @@
       "fuente": "§5.1"
     },
     {
-      "id": "trasplante_reciente",
-      "origen": "trasplante.fecha",
-      "motivo": "Trasplante reciente (menos de 6 meses): validar antes de la intervención.",
-      "fuente": "§5.16.15"
+      "id": "arritmia_sintomatica",
+      "origen": "fibrilacion_auricular.sincope_palpitaciones_reciente",
+      "motivo": "Fibrilación auricular u otra arritmia con palpitaciones o síncope recientes: validar antes de la intervención.",
+      "fuente": "§5.1"
     },
     {
-      "id": "inmunosupresores_fuera_rango",
-      "origen": "trasplante.niveles_en_rango",
-      "motivo": "Niveles de inmunosupresores fuera de rango: validar antes de la intervención.",
-      "fuente": "§5.16.15"
+      "id": "bloqueo_sin_marcapasos",
+      "origen": "fibrilacion_auricular.bloqueo_sin_marcapasos",
+      "motivo": "Bloqueo cardiaco conocido sin marcapasos: validar antes de la intervención.",
+      "fuente": "§5.1"
+    },
+    {
+      "id": "hipertension_pulmonar",
+      "origen": "hipertension_pulmonar.confirmada",
+      "motivo": "Hipertensión pulmonar: validar antes de la intervención.",
+      "fuente": "§5.2"
+    },
+    {
+      "id": "ta_alta_consulta",
+      "origen": "hta.tension_consulta",
+      "motivo": "Tensión arterial ≥ 180/110 en la consulta: validar antes de la intervención.",
+      "fuente": "§5.16.1"
+    },
+    {
+      "id": "asma_no_controlada_rescate",
+      "origen": "asma_epoc.rescate_semana",
+      "motivo": "Asma no controlada (uso de rescate más de 2 veces por semana): validar antes de la intervención.",
+      "fuente": "§5.16.3"
+    },
+    {
+      "id": "asma_aine",
+      "origen": "asma_epoc.desencadenantes",
+      "motivo": "Asma inducida por AINE/aspirina: validar antes de la intervención (evitar AINE perioperatorios).",
+      "fuente": "§5.16.3"
+    },
+    {
+      "id": "oxigeno_domiciliario",
+      "origen": "asma_epoc.oxigeno_domiciliario",
+      "motivo": "Oxigenoterapia domiciliaria: validar antes de la intervención.",
+      "fuente": "§5.16.4"
+    },
+    {
+      "id": "stop_bang_alto",
+      "origen": "stop_bang_alto",
+      "motivo": "STOP-Bang ≥ 5 sin diagnóstico de SAOS: validar antes de la intervención.",
+      "fuente": "§6.3"
+    },
+    {
+      "id": "saos_sin_cpap",
+      "origen": "saos.cumplimiento",
+      "motivo": "SAOS diagnosticado que no usa la CPAP: validar antes de la intervención.",
+      "fuente": "§5.2"
     },
     {
       "id": "hipoglucemias_inadvertidas_frec",
@@ -92,40 +194,64 @@
       "fuente": "§5.16.2"
     },
     {
-      "id": "asma_no_controlada_crisis",
-      "origen": "asma_epoc.crisis_ultimo_mes",
-      "motivo": "Asma no controlada (crisis en el último mes): validar antes de la intervención.",
-      "fuente": "§5.16.3"
+      "id": "corticoide_dosis_estres",
+      "origen": "corticoide_dosis_estres",
+      "motivo": "Corticoterapia con criterio de dosis de estrés perioperatoria: validar antes de la intervención.",
+      "fuente": "§5.3"
     },
     {
-      "id": "asma_no_controlada_ingreso",
-      "origen": "asma_epoc.ingresos_ultimo_anio",
-      "motivo": "Asma no controlada (ingreso en el último año): validar antes de la intervención.",
-      "fuente": "§5.16.3"
+      "id": "renal_terminal",
+      "origen": "enfermedad_renal.estadio",
+      "motivo": "Enfermedad renal terminal (filtrado < 15): validar antes de la intervención.",
+      "fuente": "§5.4"
     },
     {
-      "id": "asma_no_controlada_rescate",
-      "origen": "asma_epoc.rescate_semana",
-      "motivo": "Asma no controlada (uso de rescate más de 2 veces por semana): validar antes de la intervención.",
-      "fuente": "§5.16.3"
+      "id": "renal_dialisis",
+      "origen": "enfermedad_renal.dialisis",
+      "motivo": "Enfermedad renal en diálisis: validar antes de la intervención.",
+      "fuente": "§5.4"
     },
     {
-      "id": "inestabilidad_atloaxoidea",
-      "origen": "artritis_reumatoide.afectacion_cervical",
-      "motivo": "Posible inestabilidad atloaxoidea (artritis reumatoide con afectación cervical): validar la vía aérea y el cuello antes de la intervención.",
-      "fuente": "§5.16.13"
+      "id": "cirrosis_descompensada_ascitis",
+      "origen": "enfermedad_hepatica.ascitis",
+      "motivo": "Cirrosis con ascitis, varices o encefalopatía: validar antes de la intervención.",
+      "fuente": "§5.4"
     },
     {
-      "id": "miocardiopatia_sintomatica",
-      "origen": "miocardiopatia.sintomas",
-      "motivo": "Miocardiopatía sintomática: validar antes de la intervención.",
-      "fuente": "§5.1"
+      "id": "cirrosis_descompensada_varices",
+      "origen": "enfermedad_hepatica.varices",
+      "motivo": "Cirrosis con ascitis, varices o encefalopatía: validar antes de la intervención.",
+      "fuente": "§5.4"
     },
     {
-      "id": "hipertension_pulmonar",
-      "origen": "hipertension_pulmonar.confirmada",
-      "motivo": "Hipertensión pulmonar confirmada: validar antes de la intervención.",
-      "fuente": "§5.2"
+      "id": "cirrosis_descompensada_encefalopatia",
+      "origen": "enfermedad_hepatica.encefalopatia",
+      "motivo": "Cirrosis con ascitis, varices o encefalopatía: validar antes de la intervención.",
+      "fuente": "§5.4"
+    },
+    {
+      "id": "anemia_hb_baja",
+      "origen": "anemia.hemoglobina",
+      "motivo": "Hemoglobina < 10 g/dL: validar antes de la intervención (optimizar la anemia).",
+      "fuente": "§7.3"
+    },
+    {
+      "id": "hemstop_positivo",
+      "origen": "hemstop_positivo",
+      "motivo": "Cuestionario de sangrado HEMSTOP positivo, o plaquetopenia/coagulopatía conocidas: validar antes de la intervención.",
+      "fuente": "§5.5"
+    },
+    {
+      "id": "testigo_jehova",
+      "origen": "testigo_jehova",
+      "motivo": "Testigo de Jehová o rechazo de hemoderivados: validar antes de la intervención.",
+      "fuente": "§5.8"
+    },
+    {
+      "id": "enfermedad_neuromuscular",
+      "origen": "distrofia_muscular.insuficiencia_respiratoria",
+      "motivo": "Miastenia gravis, distrofias musculares u otra enfermedad neuromuscular: validar antes de la intervención.",
+      "fuente": "§5.16.11"
     },
     {
       "id": "epilepsia_no_controlada_crisis",
@@ -140,9 +266,111 @@
       "fuente": "§5.16.9"
     },
     {
+      "id": "deterioro_sin_capacidad",
+      "origen": "deterioro_cognitivo.capacidad_consentir",
+      "motivo": "Deterioro cognitivo sin capacidad para consentir: validar el consentimiento por representante legal antes de la intervención.",
+      "fuente": "§5.16.5"
+    },
+    {
+      "id": "hipertermia_maligna_pseudocolinesterasa",
+      "origen": "hipertermia_maligna_pseudocolinesterasa",
+      "motivo": "Hipertermia maligna o déficit de pseudocolinesterasa (personal o familiar): validar antes de la intervención.",
+      "fuente": "§5.15"
+    },
+    {
+      "id": "alergia_quirofano",
+      "origen": "reaccion_alergica_quirofano",
+      "motivo": "Reacción alérgica previa en quirófano: validar antes de la intervención.",
+      "fuente": "§5.6"
+    },
+    {
+      "id": "alergia_latex",
+      "origen": "alergia_latex",
+      "motivo": "Alergia al látex: validar antes de la intervención (quirófano libre de látex).",
+      "fuente": "§5.6"
+    },
+    {
+      "id": "intubacion_dificil_previa",
+      "origen": "intubacion_dificil_previa",
+      "motivo": "Intubación difícil previa confirmada: validar la vía aérea antes de la intervención.",
+      "fuente": "§6.2"
+    },
+    {
+      "id": "egri_alto",
+      "origen": "egri_alto",
+      "motivo": "EGRI ≥ 4 (predicción de vía aérea difícil): validar la vía aérea antes de la intervención.",
+      "fuente": "§6.2"
+    },
+    {
+      "id": "limitacion_cervical_reumatica",
+      "origen": "limitacion_cervical_reumatica",
+      "motivo": "Limitación cervical por artritis reumatoide o espondilitis: validar la vía aérea antes de la intervención.",
+      "fuente": "§6.2"
+    },
+    {
+      "id": "radioterapia_tumor_cervical",
+      "origen": "radioterapia_tumor_cervical",
+      "motivo": "Radioterapia o tumor cervical: validar la vía aérea antes de la intervención.",
+      "fuente": "§6.2"
+    },
+    {
+      "id": "inestabilidad_atloaxoidea",
+      "origen": "artritis_reumatoide.afectacion_cervical",
+      "motivo": "Posible inestabilidad atloaxoidea (artritis reumatoide con afectación cervical): validar la vía aérea y el cuello antes de la intervención.",
+      "fuente": "§5.16.13"
+    },
+    {
+      "id": "posible_embarazo",
+      "origen": "posible_embarazo",
+      "motivo": "Posibilidad de embarazo en cirugía no obstétrica: validar antes de la intervención.",
+      "fuente": "§5.9"
+    },
+    {
+      "id": "stbur_alto",
+      "origen": "stbur_alto",
+      "motivo": "STBUR ≥ 3 (riesgo respiratorio perioperatorio en el niño): validar antes de la intervención.",
+      "fuente": "§6.3"
+    },
+    {
+      "id": "cocaina_reciente",
+      "origen": "cocaina_reciente",
+      "motivo": "Consumo de cocaína en la última semana: validar antes de la intervención.",
+      "fuente": "§5.7"
+    },
+    {
+      "id": "audit_abstinencia",
+      "origen": "audit_abstinencia",
+      "motivo": "AUDIT-C ≥ 8 (riesgo de síndrome de abstinencia alcohólica): validar antes de la intervención.",
+      "fuente": "§6.9"
+    },
+    {
+      "id": "fragilidad_mets_riesgo_alto",
+      "origen": "fragilidad_mets_riesgo_alto",
+      "motivo": "Capacidad funcional < 4 METs o fragilidad (CFS ≥ 5) en cirugía de riesgo alto: validar antes de la intervención.",
+      "fuente": "§6.6"
+    },
+    {
+      "id": "trasplante_reciente",
+      "origen": "trasplante.fecha",
+      "motivo": "Trasplante reciente (menos de 6 meses): validar antes de la intervención.",
+      "fuente": "§5.16.15"
+    },
+    {
+      "id": "inmunosupresores_fuera_rango",
+      "origen": "trasplante.niveles_en_rango",
+      "motivo": "Niveles de inmunosupresores fuera de rango: validar antes de la intervención.",
+      "fuente": "§5.16.15"
+    },
+    {
+      "id": "miocardiopatia_sintomatica",
+      "origen": "miocardiopatia.sintomas",
+      "motivo": "Miocardiopatía sintomática: validar antes de la intervención.",
+      "fuente": "§5.1"
+    },
+    {
       "id": "em_brote_reciente",
       "origen": "esclerosis_multiple.ultimo_brote_fecha",
-      "motivo": "Brote reciente de esclerosis múltiple: validar antes de la intervención.",
+      "motivo": "Brote de esclerosis múltiple en los últimos 3 meses: validar antes de la intervención.",
       "fuente": "§5.16.12"
     }
   ]

@@ -48,6 +48,7 @@ export function PasoHabitos({ inicial, edadAnios, sexo, onContinuar, onVolver }:
   const [paquetesAnio, setPaquetesAnio] = useState(inicial?.paquetesAnio !== undefined ? String(inicial.paquetesAnio) : '');
   const [fechaAbandono, setFechaAbandono] = useState(inicial?.fechaAbandonoTabaco ?? '');
   const [descripcionTabaco, setDescripcionTabaco] = useState(inicial?.descripcionTabaco ?? '');
+  const [cocaina, setCocaina] = useState(inicial?.cocainaUltimaSemana ?? false);
 
   // AUDIT-C: ninguna pregunta es obligatoria (undefined = sin contestar).
   const [aFrec, setAFrec] = useState<number | undefined>(inicial?.auditFrecuencia);
@@ -101,6 +102,7 @@ export function PasoHabitos({ inicial, edadAnios, sexo, onContinuar, onVolver }:
     if ((tabaco === 'activo' || tabaco === 'exfumador') && descripcionTabaco.trim() !== '') {
       datos.descripcionTabaco = descripcionTabaco.trim();
     }
+    if (cocaina) datos.cocainaUltimaSemana = true;
     if (mayor) {
       if (cfsNum !== null) datos.cfs = cfsNum;
       datos.cuatroAt = at4;
@@ -156,6 +158,13 @@ export function PasoHabitos({ inicial, edadAnios, sexo, onContinuar, onVolver }:
       ) : (
         <p className="aviso aviso-info" role="note" aria-live="polite">AUDIT-C no completado (no genera alertas ni anexo).</p>
       )}
+
+      <div className="campo">
+        <label className="radio-tarjeta">
+          <input type="checkbox" checked={cocaina} onChange={(e) => setCocaina(e.target.checked)} />
+          Consumo de cocaína en la última semana
+        </label>
+      </div>
 
       <h3>Capacidad funcional</h3>
       <p>¿Puede subir dos pisos de escaleras sin pararse?</p>

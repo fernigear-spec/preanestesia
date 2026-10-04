@@ -1261,6 +1261,7 @@ _Fuente: docs/documento_fuente.md §5.5_
 - **Última hemoglobina** (g/dL) — _numero_
   - Por qué: Una Hb < 13 g/dL antes de cirugía con sangrado previsible aconseja optimizar la anemia y pedir ferritina.
   - Genera → 🧪 prueba: si < 13 g/dL → apoya pedir hemograma y ferritina; valorar optimizar la anemia. _(§7.3)_
+  - Genera → 🔔 alerta amarilla: si < 10 g/dL → hemoglobina < 10 g/dL: validar antes de la intervención (optimizar la anemia). _(§7.3)_ **[se emite]**
 - **Fecha de esa hemoglobina** — _fecha_
 - **¿Ferropenia (falta de hierro) conocida?** — _boolean_
 - **¿Sangrado reciente?** — _boolean_
@@ -1321,6 +1322,7 @@ _Fuente: docs/documento_fuente.md §5.2, §5.16.3, §5.16.4_
 - **¿Usa oxígeno en casa?** — _boolean_
   - Por qué: La oxigenoterapia domiciliaria sube la clase de riesgo del paciente.
   - Genera → 📊 clase de riesgo: si = sí → sube la clase de riesgo del paciente a alta. _(§5.2)_
+  - Genera → 🔔 alerta amarilla: si = sí → oxigenoterapia domiciliaria: validar antes de la intervención. _(§5.16.4)_ **[se emite]**
 - **Tipo de oxígeno domiciliario** — _opcion_: Nocturno / Continuo
 - **¿Usa CPAP o BiPAP?** — _boolean_
 - **¿Tos con expectoración habitual?** — _boolean_
@@ -1349,6 +1351,8 @@ _Fuente: docs/documento_fuente.md §5.1_
 - **¿Ha tenido un infarto o un síndrome coronario agudo?** — _boolean_
   - Por qué: Un infarto reciente aumenta el riesgo perioperatorio y cambia el manejo de la medicación del corazón.
 - **Fecha del infarto o síndrome coronario agudo** — _fecha_
+  - Por qué: Un infarto de menos de 60 días aconseja posponer la cirugía programada.
+  - Genera → 🔔 alerta roja: si infarto hace menos de 60 días → infarto de miocardio hace menos de 60 días: valorar posponer la cirugía programada. _(§5.1 (ESC 2022))_ **[se emite]**
 - **¿Le han revascularizado las arterias del corazón?** — _opcion_: No / Sí, con cateterismo (angioplastia/stent) / Sí, con cirugía (bypass)
 - **¿La revascularización fue completa o incompleta?** — _opcion_: Completa / Incompleta / No lo sabe
 - **¿Le pusieron un stent (muelle) en las arterias del corazón?** — _boolean_
@@ -1361,6 +1365,7 @@ _Fuente: docs/documento_fuente.md §5.1_
 - **¿Con qué esfuerzo le aparece la angina?** — _opcion_: Solo con grandes esfuerzos / Con esfuerzos moderados / Con mínimos esfuerzos / En reposo
   - Genera → 📊 clase de riesgo: si = mínimos esfuerzos o reposo → sube la clase de riesgo del paciente a alta (angina activa). _(§5.1)_
   - Genera → 🅰 ASA: si = mínimos esfuerzos o reposo → ASA mínimo 4 (angina activa). _(§5.1)_
+  - Genera → 🔔 alerta roja: si = mínimos esfuerzos o reposo → angina con mínimos esfuerzos o en reposo: valorar posponer la cirugía programada. _(§5.1 (ESC 2022))_ **[se emite]**
 - **¿La angina ha cambiado (más frecuente o más intensa) en las últimas semanas?** — _boolean_
   - Por qué: Una angina que cambia recientemente puede indicar isquemia inestable: es una señal de alerta.
   - Genera → 🔔 alerta roja: si = sí → posible isquemia inestable. _(§5.1)_ **[se emite]**
@@ -1422,6 +1427,7 @@ _Fuente: docs/documento_fuente.md §5.3, §5.16.2, §8.5_
   - Por qué: Una HbA1c > 8,5 % indica mal control y puede aconsejar optimizar antes de una cirugía programada.
   - Genera → 📊 clase de riesgo: si > 8,5 % → sube la clase de riesgo del paciente a moderada. _(§5.3)_
   - Genera → 🅰 ASA: si > 8,5 % → ASA mínimo 3; en otro caso, mínimo 2. _(§5.3)_
+  - Genera → 🔔 alerta roja: si > 8,5 % → HbA1c > 8,5 % (mal control): valorar posponer la cirugía programada para optimizar. _(§5.3 (ESC 2022))_ **[se emite]**
 - **Fecha de la HbA1c** — _fecha_
 - **Tratamiento** — _opcion_: Solo dieta / Pastillas / Insulina / Pastillas e insulina
 - **Frecuencia de hipoglucemias (bajadas de azúcar)** — _opcion_: Nunca / Alguna al mes / Alguna a la semana / A diario
@@ -1473,8 +1479,14 @@ _Fuente: docs/documento_fuente.md §5.4_
 - **¿Tiene cirrosis?** — _boolean_
   - Por qué: La hepatopatía conocida hace que se añadan transaminasas y bilirrubina a la analítica.
 - **¿Ascitis (líquido en el abdomen)?** — _boolean_
+  - Por qué: La cirrosis con ascitis es hepatopatía descompensada: aconseja validar antes de la intervención.
+  - Genera → 🔔 alerta amarilla: si = sí → cirrosis con ascitis, varices o encefalopatía: validar antes de la intervención. _(§5.4)_ **[se emite]**
 - **¿Varices esofágicas conocidas?** — _boolean_
+  - Por qué: La cirrosis con varices es hepatopatía descompensada: aconseja validar antes de la intervención.
+  - Genera → 🔔 alerta amarilla: si = sí → cirrosis con ascitis, varices o encefalopatía: validar antes de la intervención. _(§5.4)_ **[se emite]**
 - **¿Episodios de encefalopatía (confusión)?** — _boolean_
+  - Por qué: La cirrosis con encefalopatía es hepatopatía descompensada: aconseja validar antes de la intervención.
+  - Genera → 🔔 alerta amarilla: si = sí → cirrosis con ascitis, varices o encefalopatía: validar antes de la intervención. _(§5.4)_ **[se emite]**
 - **¿Plaquetas bajas conocidas?** — _boolean_
 
 ### Enfermedad inflamatoria intestinal
@@ -1498,10 +1510,13 @@ _Fuente: docs/documento_fuente.md §5.4, §6.7_
 - **Estadio o filtrado conocido** — _opcion_: No lo sabe / Leve (filtrado > 60) / Moderada (filtrado 30-60) / Grave (filtrado 15-30) / Terminal (filtrado < 15)
   - Genera → 📊 clase de riesgo: si = terminal → sube la clase de riesgo del paciente a alta. _(§5.4)_
   - Genera → 🅰 ASA: si = terminal → ASA mínimo 4 (moderada/grave: mínimo 3). _(§5.4)_
+  - Genera → 🔔 alerta amarilla: si = terminal (filtrado < 15) → enfermedad renal terminal (filtrado < 15): validar antes de la intervención. _(§5.4)_ **[se emite]**
 - **Creatinina más reciente** (mg/dL) — _numero_
   - Por qué: La creatinina permite calcular el aclaramiento, del que dependen los plazos de varios anticoagulantes.
 - **Fecha de esa creatinina** — _fecha_
 - **¿Está en diálisis?** — _opcion_: No / Sí, hemodiálisis / Sí, diálisis peritoneal
+  - Por qué: La enfermedad renal en diálisis aconseja validar el momento y la coordinación con nefrología antes de la intervención.
+  - Genera → 🔔 alerta amarilla: si = en hemodiálisis o peritoneal → enfermedad renal en diálisis: validar antes de la intervención. _(§5.4)_ **[se emite]**
 - **Días de diálisis y brazo de la fístula** — _texto_
 - **¿Tiene un trasplante renal?** — _boolean_
 - **¿Tiene proteinuria o nefropatía conocida?** — _boolean_
@@ -1554,6 +1569,12 @@ _Fuente: docs/documento_fuente.md §5.1, §6.5_
 - **Fecha del ictus/AIT/embolia** — _fecha_
   - Por qué: Un ictus/AIT de menos de 3 meses es alerta roja (valorar posponer la cirugía programada).
   - Genera → 🔔 alerta roja: si ictus/AIT en los últimos 3 meses → ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada. _(§5.1 (ESC 2022))_ **[se emite]**
+- **¿Palpitaciones o síncope (desmayo) recientes?** — _boolean_
+  - Por qué: Las palpitaciones o síncopes recientes con una arritmia aconsejan validar el control del ritmo antes de la intervención.
+  - Genera → 🔔 alerta amarilla: si = sí → arritmia con palpitaciones o síncope recientes: validar antes de la intervención. _(§5.1)_ **[se emite]**
+- **¿Bloqueo cardiaco conocido sin marcapasos?** — _boolean_
+  - Por qué: Un bloqueo cardiaco conocido sin marcapasos aconseja validar antes de la intervención.
+  - Genera → 🔔 alerta amarilla: si = sí → bloqueo cardiaco conocido sin marcapasos: validar antes de la intervención. _(§5.1)_ **[se emite]**
 
 ### Hipertensión pulmonar
 
@@ -1584,6 +1605,9 @@ _Fuente: docs/documento_fuente.md §5.1, §5.16.1_
 - **Síntomas de mal control** — _opcion_multiple_: Cefalea frecuente / Acúfenos (pitidos en los oídos) / Visión borrosa
   - Por qué: Cefalea, acúfenos o visión borrosa pueden indicar que la tensión no está bien controlada.
   - Genera → 🔔 alerta amarilla: si alguno marcado → posible HTA mal controlada. _(§5.16.1)_ **[se emite]**
+- **Tensión medida hoy en la consulta** — _opcion_: Menor de 180/110 / 180/110 o más / No medida
+  - Por qué: Una tensión ≥ 180/110 en la consulta aconseja validar el control antes de la intervención.
+  - Genera → 🔔 alerta amarilla: si = 180/110 o más → tensión arterial ≥ 180/110 en la consulta: validar antes de la intervención. _(§5.16.1)_ **[se emite]**
 
 ### Ictus/AIT y trombosis venosa (TVP/TEP)
 
@@ -1616,12 +1640,18 @@ _Fuente: docs/documento_fuente.md §5.1_
   - Por qué: La clase NYHA describe cuánto le limita el corazón y sube la clase de riesgo del paciente.
   - Genera → 📊 clase de riesgo: si = III o IV → sube la clase de riesgo del paciente a alta. _(§5.1)_
   - Genera → 🅰 ASA: si = III o IV → ASA mínimo 4. _(§5.1)_
+  - Genera → 🔔 alerta roja: si = III o IV → insuficiencia cardiaca muy sintomática (NYHA III-IV): valorar posponer la cirugía programada. _(§5.1 (ESC 2022))_ **[se emite]**
 - **Fracción de eyección (FEVI), si se conoce** (%) — _numero_
   - Por qué: Una FEVI reducida (≤ 40 %) hace que los IECA/ARA-II se mantengan el día de la cirugía.
   - Genera → 💊 regla: si ≤ 40 % → los IECA/ARA-II se mantienen el día de la cirugía. _(§8)_
 - **¿Le han dicho que tiene el corazón «débil» o con la función disminuida (disfunción sistólica)?** — _boolean_
   - Genera → 💊 regla: si = sí → los IECA/ARA-II se mantienen el día de la cirugía. _(§8)_
 - **Fecha del último ingreso por insuficiencia cardiaca** — _fecha_
+  - Por qué: Un ingreso por insuficiencia cardiaca en los últimos 3 meses indica una posible descompensación: puede aconsejar posponer la cirugía programada.
+  - Genera → 🔔 alerta roja: si ingreso en los últimos 3 meses → ingreso por insuficiencia cardiaca en los últimos 3 meses: valorar posponer la cirugía programada. _(§5.1 (ESC 2022))_ **[se emite]**
+- **¿Ha empeorado últimamente (más ahogo, más hinchazón o más fatiga que de costumbre)?** — _boolean_
+  - Por qué: Un empeoramiento reciente sugiere una insuficiencia cardiaca descompensada: puede aconsejar posponer la cirugía programada.
+  - Genera → 🔔 alerta roja: si = sí → empeoramiento reciente de la insuficiencia cardiaca: valorar posponer la cirugía programada. _(§5.1 (ESC 2022))_ **[se emite]**
 - **¿Necesita dormir incorporado o con varias almohadas (ortopnea)?** — _boolean_
 - **¿Tiene hinchazón de piernas (edemas)?** — _boolean_
 - **Fecha del último ecocardiograma** — _fecha_
@@ -1737,6 +1767,8 @@ _Fuente: docs/documento_fuente.md §5.2, §6.3_
   - Por qué: Con diagnóstico confirmado no hace falta calcular STOP-Bang; sin diagnóstico, se calcula.
 - **¿Usa CPAP o BiPAP?** — _boolean_
 - **¿La usa la mayoría de las noches?** — _boolean_
+  - Por qué: Un SAOS diagnosticado que no usa la CPAP aconseja validar antes de la intervención.
+  - Genera → 🔔 alerta amarilla: si = no la usa habitualmente → SAOS diagnosticado que no usa la CPAP habitualmente: validar antes de la intervención. _(§5.2)_ **[se emite]**
 - **Presión de la CPAP (si la sabe)** — _texto_
 - **¿Ronca fuerte (se oye a través de la puerta o molesta a quien duerme al lado)?** — _boolean_
   - Por qué: Es uno de los cuatro componentes principales del STOP-Bang (§6.3).
@@ -1801,6 +1833,9 @@ _Fuente: docs/documento_fuente.md §5.1_
   - Por qué: Si no hay ecocardiograma en los últimos 12 meses o hay síntomas nuevos, se solicita uno.
 - **¿Síntomas nuevos (más disnea, síncope o angina)?** — _boolean_
   - Genera → 🧪 prueba: si = sí → ecocardiograma. _(§7.3)_
+- **¿Estenosis aórtica grave con síntomas (síncope, angina o disnea)?** — _boolean_
+  - Por qué: La estenosis aórtica grave sintomática es una valvulopatía de alto riesgo: puede aconsejar posponer la cirugía programada.
+  - Genera → 🔔 alerta roja: si = sí → valvulopatía grave sintomática (estenosis aórtica grave sintomática): valorar posponer la cirugía programada. _(§5.1 (ESC 2022))_ **[se emite]**
 
 ## 16 bis. Puntos de validación clínica (§13 bis)
 
@@ -1810,33 +1845,71 @@ _Mecanismo distinto de las alertas: condiciones que el anestesiólogo revisa al 
 
 | Motivo | Origen | Fuente |
 | --- | --- | --- |
-| Stent coronario reciente: valorar diferir la cirugía programada; no suspender la doble antiagregación sin consultar con cardiología. | `stent_reciente` | §8.3 (ESC 2022) |
+| Insuficiencia cardiaca muy sintomática (NYHA III-IV): valorar posponer la cirugía programada. | `insuficiencia_cardiaca.nyha` | §5.1 (ESC 2022) |
+| Ingreso por insuficiencia cardiaca en los últimos 3 meses: valorar posponer la cirugía programada. | `insuficiencia_cardiaca.ultimo_ingreso` | §5.1 (ESC 2022) |
+| Empeoramiento reciente de la insuficiencia cardiaca: valorar posponer la cirugía programada. | `insuficiencia_cardiaca.empeoramiento_reciente` | §5.1 (ESC 2022) |
+| Angina inestable o de reciente cambio: valorar posponer la cirugía programada. | `cardiopatia_isquemica.angina_cambio_reciente` | §5.1 (ESC 2022) |
+| Angina con mínimos esfuerzos o en reposo: valorar posponer la cirugía programada. | `cardiopatia_isquemica.angina_esfuerzo` | §5.1 (ESC 2022) |
+| Infarto de miocardio hace menos de 60 días: valorar posponer la cirugía programada. | `cardiopatia_isquemica.infarto_fecha` | §5.1 (ESC 2022) |
+| Stent coronario reciente (< 6 meses programado, < 12 meses por SCA): valorar diferir la cirugía programada; no suspender la doble antiagregación sin consultar con cardiología. | `stent_reciente` | §8.3 (ESC 2022) |
 | Ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada. | `ictus_o_tvp.ictus_fecha` | §5.1 (ESC 2022) |
 | Ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada. | `fibrilacion_auricular.ictus_ait_fecha` | §5.1 (ESC 2022) |
-| Posible isquemia miocárdica inestable (angina de reciente comienzo o cambiante): valorar posponer la cirugía programada. | `cardiopatia_isquemica.angina_cambio_reciente` | §5.1 (ESC 2022) |
-| Infección respiratoria activa: valorar posponer la cirugía programada. | `infeccion_respiratoria.sintomas` | §5.2, §5.12 |
+| Valvulopatía grave sintomática (en especial estenosis aórtica grave): valorar posponer la cirugía programada. | `valvulopatia.estenosis_aortica_grave_sintomatica` | §5.1 (ESC 2022) |
+| Infección respiratoria activa o reciente (fiebre, tos productiva o cambio del esputo): valorar posponer la cirugía programada. | `infeccion_respiratoria.sintomas` | §5.2, §5.12 |
 | Síntomas respiratorios nuevos (posible infección respiratoria activa): valorar posponer la cirugía programada. | `asma_epoc.sintomas_respiratorios_nuevos` | §5.16.4 |
-| Asma inducida por AINE/aspirina: evitar AINE perioperatorios; valorar posponer si hay crisis reciente. | `asma_epoc.desencadenantes` | §5.16.3 |
-| Infección activa en paciente inmunodeprimido (trasplante): valorar posponer la cirugía programada. | `trasplante.infeccion_activa` | §5.16.15 |
+| EPOC o asma con agudización en el último mes: valorar posponer la cirugía programada. | `asma_epoc.crisis_ultimo_mes` | §5.16.3 |
+| EPOC o asma con agudización reciente (ingreso): valorar posponer la cirugía programada. | `asma_epoc.ingresos_ultimo_anio` | §5.16.3 |
+| HbA1c > 8,5 % (mal control): valorar posponer la cirugía programada para optimizar. | `diabetes.hba1c` | §5.3 (ESC 2022) |
+| 4AT ≥ 4: posible delirium actual. Valorar posponer la cirugía programada. | `cuatro_at_alto` | §6.10 |
+| Trasplante con infección activa (o rechazo reciente): valorar posponer la cirugía programada. | `trasplante.infeccion_activa` | §5.16.15 |
+| mtND4: variante positiva o factores de riesgo, con procedimiento diferible y test disponible. Valorar diferir para el estudio genético. | `mtnd4_rojo` | §9 (SEDAR 2026) |
 
 **🟡 Validar antes de la intervención**
 
 | Motivo | Origen | Fuente |
 | --- | --- | --- |
 | TVP o TEP de menos de 3 meses: validar antes de la intervención. | `ictus_o_tvp.tvp_tep_fecha` | §5.1 |
-| Trasplante reciente (menos de 6 meses): validar antes de la intervención. | `trasplante.fecha` | §5.16.15 |
-| Niveles de inmunosupresores fuera de rango: validar antes de la intervención. | `trasplante.niveles_en_rango` | §5.16.15 |
+| Fibrilación auricular u otra arritmia con palpitaciones o síncope recientes: validar antes de la intervención. | `fibrilacion_auricular.sincope_palpitaciones_reciente` | §5.1 |
+| Bloqueo cardiaco conocido sin marcapasos: validar antes de la intervención. | `fibrilacion_auricular.bloqueo_sin_marcapasos` | §5.1 |
+| Hipertensión pulmonar: validar antes de la intervención. | `hipertension_pulmonar.confirmada` | §5.2 |
+| Tensión arterial ≥ 180/110 en la consulta: validar antes de la intervención. | `hta.tension_consulta` | §5.16.1 |
+| Asma no controlada (uso de rescate más de 2 veces por semana): validar antes de la intervención. | `asma_epoc.rescate_semana` | §5.16.3 |
+| Asma inducida por AINE/aspirina: validar antes de la intervención (evitar AINE perioperatorios). | `asma_epoc.desencadenantes` | §5.16.3 |
+| Oxigenoterapia domiciliaria: validar antes de la intervención. | `asma_epoc.oxigeno_domiciliario` | §5.16.4 |
+| STOP-Bang ≥ 5 sin diagnóstico de SAOS: validar antes de la intervención. | `stop_bang_alto` | §6.3 |
+| SAOS diagnosticado que no usa la CPAP: validar antes de la intervención. | `saos.cumplimiento` | §5.2 |
 | Hipoglucemias frecuentes: validar el control de la diabetes antes de la intervención. | `diabetes.frecuencia_hipoglucemias` | §5.16.2 |
 | Hipoglucemias inadvertidas (no las detecta): validar el control de la diabetes antes de la intervención. | `diabetes.detecta_hipoglucemias` | §5.16.2 |
-| Asma no controlada (crisis en el último mes): validar antes de la intervención. | `asma_epoc.crisis_ultimo_mes` | §5.16.3 |
-| Asma no controlada (ingreso en el último año): validar antes de la intervención. | `asma_epoc.ingresos_ultimo_anio` | §5.16.3 |
-| Asma no controlada (uso de rescate más de 2 veces por semana): validar antes de la intervención. | `asma_epoc.rescate_semana` | §5.16.3 |
-| Posible inestabilidad atloaxoidea (artritis reumatoide con afectación cervical): validar la vía aérea y el cuello antes de la intervención. | `artritis_reumatoide.afectacion_cervical` | §5.16.13 |
-| Miocardiopatía sintomática: validar antes de la intervención. | `miocardiopatia.sintomas` | §5.1 |
-| Hipertensión pulmonar confirmada: validar antes de la intervención. | `hipertension_pulmonar.confirmada` | §5.2 |
+| Corticoterapia con criterio de dosis de estrés perioperatoria: validar antes de la intervención. | `corticoide_dosis_estres` | §5.3 |
+| Enfermedad renal terminal (filtrado < 15): validar antes de la intervención. | `enfermedad_renal.estadio` | §5.4 |
+| Enfermedad renal en diálisis: validar antes de la intervención. | `enfermedad_renal.dialisis` | §5.4 |
+| Cirrosis con ascitis, varices o encefalopatía: validar antes de la intervención. | `enfermedad_hepatica.ascitis` | §5.4 |
+| Cirrosis con ascitis, varices o encefalopatía: validar antes de la intervención. | `enfermedad_hepatica.varices` | §5.4 |
+| Cirrosis con ascitis, varices o encefalopatía: validar antes de la intervención. | `enfermedad_hepatica.encefalopatia` | §5.4 |
+| Hemoglobina < 10 g/dL: validar antes de la intervención (optimizar la anemia). | `anemia.hemoglobina` | §7.3 |
+| Cuestionario de sangrado HEMSTOP positivo, o plaquetopenia/coagulopatía conocidas: validar antes de la intervención. | `hemstop_positivo` | §5.5 |
+| Testigo de Jehová o rechazo de hemoderivados: validar antes de la intervención. | `testigo_jehova` | §5.8 |
+| Miastenia gravis, distrofias musculares u otra enfermedad neuromuscular: validar antes de la intervención. | `distrofia_muscular.insuficiencia_respiratoria` | §5.16.11 |
 | Epilepsia no controlada (crisis reciente): validar antes de la intervención. | `epilepsia.ultima_crisis` | §5.16.9 |
 | Epilepsia no controlada (estatus epiléptico previo): validar antes de la intervención. | `epilepsia.estatus_previo` | §5.16.9 |
-| Brote reciente de esclerosis múltiple: validar antes de la intervención. | `esclerosis_multiple.ultimo_brote_fecha` | §5.16.12 |
+| Deterioro cognitivo sin capacidad para consentir: validar el consentimiento por representante legal antes de la intervención. | `deterioro_cognitivo.capacidad_consentir` | §5.16.5 |
+| Hipertermia maligna o déficit de pseudocolinesterasa (personal o familiar): validar antes de la intervención. | `hipertermia_maligna_pseudocolinesterasa` | §5.15 |
+| Reacción alérgica previa en quirófano: validar antes de la intervención. | `reaccion_alergica_quirofano` | §5.6 |
+| Alergia al látex: validar antes de la intervención (quirófano libre de látex). | `alergia_latex` | §5.6 |
+| Intubación difícil previa confirmada: validar la vía aérea antes de la intervención. | `intubacion_dificil_previa` | §6.2 |
+| EGRI ≥ 4 (predicción de vía aérea difícil): validar la vía aérea antes de la intervención. | `egri_alto` | §6.2 |
+| Limitación cervical por artritis reumatoide o espondilitis: validar la vía aérea antes de la intervención. | `limitacion_cervical_reumatica` | §6.2 |
+| Radioterapia o tumor cervical: validar la vía aérea antes de la intervención. | `radioterapia_tumor_cervical` | §6.2 |
+| Posible inestabilidad atloaxoidea (artritis reumatoide con afectación cervical): validar la vía aérea y el cuello antes de la intervención. | `artritis_reumatoide.afectacion_cervical` | §5.16.13 |
+| Posibilidad de embarazo en cirugía no obstétrica: validar antes de la intervención. | `posible_embarazo` | §5.9 |
+| STBUR ≥ 3 (riesgo respiratorio perioperatorio en el niño): validar antes de la intervención. | `stbur_alto` | §6.3 |
+| Consumo de cocaína en la última semana: validar antes de la intervención. | `cocaina_reciente` | §5.7 |
+| AUDIT-C ≥ 8 (riesgo de síndrome de abstinencia alcohólica): validar antes de la intervención. | `audit_abstinencia` | §6.9 |
+| Capacidad funcional < 4 METs o fragilidad (CFS ≥ 5) en cirugía de riesgo alto: validar antes de la intervención. | `fragilidad_mets_riesgo_alto` | §6.6 |
+| Trasplante reciente (menos de 6 meses): validar antes de la intervención. | `trasplante.fecha` | §5.16.15 |
+| Niveles de inmunosupresores fuera de rango: validar antes de la intervención. | `trasplante.niveles_en_rango` | §5.16.15 |
+| Miocardiopatía sintomática: validar antes de la intervención. | `miocardiopatia.sintomas` | §5.1 |
+| Brote de esclerosis múltiple en los últimos 3 meses: validar antes de la intervención. | `esclerosis_multiple.ultimo_brote_fecha` | §5.16.12 |
 
 ## 17. Pendiente de revisión por el servicio
 

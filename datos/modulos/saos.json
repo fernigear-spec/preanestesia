@@ -29,7 +29,18 @@
         "pregunta": "cpap",
         "igual": true
       },
-      "etiquetaSap": "usa la CPAP habitualmente"
+      "porque": "Un SAOS diagnosticado que no usa la CPAP aconseja validar antes de la intervención.",
+      "etiquetaSap": "usa la CPAP habitualmente",
+      "genera": [
+        {
+          "cuando": "= no la usa habitualmente",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "SAOS diagnosticado que no usa la CPAP habitualmente: validar antes de la intervención",
+          "fuente": "§5.2",
+          "si": { "igual": false }
+        }
+      ]
     },
     {
       "id": "presion",

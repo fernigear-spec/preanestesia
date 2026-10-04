@@ -50,7 +50,9 @@ function valorQueSatisface(cond: CondicionEfecto): unknown {
   if (cond.contieneAlguno !== undefined) return [cond.contieneAlguno[0]];
   if (cond.mayorQue !== undefined) return cond.mayorQue + 1;
   if (cond.mayorIgualQue !== undefined) return cond.mayorIgualQue;
+  if (cond.menorQue !== undefined) return cond.menorQue - 1;
   if (cond.recienteMeses !== undefined) return IV.toISOString().slice(0, 10);
+  if (cond.recienteDias !== undefined) return IV.toISOString().slice(0, 10);
   if (cond.sinFechaRecienteMeses !== undefined) {
     const antigua = new Date(IV.getTime());
     antigua.setMonth(antigua.getMonth() - cond.sinFechaRecienteMeses - 2);
@@ -67,21 +69,25 @@ describe('§13 bis · puntos de validación clínica', () => {
     expect(CATALOGO.validar.every((p) => p.tipo === 'validar')).toBeTrue();
   });
 
-  it('coherencia: cada origen existe (condición de módulo que se emite, o hecho especial)', () => {
-    const especiales = new Set(['stent_reciente']);
+  const idsModulo = new Set(MODULOS.map((m) => m.id));
+  const esOrigenModulo = (origen: string): boolean => {
+    const i = origen.indexOf('.');
+    return i > 0 && idsModulo.has(origen.slice(0, i));
+  };
+
+  it('coherencia: cada origen de módulo existe y emite una alerta con condición', () => {
     const fallos: string[] = [];
     for (const d of TODOS) {
-      if (especiales.has(d.origen)) continue;
-      if (condicionDe(d.origen) === null) fallos.push(`${d.id} → origen inexistente: ${d.origen}`);
+      if (!esOrigenModulo(d.origen)) continue;
+      if (condicionDe(d.origen) === null) fallos.push(`${d.id} → origen de módulo inexistente o sin alerta: ${d.origen}`);
     }
     expect(fallos).toEqual([]);
   });
 
   it('cada punto con origen de módulo se DISPARA cuando su condición se cumple, con el tipo correcto', () => {
-    const especiales = new Set(['stent_reciente']);
     const fallos: string[] = [];
     for (const d of TODOS) {
-      if (especiales.has(d.origen)) continue;
+      if (!esOrigenModulo(d.origen)) continue;
       const c = condicionDe(d.origen)!;
       const respuestas = { [c.moduloId]: { [c.preguntaId]: valorQueSatisface(c.si) as never } };
       const puntos = derivarPuntosValidacion({
@@ -94,6 +100,30 @@ describe('§13 bis · puntos de validación clínica', () => {
     expect(fallos).toEqual([]);
   });
 
+  it('cada punto con origen de HECHO se DISPARA cuando su flag es true, con el tipo correcto', () => {
+    const fallos: string[] = [];
+    for (const d of TODOS) {
+      if (esOrigenModulo(d.origen)) continue;
+      const puntos = derivarPuntosValidacion({
+        catalogo: CATALOGO, modulos: MODULOS, respuestas: {}, activos: new Set(), fechaIntervencion: IV,
+        hechos: { [d.origen]: true },
+      });
+      const encontrado = puntos.find((p) => p.id === d.id);
+      if (!encontrado) fallos.push(`${d.id} no se disparó con el hecho ${d.origen}`);
+      else if (encontrado.tipo !== d.tipo) fallos.push(`${d.id} tipo ${encontrado.tipo} ≠ ${d.tipo}`);
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  it('un hecho en false no dispara su punto', () => {
+    const hechoDef = TODOS.find((d) => !esOrigenModulo(d.origen))!;
+    const puntos = derivarPuntosValidacion({
+      catalogo: CATALOGO, modulos: MODULOS, respuestas: {}, activos: new Set(), fechaIntervencion: IV,
+      hechos: { [hechoDef.origen]: false },
+    });
+    expect(puntos.some((p) => p.id === hechoDef.id)).toBeFalse();
+  });
+
   it('sin ningún disparador no hay puntos de validación', () => {
     const puntos = derivarPuntosValidacion({
       catalogo: CATALOGO, modulos: MODULOS, respuestas: {}, activos: new Set(), fechaIntervencion: IV,
@@ -104,7 +134,7 @@ describe('§13 bis · puntos de validación clínica', () => {
   it('stent reciente → punto "posponer" (rojo)', () => {
     const puntos = derivarPuntosValidacion({
       catalogo: CATALOGO, modulos: MODULOS, respuestas: {}, activos: new Set(), fechaIntervencion: IV,
-      hechosEspeciales: { stentReciente: true },
+      hechos: { stent_reciente: true },
     });
     const stent = puntos.find((p) => p.id === 'stent_reciente');
     expect(stent?.tipo).toBe('posponer');
@@ -114,7 +144,7 @@ describe('§13 bis · puntos de validación clínica', () => {
   it('sin stent reciente, el punto del stent no aparece', () => {
     const puntos = derivarPuntosValidacion({
       catalogo: CATALOGO, modulos: MODULOS, respuestas: {}, activos: new Set(), fechaIntervencion: IV,
-      hechosEspeciales: { stentReciente: false },
+      hechos: { stent_reciente: false },
     });
     expect(puntos.some((p) => p.id === 'stent_reciente')).toBeFalse();
   });
@@ -140,7 +170,7 @@ describe('§13 bis · puntos de validación clínica', () => {
         miocardiopatia: { sintomas: true },
       },
       activos: new Set(['ictus_o_tvp', 'miocardiopatia']), fechaIntervencion: IV,
-      hechosEspeciales: { stentReciente: true },
+      hechos: { stent_reciente: true },
     });
     const tipos = puntos.map((p) => p.tipo);
     // Todos los 'posponer' van antes que cualquier 'validar'.

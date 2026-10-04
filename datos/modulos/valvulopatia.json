@@ -140,6 +140,23 @@
         }
       ],
       "etiquetaSap": "síntomas valvulares nuevos"
+    },
+    {
+      "id": "estenosis_aortica_grave_sintomatica",
+      "etiqueta": "¿Estenosis aórtica grave con síntomas (síncope, angina o disnea)?",
+      "tipo": "boolean",
+      "porque": "La estenosis aórtica grave sintomática es una valvulopatía de alto riesgo: puede aconsejar posponer la cirugía programada.",
+      "etiquetaSap": "estenosis aórtica grave sintomática",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "roja",
+          "efecto": "valvulopatía grave sintomática (estenosis aórtica grave sintomática): valorar posponer la cirugía programada",
+          "fuente": "§5.1 (ESC 2022)",
+          "si": { "igual": true }
+        }
+      ]
     }
   ]
 }

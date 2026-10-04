@@ -38,6 +38,14 @@
           "tipo": "asa",
           "efecto": "ASA mínimo 4",
           "fuente": "§5.1"
+        },
+        {
+          "cuando": "= III o IV",
+          "tipo": "alerta",
+          "gravedad": "roja",
+          "efecto": "insuficiencia cardiaca muy sintomática (NYHA III-IV): valorar posponer la cirugía programada",
+          "fuente": "§5.1 (ESC 2022)",
+          "si": { "enLista": ["III", "IV"] }
         }
       ]
     },
@@ -75,7 +83,35 @@
     {
       "id": "ultimo_ingreso",
       "etiqueta": "Fecha del último ingreso por insuficiencia cardiaca",
-      "tipo": "fecha"
+      "tipo": "fecha",
+      "porque": "Un ingreso por insuficiencia cardiaca en los últimos 3 meses indica una posible descompensación: puede aconsejar posponer la cirugía programada.",
+      "genera": [
+        {
+          "cuando": "ingreso en los últimos 3 meses",
+          "tipo": "alerta",
+          "gravedad": "roja",
+          "efecto": "ingreso por insuficiencia cardiaca en los últimos 3 meses: valorar posponer la cirugía programada",
+          "fuente": "§5.1 (ESC 2022)",
+          "si": { "recienteMeses": 3 }
+        }
+      ]
+    },
+    {
+      "id": "empeoramiento_reciente",
+      "etiqueta": "¿Ha empeorado últimamente (más ahogo, más hinchazón o más fatiga que de costumbre)?",
+      "tipo": "boolean",
+      "porque": "Un empeoramiento reciente sugiere una insuficiencia cardiaca descompensada: puede aconsejar posponer la cirugía programada.",
+      "etiquetaSap": "empeoramiento reciente de IC",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "roja",
+          "efecto": "empeoramiento reciente de la insuficiencia cardiaca: valorar posponer la cirugía programada",
+          "fuente": "§5.1 (ESC 2022)",
+          "si": { "igual": true }
+        }
+      ]
     },
     {
       "id": "ortopnea",

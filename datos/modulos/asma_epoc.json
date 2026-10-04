@@ -206,6 +206,14 @@
           "tipo": "clase_riesgo",
           "efecto": "sube la clase de riesgo del paciente a alta",
           "fuente": "§5.2"
+        },
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "oxigenoterapia domiciliaria: validar antes de la intervención",
+          "fuente": "§5.16.4",
+          "si": { "igual": true }
         }
       ],
       "etiquetaSap": "oxigenoterapia domiciliaria"

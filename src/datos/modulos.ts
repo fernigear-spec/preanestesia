@@ -45,8 +45,12 @@ export interface CondicionEfecto {
   mayorQue?: number;
   /** La respuesta (número) es mayor o igual que este umbral. */
   mayorIgualQue?: number;
+  /** La respuesta (número) es estrictamente menor que este umbral. */
+  menorQue?: number;
   /** La respuesta (fecha ISO) está dentro de los últimos N meses respecto a la intervención (o "hoy"). */
   recienteMeses?: number;
+  /** La respuesta (fecha ISO) está dentro de los últimos N días respecto a la intervención (o "hoy"). */
+  recienteDias?: number;
   /**
    * La respuesta (fecha ISO) está AUSENTE o es anterior a N meses respecto a la
    * intervención (o "hoy"): es decir, NO hay una fecha reciente. Pensado para notas
@@ -212,7 +216,7 @@ export function validarModulo(obj: unknown, fichero: string): ErrorModulo[] {
             if (typeof gg.si !== 'object' || gg.si === null) {
               errores.push({ fichero, campo: `${dondeG}.si`, mensaje: 'si debe ser un objeto de condición' });
             } else {
-              const ops = ['igual', 'enLista', 'contieneAlguno', 'mayorQue', 'mayorIgualQue', 'recienteMeses', 'sinFechaRecienteMeses'];
+              const ops = ['igual', 'enLista', 'contieneAlguno', 'mayorQue', 'mayorIgualQue', 'menorQue', 'recienteMeses', 'recienteDias', 'sinFechaRecienteMeses'];
               const presentes = ops.filter((k) => (gg.si as Record<string, unknown>)[k] !== undefined);
               if (presentes.length !== 1) {
                 errores.push({ fichero, campo: `${dondeG}.si`, mensaje: `una condición requiere exactamente un operador (tiene ${presentes.length})` });
