@@ -30,6 +30,18 @@ interface Props {
   ex?: ExtrasHojaQr | undefined;
 }
 
+/**
+ * Dirección base de la vista del paciente a la que apuntan los QR (§8.16, Bloque
+ * III-A). Sale de `config.url_vista_paciente`; así, al migrar de GitHub Pages a
+ * Cloudflare basta con cambiar esa clave. Si no estuviera configurada, se usa la
+ * ruta «/paciente/» del propio despliegue actual como respaldo.
+ */
+function urlVistaPaciente(): string {
+  const u = (config as { url_vista_paciente?: string }).url_vista_paciente;
+  if (u && u.length > 0) return u;
+  return `${location.origin}${location.pathname.replace(/\/[^/]*$/, '')}/paciente/`;
+}
+
 export function HojaPaciente({ plan, intervencion, ay, ex }: Props) {
   const [cadena, setCadena] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
@@ -54,7 +66,7 @@ export function HojaPaciente({ plan, intervencion, ay, ex }: Props) {
     void serializar(payload).then(async (c) => {
       if (!vivo) return;
       setCadena(c);
-      const url = `${location.origin}${location.pathname}#p=${c}`;
+      const url = `${urlVistaPaciente()}#p=${c}`;
       try {
         const data = await QRCode.toDataURL(url, { errorCorrectionLevel: 'M', margin: 1, width: 240 });
         if (vivo) setQrDataUrl(data);
@@ -65,7 +77,7 @@ export function HojaPaciente({ plan, intervencion, ay, ex }: Props) {
     return () => { vivo = false; };
   }, [contenido, intervencion.fechaHora]);
 
-  const enlace = cadena ? `${location.origin}${location.pathname}#p=${cadena}` : '';
+  const enlace = cadena ? `${urlVistaPaciente()}#p=${cadena}` : '';
   const cabe = cadena ? cabeEnQr(cadena) : true;
 
   async function copiar() {

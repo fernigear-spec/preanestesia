@@ -8,8 +8,11 @@
  * service worker) y solo existen en memoria, por lo que jamás se guardan en caché.
  */
 import { defineConfig } from 'vite';
+import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+
+const raiz = import.meta.dirname;
 
 // El base path depende del repositorio en GitHub Pages: /preanestesia/
 export default defineConfig({
@@ -30,9 +33,16 @@ export default defineConfig({
         theme_color: '#0b6b5a',
       },
       workbox: {
-        // Solo el esqueleto de la app: nunca datos de paciente.
+        // Solo el esqueleto de la app de ENFERMERÍA: nunca datos de paciente ni la
+        // vista del paciente (que es una aplicación independiente, ver abajo).
         globPatterns: ['**/*.{js,css,html,svg,woff2,webmanifest}'],
+        // Excluir la vista del paciente del precache de la app de enfermería: ni su
+        // HTML (carpeta «paciente/») ni su bundle propio (assets/paciente-*.js).
+        globIgnores: ['paciente/**', 'assets/paciente-*.js'],
         navigateFallback: 'index.html',
+        // El service worker no debe gobernar la vista del paciente («/paciente/»):
+        // así cada app se actualiza y cachea por separado.
+        navigateFallbackDenylist: [/\/paciente\//],
         cleanupOutdatedCaches: true,
       },
     }),
@@ -40,5 +50,15 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    rollupOptions: {
+      // Dos "builds" independientes (§8.16, Bloque III-A):
+      //  - la app de enfermería (index.html → src/main.tsx),
+      //  - la vista del paciente (paciente.html → src/mainPaciente.tsx), que se
+      //    emite como «paciente/index.html» para servirse en la ruta «/paciente/».
+      input: {
+        enfermeria: resolve(raiz, 'index.html'),
+        paciente: resolve(raiz, 'paciente/index.html'),
+      },
+    },
   },
 });

@@ -344,6 +344,34 @@ La ilustración esquemática de Mallampati (R6.2.1) se dibuja como **SVG propio*
 - `vite.config.ts` con `base: '/preanestesia/'` para las rutas de Pages.
 - El PWA/service worker se genera en el build.
 
+### Vista del paciente como build independiente (§8.16, Bloque III-A, 2026-10-04)
+
+La hoja del paciente se publica como una **segunda aplicación**, separada de la de
+enfermería, para que lo que abre el paciente al escanear el QR sea mínimo y no lleve
+ningún dato clínico embebido:
+
+- **Dos entradas en Vite** (`build.rollupOptions.input`): `index.html → src/main.tsx`
+  (app de enfermería) y `paciente/index.html → src/mainPaciente.tsx` (vista del
+  paciente). La segunda se emite como `dist/paciente/index.html`, servida en la ruta
+  **`/paciente/`**.
+- La vista del paciente **solo** contiene: su hoja (`VistaPaciente` + `CuerpoHoja` +
+  `render`), el cambio de idioma (es/ca), el PDF (impresión del navegador), los anexos
+  y el recálculo de fechas (§8.16: `hojaPaciente.ts`, `fechas/`, `serializar.ts`). **No**
+  incluye el motor de reglas, los catálogos de fármacos, los módulos, el panel de
+  administración ni la entrevista. Se garantiza con la prueba
+  `tests/unit/ui/aislamientoPaciente.test.ts`, que recorre el grafo de imports de valor
+  desde `src/mainPaciente.tsx` y comprueba que nunca alcanza esas rutas prohibidas.
+- **La dirección base del QR sale de `config.url_vista_paciente`** (p. ej.
+  `https://holaaneshealth-eng.github.io/preanestesia/paciente/`). Así, al migrar de
+  GitHub Pages a Cloudflare basta con cambiar esa clave en `datos/config.json`.
+  `HojaPaciente.tsx` compone el enlace del QR como `url_vista_paciente + '#p=' + payload`.
+- **Service worker:** el de la app de enfermería **no** precachea ni gobierna la vista
+  del paciente (`globIgnores: ['paciente/**', 'assets/paciente-*.js']` y
+  `navigateFallbackDenylist: [/\/paciente\//]`), de modo que cada app se cachea y
+  actualiza por separado.
+- Prueba E2E (`vistaPrevia.spec.ts`): genera el QR desde el resumen, comprueba que el
+  enlace apunta a `/paciente/#p=…` y abre la hoja en la nueva ruta.
+
 ---
 
 ## Versionado de textos del paciente (histórico)

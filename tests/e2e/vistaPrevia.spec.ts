@@ -399,7 +399,11 @@ test.describe('Vista previa', () => {
     // La caché solo guarda el esqueleto (js/css/html/manifest), nunca la URL con «#p=»
     // (el fragmento no llega al service worker) ni ningún dato del paciente.
     expect(claveCache).not.toContain('#p=');
-    expect(claveCache).not.toContain('paciente');
+    // Bloque III-A (§8.16): el service worker de enfermería tampoco precachea la
+    // vista del paciente (ni su HTML en «/paciente/» ni su bundle propio), que es
+    // una aplicación independiente que se cachea por su cuenta.
+    expect(claveCache).not.toContain('/paciente/');
+    expect(claveCache).not.toContain('assets/paciente-');
   });
 
   test('F1: STOP-Bang alto (varón 56, ronca, HTA, IMC 36, cuello 42) → 6, riesgo alto y alerta', async ({ page }) => {
@@ -777,5 +781,81 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: 'datos/opioides.json', exact: true }).click();
     await expect(page.getByRole('textbox', { name: /Contenido de datos\/opioides\.json/ })).toBeVisible();
     await expect(page.getByText(/JSON válido/)).toBeVisible();
+  });
+
+  /**
+   * Bloque III-A (§8.16): la vista del paciente es un build independiente, publicado
+   * en «/paciente/». El QR del resumen apunta a esa dirección (config.url_vista_paciente)
+   * con el fragmento «#p=…». Esta prueba genera el QR, extrae el enlace y abre la vista
+   * del paciente en la nueva ruta, comprobando que la hoja se muestra correctamente.
+   */
+  test('§8.16 vista del paciente aparte: el QR apunta a /paciente/ y la hoja se abre en esa ruta', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    // Paso 1 con fecha e intervención.
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 2 alergias + paso 3 básicos.
+    await pasoAlergiasSinAlergias(page);
+    await page.locator('#edad').fill('60');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('80');
+    await page.locator('#talla').fill('175');
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Pasos 4-7.
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
+
+    // Paso 8: Adiro (plazo en días) para tener una instrucción concreta en la hoja.
+    await page.locator('#med').fill('Adiro');
+    await page.getByRole('button', { name: /Adiro/ }).first().click();
+    await page.getByRole('button', { name: '09:00', exact: true }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
+
+    // Pasos 9, 10 y 11.
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 vía aérea
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento
+    await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
+
+    // Generar la hoja y el QR del paciente.
+    await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
+    await expect(page.getByRole('img', { name: /Código QR/ })).toBeVisible();
+
+    // Capturar el enlace que copia el botón (lo que lleva el QR).
+    await page.evaluate(() => {
+      const w = window as unknown as { __enlace: string };
+      w.__enlace = '';
+      navigator.clipboard.writeText = async (texto: string) => {
+        w.__enlace = texto;
+      };
+    });
+    await page.getByRole('button', { name: /Copiar enlace para el paciente/ }).click();
+    const enlace = await page.evaluate(() => (window as unknown as { __enlace: string }).__enlace);
+
+    // El enlace apunta a la dirección de la vista del paciente (config.url_vista_paciente),
+    // en la ruta «/paciente/», y lleva el payload en «#p=…».
+    expect(enlace).toBeTruthy();
+    expect(enlace).toContain('/paciente/');
+    expect(enlace).toContain('#p=');
+
+    // Abrir SOLO el fragmento en la ruta de la vista del paciente del propio despliegue
+    // (en producción el dominio sale de config; aquí probamos la ruta local «/paciente/»).
+    const fragmento = enlace.slice(enlace.indexOf('#p='));
+    await page.goto(`/preanestesia/paciente/${fragmento}`);
+
+    // La vista independiente del paciente muestra la hoja (título y medicación).
+    await expect(page.getByRole('heading', { name: 'Recomendaciones para su intervención' })).toBeVisible();
+    await expect(page.getByText('Adiro')).toBeVisible();
+    // Y ofrece el cambio de idioma (castellano/catalán), propio de la vista del paciente.
+    await expect(page.getByRole('button', { name: 'Català' })).toBeVisible();
   });
 });
