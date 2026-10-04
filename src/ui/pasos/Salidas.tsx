@@ -44,6 +44,8 @@ interface Props {
   modalidad: string;
   /** Confirma o marca «le llamaremos» un fármaco pendiente (§12), por su índice en la medicación. */
   onConfirmarFarmaco?: (indice: number, cambios: { confirmadoPor?: string; leLlamaremos?: boolean }) => void;
+  /** "Hoy" para los cálculos con fecha actual (plazo no alcanzable, vigencia sin fecha). La UI pasa la real; el modo entrenamiento, una fija. */
+  fechaReferencia?: Date;
 }
 
 interface AlertaVista { gravedad: GravedadAlerta; mensaje: string; }
@@ -64,7 +66,7 @@ function fechaCorta(d: Date): string {
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 }
 
-export function Salidas({ entrevista, modalidad, onConfirmarFarmaco }: Props) {
+export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, fechaReferencia }: Props) {
   const { intervencion, procedimiento, basicos, antecedentes, mtnd4, alergias, habitos, cribado, medicacion, viaAerea, consentimiento } = entrevista;
   const [soloAscii, setSoloAscii] = useState(false);
   const [asaManual, setAsaManual] = useState<ClaseAsa | ''>('');
@@ -74,6 +76,7 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco }: Props) {
 
   const salida = useMemo(() => {
     if (!intervencion || !basicos || !cribado) return null;
+    const hoy = fechaReferencia ?? new Date(); // "hoy" para plazo no alcanzable y vigencia sin fecha
     const enfermedades = new Set(cribado.enfermedades);
     const respuestas = cribado.respuestasModulos;
     const imc = calcularImc(basicos.pesoKg, basicos.tallaCm);
@@ -84,7 +87,7 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco }: Props) {
       edadAnios: basicos.edadAnios, pesoKg: basicos.pesoKg, sexo: basicos.sexo,
       fechaIntervencion: intervencion.fechaHora, espacioCerrado: intervencion.espacioCerrado, contrasteYodado: intervencion.contrasteYodado,
     });
-    const plan = construirPlanPaciente(medicacion ?? [], intervencion, clin, basicos.pesoKg);
+    const plan = construirPlanPaciente(medicacion ?? [], intervencion, clin, basicos.pesoKg, hoy);
 
     // AUDIT-C solo si las tres preguntas están contestadas (§6.9); si no, no genera alertas ni anexo.
     const auditCompleto = habitos !== null && habitos.auditFrecuencia !== undefined && habitos.auditCantidad !== undefined && habitos.auditAtracon !== undefined;
@@ -117,6 +120,7 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco }: Props) {
       fragilidad: habitos?.cfs !== undefined && habitos.cfs >= 5,
       capacidadFuncionalReducida,
       fechaIntervencion: intervencion.fechaHora ?? null,
+      fechaReferencia: hoy,
       pruebasRecientes: {
         ...(fechaPrueba(pr.hemograma) ? { hemograma: fechaPrueba(pr.hemograma)! } : {}),
         ...(fechaPrueba(pr.coagulacion) ? { coagulacion: fechaPrueba(pr.coagulacion)! } : {}),
@@ -133,7 +137,7 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco }: Props) {
       ...(habitos?.cfs !== undefined ? { cfs: habitos.cfs } : {}), ...(cuatroAt ? { cuatroAtPuntuacion: cuatroAt.puntuacion } : {}),
       edadPediatricaMaxima: config.edad_pediatrica_maxima, glp1Semanal: (medicacion ?? []).some((f) => f.idRegla === 'glp1_semanal'), diabetes: enfermedades.has('diabetes'),
     });
-    const refFecha = intervencion.fechaHora ?? new Date(Date.now() + 90 * 86_400_000);
+    const refFecha = intervencion.fechaHora ?? new Date(hoy.getTime() + 90 * 86_400_000);
     const ayuno = calcularAyuno({ induccion: refFecha, pediatrico: extras.pediatrico, ...(basicos.edadMeses !== undefined ? { edadMeses: basicos.edadMeses } : {}), situacion: extras.situacion });
 
     // ASA.
@@ -252,8 +256,8 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco }: Props) {
     // neuroaxial/bloqueo profundo, la amarilla adicional. Se evalúa desde los hechos
     // clínicos (fecha y motivo del stent) con el contexto de la técnica efectiva.
     if (clin.stent && clin.stent.mesesDesdeImplante !== null) {
-      const refFecha = intervencion.fechaHora ?? new Date(Date.now() + 90 * 86_400_000);
-      const ctxStent = construirContexto({ ...intervencion, fechaHora: refFecha, fechaDesconocida: false }, basicos.pesoKg, clin.aclaramiento);
+      const refFecha = intervencion.fechaHora ?? new Date(hoy.getTime() + 90 * 86_400_000);
+      const ctxStent = construirContexto({ ...intervencion, fechaHora: refFecha, fechaDesconocida: false }, basicos.pesoKg, clin.aclaramiento, undefined, hoy);
       // Si no se conoce el motivo del stent, se usa la ventana más conservadora (SCA, 12 meses).
       const stentEval = evaluarStent({ mesesDesdeImplante: clin.stent.mesesDesdeImplante, traSca: clin.stent.traSca ?? true }, ctxStent);
       for (const a of stentEval.alertas) alertas.push({ gravedad: a.gravedad, mensaje: a.mensaje });
@@ -265,6 +269,7 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco }: Props) {
     const efectosMod = emitirEfectosModulos({
       modulos: MODULOS, respuestas, activos: enfermedades,
       fechaIntervencion: intervencion.fechaHora ?? null,
+      fechaReferencia: hoy,
     });
     for (const a of efectosMod.alertas) alertas.push({ gravedad: a.gravedad, mensaje: a.mensaje });
 
@@ -306,7 +311,7 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco }: Props) {
     const sap = construirSap(entradaSap, { soloAscii, usarAbreviaturas: true, abreviaturas: plantillasSap.abreviaturas });
 
     return { asa, escalas, alertas, notas, plan, pruebas: rp.pruebas, claseRiesgo: rp.clase, ayuno, sap };
-  }, [intervencion, basicos, cribado, medicacion, habitos, viaAerea, consentimiento, antecedentes, mtnd4, alergias, modalidad, soloAscii, asaManual]);
+  }, [intervencion, basicos, cribado, medicacion, habitos, viaAerea, consentimiento, antecedentes, mtnd4, alergias, modalidad, soloAscii, asaManual, fechaReferencia]);
 
   if (!salida) return null;
 

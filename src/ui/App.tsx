@@ -54,6 +54,10 @@ type Pantalla =
   | 'mtnd4'
   | 'resumen';
 
+/** "Hoy" fijo para el modo entrenamiento (§14.2): los casos tienen fecha de
+ *  intervención fija, así que el "plazo no alcanzable" no debe depender del día real. */
+const FECHA_REFERENCIA_ENTRENAMIENTO = new Date(2026, 8, 29, 9, 0); // 29/09/2026
+
 const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 function fechaLegible(d: Date): string {
   return `${DIAS[d.getDay()]} ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} a las ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
@@ -521,6 +525,7 @@ export function App() {
                 cribado={cribado}
                 habitos={habitos}
                 consentimiento={consentimiento}
+                {...(entrenamiento ? { fechaReferencia: FECHA_REFERENCIA_ENTRENAMIENTO } : {})}
               />
             )}
 
@@ -537,6 +542,7 @@ export function App() {
             <Salidas
               entrevista={entrevista}
               modalidad={modalidad ?? 'presencial'}
+              {...(entrenamiento ? { fechaReferencia: FECHA_REFERENCIA_ENTRENAMIENTO } : {})}
               onConfirmarFarmaco={(i, cambios) =>
                 setEntrevista((e) => ({
                   ...e,

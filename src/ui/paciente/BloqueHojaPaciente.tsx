@@ -26,6 +26,8 @@ interface Props {
   cribado: CribadoUi;
   habitos: HabitosUi | null;
   consentimiento: ConsentimientoUi | null;
+  /** "Hoy" para el plazo no alcanzable; la UI pasa la real, el modo entrenamiento una fija. */
+  fechaReferencia?: Date;
 }
 
 const CONS_MAP: Record<ConsentimientoUi['estado'], 'entregado' | 'pendiente' | 'no_procede'> = {
@@ -34,8 +36,9 @@ const CONS_MAP: Record<ConsentimientoUi['estado'], 'entregado' | 'pendiente' | '
   no_procede: 'no_procede',
 };
 
-export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado, habitos, consentimiento }: Props) {
+export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado, habitos, consentimiento, fechaReferencia }: Props) {
   const [generar, setGenerar] = useState(false);
+  const hoy = fechaReferencia ?? new Date();
 
   const sexo: Sexo = basicos.sexo;
   const clin = useMemo(
@@ -54,8 +57,8 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
   );
 
   const plan = useMemo(
-    () => construirPlanPaciente(medicacion, intervencion, clin, basicos.pesoKg),
-    [medicacion, intervencion, clin, basicos.pesoKg],
+    () => construirPlanPaciente(medicacion, intervencion, clin, basicos.pesoKg, hoy),
+    [medicacion, intervencion, clin, basicos.pesoKg, hoy],
   );
 
   // Ayuno (§8.14) y condicionales de la hoja (§10.2).
@@ -78,7 +81,7 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
       glp1Semanal: medicacion.some((f) => f.idRegla === 'glp1_semanal'),
       diabetes: new Set(cribado.enfermedades).has('diabetes'),
     });
-    const refFecha = intervencion.fechaHora ?? new Date(Date.now() + 90 * MS_DIA);
+    const refFecha = intervencion.fechaHora ?? new Date(hoy.getTime() + 90 * MS_DIA);
     const planAyuno = calcularAyuno({
       induccion: refFecha,
       pediatrico: extrasIn.pediatrico,
@@ -87,7 +90,7 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
     });
     const extras = consentimiento ? { ...extrasIn.extras, cons: CONS_MAP[consentimiento.estado] } : extrasIn.extras;
     return { ayunoQr: ayunoQrDesde(planAyuno, extrasIn.pediatrico, extrasIn.situacion), extras };
-  }, [basicos, cribado, habitos, sexo, intervencion.fechaHora, medicacion, consentimiento]);
+  }, [basicos, cribado, habitos, sexo, intervencion.fechaHora, medicacion, consentimiento, hoy]);
 
   // §3 (2026-10-04): la hoja y el QR se generan SIEMPRE, sin bloqueo por fármacos
   // pendientes. Los pendientes aparecen en la hoja con la frase única de §12

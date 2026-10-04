@@ -62,10 +62,12 @@ export function construirPlanPaciente(
   intervencion: DatosIntervencion,
   clin: DatosClinicos,
   pesoKg: number,
+  /** "Hoy" para el plazo no alcanzable; la UI pasa la real, el modo entrenamiento una fija. */
+  fechaReferencia: Date = new Date(),
 ): FarmacoPlan[] {
   // Fecha de referencia para extraer "requiere confirmación" y textos fijos.
-  const refFecha = intervencion.fechaHora ?? new Date(Date.now() + 90 * MS_DIA);
-  const ctx = construirContexto({ ...intervencion, fechaHora: refFecha, fechaDesconocida: false }, pesoKg, clin.aclaramiento);
+  const refFecha = intervencion.fechaHora ?? new Date(fechaReferencia.getTime() + 90 * MS_DIA);
+  const ctx = construirContexto({ ...intervencion, fechaHora: refFecha, fechaDesconocida: false }, pesoKg, clin.aclaramiento, undefined, fechaReferencia);
 
   return medicacion.map((f) => {
     const datos: DatosFarmacoUi = {

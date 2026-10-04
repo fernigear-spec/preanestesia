@@ -49,8 +49,10 @@ export interface EntradaRiesgoPruebas {
   fragilidad?: boolean;
   /** Capacidad funcional reducida (< 4 METs o DASI ≤ 34), para la nota ** del BNP. Opcional. */
   capacidadFuncionalReducida?: boolean;
-  /** Fecha prevista de la intervención; sin ella, se usa "hoy" para la vigencia (§7.4, §8.16). */
+  /** Fecha prevista de la intervención; sin ella, se usa `fechaReferencia` ("hoy") para la vigencia (§7.4, §8.16). */
   fechaIntervencion?: Date | null;
+  /** "Hoy" para la vigencia cuando no hay fecha de intervención. La UI pasa la real; las pruebas, una fija. Si falta, `new Date()`. */
+  fechaReferencia?: Date;
   /** Fechas de pruebas recientes para descontar las vigentes (§7.4). */
   pruebasRecientes?: FechasPruebasRecientes;
   /** Ecocardiograma con función ventricular conocida y estable (18 meses de validez). */
@@ -202,7 +204,7 @@ export function derivarFactoresPruebas(e: EntradaRiesgoPruebas): FactoresPruebas
  */
 export function derivarVigenciaPruebas(e: EntradaRiesgoPruebas): VigenciaPruebas {
   const recientes = e.pruebasRecientes ?? {};
-  const referencia = e.fechaIntervencion ?? new Date();
+  const referencia = e.fechaIntervencion ?? e.fechaReferencia ?? new Date();
   const vig: VigenciaPruebas = {};
   const pruebas: PruebaConVigencia[] = ['hemograma', 'coagulacion', 'bioquimica', 'ecg', 'rx_torax', 'ecocardiograma'];
   for (const p of pruebas) {

@@ -199,6 +199,13 @@ export interface ContextoReglas {
   indicacion?: string;
   /** Pauta horaria del fármaco en evaluación (horas de toma del paciente). */
   pautaFarmaco?: PautaHorariaCtx;
+  /**
+   * "Hoy" para los cálculos que comparan con la fecha actual (plazo no alcanzable,
+   * §3.2.5/§4). La interfaz pasa la fecha real; las pruebas, el informe y el modo
+   * entrenamiento pasan una fecha fija para no depender del día de ejecución. Si
+   * falta, se usa `new Date()`.
+   */
+  fechaReferencia?: Date;
 }
 
 /** Pauta horaria: horas "HH:MM" de toma en un día. */

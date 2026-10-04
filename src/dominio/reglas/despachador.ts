@@ -113,7 +113,7 @@ export function evaluarFarmacoUi(d: DatosFarmacoUi, ctx: ContextoReglas, clin: D
   const base = aplicarOverridesCatalogo(d, evaluarRegla(d, ctxPauta, clin));
   // Plazo no alcanzable (§4, paso 1): si con la fecha prevista la última toma ya cae
   // en el pasado, el fármaco pasa a "consultar" y eleva una alerta roja (igual que el QR).
-  const { resultado, alerta } = aplicarPlazoNoAlcanzable(base, ctxPauta, new Date());
+  const { resultado, alerta } = aplicarPlazoNoAlcanzable(base, ctxPauta, ctxPauta.fechaReferencia ?? new Date());
   return alerta ? agregarAlerta(resultado, alerta) : resultado;
 }
 

@@ -51,8 +51,10 @@ export interface EntradaEfectosModulos {
   respuestas: RespuestasModulos;
   /** Solo evalúa estos módulos (ids marcados por el paciente). Si falta, evalúa todos los de `modulos`. */
   activos?: Set<string>;
-  /** Fecha de la intervención para las condiciones por recencia; sin ella, "hoy" (§8.16). */
+  /** Fecha de la intervención para las condiciones por recencia; sin ella, `fechaReferencia` ("hoy") (§8.16). */
   fechaIntervencion?: Date | null;
+  /** "Hoy" para la recencia cuando no hay fecha de intervención. La UI pasa la real; las pruebas, una fija. Si falta, `new Date()`. */
+  fechaReferencia?: Date;
 }
 
 /**
@@ -116,7 +118,7 @@ export function efectoEjecutable(g: EfectoRespuesta): boolean {
  * con las respuestas dadas. No duplica: una misma pareja mensaje+gravedad aparece una vez.
  */
 export function emitirEfectosModulos(e: EntradaEfectosModulos): EfectosModulos {
-  const referencia = e.fechaIntervencion ?? new Date();
+  const referencia = e.fechaIntervencion ?? e.fechaReferencia ?? new Date();
   const alertas: AlertaModulo[] = [];
   const notas: NotaModulo[] = [];
   const vistasAlertas = new Set<string>();

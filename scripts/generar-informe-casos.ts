@@ -44,8 +44,10 @@ import type { ResultadoFarmaco } from '../src/dominio/tipos.ts';
 
 const IV = new Date(2026, 9, 15, 8, 0);
 const IV13 = new Date(2026, 9, 15, 13, 0);
+/** "Hoy" fijo (29/09/2026): el informe no depende del día de ejecución (plazo no alcanzable). */
+const HOY_FIJO = new Date(2026, 8, 29, 9, 0);
 function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
-  return { fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio', grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false, riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, pesoKg: 80, aclaramiento: null, ...p };
+  return { fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio', grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false, riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, pesoKg: 80, aclaramiento: null, fechaReferencia: HOY_FIJO, ...p };
 }
 const P = (...horas: string[]) => ({ horas });
 const DIAS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];

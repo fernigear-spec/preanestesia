@@ -32,11 +32,17 @@ import { reglaFitoterapia, reglaAnticonceptivoThs } from '../../src/dominio/regl
 const IV = new Date(2026, 9, 15, 8, 0);
 const IV13 = new Date(2026, 9, 15, 13, 0);
 
+/** "Hoy" fijo para las pruebas: así el plazo no alcanzable no depende del día de
+ *  ejecución del CI. Se usa el 29/09/2026, anterior a la última toma más temprana de
+ *  la batería (ginkgo, 14 días → 30/09), para que todos los plazos sean alcanzables y
+ *  los resultados coincidan con la regla directa. */
+const HOY = new Date(2026, 8, 29, 9, 0);
 function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
   return {
     fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio',
     grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false,
-    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, pesoKg: 80, aclaramiento: null, ...p,
+    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, pesoKg: 80, aclaramiento: null,
+    fechaReferencia: HOY, ...p,
   };
 }
 const P = (...horas: string[]) => ({ horas });
@@ -341,13 +347,8 @@ describe('Punto 4 · E otros: despachador == regla directa', () => {
     const directo = reglaAntiangiogenico({ idFarmaco: 'aflibercept_intravitreo', nombreComercial: 'Eylea', principio: 'aflibercept', intravitreo: true }).farmaco;
     expect(evaluarFarmacoUi(d('antiangiogenico_intravitreo', { idFarmaco: 'aflibercept_intravitreo', nombreComercial: 'Eylea', principiosActivos: ['aflibercept'], via: 'subcutanea' }), c, clin())).toEqual(directo);
   });
-  it('E15 ginkgo fitoterapia: la pauta de la regla coincide (plazo de 14 días)', () => {
-    // La regla directa suspende 14 días. A través del despachador, si HOY la fecha
-    // límite ya no se puede cumplir, se aplica el post-proceso de "plazo no alcanzable"
-    // (§4, paso 1): pasa a "consultar" con alerta roja. Para comparar la PAUTA con la
-    // regla directa, se usa una intervención lo bastante lejana (deadline en el futuro).
-    const futuro = new Date(Date.now() + 60 * 86_400_000);
-    const c = ctx({ fechaHoraIntervencion: futuro, pautaFarmaco: P('09:00') });
+  it('E15 ginkgo fitoterapia', () => {
+    const c = ctx({ pautaFarmaco: P('09:00') });
     const directo = reglaFitoterapia({ idFarmaco: 'ginkgo', nombreComercial: 'Ginkgo', principio: 'ginkgo' }, c);
     expect(evaluarFarmacoUi(d('fitoterapia', { idFarmaco: 'ginkgo', nombreComercial: 'Ginkgo', principiosActivos: ['ginkgo'], horas: ['09:00'] }), c, clin())).toEqual(directo);
   });
@@ -377,5 +378,46 @@ describe('Punto 4 · reglas nuevas del despachador (§8.5, §8.3, §8.4)', () =>
     const c = ctx({ pautaFarmaco: P('09:00') });
     const directo = reglaAntidiabeticoNoDiaIq({ idFarmaco: 'gliclazida', nombreComercial: 'Diamicron', principio: 'gliclazida', grupo: 'sulfonilurea' }, c);
     expect(evaluarFarmacoUi(d('sulfonilurea', { idFarmaco: 'gliclazida', nombreComercial: 'Diamicron', principiosActivos: ['gliclazida'], horas: ['09:00'] }), c, clin())).toEqual(directo);
+  });
+});
+
+// —————————— Independencia del reloj real (regresión del plazo no alcanzable) ——————————
+// El despachador usa ctx.fechaReferencia como "hoy"; nunca el reloj del sistema cuando
+// esa fecha está presente. Esta prueba simula que la máquina está en el futuro
+// (01/01/2027, posterior a la intervención del 15/10/2026) y comprueba que los
+// resultados de la batería NO cambian: así el CI no dependerá del día de ejecución.
+describe('Punto 4 · los casos no dependen del reloj real (fechaReferencia fija)', () => {
+  // Un conjunto representativo de fármacos con distintos tipos de plazo.
+  function evaluarMuestra() {
+    return [
+      evaluarFarmacoUi(d('acod_antixa', { idFarmaco: 'apixaban', nombreComercial: 'Eliquis', principiosActivos: ['apixaban'], horas: ['09:00', '21:00'] }), ctx({ riesgoHemorragico: 'bajo', aclaramiento: 70, pautaFarmaco: P('09:00', '21:00') }), clin()),
+      evaluarFarmacoUi(d('p2y12_clopidogrel', { nombreComercial: 'Plavix', principiosActivos: ['clopidogrel'], horas: ['09:00'] }), ctx({ neuroaxial: true, pautaFarmaco: P('09:00') }), clin()),
+      evaluarFarmacoUi(d('fitoterapia', { idFarmaco: 'ginkgo', nombreComercial: 'Ginkgo', principiosActivos: ['ginkgo'], horas: ['09:00'] }), ctx({ pautaFarmaco: P('09:00') }), clin()),
+      evaluarFarmacoUi(d('aine_naproxeno', { idFarmaco: 'naproxeno', nombreComercial: 'Naprosyn', principiosActivos: ['naproxeno'], horas: ['09:00', '21:00'] }), ctx({ pautaFarmaco: P('09:00', '21:00') }), clin()),
+      evaluarFarmacoUi(d('avk_warfarina', { idFarmaco: 'warfarina', nombreComercial: 'Aldocumar', principiosActivos: ['warfarina'], horas: ['18:00'] }), ctx({ pautaFarmaco: P('18:00') }), clin()),
+    ];
+  }
+
+  it('con el reloj del sistema en 01/01/2027 (posterior a la IQ), los resultados son idénticos', () => {
+    const baseline = evaluarMuestra();
+    const DateReal = globalThis.Date;
+    const FUTURO = new DateReal(2027, 0, 1, 9, 0).getTime();
+    // Sustituye el reloj: new Date() (sin argumentos) y Date.now() devuelven el futuro;
+    // con argumentos se comporta como siempre.
+    const DateFalsa = function (this: unknown, ...args: unknown[]) {
+      return args.length === 0
+        ? new DateReal(FUTURO)
+        : new (DateReal as unknown as new (...a: unknown[]) => Date)(...args);
+    } as unknown as DateConstructor;
+    DateFalsa.now = () => FUTURO;
+    DateFalsa.parse = DateReal.parse;
+    DateFalsa.UTC = DateReal.UTC;
+    (globalThis as { Date: DateConstructor }).Date = DateFalsa;
+    try {
+      const futuro = evaluarMuestra();
+      expect(futuro).toEqual(baseline);
+    } finally {
+      (globalThis as { Date: DateConstructor }).Date = DateReal;
+    }
   });
 });

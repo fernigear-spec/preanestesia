@@ -30,6 +30,7 @@ export function construirContexto(
   pesoKg: number,
   aclaramiento: number | null,
   indicacion?: string,
+  fechaReferencia?: Date,
 ): ContextoReglas {
   // Técnica efectiva: "no se sabe" + neuroaxial probable ⇒ tratar como neuroaxial (R3.2.3).
   const neuroaxial =
@@ -63,6 +64,7 @@ export function construirContexto(
     aclaramiento,
   };
   if (indicacion !== undefined) ctx.indicacion = indicacion;
+  if (fechaReferencia !== undefined) ctx.fechaReferencia = fechaReferencia;
   return ctx;
 }
 
