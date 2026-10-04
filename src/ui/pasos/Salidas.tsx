@@ -92,6 +92,10 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     const enfermedades = new Set(cribado.enfermedades);
     const respuestas = cribado.respuestasModulos;
     const imc = calcularImc(basicos.pesoKg, basicos.tallaCm);
+    // El módulo de pediatría se activa por edad, no por casilla: para que sus efectos
+    // (p. ej. cardiopatía congénita) se emitan, se añade a los módulos «activos».
+    const activos = new Set(enfermedades);
+    if (basicos.edadAnios <= config.edad_pediatrica_maxima) activos.add('pediatria');
 
     const clin = derivarHechosClinicos({
       respuestas, enfermedades,
@@ -282,7 +286,7 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     // están escritas a mano. Incluye ictus/AIT < 3 meses (roja), TVP/TEP < 3 meses
     // (amarilla), asma no controlada, trasplante reciente, etc.
     const efectosMod = emitirEfectosModulos({
-      modulos: MODULOS, respuestas, activos: enfermedades,
+      modulos: MODULOS, respuestas, activos,
       fechaIntervencion: intervencion.fechaHora ?? null,
       fechaReferencia: hoy,
     });
@@ -345,7 +349,7 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     // Los "hechos" (escalas, hechos clínicos, paso 1, alergias, antecedentes y vía
     // aérea) los calcula un ayudante puro compartido con la hoja del paciente.
     const puntosValidacion = derivarPuntosValidacion({
-      catalogo: VALIDACIONES, modulos: MODULOS, respuestas, activos: enfermedades,
+      catalogo: VALIDACIONES, modulos: MODULOS, respuestas, activos,
       fechaIntervencion: intervencion.fechaHora ?? null, fechaReferencia: hoy,
       hechos: construirHechosValidacion(entrevista, hoy),
     });

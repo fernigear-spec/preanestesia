@@ -179,6 +179,29 @@ describe('§13 bis · puntos de validación clínica', () => {
     expect(primerValidar === -1 || ultimoPosponer < primerValidar).toBeTrue();
   });
 
+  it('nuevas condiciones ancladas: feocromocitoma, suprarrenal, cardiopatía congénita (orígenes de módulo)', () => {
+    const puntos = derivarPuntosValidacion({
+      catalogo: CATALOGO, modulos: MODULOS,
+      respuestas: {
+        hipotiroidismo: { feocromocitoma: true, insuficiencia_suprarrenal: true },
+        pediatria: { cardiopatia_congenita: true },
+      },
+      activos: new Set(['hipotiroidismo', 'pediatria']), fechaIntervencion: IV,
+    });
+    expect(puntos.some((p) => p.id === 'feocromocitoma')).toBeTrue();
+    expect(puntos.some((p) => p.id === 'insuficiencia_suprarrenal')).toBeTrue();
+    expect(puntos.some((p) => p.id === 'cardiopatia_congenita')).toBeTrue();
+  });
+
+  it('nuevas condiciones ancladas por hecho: preeclampsia y prematuro posconcepcional', () => {
+    const puntos = derivarPuntosValidacion({
+      catalogo: CATALOGO, modulos: MODULOS, respuestas: {}, activos: new Set(), fechaIntervencion: IV,
+      hechos: { preeclampsia: true, prematuro_edad_posconcepcional: true },
+    });
+    expect(puntos.find((p) => p.id === 'preeclampsia')?.tipo).toBe('validar');
+    expect(puntos.find((p) => p.id === 'prematuro_apnea')?.tipo).toBe('validar');
+  });
+
   it('una condición antigua (ictus hace 6 meses) no genera punto', () => {
     const haceSeis = new Date(2026, 3, 15).toISOString().slice(0, 10);
     const puntos = derivarPuntosValidacion({

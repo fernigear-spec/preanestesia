@@ -1,6 +1,6 @@
 {
   "id": "hipotiroidismo",
-  "titulo": "Tiroides",
+  "titulo": "Enfermedades endocrinas (tiroides, suprarrenal)",
   "fuente": "docs/documento_fuente.md §5.3",
   "preguntas": [
     {
@@ -15,6 +15,10 @@
         {
           "valor": "hipertiroidismo",
           "etiqueta": "Hipertiroidismo"
+        },
+        {
+          "valor": "ninguno",
+          "etiqueta": "Sin problema tiroideo"
         }
       ]
     },
@@ -29,6 +33,40 @@
       "id": "ultimo_control",
       "etiqueta": "Fecha del último control",
       "tipo": "fecha"
+    },
+    {
+      "id": "feocromocitoma",
+      "etiqueta": "¿Tiene un feocromocitoma o paraganglioma?",
+      "tipo": "boolean",
+      "porque": "El feocromocitoma exige preparación específica (bloqueo alfa) y coordinación antes de la cirugía: punto de validación.",
+      "etiquetaSap": "feocromocitoma",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "feocromocitoma: validar la preparación (bloqueo alfa) antes de la intervención",
+          "fuente": "§5.3",
+          "si": { "igual": true }
+        }
+      ]
+    },
+    {
+      "id": "insuficiencia_suprarrenal",
+      "etiqueta": "¿Tiene insuficiencia suprarrenal (enfermedad de Addison o tratamiento con corticoides por el suprarrenal)?",
+      "tipo": "boolean",
+      "porque": "La insuficiencia suprarrenal exige dosis de estrés de corticoides perioperatoria: punto de validación.",
+      "etiquetaSap": "insuficiencia suprarrenal",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "insuficiencia suprarrenal: validar la pauta de corticoides de estrés antes de la intervención",
+          "fuente": "§5.3",
+          "si": { "igual": true }
+        }
+      ]
     }
   ]
 }

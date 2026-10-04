@@ -1,0 +1,40 @@
+{
+  "id": "pediatrico_prematuro",
+  "titulo": "Lactante prematuro con cardiopatía congénita",
+  "descripcion": "Lactante de 6 meses, nacido a las 30 semanas (edad posconcepcional ~56 semanas) y con cardiopatía congénita, para herniorrafia inguinal. Pensado para ver los puntos de validación pediátricos (§5.12): prematuro con riesgo de apnea y cardiopatía congénita.",
+  "modalidad": "presencial",
+  "esperado": [
+    "🟡 Validar antes: prematuro con edad posconcepcional < 60 semanas (riesgo de apnea).",
+    "🟡 Validar antes: cardiopatía congénita.",
+    "Ayuno pediátrico; sin STOP-Bang (es un niño)."
+  ],
+  "intervencion": {
+    "procedimientoId": "cgd_hernioplastia_inguinal",
+    "fecha": "2026-11-05",
+    "hora": "08:00",
+    "tecnica": "general",
+    "contrasteYodado": "no"
+  },
+  "basicos": {
+    "edadAnios": 0,
+    "edadMeses": 6,
+    "sexo": "hombre",
+    "pesoKg": 7,
+    "tallaCm": 65,
+    "embarazada": false
+  },
+  "cribado": {
+    "ningunaConocida": false,
+    "enfermedades": ["pediatria"],
+    "respuestasModulos": {
+      "pediatria": {
+        "prematuro": true,
+        "semanas_gestacion_nacer": 30,
+        "cardiopatia_congenita": true,
+        "cardiopatia_detalle": "CIV pequeña, no corregida"
+      }
+    }
+  },
+  "medicacion": [],
+  "consentimiento": { "estado": "pendiente_entregar" }
+}

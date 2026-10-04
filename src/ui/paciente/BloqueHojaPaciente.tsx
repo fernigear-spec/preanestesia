@@ -74,8 +74,10 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
   // revisión solo mientras quede algún punto SIN validar (ni validado ni pospuesto;
   // los marcados «posponer o derivar» mantienen el aviso, porque siguen abiertos).
   const revisionPendiente = useMemo(() => {
+    const activos = new Set(cribado.enfermedades);
+    if (basicos.edadAnios <= EDAD_PEDIATRICA_MAXIMA) activos.add('pediatria');
     const puntos = derivarPuntosValidacion({
-      catalogo: VALIDACIONES, modulos: MODULOS, respuestas: cribado.respuestasModulos, activos: new Set(cribado.enfermedades),
+      catalogo: VALIDACIONES, modulos: MODULOS, respuestas: cribado.respuestasModulos, activos,
       fechaIntervencion: intervencion.fechaHora ?? null, fechaReferencia: hoy,
       hechos: construirHechosValidacion(entrevista, hoy),
     });

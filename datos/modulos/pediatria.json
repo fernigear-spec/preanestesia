@@ -98,8 +98,18 @@
       "id": "cardiopatia_congenita",
       "etiqueta": "¿Tiene una cardiopatía congénita?",
       "tipo": "boolean",
-      "porque": "Requiere valoración específica; se registra para el anestesiólogo (§5.12).",
-      "etiquetaSap": "cardiopatía congénita"
+      "porque": "Requiere valoración específica por el anestesiólogo: punto de validación (§5.12).",
+      "etiquetaSap": "cardiopatía congénita",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "cardiopatía congénita (paciente pediátrico): validar antes de la intervención",
+          "fuente": "§5.12",
+          "si": { "igual": true }
+        }
+      ]
     },
     {
       "id": "cardiopatia_detalle",

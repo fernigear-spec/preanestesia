@@ -831,6 +831,15 @@ test.describe('Vista previa', () => {
     ).toBeVisible();
   });
 
+  test('§5.12: lactante prematuro con cardiopatía congénita muestra ambos puntos de validación', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await abrirCasoEntrenamiento(page, /Lactante prematuro/);
+    await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
+    const seccion = page.locator('section.validaciones');
+    await expect(seccion.getByText(/prematuro con edad posconcepcional < 60 semanas/i)).toBeVisible();
+    await expect(seccion.getByText(/Cardiopatía congénita/)).toBeVisible();
+  });
+
   test('§14.4 guía imprimible: se genera desde los módulos con casillas en blanco', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Guía imprimible' }).click();

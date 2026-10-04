@@ -1586,14 +1586,20 @@ _Fuente: docs/documento_fuente.md §5.2_
   - Genera → 🔔 alerta amarilla: si = sí → hipertensión pulmonar: valorar antes de la intervención. _(§5.2)_ **[se emite]**
 - **Tratamiento específico (si lo tiene)** — _texto_
 
-### Tiroides
+### Enfermedades endocrinas (tiroides, suprarrenal)
 
 _Fuente: docs/documento_fuente.md §5.3_
 
-- **Tipo de problema tiroideo** — _opcion_: Hipotiroidismo / Hipertiroidismo
+- **Tipo de problema tiroideo** — _opcion_: Hipotiroidismo / Hipertiroidismo / Sin problema tiroideo
 - **¿Tiene bocio grande o le han operado del tiroides?** — _boolean_
   - Por qué: El bocio grande o la cirugía tiroidea previa pueden dificultar la vía aérea (señal de alerta).
 - **Fecha del último control** — _fecha_
+- **¿Tiene un feocromocitoma o paraganglioma?** — _boolean_
+  - Por qué: El feocromocitoma exige preparación específica (bloqueo alfa) y coordinación antes de la cirugía: punto de validación.
+  - Genera → 🔔 alerta amarilla: si = sí → feocromocitoma: validar la preparación (bloqueo alfa) antes de la intervención. _(§5.3)_ **[se emite]**
+- **¿Tiene insuficiencia suprarrenal (enfermedad de Addison o tratamiento con corticoides por el suprarrenal)?** — _boolean_
+  - Por qué: La insuficiencia suprarrenal exige dosis de estrés de corticoides perioperatoria: punto de validación.
+  - Genera → 🔔 alerta amarilla: si = sí → insuficiencia suprarrenal: validar la pauta de corticoides de estrés antes de la intervención. _(§5.3)_ **[se emite]**
 
 ### Hipertensión arterial
 
@@ -1754,7 +1760,8 @@ _Fuente: docs/documento_fuente.md §5.12, §6.3, §6.4_
 - **¿Padres o hermanos con náuseas o vómitos importantes tras una anestesia?** — _boolean_
   - Por qué: El antecedente familiar de NVPO suma en la escala POVOC del niño (§6.4).
 - **¿Tiene una cardiopatía congénita?** — _boolean_
-  - Por qué: Requiere valoración específica; se registra para el anestesiólogo (§5.12).
+  - Por qué: Requiere valoración específica por el anestesiólogo: punto de validación (§5.12).
+  - Genera → 🔔 alerta amarilla: si = sí → cardiopatía congénita (paciente pediátrico): validar antes de la intervención. _(§5.12)_ **[se emite]**
 - **Diagnóstico y si está corregida** — _texto_
 - **¿Tiene algún síndrome (por ejemplo, síndrome de Down)?** — _boolean_
   - Por qué: Algunos síndromes se asocian a vía aérea difícil o inestabilidad cervical (§5.12).
@@ -1949,6 +1956,11 @@ _Mecanismo distinto de las alertas: condiciones que el anestesiólogo revisa al 
 | Niveles de inmunosupresores fuera de rango: validar antes de la intervención. | `trasplante.niveles_en_rango` | §5.16.15 |
 | Miocardiopatía sintomática: validar antes de la intervención. | `miocardiopatia.sintomas` | §5.1 |
 | Brote de esclerosis múltiple en los últimos 3 meses: validar antes de la intervención. | `esclerosis_multiple.ultimo_brote_fecha` | §5.16.12 |
+| Feocromocitoma: validar la preparación (bloqueo alfa) antes de la intervención. | `hipotiroidismo.feocromocitoma` | §5.3 |
+| Insuficiencia suprarrenal: validar la pauta de corticoides de estrés antes de la intervención. | `hipotiroidismo.insuficiencia_suprarrenal` | §5.3 |
+| Cardiopatía congénita (paciente pediátrico): validar antes de la intervención. | `pediatria.cardiopatia_congenita` | §5.12 |
+| Prematuro con edad posconcepcional < 60 semanas (riesgo de apnea postoperatoria): validar antes de la intervención. | `prematuro_edad_posconcepcional` | §5.12 |
+| Preeclampsia o HTA gestacional: validar antes de la intervención. | `preeclampsia` | §5.13 |
 
 ## 17. Pendiente de revisión por el servicio
 

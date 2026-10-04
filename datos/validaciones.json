@@ -372,6 +372,36 @@
       "origen": "esclerosis_multiple.ultimo_brote_fecha",
       "motivo": "Brote de esclerosis múltiple en los últimos 3 meses: validar antes de la intervención.",
       "fuente": "§5.16.12"
+    },
+    {
+      "id": "feocromocitoma",
+      "origen": "hipotiroidismo.feocromocitoma",
+      "motivo": "Feocromocitoma: validar la preparación (bloqueo alfa) antes de la intervención.",
+      "fuente": "§5.3"
+    },
+    {
+      "id": "insuficiencia_suprarrenal",
+      "origen": "hipotiroidismo.insuficiencia_suprarrenal",
+      "motivo": "Insuficiencia suprarrenal: validar la pauta de corticoides de estrés antes de la intervención.",
+      "fuente": "§5.3"
+    },
+    {
+      "id": "cardiopatia_congenita",
+      "origen": "pediatria.cardiopatia_congenita",
+      "motivo": "Cardiopatía congénita (paciente pediátrico): validar antes de la intervención.",
+      "fuente": "§5.12"
+    },
+    {
+      "id": "prematuro_apnea",
+      "origen": "prematuro_edad_posconcepcional",
+      "motivo": "Prematuro con edad posconcepcional < 60 semanas (riesgo de apnea postoperatoria): validar antes de la intervención.",
+      "fuente": "§5.12"
+    },
+    {
+      "id": "preeclampsia",
+      "origen": "preeclampsia",
+      "motivo": "Preeclampsia o HTA gestacional: validar antes de la intervención.",
+      "fuente": "§5.13"
     }
   ]
 }

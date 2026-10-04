@@ -18,6 +18,10 @@ export interface DatosBasicosUi extends DatosBasicos {
   moduloObstetrico?: boolean;
   /** Testigo de Jehová o rechazo de hemoderivados (§5.8). Pregunta opcional. */
   rechazaHemoderivados?: boolean;
+  /** Obstétrico (§5.13): preeclampsia o HTA gestacional. Pregunta opcional. */
+  preeclampsia?: boolean;
+  /** Obstétrico (§5.13): plaquetas de la última analítica (×10⁹/L). Opcional. */
+  plaquetasUltimaAnalitica?: number;
 }
 
 /** Una intervención previa (paso 3, R3.2.10). */
@@ -342,7 +346,7 @@ export const APARATOS: Array<{ aparato: string; enfermedades: Array<{ id: string
     aparato: 'Endocrino y metabolismo',
     enfermedades: [
       { id: 'diabetes', etiqueta: 'Diabetes' },
-      { id: 'hipotiroidismo', etiqueta: 'Hipotiroidismo' },
+      { id: 'hipotiroidismo', etiqueta: 'Tiroides u otra enfermedad endocrina (suprarrenal)' },
       { id: 'obesidad', etiqueta: 'Obesidad' },
     ],
   },

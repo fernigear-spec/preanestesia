@@ -32,6 +32,8 @@ export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Prop
   const [fechaUltimaRegla, setFechaUltimaRegla] = useState(inicial?.fechaUltimaRegla ?? '');
   const [rechazaHemoderivados, setRechazaHemoderivados] = useState(inicial?.rechazaHemoderivados ?? false);
   const [semanas, setSemanas] = useState(inicial?.semanasGestacion !== undefined ? String(inicial.semanasGestacion) : '');
+  const [preeclampsia, setPreeclampsia] = useState(inicial?.preeclampsia ?? false);
+  const [plaquetas, setPlaquetas] = useState(inicial?.plaquetasUltimaAnalitica !== undefined ? String(inicial.plaquetasUltimaAnalitica) : '');
 
   const edadNum = Number(edad);
   const mesesNum = Number(meses);
@@ -71,6 +73,8 @@ export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Prop
     if (obstetrico) {
       datos.moduloObstetrico = true;
       if (semanas !== '') datos.semanasGestacion = semanasNum;
+      if (preeclampsia) datos.preeclampsia = true;
+      if (plaquetas !== '' && !Number.isNaN(Number(plaquetas))) datos.plaquetasUltimaAnalitica = Number(plaquetas);
     } else if (preguntarEmbarazo) {
       if (posibleEmbarazo !== undefined) datos.posibleEmbarazo = posibleEmbarazo;
       if (fechaUltimaRegla !== '') datos.fechaUltimaRegla = fechaUltimaRegla;
@@ -147,6 +151,14 @@ export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Prop
               Embarazo de {semanasNum} semanas (≥ {SEMANAS_AYUNO_INDIVIDUALIZADO}): <strong>ayuno individualizado</strong> y profilaxis de aspiración.
             </p>
           )}
+          <label className="radio-tarjeta">
+            <input type="checkbox" checked={preeclampsia} onChange={(e) => setPreeclampsia(e.target.checked)} />
+            Preeclampsia o hipertensión gestacional
+          </label>
+          <div className="campo">
+            <label htmlFor="plaquetas">Plaquetas de la última analítica (×10⁹/L, opcional)</label>
+            <input id="plaquetas" type="number" min={0} max={1000} inputMode="numeric" value={plaquetas} onChange={(e) => setPlaquetas(e.target.value)} />
+          </div>
         </fieldset>
       )}
 

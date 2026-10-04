@@ -124,6 +124,21 @@ export function construirHechosValidacion(e: EstadoEntrevista, hoy: Date): Hecho
   const incidencias = new Set((antecedentes?.intervencionesPrevias ?? []).flatMap((iq) => iq.incidencias));
   const ce = cribado.condicionesEspeciales;
 
+  // Prematuro con edad posconcepcional < 60 semanas (§5.12): semanas al nacer +
+  // edad del niño en semanas (de la edad en meses del paso 3). Riesgo de apnea.
+  const pedResp = respuestas['pediatria'] ?? {};
+  let prematuroApnea = false;
+  if (pediatrico && pedResp['prematuro'] === true) {
+    const semNacer = typeof pedResp['semanas_gestacion_nacer'] === 'number' ? (pedResp['semanas_gestacion_nacer'] as number) : null;
+    if (semNacer !== null && basicos.edadMeses !== undefined) {
+      const edadPosconcepcional = semNacer + basicos.edadMeses * 4.345;
+      prematuroApnea = edadPosconcepcional < 60;
+    } else if (semNacer !== null && basicos.edadMeses === undefined) {
+      // Sin edad en meses no se puede calcular; conservador si es un lactante muy pequeño (< 1 año).
+      prematuroApnea = basicos.edadAnios < 1;
+    }
+  }
+
   return {
     stent_reciente: stentReciente,
     infarto_reciente: clin.infartoReciente,
@@ -146,5 +161,7 @@ export function construirHechosValidacion(e: EstadoEntrevista, hoy: Date): Hecho
       ce.hipertermiaMalignaPersonal || ce.hipertermiaMalignaFamiliar || ce.pseudocolinesterasaPersonal || ce.pseudocolinesterasaFamiliar,
     testigo_jehova: basicos.rechazaHemoderivados === true,
     cocaina_reciente: habitos?.cocainaUltimaSemana === true,
+    prematuro_edad_posconcepcional: prematuroApnea,
+    preeclampsia: basicos.preeclampsia === true,
   };
 }
