@@ -78,10 +78,16 @@ export interface HabitosUi {
   /** Datos de exfumador. */
   paquetesAnio?: number;
   fechaAbandonoTabaco?: string;
-  /** AUDIT-C (0-4 cada pregunta). */
-  auditFrecuencia: number;
-  auditCantidad: number;
-  auditAtracon: number;
+  /** Descripción libre del consumo (si fumador activo o exfumador). Opcional. */
+  descripcionTabaco?: string;
+  /**
+   * AUDIT-C (0-4 cada pregunta). Ninguna es obligatoria; `undefined` = sin contestar.
+   * La puntuación solo se calcula si las tres están contestadas (§6.9, decisión
+   * del servicio 2026-10-04); si falta alguna, el resumen dice «AUDIT-C no completado».
+   */
+  auditFrecuencia?: number;
+  auditCantidad?: number;
+  auditAtracon?: number;
   /** Capacidad funcional: ¿sube dos pisos sin parar? */
   subeDosPisos: 'si' | 'no' | 'dudoso';
   /** Ítems DASI positivos (solo si no sube dos pisos con claridad). */

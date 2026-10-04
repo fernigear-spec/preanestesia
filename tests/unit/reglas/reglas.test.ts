@@ -28,7 +28,6 @@ function ctx(parcial: Partial<ContextoReglas> = {}): ContextoReglas {
     neuroaxial: false,
     bloqueoProfundo: false,
     riesgoTromboticoAlto: false, espacioCerrado: false, retina: false,
-    regimen: 'ingreso',
     pesoKg: 80,
     aclaramiento: null,
     // Pauta a las 08:00 (igual que la hora de la intervención): así, para un plazo
@@ -281,14 +280,16 @@ describe('Antidiabéticos (§8.5)', () => {
     expect(dias).toBe(4);
   });
 
-  it('bomba de insulina: CMA de riesgo bajo → sin confirmación', () => {
-    const r = reglaBombaInsulina({ idFarmaco: 'bomba', nombreComercial: 'Bomba' }, ctx({ regimen: 'cma', riesgoCardiovascular: 'bajo' }));
+  it('bomba de insulina: cirugía de riesgo bajo → sin confirmación', () => {
+    const r = reglaBombaInsulina({ idFarmaco: 'bomba', nombreComercial: 'Bomba' }, ctx({ riesgoCardiovascular: 'bajo' }));
     expect(r.requiereConfirmacion).toBeFalse();
   });
 
-  it('bomba de insulina: ingreso → requiere confirmación', () => {
-    const r = reglaBombaInsulina({ idFarmaco: 'bomba', nombreComercial: 'Bomba' }, ctx({ regimen: 'ingreso', riesgoCardiovascular: 'bajo' }));
-    expect(r.requiereConfirmacion).toBeTrue();
+  it('bomba de insulina: cirugía de riesgo intermedio o alto → requiere confirmación', () => {
+    const rInter = reglaBombaInsulina({ idFarmaco: 'bomba', nombreComercial: 'Bomba' }, ctx({ riesgoCardiovascular: 'intermedio' }));
+    expect(rInter.requiereConfirmacion).toBeTrue();
+    const rAlto = reglaBombaInsulina({ idFarmaco: 'bomba', nombreComercial: 'Bomba' }, ctx({ riesgoCardiovascular: 'alto' }));
+    expect(rAlto.requiereConfirmacion).toBeTrue();
   });
 });
 

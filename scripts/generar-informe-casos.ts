@@ -45,7 +45,7 @@ import type { ResultadoFarmaco } from '../src/dominio/tipos.ts';
 const IV = new Date(2026, 9, 15, 8, 0);
 const IV13 = new Date(2026, 9, 15, 13, 0);
 function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
-  return { fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio', grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false, riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null, ...p };
+  return { fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio', grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false, riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, pesoKg: 80, aclaramiento: null, ...p };
 }
 const P = (...horas: string[]) => ({ horas });
 const DIAS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
@@ -394,11 +394,13 @@ function add(id: string, calculado: string, textoPaciente: string, _a?: string |
   add('D9', `mañana: ${man} UI (50 %)`, r.textoPaciente, 'mañana 10 UI (50 % de 20)', man === 10);
 }
 {
-  const r = reglaBombaInsulina({ idFarmaco: 'b', nombreComercial: 'Bomba' }, ctx({ regimen: 'cma', riesgoCardiovascular: 'bajo' }));
+  // D10: bomba + cirugía de riesgo bajo → sin confirmación (decide solo el riesgo).
+  const r = reglaBombaInsulina({ idFarmaco: 'b', nombreComercial: 'Bomba' }, ctx({ riesgoCardiovascular: 'bajo' }));
   add('D10', farmacoResumen(r), r.textoPaciente, !r.requiereConfirmacion && r.textoPaciente.includes('80 %'));
 }
 {
-  const r = reglaBombaInsulina({ idFarmaco: 'b', nombreComercial: 'Bomba' }, ctx({ regimen: 'ingreso' }));
+  // D11: bomba + cirugía de riesgo intermedio → requiere confirmación.
+  const r = reglaBombaInsulina({ idFarmaco: 'b', nombreComercial: 'Bomba' }, ctx({ riesgoCardiovascular: 'intermedio' }));
   add('D11', farmacoResumen(r), r.textoPaciente, 'requiere confirmación', r.requiereConfirmacion);
 }
 

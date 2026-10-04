@@ -229,31 +229,31 @@ export function App() {
             onVolver={() => setPantalla('inicio')}
             onContinuar={(datos, proc) => {
               setEntrevista((e) => ({ ...e, intervencion: datos, procedimiento: proc }));
-              setPantalla('basicos');
-            }}
-          />
-        )}
-
-        {/* 2 · Datos básicos */}
-        {pantalla === 'basicos' && (
-          <PasoBasicos
-            inicial={basicos}
-            obstetrico={procedimiento?.obstetrico ?? false}
-            onVolver={() => setPantalla('intervencion')}
-            onContinuar={(datos) => {
-              setEntrevista((e) => ({ ...e, basicos: datos }));
               setPantalla('alergias');
             }}
           />
         )}
 
-        {/* 3 · Alergias */}
+        {/* 2 · Alergias (decisión del servicio, 2026-10-04: antes del paso de datos básicos) */}
         {pantalla === 'alergias' && (
           <PasoAlergias
             inicial={alergias}
-            onVolver={() => setPantalla('basicos')}
+            onVolver={() => setPantalla('intervencion')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, alergias: datos }));
+              setPantalla('basicos');
+            }}
+          />
+        )}
+
+        {/* 3 · Datos básicos */}
+        {pantalla === 'basicos' && (
+          <PasoBasicos
+            inicial={basicos}
+            obstetrico={procedimiento?.obstetrico ?? false}
+            onVolver={() => setPantalla('alergias')}
+            onContinuar={(datos) => {
+              setEntrevista((e) => ({ ...e, basicos: datos }));
               setPantalla('antecedentes');
             }}
           />
@@ -327,16 +327,18 @@ export function App() {
             }}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, medicacion: datos }));
-              setPantalla('viaAerea');
+              // En telefónica no se explora la vía aérea (§6.2.5, decisión del servicio
+              // 2026-10-04): se salta directamente al consentimiento.
+              setPantalla(modalidad === 'telefonica' ? 'consentimiento' : 'viaAerea');
             }}
           />
         )}
 
-        {/* 9 · Vía aérea */}
-        {pantalla === 'viaAerea' && basicos && (
+        {/* 9 · Vía aérea (no se muestra en telefónica) */}
+        {pantalla === 'viaAerea' && basicos && modalidad !== 'telefonica' && (
           <PasoViaAerea
             inicial={viaAerea}
-            telefonica={modalidad === 'telefonica'}
+            telefonica={false}
             basicos={{ edadAnios: basicos.edadAnios, pesoKg: basicos.pesoKg, tallaCm: basicos.tallaCm, sexo: basicos.sexo }}
             onVolver={() => setPantalla('medicacion')}
             onContinuar={(datos) => {
@@ -351,7 +353,7 @@ export function App() {
           <PasoConsentimiento
             inicial={consentimiento}
             telefonica={modalidad === 'telefonica'}
-            onVolver={() => setPantalla('viaAerea')}
+            onVolver={() => setPantalla(modalidad === 'telefonica' ? 'medicacion' : 'viaAerea')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, consentimiento: datos }));
               setPantalla('mtnd4');
@@ -381,7 +383,7 @@ export function App() {
             <ul className="resumen-lista">
               <li><strong>Procedimiento:</strong> {procedimiento.nombre} ({procedimiento.especialidad.replace(/_/g, ' ')})</li>
               <li><strong>Fecha y hora:</strong> {intervencion.fechaHora ? `${fechaLegible(intervencion.fechaHora)}${intervencion.horaAsumida ? ' (hora asumida)' : ''}` : 'aún no conocida (las instrucciones se darán como margen)'}</li>
-              <li><strong>Régimen:</strong> {intervencion.regimen} · <strong>Técnica:</strong> {intervencion.tecnica.replace(/_/g, ' ')}</li>
+              <li><strong>Técnica:</strong> {intervencion.tecnica.replace(/_/g, ' ')}</li>
               <li><strong>Riesgos:</strong> cardiovascular {intervencion.riesgoCardiovascular}, hemorrágico {intervencion.riesgoHemorragico}</li>
             </ul>
 
@@ -464,7 +466,9 @@ export function App() {
                 <h3>Hábitos y capacidad funcional</h3>
                 <ul className="resumen-lista">
                   <li><strong>Tabaco:</strong> {habitos.tabaco === 'nunca' ? 'nunca ha fumado' : habitos.tabaco === 'activo' ? 'fumador activo' : `exfumador${habitos.paquetesAnio !== undefined ? ` (${habitos.paquetesAnio} paquetes-año)` : ''}`}</li>
-                  <li><strong>AUDIT-C:</strong> {habitos.auditFrecuencia + habitos.auditCantidad + habitos.auditAtracon} puntos</li>
+                  <li><strong>AUDIT-C:</strong> {habitos.auditFrecuencia !== undefined && habitos.auditCantidad !== undefined && habitos.auditAtracon !== undefined
+                    ? `${habitos.auditFrecuencia + habitos.auditCantidad + habitos.auditAtracon} puntos`
+                    : 'no completado'}</li>
                   <li><strong>Capacidad funcional:</strong> {habitos.subeDosPisos === 'si' ? 'sube dos pisos sin parar' : 'DASI evaluado'}</li>
                   {habitos.cfs !== undefined && <li><strong>CFS:</strong> {habitos.cfs}</li>}
                 </ul>
@@ -498,7 +502,9 @@ export function App() {
 
             <h3>Vía aérea</h3>
             <ul className="resumen-lista">
-              <li>{viaAerea ? describirViaAerea(viaAerea, modalidad === 'telefonica') : 'no recogida'}</li>
+              <li>{modalidad === 'telefonica'
+                ? 'pendiente de explorar el día de la intervención'
+                : viaAerea ? describirViaAerea(viaAerea, false) : 'no recogida'}</li>
             </ul>
 
             <h3>Consentimiento</h3>

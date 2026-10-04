@@ -257,7 +257,7 @@ apixabán (anti-Xa), riesgo hemorrágico alto (prótesis rodilla) + raquídea + 
 - **ACOD + neuroaxial + aclaramiento (Decisión 1):** los ajustes por aclaramiento **se suman** al plazo de neuroaxial. Dabigatrán con neuroaxial: 72/96/120 h según CrCl > 80 / 50-80 / < 50. Anti-Xa con neuroaxial y CrCl < 30: 96 h. Todos los tramos son casos de prueba unitaria.
 - **Combinaciones fijas (Decisión 5):** el motor agrupa por medicamento comercial; una combinación fija emite **una** instrucción con el plazo más restrictivo. Si la combinación fuerza a retirar la metformina antes de su plazo propio, se añade la nota «vigilar glucemia en los días sin tratamiento» a las notas del anestesiólogo.
 - **GLP-1 (Decisión 8):** diarios → última dosis 4 días antes (omitir 3 días previos + día de la IQ). Semanales → el módulo `fechas/` localiza la dosis programada que cae en la ventana de 7 días previos y la marca como omitida, mostrando su fecha exacta.
-- **Bomba de insulina (Decisión 6):** el `ContextoReglas` incluye régimen (CMA/ingreso) y riesgo quirúrgico; la regla decide `requiereConfirmacion` en función de ellos.
+- **Bomba de insulina (Decisión 6; revisada 2026-10-04):** se retira el régimen del `ContextoReglas` y de `DatosIntervencion`. La regla decide `requiereConfirmacion` **solo** por el riesgo quirúrgico: bajo → sin confirmación; intermedio o alto → confirmación.
 - **Sugammadex (Decisión 11):** regla condicional que, para mujer con anticonceptivo hormonal y posible AG, añade el texto correspondiente (oral vs. no oral) a la hoja del paciente y el recordatorio al alta a las notas del anestesiólogo.
 - **4AT (Decisión 7):** `cuatroAT.ts` calcula el total y la categoría (0 / 1-3 / ≥ 4). Se ejecuta en presencial y telefónica; el resumen registra la modalidad.
 
@@ -270,6 +270,14 @@ apixabán (anti-Xa), riesgo hemorrágico alto (prótesis rodilla) + raquídea + 
   - CSV: comprueba columnas presentes, tipos, valores dentro de listas cerradas (p. ej. riesgo ∈ {bajo, intermedio, alto}), y que cada `id_regla` de `farmacos.csv` exista en `reglas_farmacos.json`.
   - JSON de módulos: comprueba estructura de preguntas, tipos de respuesta, referencias y, si existe, la forma del campo `genera` de cada pregunta (efectos por respuesta: `cuando`, `efecto`, `tipo` ∈ {alerta, nota, prueba, clase_riesgo, asa, regla, hecho}, `gravedad` obligatoria en las alertas). Un test de cobertura (`coberturaAlertas.test.ts`) exige que las respuestas de §5/§5.16 que generan un efecto conserven su `genera` (decisión 30/09/2026).
 - Si hay error, se muestra una pantalla de bloqueo con **fichero, fila y columna** exactos y **no se puede iniciar** ninguna entrevista (R2.3, caso de prueba 21).
+
+### Ejecución de los efectos de módulo (§5.16, 2026-10-04)
+
+Hasta la Fase 1 el campo `genera` era solo descriptivo. Ahora cada efecto de tipo `alerta` o `nota` lleva una **condición estructurada `si`** (igual / enLista / contieneAlguno / mayorQue / mayorIgualQue / recienteMeses / sinFechaRecienteMeses) que `src/dominio/entrevista/efectosModulos.ts` (`emitirEfectosModulos`, función pura) evalúa contra las respuestas para **emitir** las alertas y notas en el resumen del anestesiólogo, conservando las que no salen de módulos (escalas, vía aérea, mtND4, HEMSTOP). Incluye ictus/AIT < 3 meses (roja) y TVP/TEP < 3 meses (amarilla). Dos pruebas lo cubren: una comprueba que cada efecto con `si` se emite, y otra (`coherenciaEfectos.test.ts`) que los efectos de tipo `clase_riesgo`/`asa`/`prueba`/`regla` coinciden con el cálculo real de su capa (`riesgoYPruebas`, `asaSugerido`, `tablaPruebas`, `hechosClinicos`).
+
+### Pruebas complementarias: BNP y vigencia (§7.3/§7.4, 2026-10-04)
+
+`tablaPruebas.decidirPruebas` admite la prueba `bnp` (nota **: cirugía intermedia/alta + comorbilidad CV significativa / fragilidad / capacidad reducida) y un parámetro de vigencia que **descuenta** las pruebas aún vigentes. `riesgoYPruebas` deriva la comorbilidad CV del conjunto de enfermedades (la HTA aislada no cuenta), la fragilidad/capacidad de las escalas, y la vigencia de las fechas del apartado «Pruebas recientes» del paso 6 (comparadas con la fecha de la intervención o «hoy»).
 
 ---
 

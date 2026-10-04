@@ -15,7 +15,7 @@ function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
   return {
     fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio',
     grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false,
-    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null,
+    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, pesoKg: 80, aclaramiento: null,
     // Pauta a las 08:00: plazos en horas caen en el límite exacto; plazos en días,
     // última toma el día (N+1) a las 08:00. (Fechas exactas: docs/casos_referencia.)
     pautaFarmaco: { horas: ['08:00'] },

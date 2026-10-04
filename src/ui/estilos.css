@@ -134,6 +134,8 @@ body {
 .campo input[type='date'],
 .campo input[type='time'],
 .campo input[type='search'],
+.campo input[type='number'],
+.campo input[type='text'],
 .campo select {
   width: 100%;
   min-height: 52px;
@@ -143,6 +145,7 @@ body {
   border-radius: var(--radio);
   background: #fff;
   color: var(--color-texto);
+  box-sizing: border-box;
 }
 .campo input:focus,
 .campo select:focus,
@@ -313,6 +316,14 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 12px;
+}
+
+/* Campos de entrada más grandes (edad, peso, talla, medicamento, reacción) para
+   una valoración más ágil en tablet (decisión del servicio, 2026-10-04). */
+.campo-grande {
+  font-size: 1.25rem;
+  padding: 14px 16px;
+  min-height: 56px;
 }
 
 /* Bloque "añadir intervención previa" con fondo tenue */

@@ -1,4 +1,24 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
+
+/**
+ * Orden de la entrevista tras la Fase 2 (decisión del servicio, 2026-10-04):
+ * 1 intervención · 2 ALERGIAS · 3 datos básicos · 4 antecedentes · 5 hábitos ·
+ * 6 enfermedades · 7 técnica · 8 medicación · 9 vía aérea (no en telefónica) ·
+ * 10 consentimiento · 11 mtND4 · 12 resultados.
+ */
+
+/** Paso 2 · Alergias: sin marcar «Alergias conocidas» = sin alergias conocidas. */
+async function pasoAlergiasSinAlergias(page: Page) {
+  await expect(page.getByRole('heading', { name: /Paso 2 · Alergias/ })).toBeVisible();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+}
+
+/** Paso 11 · mtND4: puerta en «No» → pasa de largo sin alerta. */
+async function pasoMtnd4NoVenezolana(page: Page) {
+  await expect(page.getByRole('heading', { name: /Paso 11 · Origen materno/ })).toBeVisible();
+  await page.getByRole('radio', { name: 'No', exact: true }).check();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+}
 
 test.describe('Vista previa', () => {
   test('muestra la banda de versión de prueba y arranca en la pantalla de inicio', async ({ page }) => {
@@ -30,9 +50,9 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await expect(page.getByText(/Riesgos del procedimiento/)).toBeVisible();
 
-    // Continuar al paso 2.
+    // Continuar al paso 2 (ahora alergias).
     await page.getByRole('button', { name: 'Continuar' }).click();
-    await expect(page.getByRole('heading', { name: /Paso 2 · Datos básicos/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Paso 2 · Alergias/ })).toBeVisible();
   });
 
   test('paso 1: fecha desconocida permite continuar y avisa de márgenes (§8.16)', async ({ page }) => {
@@ -46,7 +66,7 @@ test.describe('Vista previa', () => {
     await page.locator('#proc').fill('hernioplastia');
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
-    await expect(page.getByRole('heading', { name: /Paso 2 · Datos básicos/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Paso 2 · Alergias/ })).toBeVisible();
   });
 
   test('entrevista completa SIN fecha: márgenes en horas, días y "no tomar el día" sin fallar (§8.16)', async ({ page }) => {
@@ -63,16 +83,15 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Paso 2.
+    // Paso 2 alergias (sin alergias) y paso 3 datos básicos.
+    await pasoAlergiasSinAlergias(page);
     await page.locator('#edad').fill('60');
     await page.getByRole('radio', { name: 'Hombre' }).check();
     await page.locator('#peso').fill('80');
     await page.locator('#talla').fill('175');
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Pasos 3-7 sin datos extra (nuevo orden: alergias, antecedentes, hábitos, enfermedades, técnica).
-    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    // Pasos 4-7 sin datos extra (antecedentes, hábitos, enfermedades, técnica).
     await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
     await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
     await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
@@ -115,8 +134,11 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Paso 2 — datos básicos. Edad de mujer 12-55 → aparece la pregunta de embarazo.
-    await expect(page.getByRole('heading', { name: /Paso 2 · Datos básicos/ })).toBeVisible();
+    // Paso 2 — alergias (sin alergias conocidas).
+    await pasoAlergiasSinAlergias(page);
+
+    // Paso 3 — datos básicos. Edad de mujer 12-55 → aparece la pregunta de embarazo.
+    await expect(page.getByRole('heading', { name: /Paso 3 · Datos básicos/ })).toBeVisible();
     await page.locator('#edad').fill('40');
     await page.getByRole('radio', { name: 'Mujer' }).check();
     await page.locator('#peso').fill('65');
@@ -124,11 +146,6 @@ test.describe('Vista previa', () => {
     await expect(page.getByText(/IMC:/)).toBeVisible();
     await expect(page.getByText(/Posibilidad de embarazo/)).toBeVisible();
     await page.getByRole('radio', { name: /No hay posibilidad/ }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click();
-
-    // Paso 3 — alergias. Marcar "No alergias conocidas".
-    await expect(page.getByRole('heading', { name: /Paso 3 · Alergias/ })).toBeVisible();
-    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
     // Paso 4 — antecedentes.
@@ -162,8 +179,9 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('heading', { name: /Paso 10 · Consentimiento/ })).toBeVisible();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Paso 11 — mtND4. Marcar factor materno y ver la alerta roja.
+    // Paso 11 — mtND4. Puerta en "Sí, es posible" → aparece el guion y los factores.
     await expect(page.getByRole('heading', { name: /Paso 11 · Origen materno/ })).toBeVisible();
+    await page.getByRole('radio', { name: 'Sí, es posible' }).check();
     await expect(page.getByText(/Guion para explicar la pregunta/)).toBeVisible();
     await page.getByRole('checkbox', { name: /Ascendencia venezolana por línea materna/ }).check();
     await expect(page.getByText(/Alerta roja/)).toBeVisible();
@@ -193,14 +211,13 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
+    await pasoAlergiasSinAlergias(page);
     await page.locator('#edad').fill('60');
     await page.getByRole('radio', { name: 'Hombre' }).check();
     await page.locator('#peso').fill('80');
     await page.locator('#talla').fill('175');
-    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
 
-    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
     await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
     await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
 
@@ -218,7 +235,7 @@ test.describe('Vista previa', () => {
     // Pasos 9, 10 y 11.
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 vía aérea
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
+    await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
 
     // Resumen: hay pendiente → no se puede generar.
     await expect(page.getByText(/pendientes de confirmar/)).toBeVisible();
@@ -243,16 +260,15 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Paso 2.
+    // Paso 2 alergias + paso 3 básicos.
+    await pasoAlergiasSinAlergias(page);
     await page.locator('#edad').fill('60');
     await page.getByRole('radio', { name: 'Hombre' }).check();
     await page.locator('#peso').fill('80');
     await page.locator('#talla').fill('175');
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Pasos 3-7.
-    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    // Pasos 4-7.
     await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
     await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
     await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
@@ -267,7 +283,7 @@ test.describe('Vista previa', () => {
     // Pasos 9, 10 y 11.
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 vía aérea
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
+    await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
 
     // Resumen: generar la hoja del paciente y ver el QR.
     await expect(page.getByRole('heading', { name: /Resumen de la entrevista/ })).toBeVisible();
@@ -298,13 +314,12 @@ test.describe('Vista previa', () => {
     await page.locator('#proc').fill('hernioplastia');
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
+    await pasoAlergiasSinAlergias(page);
     await page.locator('#edad').fill('60');
     await page.getByRole('radio', { name: 'Hombre' }).check();
     await page.locator('#peso').fill('80');
     await page.locator('#talla').fill('175');
-    await page.getByRole('button', { name: 'Continuar' }).click();
-    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
     await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
     await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
     await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
@@ -313,7 +328,7 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
+    await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
     await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
     await expect(page.getByRole('img', { name: /Código QR/ })).toBeVisible();
 
@@ -346,15 +361,14 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Paso 2: varón 56, IMC ≈ 36 (113 kg, 177 cm).
+    // Paso 2 alergias + paso 3 básicos: varón 56, IMC ≈ 36 (113 kg, 177 cm).
+    await pasoAlergiasSinAlergias(page);
     await page.locator('#edad').fill('56');
     await page.getByRole('radio', { name: 'Hombre' }).check();
     await page.locator('#peso').fill('113');
     await page.locator('#talla').fill('177');
-    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
 
-    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
     await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
     await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
 
@@ -370,7 +384,7 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
+    await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
 
     const stopBang = page.getByRole('listitem').filter({ hasText: 'STOP-Bang' });
     await expect(stopBang).toContainText('6');
@@ -388,16 +402,15 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Paso 2: mujer 45, IMC ≈ 30 (82 kg, 165 cm).
+    // Paso 2 alergias + paso 3 básicos: mujer 45, IMC ≈ 30 (82 kg, 165 cm).
+    await pasoAlergiasSinAlergias(page);
     await page.locator('#edad').fill('45');
     await page.getByRole('radio', { name: 'Mujer' }).check();
     await page.locator('#peso').fill('82');
     await page.locator('#talla').fill('165');
     await page.getByRole('radio', { name: /No hay posibilidad/ }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
 
-    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
     await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
     await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
 
@@ -413,7 +426,7 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
+    await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
 
     const stopBang = page.getByRole('listitem').filter({ hasText: 'STOP-Bang' });
     await expect(stopBang).toContainText('2');
@@ -430,14 +443,13 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
+    await pasoAlergiasSinAlergias(page);
     await page.locator('#edad').fill('60');
     await page.getByRole('radio', { name: 'Hombre' }).check();
     await page.locator('#peso').fill('80');
     await page.locator('#talla').fill('175');
-    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
 
-    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
     await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
     await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
     await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
@@ -457,7 +469,7 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
+    await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
 
     const morfina = page.getByRole('listitem').filter({ hasText: 'Morfina equivalente' });
     await expect(morfina).toContainText('140');
@@ -475,14 +487,13 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
+    await pasoAlergiasSinAlergias(page);
     await page.locator('#edad').fill('62');
     await page.getByRole('radio', { name: 'Hombre' }).check();
     await page.locator('#peso').fill('80');
     await page.locator('#talla').fill('175');
-    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
 
-    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
     await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
     await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
 
@@ -496,7 +507,7 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 -> resumen
+    await pasoMtnd4NoVenezolana(page); // 11 -> resumen
 
     await expect(page.getByText(/ictus o AIT de menos de 3 meses/)).toBeVisible();
   });
@@ -511,16 +522,15 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Mujer 40 (para que la anticoncepción tenga sentido); sin posibilidad de embarazo.
+    // Paso 2 alergias + paso 3 básicos: mujer 40, sin posibilidad de embarazo.
+    await pasoAlergiasSinAlergias(page);
     await page.locator('#edad').fill('40');
     await page.getByRole('radio', { name: 'Mujer' }).check();
     await page.locator('#peso').fill('65');
     await page.locator('#talla').fill('165');
     await page.getByRole('radio', { name: /No hay posibilidad/ }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
 
-    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
     await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
     await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
     await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
@@ -533,7 +543,7 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
     await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 11 mtND4 -> resumen
+    await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
 
     // La nota del sugammadex (§8.15) para vía no oral: método de barrera 7 días.
     await page.getByRole('button', { name: /Notas técnicas/ }).click();
@@ -555,16 +565,15 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: /Cirugia de catarata con anestesia topica/i }).first().click();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
-    // Paso 2 (edad < 65 para no exigir los campos de fragilidad en el paso 5).
+    // Paso 2 alergias + paso 3 básicos (edad < 65 para no exigir fragilidad en el paso 5).
+    await pasoAlergiasSinAlergias(page);
     await page.locator('#edad').fill('60');
     await page.getByRole('radio', { name: 'Hombre' }).check();
     await page.locator('#peso').fill('80');
     await page.locator('#talla').fill('170');
-    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
 
-    // Pasos 3-6 sin datos extra.
-    await page.getByRole('checkbox', { name: 'No alergias conocidas' }).check();
-    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 alergias
+    // Pasos 4-6 sin datos extra.
     await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
     await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
     await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
@@ -608,7 +617,63 @@ test.describe('Vista previa', () => {
     await page.locator('#otro-cv').selectOption('intermedio');
     await page.locator('#otro-hemo').selectOption('bajo');
     await page.getByRole('button', { name: 'Continuar' }).click();
-    await expect(page.getByRole('heading', { name: /Paso 2 · Datos básicos/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Paso 2 · Alergias/ })).toBeVisible();
+  });
+
+  test('§6.2.5 telefónica: no se muestra el paso de vía aérea y el resumen lo marca pendiente', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Telefónica' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    await pasoAlergiasSinAlergias(page);
+    await page.locator('#edad').fill('60');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('80');
+    await page.locator('#talla').fill('175');
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
+    await expect(page.getByRole('heading', { name: /Paso 8 · Medicación/ })).toBeVisible();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> (salta vía aérea) 10 consentimiento
+
+    // En telefónica NO aparece el paso de vía aérea: se va directo al consentimiento.
+    await expect(page.getByRole('heading', { name: /Paso 10 · Consentimiento/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Paso 9 · Vía aérea/ })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
+    await pasoMtnd4NoVenezolana(page); // 11 -> resumen
+
+    // El resumen marca la vía aérea como pendiente y no calcula EGRI/Langeron.
+    await expect(page.getByText(/pendiente de explorar el día de la intervención/)).toBeVisible();
+    await expect(page.getByRole('listitem').filter({ hasText: 'EGRI' })).toHaveCount(0);
+  });
+
+  test('§2b alergias: al marcar «Alergias conocidas» se despliega el formulario de medicamentos', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Paso 2 alergias: sin marcar, no hay formulario de medicamentos.
+    await expect(page.getByRole('heading', { name: /Paso 2 · Alergias/ })).toBeVisible();
+    await expect(page.locator('#al-farmaco')).toHaveCount(0);
+    // Al marcar «Alergias conocidas» aparecen los formularios y se añade una alergia.
+    await page.getByRole('checkbox', { name: 'Alergias conocidas' }).check();
+    await expect(page.locator('#al-farmaco')).toBeVisible();
+    await page.locator('#al-farmaco').fill('Penicilina');
+    await page.locator('#al-reaccion').fill('exantema');
+    await page.getByRole('button', { name: 'Añadir a la lista' }).click();
+    await expect(page.getByText('Penicilina')).toBeVisible();
   });
 
   test('§14.2 modo entrenamiento: carga un caso y muestra la comparación con lo esperado', async ({ page }) => {

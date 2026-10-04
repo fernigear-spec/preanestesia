@@ -47,10 +47,13 @@ export function PasoHabitos({ inicial, edadAnios, sexo, onContinuar, onVolver }:
   const [tabaco, setTabaco] = useState<HabitosUi['tabaco']>(inicial?.tabaco ?? 'nunca');
   const [paquetesAnio, setPaquetesAnio] = useState(inicial?.paquetesAnio !== undefined ? String(inicial.paquetesAnio) : '');
   const [fechaAbandono, setFechaAbandono] = useState(inicial?.fechaAbandonoTabaco ?? '');
+  const [descripcionTabaco, setDescripcionTabaco] = useState(inicial?.descripcionTabaco ?? '');
 
-  const [aFrec, setAFrec] = useState(inicial?.auditFrecuencia ?? 0);
-  const [aCant, setACant] = useState(inicial?.auditCantidad ?? 0);
-  const [aAtr, setAAtr] = useState(inicial?.auditAtracon ?? 0);
+  // AUDIT-C: ninguna pregunta es obligatoria (undefined = sin contestar).
+  const [aFrec, setAFrec] = useState<number | undefined>(inicial?.auditFrecuencia);
+  const [aCant, setACant] = useState<number | undefined>(inicial?.auditCantidad);
+  const [aAtr, setAAtr] = useState<number | undefined>(inicial?.auditAtracon);
+  const auditCompleto = aFrec !== undefined && aCant !== undefined && aAtr !== undefined;
 
   const [dosPisos, setDosPisos] = useState<HabitosUi['subeDosPisos']>(inicial?.subeDosPisos ?? 'si');
   const [itemsDasi, setItemsDasi] = useState<Set<ItemDasi>>(new Set((inicial?.itemsDasi ?? []) as ItemDasi[]));
@@ -60,8 +63,10 @@ export function PasoHabitos({ inicial, edadAnios, sexo, onContinuar, onVolver }:
     inicial?.cuatroAt ?? { alerta: 'normal', amt4: '0_errores', meses: '7_o_mas', cambioAgudo: 'no' },
   );
 
-  // Resultados en vivo.
-  const audit = calcularAuditC({ frecuenciaConsumo: aFrec, cantidadTipica: aCant, frecuenciaAtracon: aAtr, sexo });
+  // Resultados en vivo. El AUDIT-C solo se calcula si las tres están contestadas.
+  const audit = auditCompleto
+    ? calcularAuditC({ frecuenciaConsumo: aFrec, cantidadTipica: aCant, frecuenciaAtracon: aAtr, sexo })
+    : null;
   const necesitaDasi = dosPisos !== 'si';
   const dasi = necesitaDasi ? calcularDasi([...itemsDasi]) : null;
   const cfsNum = cfs === '' ? null : Number(cfs);
@@ -83,15 +88,18 @@ export function PasoHabitos({ inicial, edadAnios, sexo, onContinuar, onVolver }:
   function continuar() {
     const datos: HabitosUi = {
       tabaco,
-      auditFrecuencia: aFrec,
-      auditCantidad: aCant,
-      auditAtracon: aAtr,
       subeDosPisos: dosPisos,
       itemsDasi: [...itemsDasi],
     };
+    if (aFrec !== undefined) datos.auditFrecuencia = aFrec;
+    if (aCant !== undefined) datos.auditCantidad = aCant;
+    if (aAtr !== undefined) datos.auditAtracon = aAtr;
     if (tabaco === 'exfumador') {
       if (paquetesAnio !== '') datos.paquetesAnio = Number(paquetesAnio);
       if (fechaAbandono !== '') datos.fechaAbandonoTabaco = fechaAbandono;
+    }
+    if ((tabaco === 'activo' || tabaco === 'exfumador') && descripcionTabaco.trim() !== '') {
+      datos.descripcionTabaco = descripcionTabaco.trim();
     }
     if (mayor) {
       if (cfsNum !== null) datos.cfs = cfsNum;
@@ -125,17 +133,29 @@ export function PasoHabitos({ inicial, edadAnios, sexo, onContinuar, onVolver }:
           </div>
         </>
       )}
+      {(tabaco === 'activo' || tabaco === 'exfumador') && (
+        <div className="campo">
+          <label htmlFor="desc-tabaco">Describa el consumo (opcional)</label>
+          <input id="desc-tabaco" type="text" value={descripcionTabaco} onChange={(e) => setDescripcionTabaco(e.target.value)}
+            placeholder="p. ej. 1 paquete al día desde los 20 años" />
+        </div>
+      )}
 
       <h3>Alcohol (AUDIT-C)</h3>
-      <AuditPregunta id="a1" etiqueta="¿Con qué frecuencia consume alcohol?" valor={aFrec} onCambio={setAFrec} />
-      <AuditPregunta id="a2" etiqueta="¿Cuántas consumiciones toma un día normal?" valor={aCant} onCambio={setACant} />
-      <AuditPregunta id="a3" etiqueta="¿Con qué frecuencia toma 6 o más en una ocasión?" valor={aAtr} onCambio={setAAtr} />
-      <p className={`aviso ${audit.riesgoAbstinencia ? 'aviso-atencion' : 'aviso-info'}`} role="note" aria-live="polite">
-        AUDIT-C: <strong>{audit.puntuacion}</strong> ·{' '}
-        {audit.categoria === 'negativo' && 'negativo'}
-        {audit.categoria === 'positivo' && 'positivo → consejo breve y hoja de reducción'}
-        {audit.categoria === 'riesgo_abstinencia' && '≥ 8 → alerta de riesgo de síndrome de abstinencia perioperatorio'}
-      </p>
+      <p className="aviso aviso-info" role="note">Ninguna pregunta es obligatoria. La puntuación solo se calcula si contesta las tres.</p>
+      <AuditPregunta id="a1" etiqueta="¿Con qué frecuencia consume alguna bebida alcohólica?" valor={aFrec} onCambio={setAFrec} />
+      <AuditPregunta id="a2" etiqueta="¿Cuántas consumiciones de alcohol suele tomar en un día típico?" valor={aCant} onCambio={setACant} />
+      <AuditPregunta id="a3" etiqueta="¿Con qué frecuencia toma 6 o más bebidas en una sola ocasión?" valor={aAtr} onCambio={setAAtr} />
+      {audit ? (
+        <p className={`aviso ${audit.riesgoAbstinencia ? 'aviso-atencion' : 'aviso-info'}`} role="note" aria-live="polite">
+          AUDIT-C: <strong>{audit.puntuacion}</strong> ·{' '}
+          {audit.categoria === 'negativo' && 'negativo'}
+          {audit.categoria === 'positivo' && 'positivo → consejo breve y hoja de reducción'}
+          {audit.categoria === 'riesgo_abstinencia' && '≥ 8 → alerta de riesgo de síndrome de abstinencia perioperatorio'}
+        </p>
+      ) : (
+        <p className="aviso aviso-info" role="note" aria-live="polite">AUDIT-C no completado (no genera alertas ni anexo).</p>
+      )}
 
       <h3>Capacidad funcional</h3>
       <p>¿Puede subir dos pisos de escaleras sin pararse?</p>
@@ -214,11 +234,12 @@ export function PasoHabitos({ inicial, edadAnios, sexo, onContinuar, onVolver }:
   );
 }
 
-function AuditPregunta({ id, etiqueta, valor, onCambio }: { id: string; etiqueta: string; valor: number; onCambio: (n: number) => void }) {
+function AuditPregunta({ id, etiqueta, valor, onCambio }: { id: string; etiqueta: string; valor: number | undefined; onCambio: (n: number | undefined) => void }) {
   return (
     <div className="campo">
       <label htmlFor={id}>{etiqueta}</label>
-      <select id={id} value={valor} onChange={(e) => onCambio(Number(e.target.value))}>
+      <select id={id} value={valor === undefined ? '' : valor} onChange={(e) => onCambio(e.target.value === '' ? undefined : Number(e.target.value))}>
+        <option value="">— sin contestar —</option>
         {OPCIONES_0_4.map((n) => (
           <option key={n} value={n}>{n}</option>
         ))}

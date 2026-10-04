@@ -78,12 +78,12 @@ export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Prop
   }
 
   return (
-    <section className="tarjeta" aria-labelledby="paso2-tit">
-      <h2 id="paso2-tit">Paso 2 · Datos básicos</h2>
+    <section className="tarjeta" aria-labelledby="paso-basicos-tit">
+      <h2 id="paso-basicos-tit">Paso 3 · Datos básicos</h2>
 
       <div className="campo">
         <label htmlFor="edad">Edad (años)</label>
-        <input id="edad" type="number" min={0} max={129} inputMode="numeric" value={edad} onChange={(e) => setEdad(e.target.value)} />
+        <input id="edad" className="campo-grande" type="number" min={0} max={129} inputMode="numeric" value={edad} onChange={(e) => setEdad(e.target.value)} />
       </div>
 
       {menorDe2 && (
@@ -110,11 +110,11 @@ export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Prop
 
       <div className="campo">
         <label htmlFor="peso">Peso (kg){esPediatrico ? ' · obligatorio' : ''}</label>
-        <input id="peso" type="number" min={0} step="0.1" inputMode="decimal" value={peso} onChange={(e) => setPeso(e.target.value)} />
+        <input id="peso" className="campo-grande" type="number" min={0} step="0.1" inputMode="decimal" value={peso} onChange={(e) => setPeso(e.target.value)} />
       </div>
       <div className="campo">
         <label htmlFor="talla">Talla (cm)</label>
-        <input id="talla" type="number" min={0} step="0.1" inputMode="decimal" value={talla} onChange={(e) => setTalla(e.target.value)} />
+        <input id="talla" className="campo-grande" type="number" min={0} step="0.1" inputMode="decimal" value={talla} onChange={(e) => setTalla(e.target.value)} />
       </div>
 
       {imc !== null && (

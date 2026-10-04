@@ -57,7 +57,6 @@ function ctx(): ContextoReglas {
     neuroaxial: false,
     bloqueoProfundo: false,
     riesgoTromboticoAlto: false, espacioCerrado: false, retina: false,
-    regimen: 'ingreso',
     pesoKg: 80,
     aclaramiento: 90, // conocido, para que las reglas dependientes del riñón calculen
   };

@@ -59,7 +59,6 @@ export function construirContexto(
     riesgoTromboticoAlto: intervencion.riesgoTromboticoAlto,
     espacioCerrado: intervencion.espacioCerrado,
     retina: intervencion.retina,
-    regimen: intervencion.regimen,
     pesoKg,
     aclaramiento,
   };

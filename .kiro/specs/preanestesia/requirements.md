@@ -87,32 +87,32 @@ Todo el contenido clínico (preguntas, fármacos, reglas, procedimientos, planti
 
 ### R3.2 Pasos de la entrevista
 
-> **Orden actualizado (decisión del servicio, 30/09/2026).** La entrevista tiene 12 pasos: 1) intervención, 2) datos básicos, 3) alergias, 4) antecedentes, 5) hábitos, 6) enfermedades y hemostasia, 7) técnica anestésica prevista, 8) medicación, 9) vía aérea, 10) consentimiento, 11) origen materno (mtND4) y 12) resultados. Se elimina el «carácter» de la intervención y el sufijo «E» del ASA. La técnica anestésica pasa a un paso propio (paso 7) y, si se cambia, las reglas y salidas se recalculan. La hipertermia maligna y el déficit de pseudocolinesterasa (personales o familiares) pasan a las condiciones especiales del paso 6 (R5.15). Los identificadores R3.2.x se conservan aunque cambie el número de paso.
+> **Orden actualizado (decisión del servicio, 30/09/2026; revisado 2026-10-04).** La entrevista tiene 12 pasos: 1) intervención, 2) **alergias**, 3) **datos básicos**, 4) antecedentes, 5) hábitos, 6) enfermedades y hemostasia, 7) técnica anestésica prevista, 8) medicación, 9) vía aérea, 10) consentimiento, 11) origen materno (mtND4) y 12) resultados. Las alergias pasan antes de los datos básicos (2026-10-04). Se elimina el «carácter» de la intervención, el **régimen** (CMA/ingreso) y el sufijo «E» del ASA. La técnica anestésica pasa a un paso propio (paso 7) y, si se cambia, las reglas y salidas se recalculan. La hipertermia maligna y el déficit de pseudocolinesterasa (personales o familiares) pasan a las condiciones especiales del paso 6 (R5.15). Los identificadores R3.2.x se conservan aunque cambie el número de paso.
 
 **Paso 1 — Datos de la intervención**
-- **R3.2.1** Campos: fecha y hora prevista de la intervención, procedimiento (buscador con autocompletado sobre `procedimientos.csv`), lateralidad (si aplica según el procedimiento), régimen (CMA, ingreso, UCI prevista) y contraste yodado. **La técnica anestésica ya no se recoge aquí, sino en el paso 7.** Se elimina el campo «carácter» (programada/urgencia).
+- **R3.2.1** Campos: fecha y hora prevista de la intervención, procedimiento (buscador con autocompletado sobre `procedimientos.csv`), lateralidad (si aplica según el procedimiento) y contraste yodado. Se elimina el campo «carácter» (programada/urgencia) y, desde 2026-10-04, el **régimen** (CMA/ingreso): la bomba de insulina decide por el riesgo quirúrgico (R8.5). **La técnica anestésica ya no se recoge aquí, sino en el paso 7.**
 - **R3.2.2** Si no se conoce la hora, se asume las 08:00 y la hoja del paciente lo advierte.
 - **R3.2.4** Aviso si la intervención está a más de 60 días («las suspensiones deben recalcularse si cambia la fecha»).
 - **R3.2.5** Alerta por fármaco si alguna fecha límite de suspensión calculada ya ha pasado o cae hoy: «ya no se puede cumplir el plazo; consultar con el anestesiólogo». Ese fármaco pasa a requerir confirmación.
 - **R3.2.6b** El paso 1 permite marcar «fecha de intervención aún no conocida» y continuar. Sin fecha, la hoja del paciente expresa cada instrucción como margen (sin adelantos de tomas); con fecha, muestra la fecha y hora calculadas y el margen entre paréntesis. El QR del paciente permite recalcular al introducir o cambiar la fecha, y su caducidad depende de si hay fecha. *(§8.16; véase R11 para el QR y R10 para la vista del paciente.)*
 
-**Paso 2 — Datos básicos**
-- **R3.2.7** Campos: edad (fecha de nacimiento o años; en menores de 2 años, meses), sexo, peso, talla. IMC se calcula automáticamente.
+**Paso 2 — Alergias**
+- **R3.2.14** Una sola casilla «Alergias conocidas» (2026-10-04): si no se marca, se registra como «sin alergias conocidas». Al marcarla se despliegan los formularios: medicamentos (con tipo de reacción; campos «medicamento» y «tipo de reacción» grandes), látex, contrastes yodados, alimentos relevantes (huevo, soja, frutos secos, frutas tropicales si alergia al látex), clorhexidina, adhesivos.
+- **R3.2.15** Si no se marca «Alergias conocidas», se registra como sin alergias conocidas (sustituye a la antigua casilla «No alergias conocidas»).
+
+**Paso 3 — Datos básicos**
+- **R3.2.7** Campos: edad (fecha de nacimiento o años; en menores de 2 años, meses), sexo, peso, talla. Edad, peso y talla con campos grandes (2026-10-04). IMC se calcula automáticamente.
 - **R3.2.8** En menores de edad (edad ≤ edad pediátrica máxima de `config.json`), el peso es obligatorio; se activa el módulo pediátrico (R5.12), se sustituye STOP-Bang por STBUR y Apfel por POVOC.
 - **R3.2.9** En mujeres de 12 a 55 años: preguntar posibilidad de embarazo y fecha de la última regla. Si está embarazada, activar módulo obstétrico (R5.13).
 
-**Paso 3 — Alergias**
-- **R3.2.14** Medicamentos (con tipo de reacción), látex, contrastes yodados, alimentos relevantes (huevo, soja, frutos secos, frutas tropicales si alergia al látex), clorhexidina, adhesivos.
-- **R3.2.15** Opción explícita «No alergias conocidas».
-
 **Paso 4 — Antecedentes anestésicos y quirúrgicos**
-- **R3.2.10** Lista añadible de intervenciones previas (procedimiento, año, tipo de anestesia, incidencias).
+- **R3.2.10** Lista añadible de intervenciones previas (procedimiento, año, tipo de anestesia, incidencias). Al añadir una intervención, el año, el tipo de anestesia y las incidencias son **opcionales**; solo el procedimiento es obligatorio (2026-10-04).
 - **R3.2.11** Incidencias a preguntar de forma explícita: intubación o ventilación difícil conocida, NVPO, despertar prolongado, reacción alérgica en quirófano, despertar intraoperatorio, dificultad con epidural o raquídea, transfusiones y reacción transfusional.
 - **R3.2.12** La hipertermia maligna y el déficit de pseudocolinesterasa (personales y familiares) ya no se recogen aquí: pasan a las condiciones especiales del paso 6 (R5.15).
 
 **Paso 5 — Hábitos, capacidad funcional y fragilidad**
-- **R3.2.16** Tabaco: activo, exfumador (con fecha de abandono y paquetes-año), nunca.
-- **R3.2.17** Alcohol: AUDIT-C (3 preguntas). Positivo ≥ 4 en hombres y ≥ 3 en mujeres: consejo breve y hoja de reducción. ≥ 8: alerta de riesgo de síndrome de abstinencia perioperatorio.
+- **R3.2.16** Tabaco: activo, exfumador (con fecha de abandono y paquetes-año), nunca. Si es fumador activo o exfumador, campo libre para describir el consumo (2026-10-04).
+- **R3.2.17** Alcohol: AUDIT-C (3 preguntas, textos de R6.9). Ninguna es obligatoria; la puntuación solo se calcula si las tres están contestadas; si no, «AUDIT-C no completado» y sin alertas ni anexo. Positivo ≥ 4 en hombres y ≥ 3 en mujeres: consejo breve y hoja de reducción. ≥ 8: alerta de riesgo de síndrome de abstinencia perioperatorio.
 - **R3.2.18** Otras drogas: cannabis, cocaína (con fecha del último consumo), otras. Cocaína en la última semana: alerta.
 - **R3.2.19** Capacidad funcional: pregunta directa de dos pisos; si negativa o dudosa, DASI completo (R6.6).
 - **R3.2.20** En pacientes de 65 años o más: Clinical Frailty Scale (R6.10) y el test **4AT** (R6.10), en modalidad presencial **y** telefónica. *(Decisión 7.)*
@@ -136,13 +136,13 @@ Todo el contenido clínico (preguntas, fármacos, reglas, procedimientos, planti
 - **R3.2.27** Al añadir cada fármaco actúa el asistente de coherencia (R4). Al volver al paso 7 para cambiar la técnica, la medicación introducida se conserva y se recalcula.
 
 **Paso 9 — Vía aérea**
-- **R3.2.28** Datos de vía aérea (R6.2). En modalidad telefónica, solo los datos de anamnesis; la exploración queda «pendiente de explorar el día de la intervención» y el cálculo del EGRI es parcial.
+- **R3.2.28** Datos de vía aérea (R6.2). En modalidad telefónica **no se muestra este paso** (2026-10-04): el resumen indica «Vía aérea: pendiente de explorar el día de la intervención» y las escalas de vía aérea (EGRI, Langeron) no se calculan.
 
 **Paso 10 — Consentimiento informado**
 - **R3.2.29** Tres estados: entregado y explicado (con fecha), pendiente de entregar (la hoja del paciente indica «le entregaremos el consentimiento el día de la intervención»), o no procede. Consta en el texto de SAP.
 
 **Paso 11 — Origen materno (cribado mtND4)**
-- **R3.2.13** Sección obligatoria en todos los pacientes (véase R9). Es el último paso antes de los resultados; al continuar se registra el uso (R14.3).
+- **R3.2.13** Sección obligatoria en todos los pacientes (véase R9). Empieza con una pregunta puerta «¿Es posible que su ascendencia materna sea de origen venezolano?» (2026-10-04): si «no», se pasa al siguiente paso sin alerta ni línea en la hoja; si «sí», se muestran el guion y los campos. Es el último paso antes de los resultados; al continuar se registra el uso (R14.3).
 
 **Paso 12 — Resultados**
 - **R3.2.30** Muestra todos los cálculos, pruebas complementarias, plan de medicación, normas de ayuno, alertas y permite generar las salidas (R10).
@@ -222,7 +222,7 @@ Posibilidad de embarazo (si la hay, alerta). Anticonceptivos hormonales combinad
 Se recogen en el paso 6 (enfermedades y hemostasia), no en antecedentes. La hipertermia maligna y el déficit de pseudocolinesterasa se preguntan por separado como personal y familiar. Hipertermia maligna personal o familiar (alerta roja), déficit de pseudocolinesterasa personal o familiar (alerta), porfiria (alerta con recordatorio de revisar seguridad de fármacos), alergia al látex (alerta de quirófano libre de látex).
 
 ### R5.16 Codificación del efecto por respuesta
-- **R5.16.1** Cada respuesta de un módulo que genera un efecto clínico lo declara en el campo `genera` de la pregunta (`datos/modulos/*.json`): tipo (alerta, nota, prueba, clase de riesgo, ASA, regla o dato), gravedad de la alerta, condición que lo dispara y sección del documento fuente. *(Decisión del servicio, 30/09/2026.)*
+- **R5.16.1** Cada respuesta de un módulo que genera un efecto clínico lo declara en el campo `genera` de la pregunta (`datos/modulos/*.json`): tipo (alerta, nota, prueba, clase de riesgo, ASA, regla o dato), gravedad de la alerta, condición que lo dispara (`cuando`) y sección del documento fuente. *(Decisión del servicio, 30/09/2026.)* **Ejecución (2026-10-04):** las alertas y notas llevan además una condición estructurada `si` que el motor evalúa para **emitirlas** en el resumen (`emitirEfectosModulos`); el resto de tipos los calcula su capa correspondiente. Un test comprueba que cada efecto declarado con `si` se emite, y otro (R5.16.4) que las respuestas de §5/§5.16 conservan su `genera`.
 - **R5.16.2** El validador de módulos comprueba la forma de `genera` (cuando, efecto, tipo; gravedad obligatoria en las alertas).
 - **R5.16.3** `CONTENIDO_CLINICO.md` (§16) muestra el efecto por pregunta.
 - **R5.16.4** Un test de cobertura falla si una respuesta de §5/§5.16 que genera un efecto pierde su codificación o si una entrada `genera` está mal formada.
@@ -244,7 +244,7 @@ Cada escala se implementa como módulo independiente con pruebas unitarias. Siem
 - **R6.2.2** Índice de El-Ganzouri (EGRI): apertura bucal < 4 cm +1; DTM 6-6,5 cm +1, < 6 cm +2; Mallampati II +1, III/IV +2; movilidad 80-90° +1, < 80° +2; no protrusión +1; peso 90-110 kg +1, > 110 kg +2; intubación difícil dudosa +1, confirmada +2. EGRI ≥ 4: riesgo elevado de laringoscopia difícil.
 - **R6.2.3** Predictores de ventilación difícil con mascarilla (Langeron): barba, IMC > 26, edéntulo, edad > 55 años, ronquido. ≥ 2 predictores: riesgo.
 - **R6.2.4** Alerta independiente si: radioterapia cervical, tumor de cabeza y cuello, limitación cervical reumatológica, bocio grande, intubación difícil previa confirmada.
-- **R6.2.5** En modalidad telefónica: EGRI parcial con los datos disponibles de anamnesis y aviso «exploración pendiente».
+- **R6.2.5** En modalidad telefónica no se explora la vía aérea (2026-10-04): el paso no se muestra, el resumen indica «pendiente de explorar el día de la intervención» y EGRI/Langeron no se calculan.
 
 ### R6.3 STOP-Bang y STBUR
 - **R6.3.1** STOP-Bang (adultos sin SAOS diagnosticado): 8 ítems. 0-2 bajo; 3-4 intermedio; 5-8 alto. También alto si ≥ 2 de los 4 primeros más varón, IMC > 35 o cuello > 40 cm. Alto: alerta.
@@ -267,7 +267,7 @@ Cockcroft-Gault con peso real. Acepta mg/dL y µmol/L (con conversión). Si solo
 Suma de (dosis diaria × factor) de `opioides.json`. Factores CDC 2022: morfina oral ×1, codeína ×0,15, tramadol ×0,2, tapentadol ×0,4, oxicodona ×1,5, hidromorfona oral ×5, fentanilo transdérmico µg/h ×2,4. Buprenorfina y metadona: sin conversión automática.
 
 ### R6.9 AUDIT-C
-3 preguntas, 0-12 puntos. Positivo ≥ 4 (hombres) / ≥ 3 (mujeres): consejo breve y hoja de reducción. ≥ 8: alerta de abstinencia.
+3 preguntas (textos 2026-10-04: frecuencia de consumo; consumiciones en un día típico; frecuencia de 6 o más en una ocasión), 0-12 puntos, puntuación estándar. Ninguna es obligatoria: la puntuación solo se calcula con las tres contestadas; si falta alguna, «AUDIT-C no completado», sin alertas ni anexo. Positivo ≥ 4 (hombres) / ≥ 3 (mujeres): consejo breve y hoja de reducción. ≥ 8: alerta de abstinencia.
 
 ### R6.10 Fragilidad y 4AT (≥ 65 años)  *(Decisión 7: el 4AT sustituye al Mini-Cog.)*
 - **R6.10.1** Clinical Frailty Scale 1-9 con descripción corta de cada nivel. CFS ≥ 5: alerta de fragilidad.
@@ -291,9 +291,10 @@ La más alta asignada por los módulos: bajo, bajo-moderado, moderado, alto (def
 
 ### R7.3 Tabla de decisión de pruebas
 La aplicación aplica la tabla completa de `docs/documento_fuente.md §7.3` (notas *, ** y ***) y pregunta los supuestos de excepción para Rx de tórax. Incluye la lógica de ecocardiograma. La sulodexida **no** interviene en la petición de pruebas (es solo una regla de medicación; véase Decisión 2).
+- **BNP o NT-proBNP (nota **, 2026-10-04):** solo en cirugía de riesgo intermedio o alto y si hay comorbilidad cardiovascular significativa, fragilidad (CFS ≥ 5) o capacidad funcional reducida (< 4 METs). Comorbilidad cardiovascular significativa: cardiopatía isquémica, insuficiencia cardiaca, valvulopatía moderada o grave, fibrilación auricular u otra arritmia, arteriopatía periférica o aneurisma de aorta, ictus o AIT previo, miocardiopatía e hipertensión pulmonar. La HTA aislada **no** cuenta. El BNP no tiene ventana de validez y no se descuenta por fecha.
 
 ### R7.4 Validez de pruebas
-Hemograma 30 días, bioquímica 30 días, coagulación 14 días, ECG 3 meses, Rx tórax 3 meses, ecocardiograma 12 meses (18 si función conocida y estable). La aplicación pregunta por pruebas recientes con su fecha y compara con la fecha de la intervención.
+Hemograma 30 días, bioquímica 30 días, coagulación 14 días, ECG 3 meses, Rx tórax 3 meses, ecocardiograma 12 meses (18 si función conocida y estable). En el paso de enfermedades, el apartado opcional «Pruebas recientes» recoge la fecha de la última de cada prueba; el motor compara con la fecha de la intervención (o con «hoy» si aún no hay fecha, indicándolo) y **descuenta** las que sigan vigentes ese día (2026-10-04).
 
 ---
 
@@ -334,7 +335,7 @@ Reglas específicas para cada grupo farmacológico según el protocolo de preane
 - **Combinaciones fijas de insulina + GLP-1** (Xultophy, Suliqua): requiere confirmación (omitir el GLP-1 dejaría sin insulina basal).
 - **GLP-1 diarios (semaglutida oral, liraglutida, lixisenatida):** «omitir 3 dosis» significa **no tomar los 3 días previos ni el día de la intervención**; la última dosis es **4 días antes** (ejemplo: intervención el jueves → última toma el domingo). Ayuno estándar.
 - **GLP-1 semanales:** si la dosis semanal cae **entre 7 días antes y el día de la intervención (ambos incluidos)**, **no se administra**; la hoja del paciente indica **la fecha exacta de la dosis que se omite**. Dieta de líquidos claros las 24 h previas (hoja anexa). *(docs/documento_fuente.md §8.5.)*
-- **Bomba de insulina:** basal al 70-80 % y suspender los bolos. En **cirugía de riesgo bajo en CMA**, la enfermera registra la pauta del protocolo **sin confirmación**. En **cirugía de riesgo intermedio o alto, o con ingreso**, **requiere confirmación**.
+- **Bomba de insulina:** basal al 70-80 % y suspender los bolos. La decisión depende **solo del riesgo quirúrgico** (2026-10-04, se retira el régimen): **riesgo bajo** → sin confirmación; **riesgo intermedio o alto** → requiere confirmación.
 
 ### R8.6 AINE
 Plazos por principio activo: ibuprofeno 24 h, naproxeno 72 h, diclofenaco/dexketoprofeno/ketorolaco 24 h, celecoxib/etoricoxib: mantener. Texto al paciente sobre alternativas analgésicas (paracetamol o metamizol).

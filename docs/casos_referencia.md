@@ -160,11 +160,11 @@ Esperado: miércoles 14/10 a las 21:00, 10 UI (completa). Jueves 15/10 por la ma
 **D9.** NovoMix 30, 20 UI por la mañana.
 Esperado: 10 UI la mañana de la intervención.
 
-**D10.** Bomba de insulina. Tumorectomía de mama en CMA (riesgo bajo).
-Esperado: basal al 80 % y suspender bolos. Sin confirmación.
+**D10.** Bomba de insulina. Tumorectomía de mama (riesgo quirúrgico bajo).
+Esperado: basal al 80 % y suspender bolos. Sin confirmación (la decisión depende solo del riesgo quirúrgico).
 
-**D11.** Bomba de insulina. Colectomía con ingreso.
-Esperado: requiere confirmación.
+**D11.** Bomba de insulina. Colectomía (riesgo quirúrgico intermedio).
+Esperado: requiere confirmación (riesgo intermedio o alto).
 
 ## E. Otros fármacos
 
@@ -310,3 +310,4 @@ Esperado: tarjeta inversa sugiriendo preguntar por la CPAP.
 1. IECA y ARA-II: no tomar el día de la intervención, para que el paciente no esté dos días sin tratamiento.
 2. GLP-1 semanales: la última dosis debe ser al menos 7 días antes de la intervención.
 3. Anticoagulantes con plazo en horas (ACOD, heparinas, fondaparinux): adelantar a la hora límite la primera toma posterior al límite si cae como máximo 10 horas después, siempre que quede al menos la mitad del intervalo habitual desde la toma anterior. Nunca se atrasa una toma. En el resto de fármacos no se adelantan tomas.
+4. Bomba de insulina (2026-10-04): se retira el régimen (CMA/ingreso); la decisión depende solo del riesgo quirúrgico (bajo = sin confirmación; intermedio o alto = con confirmación). Casos D10 (riesgo bajo) y D11 (riesgo intermedio) actualizados.

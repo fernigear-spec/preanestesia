@@ -43,7 +43,7 @@ function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
   return {
     fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio',
     grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false,
-    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null, ...p,
+    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, pesoKg: 80, aclaramiento: null, ...p,
   };
 }
 /** fecha/hora esperada de la última toma. */
@@ -285,11 +285,11 @@ describe('Casos D · antidiabéticos', () => {
     expect(r.ajustes.find((a) => a.momento === 'manana_intervencion')?.dosisUi).toBe(10);
     expect(r.textoPaciente).toContain('jueves 15 de octubre');
   });
-  it('D10 bomba CMA riesgo bajo: sin confirmación', () => {
-    expect(reglaBombaInsulina({ idFarmaco: 'b', nombreComercial: 'Bomba' }, ctx({ regimen: 'cma', riesgoCardiovascular: 'bajo' })).requiereConfirmacion).toBeFalse();
+  it('D10 bomba, cirugía de riesgo bajo: sin confirmación', () => {
+    expect(reglaBombaInsulina({ idFarmaco: 'b', nombreComercial: 'Bomba' }, ctx({ riesgoCardiovascular: 'bajo' })).requiereConfirmacion).toBeFalse();
   });
-  it('D11 bomba ingreso: confirmación', () => {
-    expect(reglaBombaInsulina({ idFarmaco: 'b', nombreComercial: 'Bomba' }, ctx({ regimen: 'ingreso' })).requiereConfirmacion).toBeTrue();
+  it('D11 bomba, cirugía de riesgo intermedio: confirmación', () => {
+    expect(reglaBombaInsulina({ idFarmaco: 'b', nombreComercial: 'Bomba' }, ctx({ riesgoCardiovascular: 'intermedio' })).requiereConfirmacion).toBeTrue();
   });
 });
 

@@ -20,8 +20,6 @@ export type TecnicaAnestesica =
   | 'retrobulbar_peribulbar'
   | 'no_se_sabe';
 
-export type Regimen = 'cma' | 'ingreso' | 'uci_prevista';
-
 export type RiesgoCardiovascular = 'bajo' | 'intermedio' | 'alto';
 export type RiesgoHemorragico = 'minimo' | 'bajo' | 'alto';
 export type GrupoOftalmologico = 'no_aplica' | 'riesgo_bajo' | 'riesgo_moderado_alto';
@@ -67,7 +65,6 @@ export interface DatosIntervencion {
   retina: boolean;
   /** ¿Se prevé administrar contraste yodado? (afecta a la metformina, §8.5). */
   contrasteYodado: 'si' | 'no' | 'no_se_sabe';
-  regimen: Regimen;
   /** Técnica anestésica prevista (se elige en el paso 7). */
   tecnica: TecnicaAnestesica;
 }
@@ -189,7 +186,6 @@ export interface ContextoReglas {
   espacioCerrado: boolean;
   /** Cirugía de retina. */
   retina: boolean;
-  regimen: Regimen;
   pesoKg: number;
   /** Aclaramiento de creatinina (mL/min) o null si no se conoce (R6.7). */
   aclaramiento: number | null;

@@ -14,8 +14,6 @@
     "procedimientoId": "cgd_colecistectomia_lap",
     "fecha": "2026-11-05",
     "hora": "08:00",
-    "regimen": "cma",
-    "caracter": "programada",
     "tecnica": "general",
     "contrasteYodado": "no"
   },

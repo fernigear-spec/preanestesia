@@ -242,3 +242,28 @@ Cada subtarea incluye su fichero en `src/dominio/escalas/` **y** sus pruebas uni
 7. Bloque **18** (documentación y despliegue).
 
 > Las escalas y reglas (bloques 4, 6, 7, 8) se desarrollan **con sus pruebas unitarias en la misma tarea** (TDD), ya que son el elemento de mayor riesgo clínico.
+
+---
+
+## 19. Correcciones y agilización (sesión 2026-10-04)
+
+### Fase 1 — Pruebas complementarias y efectos de módulo
+- [x] **19.1** BNP/NT-proBNP en `tablaPruebas` (nota **: cirugía intermedia/alta + comorbilidad CV significativa / fragilidad / capacidad reducida; HTA aislada no cuenta). _(R7.3)_
+- [x] **19.2** Descuento de pruebas vigentes (§7.4): entrada «Pruebas recientes» en el paso 6; `derivarVigenciaPruebas` compara con la fecha de la intervención (o «hoy»). _(R7.4)_
+- [x] **19.3** G1/G2/G3 del informe ejecutan el motor completo (`derivarRiesgoYPruebas`), sin atajos. _(docs/informe_casos_referencia.md)_
+- [x] **19.4** Ejecución de los efectos de módulo (§5.16): condición `si` en cada alerta/nota; `emitirEfectosModulos` las emite en el resumen; pruebas de emisión y de coherencia (clase_riesgo/ASA/prueba/regla). _(R5.16)_
+- [x] **19.5** Alertas ictus/AIT < 3 meses (roja) y TVP/TEP < 3 meses (amarilla), ejecutables desde los módulos. _(§5.1)_
+- [x] **19.6** Casillas §5.1/§5.2 que faltaban: miocardiopatía, hipertensión pulmonar (con alerta), arteriopatía periférica y aneurisma de aorta (presencia); conectadas a BNP y a CHA2DS2-VA (enfermedad vascular).
+- [x] **19.7** Operador `sinFechaRecienteMeses`; la nota de distrofia «valorar ecocardiograma» ya se ejecuta (ningún efecto queda solo descriptivo).
+
+### Fase 2 — Valoración más ágil
+- [x] **19.8** Paso 1: se elimina el campo «régimen»; la bomba de insulina decide por el riesgo quirúrgico (bajo = sin confirmación; intermedio/alto = con confirmación). D10/D11 actualizados. _(R3.2.1, R8.5)_
+- [x] **19.9** Nuevo orden: paso 2 = alergias, paso 3 = datos básicos. _(R3.2)_
+- [x] **19.10** Alergias: una sola casilla «Alergias conocidas»; sin marcar = sin alergias conocidas; campos «medicamento» y «tipo de reacción» grandes. _(R3.2.14)_
+- [x] **19.11** Datos básicos: campos grandes para edad, peso y talla. _(R3.2.7)_
+- [x] **19.12** Antecedentes: año, tipo de anestesia e incidencias opcionales; solo el procedimiento obligatorio. _(R3.2.10)_
+- [x] **19.13** Hábitos: campo libre de consumo si fumador activo/exfumador; AUDIT-C con los textos nuevos, ninguna obligatoria, puntuación solo con las tres contestadas («AUDIT-C no completado» si no). _(R3.2.16, R3.2.17, R6.9)_
+- [x] **19.14** Módulos: ninguna pregunta obligatoria; campos pequeños (número/texto) con el mismo tamaño que los desplegables. _(R3.2.21)_
+- [x] **19.15** Vía aérea: no se muestra en telefónica; el resumen la marca pendiente y no calcula EGRI/Langeron. _(R3.2.28, R6.2.5)_
+- [x] **19.16** mtND4: pregunta puerta «¿Es posible que su ascendencia materna sea de origen venezolano?»; «no» pasa de largo sin alerta ni línea en la hoja. _(R3.2.13, R9)_
+- [x] **19.17** E2E y pruebas actualizadas al nuevo flujo; nuevas pruebas de telefónica, alergias conocidas, efectos de módulo y coherencia.

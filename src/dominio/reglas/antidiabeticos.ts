@@ -266,9 +266,10 @@ export interface EntradaBombaInsulina {
 }
 
 export function reglaBombaInsulina(e: EntradaBombaInsulina, ctx: ContextoReglas): ResultadoFarmaco {
-  // CMA de riesgo bajo: sin confirmación. Intermedio/alto o ingreso: requiere confirmación.
-  const cmaBajoRiesgo = ctx.regimen === 'cma' && ctx.riesgoCardiovascular === 'bajo';
-  const requiereConfirmacion = !cmaBajoRiesgo;
+  // La decisión depende SOLO del riesgo quirúrgico (decisión del servicio, 2026-10-04;
+  // se retira el régimen): riesgo bajo → sin confirmación; intermedio o alto → confirmación.
+  const bajoRiesgo = ctx.riesgoCardiovascular === 'bajo';
+  const requiereConfirmacion = !bajoRiesgo;
 
   const res: ResultadoFarmaco = {
     idFarmaco: e.idFarmaco,
@@ -278,9 +279,9 @@ export function reglaBombaInsulina(e: EntradaBombaInsulina, ctx: ContextoReglas)
     textoPaciente: requiereConfirmacion
       ? 'Sobre su bomba de insulina, el anestesiólogo le indicará qué hacer. No cambie la pauta por su cuenta.'
       : 'Ponga la basal al 80 % de lo habitual y no se administre bolos el día de la intervención.',
-    reglaAplicada: cmaBajoRiesgo
-      ? 'Bomba de insulina, CMA de riesgo bajo: basal 80 %, suspender bolos (sin confirmación)'
-      : 'Bomba de insulina, riesgo intermedio/alto o ingreso: requiere confirmación',
+    reglaAplicada: bajoRiesgo
+      ? 'Bomba de insulina, cirugía de riesgo bajo: basal 80 %, suspender bolos (sin confirmación)'
+      : 'Bomba de insulina, cirugía de riesgo intermedio/alto: requiere confirmación',
     fuente: FUENTE,
     requiereConfirmacion,
   };

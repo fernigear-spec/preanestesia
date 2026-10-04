@@ -62,7 +62,8 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
 
   // Ayuno (§8.14) y condicionales de la hoja (§10.2).
   const { ayunoQr, extras } = useMemo(() => {
-    const auditPositivo = habitos
+    // AUDIT-C solo si las tres preguntas están contestadas (§6.9); si no, no hay anexo de alcohol.
+    const auditPositivo = habitos && habitos.auditFrecuencia !== undefined && habitos.auditCantidad !== undefined && habitos.auditAtracon !== undefined
       ? calcularAuditC({ frecuenciaConsumo: habitos.auditFrecuencia, cantidadTipica: habitos.auditCantidad, frecuenciaAtracon: habitos.auditAtracon, sexo }).positivo
       : false;
     const cuatroAtPuntuacion = habitos?.cuatroAt ? calcular4AT(habitos.cuatroAt).puntuacion : undefined;

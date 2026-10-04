@@ -79,7 +79,11 @@ export function Salidas({ entrevista, modalidad }: Props) {
     });
     const plan = construirPlanPaciente(medicacion ?? [], intervencion, clin, basicos.pesoKg);
 
-    const audit = habitos ? calcularAuditC({ frecuenciaConsumo: habitos.auditFrecuencia, cantidadTipica: habitos.auditCantidad, frecuenciaAtracon: habitos.auditAtracon, sexo: basicos.sexo }) : null;
+    // AUDIT-C solo si las tres preguntas están contestadas (§6.9); si no, no genera alertas ni anexo.
+    const auditCompleto = habitos !== null && habitos.auditFrecuencia !== undefined && habitos.auditCantidad !== undefined && habitos.auditAtracon !== undefined;
+    const audit = auditCompleto
+      ? calcularAuditC({ frecuenciaConsumo: habitos.auditFrecuencia!, cantidadTipica: habitos.auditCantidad!, frecuenciaAtracon: habitos.auditAtracon!, sexo: basicos.sexo })
+      : null;
     const cuatroAt = habitos?.cuatroAt ? calcular4AT(habitos.cuatroAt) : null;
     const hemstop = calcularHemstop(cribado.hemstop);
 

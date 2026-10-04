@@ -33,7 +33,10 @@ export function PasoAntecedentes({ inicial, onContinuar, onVolver }: Props) {
   // Formulario para añadir una intervención previa.
   const [proc, setProc] = useState('');
   const [anio, setAnio] = useState('');
-  const [tipo, setTipo] = useState<IntervencionPrevia['tipoAnestesia']>('general');
+  // El año, el tipo de anestesia y las incidencias son opcionales; solo el
+  // procedimiento es obligatorio (decisión del servicio, 2026-10-04). El tipo
+  // arranca en «no lo sabe» para no dar por supuesto un valor.
+  const [tipo, setTipo] = useState<IntervencionPrevia['tipoAnestesia']>('no_lo_sabe');
   const [incid, setIncid] = useState<Set<string>>(new Set());
 
   function alternarIncidencia(id: string) {
@@ -56,7 +59,7 @@ export function PasoAntecedentes({ inicial, onContinuar, onVolver }: Props) {
     setPrevias((p) => [...p, nueva]);
     setProc('');
     setAnio('');
-    setTipo('general');
+    setTipo('no_lo_sabe');
     setIncid(new Set());
   }
 

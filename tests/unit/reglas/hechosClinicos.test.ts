@@ -29,7 +29,7 @@ function ctx(aclaramiento: number | null, p: Partial<ContextoReglas> = {}): Cont
   return {
     fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio',
     grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false,
-    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, regimen: 'ingreso', pesoKg: 80, aclaramiento, ...p,
+    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, pesoKg: 80, aclaramiento, ...p,
   };
 }
 function farmaco(idRegla: string, p: Partial<DatosFarmacoUi> & { nombreComercial: string; principiosActivos: string[] }): DatosFarmacoUi {

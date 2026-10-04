@@ -149,7 +149,7 @@ function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
   return {
     fechaHoraIntervencion: IV, riesgoHemorragico: 'bajo', riesgoCardiovascular: 'intermedio',
     grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false,
-    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, regimen: 'ingreso',
+    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false,
     pesoKg: 80, aclaramiento: null, pautaFarmaco: { horas: ['09:00'] }, ...p,
   };
 }

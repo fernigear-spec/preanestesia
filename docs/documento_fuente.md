@@ -60,25 +60,25 @@ Genera los ficheros iniciales con el contenido de este documento y de los anexos
 
 Navegación por pasos con barra de progreso y un panel lateral (inferior en tablet) que muestra en tiempo real el resumen, las alertas y los cálculos. Se puede volver a cualquier paso. Cada paso indica qué preguntas faltan. Al inicio se elige la modalidad: presencial o telefónica.
 
-> **Orden actualizado (decisión del servicio, 30/09/2026).** La entrevista tiene 12 pasos en este orden: 1) intervención, 2) datos básicos, 3) alergias, 4) antecedentes, 5) hábitos, 6) enfermedades y hemostasia, 7) técnica anestésica prevista, 8) medicación, 9) vía aérea, 10) consentimiento, 11) origen materno (mtND4) y 12) resultados. Se elimina el **carácter** de la intervención (programada/urgencia) y el sufijo **E** del ASA (ya no se recoge la urgencia). La técnica anestésica prevista pasa a un paso propio (paso 7); si se cambia, las reglas de medicación y las salidas se recalculan. La hipertermia maligna y el déficit de pseudocolinesterasa (personales o familiares) se recogen como **condiciones especiales** del paso de enfermedades (§5.15), no en antecedentes.
+> **Orden actualizado (decisión del servicio, 30/09/2026; revisado 2026-10-04).** La entrevista tiene 12 pasos en este orden: 1) intervención, 2) **alergias**, 3) **datos básicos**, 4) antecedentes, 5) hábitos, 6) enfermedades y hemostasia, 7) técnica anestésica prevista, 8) medicación, 9) vía aérea, 10) consentimiento, 11) origen materno (mtND4) y 12) resultados. Las alergias pasan antes de los datos básicos (2026-10-04). Se elimina el **carácter** de la intervención (programada/urgencia), el **régimen** (CMA/ingreso) y el sufijo **E** del ASA. La técnica anestésica prevista pasa a un paso propio (paso 7); si se cambia, las reglas de medicación y las salidas se recalculan. La hipertermia maligna y el déficit de pseudocolinesterasa (personales o familiares) se recogen como **condiciones especiales** del paso de enfermedades (§5.15), no en antecedentes.
 
 ### Paso 1. Datos de la intervención
-Fecha y hora prevista (si no se conoce la hora, se asume 08:00 y la hoja del paciente lo avisa), procedimiento (desde `procedimientos.csv`), lateralidad si aplica, régimen (CMA, ingreso, UCI prevista) y contraste yodado. La técnica anestésica no se pregunta aquí, sino en el paso 7.
+Fecha y hora prevista (si no se conoce la hora, se asume 08:00 y la hoja del paciente lo avisa), procedimiento (desde `procedimientos.csv`), lateralidad si aplica y contraste yodado. El **régimen** (CMA/ingreso) se retiró (2026-10-04): la bomba de insulina decide por el riesgo quirúrgico (§8.5). La técnica anestésica no se pregunta aquí, sino en el paso 7.
 
 Avisos de fecha: si la intervención está a más de 60 días, aviso de que las suspensiones deben recalcularse si cambia la fecha. Si alguna fecha límite de suspensión calculada ya ha pasado o cae hoy, alerta por fármaco: «ya no se puede cumplir el plazo de suspensión; consultar con el anestesiólogo», y ese fármaco pasa a requerir confirmación.
 
-### Paso 2. Datos básicos
-Edad (fecha de nacimiento o años; en menores de 2 años, meses), sexo, peso, talla, IMC calculado. En menores, peso obligatorio. Si la edad es ≤ la edad pediátrica máxima, se activa el módulo pediátrico y se sustituyen STOP-Bang por STBUR y Apfel por POVOC. En mujeres de 12 a 55 años, posibilidad de embarazo y fecha de la última regla; si está embarazada, se activa el módulo obstétrico.
+### Paso 2. Alergias
+Una sola casilla «Alergias conocidas» (2026-10-04): si no se marca, se registra como **sin alergias conocidas**. Al marcarla se despliegan los formularios: medicamentos (con tipo de reacción, campos grandes), látex, contrastes yodados, alimentos relevantes (huevo, soja, frutos secos, frutas tropicales si hay alergia al látex), clorhexidina y adhesivos.
 
-### Paso 3. Alergias
-Medicamentos (con tipo de reacción), látex, contrastes yodados, alimentos relevantes (huevo, soja, frutos secos, frutas tropicales si hay alergia al látex), clorhexidina, adhesivos. «No alergias conocidas» como opción explícita.
+### Paso 3. Datos básicos
+Edad (fecha de nacimiento o años; en menores de 2 años, meses), sexo, peso, talla, IMC calculado (edad, peso y talla con campos grandes). En menores, peso obligatorio. Si la edad es ≤ la edad pediátrica máxima, se activa el módulo pediátrico y se sustituyen STOP-Bang por STBUR y Apfel por POVOC. En mujeres de 12 a 55 años, posibilidad de embarazo y fecha de la última regla; si está embarazada, se activa el módulo obstétrico.
 
 ### Paso 4. Antecedentes anestésicos y quirúrgicos
-Intervenciones previas (lista añadible: procedimiento, año, tipo de anestesia, incidencias). Incidencias a preguntar de forma explícita: intubación o ventilación difícil conocida, náuseas y vómitos postoperatorios, despertar prolongado, reacción alérgica en quirófano, despertar intraoperatorio, dificultad con la epidural o la raquídea, transfusiones y reacción transfusional. La hipertermia maligna y el déficit de pseudocolinesterasa (personales y familiares) ya no se recogen aquí: pasan a las condiciones especiales del paso 6 (§5.15).
+Intervenciones previas (lista añadible). Al añadir una intervención, el **año, el tipo de anestesia y las incidencias son opcionales**; solo el procedimiento es obligatorio (2026-10-04). Incidencias a preguntar de forma explícita: intubación o ventilación difícil conocida, náuseas y vómitos postoperatorios, despertar prolongado, reacción alérgica en quirófano, despertar intraoperatorio, dificultad con la epidural o la raquídea, transfusiones y reacción transfusional. La hipertermia maligna y el déficit de pseudocolinesterasa (personales y familiares) ya no se recogen aquí: pasan a las condiciones especiales del paso 6 (§5.15).
 
 ### Paso 5. Hábitos, capacidad funcional y fragilidad
-- Tabaco (activo, exfumador, nunca; paquetes-año; fecha de abandono).
-- Alcohol con AUDIT-C (sección 6.9).
+- Tabaco (activo, exfumador, nunca; paquetes-año; fecha de abandono). Si es fumador activo o exfumador, un campo libre para describir el consumo (2026-10-04).
+- Alcohol con AUDIT-C (sección 6.9). Ninguna de las tres preguntas es obligatoria.
 - Otras drogas (cannabis, cocaína con fecha del último consumo, otras). Consumo de cocaína en la última semana: alerta.
 - Capacidad funcional: pregunta directa «¿puede subir dos pisos de escaleras sin pararse?»; si la respuesta es no o dudosa, DASI completo (sección 6.6).
 - En pacientes de 65 años o más: Clinical Frailty Scale y 4AT, en presencial y en telefónica (sección 6.10).
@@ -93,7 +93,7 @@ Técnica prevista (general, sedación, neuroaxial, bloqueo periférico, bloqueo 
 Buscador por principio activo o nombre comercial con autocompletado sobre `farmacos.csv`, tolerante a tildes, mayúsculas y errores menores. Para cada fármaco: dosis, pauta y hora habitual. Si no está en el catálogo, se escribe a mano y queda marcado «no catalogado: mantener y consultar con el anestesiólogo». Al añadir cada fármaco actúa el asistente de coherencia (sección 5b). Al volver al paso 7 para cambiar la técnica, la medicación introducida se conserva y se recalcula.
 
 ### Paso 9. Vía aérea
-Sección 6.2. En modalidad telefónica solo se recogen los datos de anamnesis; la exploración queda «pendiente de explorar el día de la intervención» y el cálculo es parcial.
+Sección 6.2. En modalidad telefónica **no se muestra este paso** (2026-10-04): el resumen indica «Vía aérea: pendiente de explorar el día de la intervención» y las escalas de vía aérea (EGRI, Langeron) no se calculan.
 
 ### Paso 10. Consentimiento informado de anestesia
 Tres estados: entregado y explicado (con fecha), pendiente de entregar (habitual en telefónica; la hoja del paciente dice «le entregaremos el consentimiento el día de la intervención») o no procede. Consta en el texto de SAP.
@@ -273,7 +273,7 @@ Datos: Mallampati (I a IV, con ilustración esquemática propia, sin imágenes c
 - Índice de El-Ganzouri (EGRI): apertura bucal < 4 cm = 1; distancia tiromentoniana 6 a 6,5 cm = 1, < 6 cm = 2; Mallampati II = 1, III o IV = 2; movilidad cervical 80 a 90° = 1, < 80° = 2; no puede protruir la mandíbula = 1; peso 90 a 110 kg = 1, > 110 kg = 2; intubación difícil previa dudosa = 1, confirmada = 2. EGRI ≥ 4: riesgo elevado de laringoscopia difícil.
 - Ventilación difícil con mascarilla (Langeron): barba, IMC > 26, edéntulo, edad > 55 años, ronquido. Dos o más: riesgo.
 - Alerta independiente de las escalas si hay radioterapia cervical, tumor de cabeza y cuello, limitación cervical reumatológica, bocio grande o intubación difícil previa confirmada.
-- En telefónica, EGRI parcial con los componentes disponibles y el aviso «exploración pendiente».
+- En telefónica no se explora la vía aérea (2026-10-04): el paso no se muestra, el resumen indica «pendiente de explorar el día de la intervención» y las escalas de vía aérea (EGRI, Langeron) no se calculan.
 
 ### 6.3 SAOS: STOP-Bang (adultos sin SAOS diagnosticado) y STBUR (niños)
 STOP-Bang: ronquido fuerte, cansancio o somnolencia diurna, apneas observadas, HTA en tratamiento, IMC > 35, edad > 50, cuello > 40 cm, varón. 0 a 2 bajo; 3 a 4 intermedio; 5 a 8 alto. También alto con ≥ 2 de los cuatro primeros más varón, IMC > 35 o cuello > 40 cm. Alto: alerta.
@@ -296,7 +296,7 @@ Cockcroft-Gault con peso real: ((140 − edad) × peso) / (72 × creatinina en m
 Suma de dosis diarias × factor de `opioides.json`. Factores iniciales (CDC 2022): morfina oral 1; codeína 0,15; tramadol 0,2; tapentadol 0,4; oxicodona 1,5; hidromorfona oral 5; fentanilo transdérmico µg/h × 2,4. Buprenorfina y metadona sin conversión (5.7).
 
 ### 6.9 AUDIT-C
-Tres preguntas, 0 a 12 puntos. Positivo ≥ 4 en hombres y ≥ 3 en mujeres: consejo breve y hoja de reducción de consumo. ≥ 8: alerta de riesgo de síndrome de abstinencia perioperatorio.
+Tres preguntas (textos revisados 2026-10-04): 1) ¿Con qué frecuencia consume alguna bebida alcohólica?; 2) ¿Cuántas consumiciones de alcohol suele tomar en un día típico?; 3) ¿Con qué frecuencia toma 6 o más bebidas en una sola ocasión? 0 a 12 puntos, puntuación estándar. **Ninguna pregunta es obligatoria**: la puntuación solo se calcula si las tres están contestadas; si falta alguna, el resumen dice «AUDIT-C no completado» y no genera alertas ni anexo. Positivo ≥ 4 en hombres y ≥ 3 en mujeres: consejo breve y hoja de reducción de consumo. ≥ 8: alerta de riesgo de síndrome de abstinencia perioperatorio.
 
 ### 6.10 Fragilidad, deterioro cognitivo y delirium (≥ 65 años)
 - Clinical Frailty Scale 1 a 9 con descripción corta de cada nivel. ≥ 5: fragilidad (alerta).
@@ -412,7 +412,7 @@ Recordatorio en la salida: la valoración debería hacerse idealmente entre 2 y 
 - Insulina NPH: dosis completa la noche previa y 50 % la mañana de la intervención.
 - Insulina rápida o ultrarrápida: suspender la del desayuno; solo pauta correctora según glucemia capilar.
 - Insulinas premezcladas: 50 % de la dosis habitual de la mañana de la intervención.
-- Bomba de insulina: basal al 80 % y suspender los bolos. Cirugía de riesgo bajo en CMA: sin confirmación. Riesgo intermedio o alto, o ingreso: requiere confirmación.
+- Bomba de insulina: basal al 80 % y suspender los bolos. La decisión depende **solo del riesgo quirúrgico** (2026-10-04, se retira el régimen): cirugía de riesgo bajo, sin confirmación; riesgo intermedio o alto, requiere confirmación.
 - Combinaciones fijas de insulina basal con GLP-1 (degludec más liraglutida, glargina más lixisenatida): requiere confirmación, porque omitir el GLP-1 dejaría sin insulina basal.
 - Combinaciones orales: regla más restrictiva de sus componentes.
 - Nota para el anestesiólogo en diabéticos: objetivo de glucemia perioperatoria 100 a 180 mg/dL; monitorización preinducción, cada 2 h en cirugía prolongada y cada 2 a 4 h en el postoperatorio hasta reiniciar dieta; si no se ha suspendido el SGLT2, controles cada 1 a 2 h, gasometría en cirugía prolongada, cuerpos cetónicos, fluidos balanceados y vigilancia de cetoacidosis euglucémica (pH < 7,3, bicarbonato < 18 mmol/L o anión gap elevado).
@@ -534,9 +534,9 @@ g) El texto del paciente siempre incluye: 'Si le cambian la fecha o la hora de l
 
 ## 9. Cribado de riesgo mitocondrial mtND4 (consenso SEDAR 2026)
 
-Pregunta obligatoria en todos los pacientes, con un guion para la enfermera que explique el motivo con respeto, por ejemplo: «Hacemos esta pregunta a todos los pacientes porque se ha descrito una variante genética heredada por vía materna, más frecuente en familias de origen venezolano, que puede influir en cómo se elige la anestesia».
+Pregunta obligatoria en todos los pacientes. **Pregunta puerta (2026-10-04):** el paso empieza con una sola pregunta, «¿Es posible que su ascendencia materna sea de origen venezolano?». Si la respuesta es **no**, se pasa directamente al paso siguiente, sin alerta y sin línea en la hoja del paciente. Si es **sí**, se muestran el guion y el resto de campos. Guion para la enfermera: «Hacemos esta pregunta a todos los pacientes porque se ha descrito una variante genética heredada por vía materna, más frecuente en familias de origen venezolano, que puede influir en cómo se elige la anestesia».
 
-Preguntas:
+Preguntas (si la pregunta puerta es «sí»):
 - ¿Su madre, su abuela materna u otra persona de la línea materna directa es de origen venezolano?
 - ¿Desconoce el origen de su madre? ¿Nació por ovodonación?
 - En la familia por línea materna: despertar muy retrasado tras una anestesia, daño neurológico grave, ictus o lesiones cerebrales tras anestesia general, muertes inesperadas en una operación.

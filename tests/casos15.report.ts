@@ -36,7 +36,7 @@ function ctx(p: Partial<ContextoReglas> = {}): ContextoReglas {
   return {
     fechaHoraIntervencion: IV, riesgoHemorragico: 'alto', riesgoCardiovascular: 'intermedio',
     grupoOftalmologico: 'no_aplica', neuroaxial: false, bloqueoProfundo: false,
-    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, regimen: 'ingreso', pesoKg: 80, aclaramiento: null, ...p,
+    riesgoTromboticoAlto: false, espacioCerrado: false, retina: false, pesoKg: 80, aclaramiento: null, ...p,
   };
 }
 
@@ -240,8 +240,8 @@ console.log('Pautas horarias de referencia usadas: apixabán 09:00/21:00, enalap
 // Bomba de insulina CMA vs ingreso
 {
   console.log('\n— Prueba adicional: bomba de insulina CMA bajo riesgo vs ingreso —');
-  imprimirFarmaco('Bomba (CMA riesgo bajo)', reglaBombaInsulina({ idFarmaco: 'bomba', nombreComercial: 'Bomba' }, ctx({ regimen: 'cma', riesgoCardiovascular: 'bajo' })));
-  imprimirFarmaco('Bomba (ingreso)', reglaBombaInsulina({ idFarmaco: 'bomba', nombreComercial: 'Bomba' }, ctx({ regimen: 'ingreso', riesgoCardiovascular: 'bajo' })));
+  imprimirFarmaco('Bomba (cirugía riesgo bajo)', reglaBombaInsulina({ idFarmaco: 'bomba', nombreComercial: 'Bomba' }, ctx({ riesgoCardiovascular: 'bajo' })));
+  imprimirFarmaco('Bomba (cirugía riesgo intermedio)', reglaBombaInsulina({ idFarmaco: 'bomba', nombreComercial: 'Bomba' }, ctx({ riesgoCardiovascular: 'intermedio' })));
 }
 // GLP-1 diario y semanal en 3 posiciones
 {

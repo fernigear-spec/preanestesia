@@ -20,7 +20,6 @@ interface CasoJson {
     procedimientoId: string;
     fecha?: string;
     hora?: string;
-    regimen: DatosIntervencion['regimen'];
     tecnica: DatosIntervencion['tecnica'];
     contrasteYodado: DatosIntervencion['contrasteYodado'];
   };
@@ -62,7 +61,6 @@ function hidratar(c: CasoJson): CasoEntrenamiento {
         espacioCerrado: procedimiento.espacioCerrado,
         retina: procedimiento.retina,
         contrasteYodado: c.intervencion.contrasteYodado,
-        regimen: c.intervencion.regimen,
         tecnica: c.intervencion.tecnica,
       }
     : null;

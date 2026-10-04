@@ -6,7 +6,7 @@
  * está a más de 60 días. Los riesgos se heredan del procedimiento elegido.
  */
 import { useMemo, useState } from 'react';
-import type { DatosIntervencion, Regimen, RiesgoCardiovascular, RiesgoHemorragico } from '../../dominio/tipos.ts';
+import type { DatosIntervencion, RiesgoCardiovascular, RiesgoHemorragico } from '../../dominio/tipos.ts';
 import {
   cargarProcedimientos,
   buscarProcedimientos,
@@ -19,12 +19,6 @@ interface Props {
   onVolver: () => void;
 }
 
-const REGIMENES: Array<{ valor: Regimen; etiqueta: string }> = [
-  { valor: 'cma', etiqueta: 'Cirugía mayor ambulatoria (CMA)' },
-  { valor: 'ingreso', etiqueta: 'Con ingreso' },
-  { valor: 'uci_prevista', etiqueta: 'UCI prevista' },
-];
-
 const MS_DIA = 86_400_000;
 
 export function PasoIntervencion({ onContinuar, onVolver }: Props) {
@@ -36,7 +30,6 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
   const [consulta, setConsulta] = useState('');
   const [elegido, setElegido] = useState<Procedimiento | null>(null);
   const [lateralidad, setLateralidad] = useState<'no_aplica' | 'derecha' | 'izquierda' | 'bilateral'>('no_aplica');
-  const [regimen, setRegimen] = useState<Regimen>('cma');
   const [contrasteYodado, setContrasteYodado] = useState<'si' | 'no' | 'no_se_sabe'>('no');
   // «Otro procedimiento» (no listado): la enfermera fija los riesgos a mano (§7.1).
   const [otro, setOtro] = useState(false);
@@ -95,7 +88,6 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
       espacioCerrado: proc.espacioCerrado,
       retina: proc.retina,
       contrasteYodado,
-      regimen,
       tecnica: 'no_se_sabe',
     };
     onContinuar(datos, proc);
@@ -249,20 +241,8 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
         </select>
       </div>
 
-      {/* Régimen */}
-      <fieldset className="campo">
-        <legend>Régimen</legend>
-        <div className="grupo-radios">
-          {REGIMENES.map((r) => (
-            <label key={r.valor} className={`radio-tarjeta ${regimen === r.valor ? 'seleccionado' : ''}`}>
-              <input type="radio" name="regimen" value={r.valor} checked={regimen === r.valor} onChange={() => setRegimen(r.valor)} />
-              {r.etiqueta}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      {/* La técnica anestésica se elige en el paso 7. */}
+      {/* El régimen (CMA/ingreso) se retiró (decisión del servicio, 2026-10-04): la
+          bomba de insulina decide por el riesgo quirúrgico. La técnica se elige en el paso 7. */}
 
       {/* Contraste yodado (afecta a la metformina, §8.5) */}
       <fieldset className="campo">
