@@ -25,6 +25,7 @@
 - 14. Conversión de opioides
 - 15. Procedimientos
 - 16. Módulos de enfermedad
+- 16 bis. Puntos de validación clínica
 - 17. Pendiente de revisión por el servicio
 
 ## Decisiones del servicio (30/09/2026)
@@ -1800,6 +1801,42 @@ _Fuente: docs/documento_fuente.md §5.1_
   - Por qué: Si no hay ecocardiograma en los últimos 12 meses o hay síntomas nuevos, se solicita uno.
 - **¿Síntomas nuevos (más disnea, síncope o angina)?** — _boolean_
   - Genera → 🧪 prueba: si = sí → ecocardiograma. _(§7.3)_
+
+## 16 bis. Puntos de validación clínica (§13 bis)
+
+_Mecanismo distinto de las alertas: condiciones que el anestesiólogo revisa al principio de su resumen, de dos tipos. No bloquean nada; cada una se resuelve con «Validado por [nombre]» o «Posponer o derivar». Mientras quede alguna sin validar, la hoja del paciente indica que el anestesiólogo revisará su caso. Se definen en `datos/validaciones.json` (editable desde el panel de administración)._
+
+**🔴 Valorar posponer la cirugía programada**
+
+| Motivo | Origen | Fuente |
+| --- | --- | --- |
+| Stent coronario reciente: valorar diferir la cirugía programada; no suspender la doble antiagregación sin consultar con cardiología. | `stent_reciente` | §8.3 (ESC 2022) |
+| Ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada. | `ictus_o_tvp.ictus_fecha` | §5.1 (ESC 2022) |
+| Ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada. | `fibrilacion_auricular.ictus_ait_fecha` | §5.1 (ESC 2022) |
+| Posible isquemia miocárdica inestable (angina de reciente comienzo o cambiante): valorar posponer la cirugía programada. | `cardiopatia_isquemica.angina_cambio_reciente` | §5.1 (ESC 2022) |
+| Infección respiratoria activa: valorar posponer la cirugía programada. | `infeccion_respiratoria.sintomas` | §5.2, §5.12 |
+| Síntomas respiratorios nuevos (posible infección respiratoria activa): valorar posponer la cirugía programada. | `asma_epoc.sintomas_respiratorios_nuevos` | §5.16.4 |
+| Asma inducida por AINE/aspirina: evitar AINE perioperatorios; valorar posponer si hay crisis reciente. | `asma_epoc.desencadenantes` | §5.16.3 |
+| Infección activa en paciente inmunodeprimido (trasplante): valorar posponer la cirugía programada. | `trasplante.infeccion_activa` | §5.16.15 |
+
+**🟡 Validar antes de la intervención**
+
+| Motivo | Origen | Fuente |
+| --- | --- | --- |
+| TVP o TEP de menos de 3 meses: validar antes de la intervención. | `ictus_o_tvp.tvp_tep_fecha` | §5.1 |
+| Trasplante reciente (menos de 6 meses): validar antes de la intervención. | `trasplante.fecha` | §5.16.15 |
+| Niveles de inmunosupresores fuera de rango: validar antes de la intervención. | `trasplante.niveles_en_rango` | §5.16.15 |
+| Hipoglucemias frecuentes: validar el control de la diabetes antes de la intervención. | `diabetes.frecuencia_hipoglucemias` | §5.16.2 |
+| Hipoglucemias inadvertidas (no las detecta): validar el control de la diabetes antes de la intervención. | `diabetes.detecta_hipoglucemias` | §5.16.2 |
+| Asma no controlada (crisis en el último mes): validar antes de la intervención. | `asma_epoc.crisis_ultimo_mes` | §5.16.3 |
+| Asma no controlada (ingreso en el último año): validar antes de la intervención. | `asma_epoc.ingresos_ultimo_anio` | §5.16.3 |
+| Asma no controlada (uso de rescate más de 2 veces por semana): validar antes de la intervención. | `asma_epoc.rescate_semana` | §5.16.3 |
+| Posible inestabilidad atloaxoidea (artritis reumatoide con afectación cervical): validar la vía aérea y el cuello antes de la intervención. | `artritis_reumatoide.afectacion_cervical` | §5.16.13 |
+| Miocardiopatía sintomática: validar antes de la intervención. | `miocardiopatia.sintomas` | §5.1 |
+| Hipertensión pulmonar confirmada: validar antes de la intervención. | `hipertension_pulmonar.confirmada` | §5.2 |
+| Epilepsia no controlada (crisis reciente): validar antes de la intervención. | `epilepsia.ultima_crisis` | §5.16.9 |
+| Epilepsia no controlada (estatus epiléptico previo): validar antes de la intervención. | `epilepsia.estatus_previo` | §5.16.9 |
+| Brote reciente de esclerosis múltiple: validar antes de la intervención. | `esclerosis_multiple.ultimo_brote_fecha` | §5.16.12 |
 
 ## 17. Pendiente de revisión por el servicio
 

@@ -34,6 +34,15 @@ describe('§8.14 bis · selección de hojas anexas', () => {
   });
 });
 
+describe('§13 bis · aviso de revisión en la hoja del paciente', () => {
+  it('revisionPendiente=true → el extra revisionPendiente llega a la hoja', () => {
+    expect(derivarHojaExtras(base({ revisionPendiente: true })).extras.revisionPendiente).toBeTrue();
+  });
+  it('sin revisión pendiente → el extra no se incluye', () => {
+    expect(derivarHojaExtras(base({})).extras.revisionPendiente).toBeUndefined();
+  });
+});
+
 describe('§8.14 · bebida de carbohidratos en diabéticos', () => {
   const tieneCarbs = (situacion: 'diabetes' | 'diabetes_gastroparesia') =>
     calcularAyuno({ induccion: IV, pediatrico: false, situacion }).lineas.some((l) => l.codigo === 'bebida_carbohidratos');

@@ -13,6 +13,8 @@ import { MODULO_POR_ID, MODULOS } from '../../datos/modulosDatos.ts';
 import type { RespuestasModulos } from '../../datos/modulos.ts';
 import { derivarHechosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
 import { emitirEfectosModulos } from '../../dominio/entrevista/efectosModulos.ts';
+import { derivarPuntosValidacion } from '../../dominio/entrevista/puntosValidacion.ts';
+import { VALIDACIONES } from '../../datos/validacionesDatos.ts';
 import { derivarHojaExtras } from '../../dominio/entrevista/hojaExtras.ts';
 import { derivarRiesgoYPruebas } from '../../dominio/entrevista/riesgoYPruebas.ts';
 import { construirPlanPaciente } from '../paciente/construirPlanUi.ts';
@@ -71,6 +73,9 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, fechaRefere
   const [soloAscii, setSoloAscii] = useState(false);
   const [asaManual, setAsaManual] = useState<ClaseAsa | ''>('');
   const [nombresPend, setNombresPend] = useState<Record<number, string>>({});
+  // Estado de los puntos de validación (§13 bis): por id, nombre tecleado, validado o pospuesto.
+  const [valNombre, setValNombre] = useState<Record<string, string>>({});
+  const [valEstado, setValEstado] = useState<Record<string, { validadoPor?: string; posponer?: boolean }>>({});
   const [notasAbiertas, setNotasAbiertas] = useState(false);
   const [copiado, setCopiado] = useState(false);
 
@@ -255,12 +260,15 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, fechaRefere
     // Stent reciente (§8.3, R12.7): alerta roja de valorar diferir y, con técnica
     // neuroaxial/bloqueo profundo, la amarilla adicional. Se evalúa desde los hechos
     // clínicos (fecha y motivo del stent) con el contexto de la técnica efectiva.
+    let stentReciente = false;
     if (clin.stent && clin.stent.mesesDesdeImplante !== null) {
       const refFecha = intervencion.fechaHora ?? new Date(hoy.getTime() + 90 * 86_400_000);
       const ctxStent = construirContexto({ ...intervencion, fechaHora: refFecha, fechaDesconocida: false }, basicos.pesoKg, clin.aclaramiento, undefined, hoy);
       // Si no se conoce el motivo del stent, se usa la ventana más conservadora (SCA, 12 meses).
       const stentEval = evaluarStent({ mesesDesdeImplante: clin.stent.mesesDesdeImplante, traSca: clin.stent.traSca ?? true }, ctxStent);
       for (const a of stentEval.alertas) alertas.push({ gravedad: a.gravedad, mensaje: a.mensaje });
+      // El stent reciente es también un punto de validación «posponer» (§13 bis).
+      stentReciente = stentEval.recienteRequiereConfirmacion;
     }
 
     // Alertas y notas codificadas en los módulos (§5.16): se EJECUTAN aquí, no
@@ -310,7 +318,14 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, fechaRefere
     };
     const sap = construirSap(entradaSap, { soloAscii, usarAbreviaturas: true, abreviaturas: plantillasSap.abreviaturas });
 
-    return { asa, escalas, alertas, notas, plan, pruebas: rp.pruebas, claseRiesgo: rp.clase, ayuno, sap };
+    // Puntos de validación clínica (§13 bis): mecanismo distinto de las alertas.
+    const puntosValidacion = derivarPuntosValidacion({
+      catalogo: VALIDACIONES, modulos: MODULOS, respuestas, activos: enfermedades,
+      fechaIntervencion: intervencion.fechaHora ?? null, fechaReferencia: hoy,
+      hechosEspeciales: { stentReciente },
+    });
+
+    return { asa, escalas, alertas, notas, plan, pruebas: rp.pruebas, claseRiesgo: rp.clase, ayuno, sap, puntosValidacion };
   }, [intervencion, basicos, cribado, medicacion, habitos, viaAerea, consentimiento, antecedentes, mtnd4, alergias, modalidad, soloAscii, asaManual, fechaReferencia]);
 
   if (!salida) return null;
@@ -322,6 +337,69 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, fechaRefere
   return (
     <>
       <h3>Resumen del anestesiólogo</h3>
+
+      {/* Puntos de validación clínica (§13 bis): al principio del resumen. No bloquean
+          nada; cada uno se resuelve con «Validado por [nombre]» o «Posponer o derivar». */}
+      {salida.puntosValidacion.length > 0 && (
+        <section className="validaciones" aria-labelledby="val-tit">
+          <h4 id="val-tit">Puntos de validación clínica</h4>
+          <p className="aviso aviso-info">
+            Revise estos puntos antes de la intervención. No impiden continuar: puede validarlos
+            con su nombre o marcar que hay que posponer o derivar. Mientras alguno siga sin validar,
+            la hoja del paciente le indicará que su caso será revisado.
+          </p>
+          <ul className="lista-validaciones">
+            {salida.puntosValidacion.map((pv) => {
+              const estado = valEstado[pv.id];
+              const rojo = pv.tipo === 'posponer';
+              return (
+                <li key={pv.id} className={`validacion ${rojo ? 'validacion-roja' : 'validacion-amarilla'}`}>
+                  <p className="validacion-motivo">
+                    <strong>{rojo ? '🔴 Valorar posponer la cirugía programada' : '🟡 Validar antes de la intervención'}:</strong>{' '}
+                    {pv.motivo}{pv.fuente ? <em> ({pv.fuente})</em> : null}
+                  </p>
+                  {estado?.validadoPor ? (
+                    <p className="validacion-resuelta">✓ Validado por {estado.validadoPor}
+                      {' · '}
+                      <button type="button" className="boton-enlace" onClick={() => setValEstado((s) => { const n = { ...s }; delete n[pv.id]; return n; })}>deshacer</button>
+                    </p>
+                  ) : estado?.posponer ? (
+                    <p className="validacion-resuelta">⏸ Marcado para posponer o derivar
+                      {' · '}
+                      <button type="button" className="boton-enlace" onClick={() => setValEstado((s) => { const n = { ...s }; delete n[pv.id]; return n; })}>deshacer</button>
+                    </p>
+                  ) : (
+                    <div className="validacion-controles">
+                      <input
+                        type="text"
+                        placeholder="Nombre del anestesiólogo"
+                        value={valNombre[pv.id] ?? ''}
+                        onChange={(e) => setValNombre((n) => ({ ...n, [pv.id]: e.target.value }))}
+                        aria-label={`Nombre del anestesiólogo para validar: ${pv.motivo}`}
+                      />
+                      <button
+                        type="button"
+                        className="boton-secundario"
+                        disabled={!(valNombre[pv.id] ?? '').trim()}
+                        onClick={() => setValEstado((s) => ({ ...s, [pv.id]: { validadoPor: (valNombre[pv.id] ?? '').trim() } }))}
+                      >
+                        Validar
+                      </button>
+                      <button
+                        type="button"
+                        className="boton-secundario"
+                        onClick={() => setValEstado((s) => ({ ...s, [pv.id]: { posponer: true } }))}
+                      >
+                        Posponer o derivar
+                      </button>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       {salida.alertas.length > 0 && (
         <div className="resumen-alertas">

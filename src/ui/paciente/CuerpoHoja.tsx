@@ -21,6 +21,10 @@ export function CuerpoHoja({ instrucciones, ay, ex, fecha, t }: Props) {
 
   return (
     <>
+      {ex?.revisionPendiente && (
+        <p className="aviso aviso-atencion revision-pendiente">{t.revision_pendiente_texto}</p>
+      )}
+
       <h2>{t.intervencion_titulo}</h2>
       {fecha !== null ? (
         <p><strong>{fechaLarga(fecha, t)} a las {horaReloj(fecha)}</strong></p>

@@ -52,7 +52,7 @@ export function PanelAdmin({ onSalir }: Props) {
 
   const textoActual = editado[fichero.id] ?? fichero.publicado;
   const modificado = textoActual !== fichero.publicado;
-  const validacion = validarContenido(fichero.tipo, textoActual, { idsRegla });
+  const validacion = validarContenido(fichero.tipo, textoActual, { idsRegla, ruta: fichero.ruta });
   const diff = diffLineas(fichero.publicado, textoActual);
   const resumen = resumenDiff(diff);
 

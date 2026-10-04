@@ -50,9 +50,13 @@ interface Pregunta { id: string; etiqueta: string; tipo: string; unidad?: string
 interface Modulo { id: string; titulo: string; fuente?: string; preguntas: Pregunta[]; }
 interface TextosPaciente { med: Record<string, string> & { insulina: Record<string, string> }; }
 
+interface PuntoValidacionJson { id: string; origen: string; motivo: string; fuente?: string; }
+interface ValidacionesJson { _meta?: Record<string, unknown>; posponer?: PuntoValidacionJson[]; validar?: PuntoValidacionJson[]; }
+
 const config = leerJson<Config>('datos/config.json');
 const rf = leerJson<ReglasFarmacos>('datos/reglas_farmacos.json');
 const opioides = leerJson<Opioides>('datos/opioides.json');
+const validaciones = leerJson<ValidacionesJson>('datos/validaciones.json');
 const textos = leerJson<TextosPaciente>('datos/textos/es/paciente.json');
 const farmacos = parseCsv(leer('datos/farmacos.csv'));
 const procedimientos = parseCsv(leer('datos/procedimientos.csv'));
@@ -83,7 +87,8 @@ p();
   '6. Mecanismo de confirmación del anestesiólogo', '7. Ayuno y hojas anexas', '8. Sugammadex y anticoncepción',
   '9. Cribado mitocondrial mtND4', '10. ASA sugerido', '11. Escalas y cálculos',
   '12. Clase de riesgo del paciente y pruebas complementarias', '13. Catálogo de fármacos',
-  '14. Conversión de opioides', '15. Procedimientos', '16. Módulos de enfermedad', '17. Pendiente de revisión por el servicio',
+  '14. Conversión de opioides', '15. Procedimientos', '16. Módulos de enfermedad',
+  '16 bis. Puntos de validación clínica', '17. Pendiente de revisión por el servicio',
 ].forEach((s) => p(`- ${s}`));
 p();
 
@@ -418,6 +423,30 @@ for (const mod of modulos) {
   }
   p();
 }
+
+// —————————————————————————————— 16 bis. Puntos de validación ——————————————————————————————
+p('## 16 bis. Puntos de validación clínica (§13 bis)');
+p();
+p('_Mecanismo distinto de las alertas: condiciones que el anestesiólogo revisa al principio de su resumen, de dos tipos. No bloquean nada; cada una se resuelve con «Validado por [nombre]» o «Posponer o derivar». Mientras quede alguna sin validar, la hoja del paciente indica que el anestesiólogo revisará su caso. Se definen en `datos/validaciones.json` (editable desde el panel de administración)._');
+p();
+p('**🔴 Valorar posponer la cirugía programada**');
+p();
+if ((validaciones.posponer ?? []).length === 0) p('_(ninguno)_');
+else {
+  p('| Motivo | Origen | Fuente |');
+  p('| --- | --- | --- |');
+  for (const pv of validaciones.posponer ?? []) p(`| ${esc(pv.motivo)} | \`${esc(pv.origen)}\` | ${ovacio(pv.fuente)} |`);
+}
+p();
+p('**🟡 Validar antes de la intervención**');
+p();
+if ((validaciones.validar ?? []).length === 0) p('_(ninguno)_');
+else {
+  p('| Motivo | Origen | Fuente |');
+  p('| --- | --- | --- |');
+  for (const pv of validaciones.validar ?? []) p(`| ${esc(pv.motivo)} | \`${esc(pv.origen)}\` | ${ovacio(pv.fuente)} |`);
+}
+p();
 
 // —————————————————————————————— 17. Pendiente de revisión ——————————————————————————————
 p('## 17. Pendiente de revisión por el servicio');

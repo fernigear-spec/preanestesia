@@ -1,0 +1,149 @@
+{
+  "_meta": {
+    "descripcion": "Puntos de validación clínica (§13 bis). Mecanismo DISTINTO de las alertas: cada condición genera un punto que el anestesiólogo revisa al principio de su resumen. Dos tipos: 'posponer' (rojo, «valorar posponer la cirugía programada») y 'validar' (amarillo, «validar antes de la intervención»). No bloquean nada. Mientras quede alguno sin validar, la hoja del paciente incluye el aviso de revisión. El campo 'origen' identifica la condición que lo dispara: 'modulo.pregunta' (una condición ya codificada en datos/modulos/*.json, campo genera/si) o un hecho especial evaluado en código (p. ej. 'stent_reciente'). El 'motivo' y la 'fuente' que se muestran salen de aquí (editables).",
+    "version_contenido": "0.1.0",
+    "fecha_revision": "2026-09-29",
+    "tipos": {
+      "posponer": "Valorar posponer la cirugía programada (rojo).",
+      "validar": "Validar antes de la intervención (amarillo)."
+    }
+  },
+
+  "posponer": [
+    {
+      "id": "stent_reciente",
+      "origen": "stent_reciente",
+      "motivo": "Stent coronario reciente: valorar diferir la cirugía programada; no suspender la doble antiagregación sin consultar con cardiología.",
+      "fuente": "§8.3 (ESC 2022)"
+    },
+    {
+      "id": "ictus_ait_reciente",
+      "origen": "ictus_o_tvp.ictus_fecha",
+      "motivo": "Ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada.",
+      "fuente": "§5.1 (ESC 2022)"
+    },
+    {
+      "id": "ictus_ait_reciente_fa",
+      "origen": "fibrilacion_auricular.ictus_ait_fecha",
+      "motivo": "Ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada.",
+      "fuente": "§5.1 (ESC 2022)"
+    },
+    {
+      "id": "isquemia_inestable",
+      "origen": "cardiopatia_isquemica.angina_cambio_reciente",
+      "motivo": "Posible isquemia miocárdica inestable (angina de reciente comienzo o cambiante): valorar posponer la cirugía programada.",
+      "fuente": "§5.1 (ESC 2022)"
+    },
+    {
+      "id": "infeccion_respiratoria_activa",
+      "origen": "infeccion_respiratoria.sintomas",
+      "motivo": "Infección respiratoria activa: valorar posponer la cirugía programada.",
+      "fuente": "§5.2, §5.12"
+    },
+    {
+      "id": "epoc_infeccion_posible",
+      "origen": "asma_epoc.sintomas_respiratorios_nuevos",
+      "motivo": "Síntomas respiratorios nuevos (posible infección respiratoria activa): valorar posponer la cirugía programada.",
+      "fuente": "§5.16.4"
+    },
+    {
+      "id": "asma_aine",
+      "origen": "asma_epoc.desencadenantes",
+      "motivo": "Asma inducida por AINE/aspirina: evitar AINE perioperatorios; valorar posponer si hay crisis reciente.",
+      "fuente": "§5.16.3"
+    },
+    {
+      "id": "trasplante_infeccion_activa",
+      "origen": "trasplante.infeccion_activa",
+      "motivo": "Infección activa en paciente inmunodeprimido (trasplante): valorar posponer la cirugía programada.",
+      "fuente": "§5.16.15"
+    }
+  ],
+
+  "validar": [
+    {
+      "id": "tvp_tep_reciente",
+      "origen": "ictus_o_tvp.tvp_tep_fecha",
+      "motivo": "TVP o TEP de menos de 3 meses: validar antes de la intervención.",
+      "fuente": "§5.1"
+    },
+    {
+      "id": "trasplante_reciente",
+      "origen": "trasplante.fecha",
+      "motivo": "Trasplante reciente (menos de 6 meses): validar antes de la intervención.",
+      "fuente": "§5.16.15"
+    },
+    {
+      "id": "inmunosupresores_fuera_rango",
+      "origen": "trasplante.niveles_en_rango",
+      "motivo": "Niveles de inmunosupresores fuera de rango: validar antes de la intervención.",
+      "fuente": "§5.16.15"
+    },
+    {
+      "id": "hipoglucemias_inadvertidas_frec",
+      "origen": "diabetes.frecuencia_hipoglucemias",
+      "motivo": "Hipoglucemias frecuentes: validar el control de la diabetes antes de la intervención.",
+      "fuente": "§5.16.2"
+    },
+    {
+      "id": "hipoglucemias_inadvertidas",
+      "origen": "diabetes.detecta_hipoglucemias",
+      "motivo": "Hipoglucemias inadvertidas (no las detecta): validar el control de la diabetes antes de la intervención.",
+      "fuente": "§5.16.2"
+    },
+    {
+      "id": "asma_no_controlada_crisis",
+      "origen": "asma_epoc.crisis_ultimo_mes",
+      "motivo": "Asma no controlada (crisis en el último mes): validar antes de la intervención.",
+      "fuente": "§5.16.3"
+    },
+    {
+      "id": "asma_no_controlada_ingreso",
+      "origen": "asma_epoc.ingresos_ultimo_anio",
+      "motivo": "Asma no controlada (ingreso en el último año): validar antes de la intervención.",
+      "fuente": "§5.16.3"
+    },
+    {
+      "id": "asma_no_controlada_rescate",
+      "origen": "asma_epoc.rescate_semana",
+      "motivo": "Asma no controlada (uso de rescate más de 2 veces por semana): validar antes de la intervención.",
+      "fuente": "§5.16.3"
+    },
+    {
+      "id": "inestabilidad_atloaxoidea",
+      "origen": "artritis_reumatoide.afectacion_cervical",
+      "motivo": "Posible inestabilidad atloaxoidea (artritis reumatoide con afectación cervical): validar la vía aérea y el cuello antes de la intervención.",
+      "fuente": "§5.16.13"
+    },
+    {
+      "id": "miocardiopatia_sintomatica",
+      "origen": "miocardiopatia.sintomas",
+      "motivo": "Miocardiopatía sintomática: validar antes de la intervención.",
+      "fuente": "§5.1"
+    },
+    {
+      "id": "hipertension_pulmonar",
+      "origen": "hipertension_pulmonar.confirmada",
+      "motivo": "Hipertensión pulmonar confirmada: validar antes de la intervención.",
+      "fuente": "§5.2"
+    },
+    {
+      "id": "epilepsia_no_controlada_crisis",
+      "origen": "epilepsia.ultima_crisis",
+      "motivo": "Epilepsia no controlada (crisis reciente): validar antes de la intervención.",
+      "fuente": "§5.16.9"
+    },
+    {
+      "id": "epilepsia_no_controlada_estatus",
+      "origen": "epilepsia.estatus_previo",
+      "motivo": "Epilepsia no controlada (estatus epiléptico previo): validar antes de la intervención.",
+      "fuente": "§5.16.9"
+    },
+    {
+      "id": "em_brote_reciente",
+      "origen": "esclerosis_multiple.ultimo_brote_fecha",
+      "motivo": "Brote reciente de esclerosis múltiple: validar antes de la intervención.",
+      "fuente": "§5.16.12"
+    }
+  ]
+}

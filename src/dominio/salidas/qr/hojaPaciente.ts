@@ -127,6 +127,12 @@ export interface ExtrasHojaQr {
   anexos: string[];
   /** Estado del consentimiento (§10) para la línea de la hoja del paciente. */
   cons?: 'entregado' | 'pendiente' | 'no_procede';
+  /**
+   * Revisión pendiente (§13 bis): hay puntos de validación clínica activos. Mientras
+   * sea true, la hoja del paciente muestra el aviso de que el anestesiólogo revisará
+   * su caso y, si es necesario, se pondrá en contacto.
+   */
+  revisionPendiente?: boolean;
 }
 
 /** Datos del paciente que viajan en el QR (campo `d` del Payload, §8.16d). */

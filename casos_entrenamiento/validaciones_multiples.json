@@ -1,0 +1,57 @@
+{
+  "id": "validaciones_multiples",
+  "titulo": "Varios puntos de validación · stent + ictus + diabetes + asma",
+  "descripcion": "Varón de 68 años con stent reciente (hace 2 meses), ictus reciente (hace 1 mes), diabetes con hipoglucemias inadvertidas y asma no controlada. Pensado para ver juntos los puntos de validación clínica (§13 bis): dos de «valorar posponer» (rojo) y dos de «validar antes» (amarillo).",
+  "modalidad": "presencial",
+  "esperado": [
+    "Puntos de validación clínica al principio del resumen (§13 bis).",
+    "🔴 Valorar posponer: stent reciente.",
+    "🔴 Valorar posponer: ictus o AIT de menos de 3 meses.",
+    "🟡 Validar antes: hipoglucemias inadvertidas (no las detecta).",
+    "🟡 Validar antes: asma no controlada (crisis en el último mes).",
+    "Cada punto se resuelve con «Validar» (nombre) o «Posponer o derivar»; no bloquean la hoja.",
+    "La hoja del paciente muestra el aviso de que el anestesiólogo revisará su caso."
+  ],
+  "intervencion": {
+    "procedimientoId": "cgd_colecistectomia_lap",
+    "fecha": "2026-11-05",
+    "hora": "08:00",
+    "tecnica": "general",
+    "contrasteYodado": "no"
+  },
+  "basicos": {
+    "edadAnios": 68,
+    "sexo": "hombre",
+    "pesoKg": 82,
+    "tallaCm": 172,
+    "embarazada": false
+  },
+  "cribado": {
+    "ningunaConocida": false,
+    "enfermedades": ["cardiopatia_isquemica", "ictus_o_tvp", "diabetes", "asma_epoc"],
+    "respuestasModulos": {
+      "cardiopatia_isquemica": {
+        "portador_stent": true,
+        "stent_fecha": "2026-09-05",
+        "stent_tipo": "farmacoactivo",
+        "stent_motivo": "programado"
+      },
+      "ictus_o_tvp": {
+        "ictus_ait": true,
+        "ictus_fecha": "2026-10-05"
+      },
+      "diabetes": {
+        "tipo": "tipo2",
+        "tratamiento": "insulina",
+        "frecuencia_hipoglucemias": "mensual",
+        "detecta_hipoglucemias": false
+      },
+      "asma_epoc": {
+        "enfermedad": "asma",
+        "crisis_ultimo_mes": true
+      }
+    }
+  },
+  "medicacion": [],
+  "consentimiento": { "estado": "pendiente_entregar" }
+}

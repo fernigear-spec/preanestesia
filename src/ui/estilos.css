@@ -550,6 +550,17 @@ body {
 .pendiente-controles { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
 .lista-ayuno { margin: 8px 0; }
 
+/* Puntos de validación clínica (§13 bis) */
+.validaciones { margin: 8px 0 16px; }
+.lista-validaciones { list-style: none; padding: 0; margin: 8px 0; }
+.validacion { margin: 8px 0; padding: 10px 12px; border-radius: 8px; border-left: 5px solid #d0d5dd; background: #fafafa; }
+.validacion-roja { border-left-color: #c0392b; background: #fdf3f2; }
+.validacion-amarilla { border-left-color: #d4a017; background: #fdfaf0; }
+.validacion-motivo { margin: 0 0 6px; }
+.validacion-controles { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.validacion-resuelta { margin: 4px 0 0; color: #2c7a3f; font-weight: 600; }
+.revision-pendiente { font-weight: 600; }
+
 /* Impresión / PDF de la hoja del paciente */
 @media print {
   .no-print, .banda-prueba, .cabecera, .pie-app { display: none !important; }

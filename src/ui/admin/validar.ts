@@ -7,6 +7,7 @@
  */
 import { parseCsv } from '../../datos/csv.ts';
 import { validarModulo } from '../../datos/modulos.ts';
+import { validarValidaciones } from '../../datos/validaciones.ts';
 import type { TipoFichero } from './contenido.ts';
 
 export interface ResultadoValidacion {
@@ -17,6 +18,8 @@ export interface ResultadoValidacion {
 export interface OpcionesValidacion {
   /** Conjunto de id_regla válidos (claves de reglas_farmacos.json). */
   idsRegla?: Set<string>;
+  /** Ruta del fichero, para validaciones estructuradas específicas (p. ej. validaciones.json). */
+  ruta?: string;
 }
 
 export function validarContenido(
@@ -26,7 +29,20 @@ export function validarContenido(
 ): ResultadoValidacion {
   if (tipo === 'csv') return validarCsv(texto, opciones.idsRegla);
   if (tipo === 'modulo') return validarModuloTexto(texto);
+  if (opciones.ruta && opciones.ruta.endsWith('validaciones.json')) return validarValidacionesTexto(texto);
   return validarJson(texto);
+}
+
+function validarValidacionesTexto(texto: string): ResultadoValidacion {
+  let obj: unknown;
+  try {
+    obj = JSON.parse(texto);
+  } catch (e) {
+    return { ok: false, mensajes: [`JSON no válido: ${(e as Error).message}`] };
+  }
+  const errores = validarValidaciones(obj);
+  if (errores.length === 0) return { ok: true, mensajes: ['Puntos de validación válidos.'] };
+  return { ok: false, mensajes: errores.map((e) => `${e.campo ? `[${e.campo}] ` : ''}${e.mensaje}`) };
 }
 
 function validarJson(texto: string): ResultadoValidacion {

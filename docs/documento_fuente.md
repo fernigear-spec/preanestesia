@@ -625,6 +625,24 @@ Un QR admite unos 2,9 KB en modo binario con corrección de errores baja; usa co
 
 Controlada por `prehabilitacion_activa` en `config.json`, por defecto `false` (PreHabilítame es un proyecto piloto). Apagado, no aparece en ninguna salida. Encendido: si la cirugía es de riesgo intermedio o alto y hay capacidad funcional reducida, fragilidad (CFS ≥ 5) o anemia, la hoja del paciente incluye un apartado de prehabilitación con el enlace y un QR a PreHabilítame (https://holaaneshealth-eng.github.io/Prehabilitame/), y las notas del anestesiólogo lo recogen como derivación propuesta.
 
+## 13 bis. Puntos de validación clínica (2026-10-04)
+
+Mecanismo **distinto de las alertas**. Determinadas condiciones generan un **punto de validación** que el anestesiólogo revisa **al principio** de su resumen, con su **motivo** y su **fuente**. Hay dos tipos:
+
+- **Valorar posponer la cirugía programada** (rojo).
+- **Validar antes de la intervención** (amarillo).
+
+Cada punto se resuelve con **«Validado por [nombre]»** o **«Posponer o derivar»**. **No bloquean nada**: la entrevista, la hoja y el QR se generan igualmente. Mientras quede algún punto **sin validar**, la hoja del paciente incluye, en castellano y catalán: «Antes de la intervención, el anestesiólogo revisará su caso y, si es necesario, se pondrá en contacto con usted.»
+
+Los puntos se definen en `datos/validaciones.json` (editable desde el panel de administración, §14.1, y recogido en `CONTENIDO_CLINICO.md`, §16 bis). Cada punto enlaza, por su `origen`, con una condición ya evaluada por el programa: una condición de un módulo (`moduloId.preguntaId`, campo `genera`/`si`) o un hecho especial (hoy, `stent_reciente`). El **stent reciente** es un punto de **valorar posponer**.
+
+Condiciones iniciales (clasificación del servicio):
+
+- **Valorar posponer (rojo):** stent coronario reciente; ictus o AIT de menos de 3 meses; posible isquemia miocárdica inestable (angina de reciente comienzo o cambiante); infección respiratoria activa; síntomas respiratorios nuevos en asma/EPOC (posible infección); asma inducida por AINE/aspirina; infección activa en inmunodeprimido (trasplante).
+- **Validar antes (amarillo):** TVP o TEP de menos de 3 meses; trasplante reciente (< 6 meses); niveles de inmunosupresores fuera de rango; hipoglucemias frecuentes o inadvertidas; asma no controlada (crisis el último mes, ingreso el último año o rescate > 2 veces/semana); posible inestabilidad atloaxoidea (artritis reumatoide con afectación cervical); miocardiopatía sintomática; hipertensión pulmonar confirmada; epilepsia no controlada; brote reciente de esclerosis múltiple.
+
+Si para evaluar una condición faltara una pregunta, se añade al módulo correspondiente como pregunta **opcional** y se avisa. (En esta primera versión, todas las condiciones anteriores ya disponían de la pregunta necesaria en los módulos.)
+
 ## 14. Herramientas del servicio
 
 ### 14.1 Panel de administración de contenido

@@ -30,6 +30,7 @@
     "Si le cambian la fecha o la hora de la intervención"
   ],
   "telefono_titulo": "Teléfono de contacto",
+  "revision_pendiente_texto": "Antes de la intervención, el anestesiólogo revisará su caso y, si es necesario, se pondrá en contacto con usted.",
   "aviso_cambio_fecha": "Si le cambian la fecha o la hora de la intervención, abra de nuevo este código e introduzca la nueva fecha.",
   "boton_cambiar_fecha": "Me han dado la fecha o me la han cambiado",
   "nueva_fecha_label": "Fecha de la intervención",

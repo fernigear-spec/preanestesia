@@ -8,6 +8,11 @@ import { useMemo, useState } from 'react';
 import type { DatosIntervencion, Sexo } from '../../dominio/tipos.ts';
 import { derivarHechosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
 import { derivarHojaExtras } from '../../dominio/entrevista/hojaExtras.ts';
+import { derivarPuntosValidacion } from '../../dominio/entrevista/puntosValidacion.ts';
+import { VALIDACIONES } from '../../datos/validacionesDatos.ts';
+import { MODULOS } from '../../datos/modulosDatos.ts';
+import { construirContexto } from '../../dominio/reglas/motor.ts';
+import { evaluarStent } from '../../dominio/reglas/antiagregantes.ts';
 import { calcularAyuno } from '../../dominio/ayuno/ayuno.ts';
 import { ayunoQrDesde } from '../../dominio/salidas/qr/construirContenido.ts';
 import { calcularAuditC } from '../../dominio/escalas/auditC.ts';
@@ -61,6 +66,23 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
     [medicacion, intervencion, clin, basicos.pesoKg, hoy],
   );
 
+  // Puntos de validación clínica (§13 bis): si hay alguno activo, la hoja del paciente
+  // muestra el aviso de que el anestesiólogo revisará su caso (revisionPendiente).
+  const revisionPendiente = useMemo(() => {
+    let stentReciente = false;
+    if (clin.stent && clin.stent.mesesDesdeImplante !== null) {
+      const refFecha = intervencion.fechaHora ?? new Date(hoy.getTime() + 90 * MS_DIA);
+      const ctxStent = construirContexto({ ...intervencion, fechaHora: refFecha, fechaDesconocida: false }, basicos.pesoKg, clin.aclaramiento, undefined, hoy);
+      stentReciente = evaluarStent({ mesesDesdeImplante: clin.stent.mesesDesdeImplante, traSca: clin.stent.traSca ?? true }, ctxStent).recienteRequiereConfirmacion;
+    }
+    const puntos = derivarPuntosValidacion({
+      catalogo: VALIDACIONES, modulos: MODULOS, respuestas: cribado.respuestasModulos, activos: new Set(cribado.enfermedades),
+      fechaIntervencion: intervencion.fechaHora ?? null, fechaReferencia: hoy,
+      hechosEspeciales: { stentReciente },
+    });
+    return puntos.length > 0;
+  }, [clin, cribado, intervencion, basicos.pesoKg, hoy]);
+
   // Ayuno (§8.14) y condicionales de la hoja (§10.2).
   const { ayunoQr, extras } = useMemo(() => {
     // AUDIT-C solo si las tres preguntas están contestadas (§6.9); si no, no hay anexo de alcohol.
@@ -80,6 +102,7 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
       edadPediatricaMaxima: EDAD_PEDIATRICA_MAXIMA,
       glp1Semanal: medicacion.some((f) => f.idRegla === 'glp1_semanal'),
       diabetes: new Set(cribado.enfermedades).has('diabetes'),
+      ...(revisionPendiente ? { revisionPendiente: true } : {}),
     });
     const refFecha = intervencion.fechaHora ?? new Date(hoy.getTime() + 90 * MS_DIA);
     const planAyuno = calcularAyuno({
@@ -90,7 +113,7 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
     });
     const extras = consentimiento ? { ...extrasIn.extras, cons: CONS_MAP[consentimiento.estado] } : extrasIn.extras;
     return { ayunoQr: ayunoQrDesde(planAyuno, extrasIn.pediatrico, extrasIn.situacion), extras };
-  }, [basicos, cribado, habitos, sexo, intervencion.fechaHora, medicacion, consentimiento, hoy]);
+  }, [basicos, cribado, habitos, sexo, intervencion.fechaHora, medicacion, consentimiento, hoy, revisionPendiente]);
 
   // §3 (2026-10-04): la hoja y el QR se generan SIEMPRE, sin bloqueo por fármacos
   // pendientes. Los pendientes aparecen en la hoja con la frase única de §12

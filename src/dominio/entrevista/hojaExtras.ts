@@ -23,6 +23,8 @@ export interface EntradaHojaExtras {
   glp1Semanal: boolean;
   /** El paciente es diabético. */
   diabetes: boolean;
+  /** Hay puntos de validación clínica activos (§13 bis): aviso de revisión en la hoja. */
+  revisionPendiente?: boolean;
 }
 
 export interface ResultadoHojaExtras {
@@ -68,6 +70,7 @@ export function derivarHojaExtras(e: EntradaHojaExtras): ResultadoHojaExtras {
     alcohol: e.auditPositivo,
     anexos,
   };
+  if (e.revisionPendiente) extras.revisionPendiente = true;
 
   return { pediatrico, situacion, extras };
 }

@@ -748,6 +748,37 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
   });
 
+  test('§13 bis: el caso de entrenamiento con varias condiciones muestra los puntos de validación y permite validar/posponer', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Modo entrenamiento' }).click();
+    // Abrir el caso de validaciones múltiples (botón del caso por su título).
+    await page.getByRole('button', { name: 'Abrir este caso' }).nth(1).click();
+    await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
+
+    // Sección de puntos de validación clínica al principio del resumen.
+    await expect(page.getByRole('heading', { name: /Puntos de validación clínica/ })).toBeVisible();
+    // Dos de posponer (rojo) y dos de validar (amarillo).
+    await expect(page.getByText(/Stent coronario reciente/)).toBeVisible();
+    await expect(page.getByText(/Ictus o AIT de menos de 3 meses/)).toBeVisible();
+    await expect(page.getByText(/Hipoglucemias inadvertidas/)).toBeVisible();
+    await expect(page.getByText(/Asma no controlada \(crisis en el último mes\)/)).toBeVisible();
+
+    // Validar el primer punto con un nombre.
+    const primerNombre = page.getByRole('textbox', { name: /Nombre del anestesiólogo para validar/ }).first();
+    await primerNombre.fill('Dra. López');
+    await page.getByRole('button', { name: 'Validar', exact: true }).first().click();
+    await expect(page.getByText(/✓ Validado por Dra\. López/)).toBeVisible();
+
+    // Marcar otro como posponer o derivar.
+    await page.getByRole('button', { name: 'Posponer o derivar' }).first().click();
+    await expect(page.getByText(/⏸ Marcado para posponer o derivar/)).toBeVisible();
+
+    // No bloquea: la hoja del paciente se puede generar igualmente, y como hay puntos
+    // de validación activos, la hoja incluye el aviso de que el anestesiólogo revisará el caso.
+    await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
+    await expect(page.getByText('Antes de la intervención, el anestesiólogo revisará su caso y, si es necesario, se pondrá en contacto con usted.')).toBeVisible();
+  });
+
   test('§14.4 guía imprimible: se genera desde los módulos con casillas en blanco', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Guía imprimible' }).click();
