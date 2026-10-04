@@ -6,13 +6,13 @@
  * ResultadoFarmaco. Los grupos no cubiertos aquí devuelven un resultado de
  * "consultar" (el anestesiólogo lo revisará), nunca una pauta inventada.
  */
-import type { ContextoReglas, ResultadoFarmaco, Via } from '../tipos.ts';
+import type { Alerta, ContextoReglas, ResultadoFarmaco, Via } from '../tipos.ts';
 import { type DatosClinicos, HECHOS_VACIOS } from '../entrevista/hechosClinicos.ts';
 import { combinacionFija } from './motor.ts';
 import type { IndicacionInmuno } from './inmunosupresores.ts';
 import { reglaAcod } from './acod.ts';
 import { reglaAvk } from './antivitaminaK.ts';
-import { reglaAas, reglaP2y12, reglaTriflusal, reglaCilostazol, reglaDipiridamol, reglaSulodexida, reglaGpIibIiia, type GpIibIiia } from './antiagregantes.ts';
+import { reglaAas, reglaP2y12, reglaP2y12Oftalmo, reglaTriflusal, reglaCilostazol, reglaDipiridamol, reglaSulodexida, reglaGpIibIiia, type GpIibIiia } from './antiagregantes.ts';
 import { reglaHbpm, reglaFondaparinux, reglaHeparinaSodica, type TipoHbpm } from './heparinas.ts';
 import { reglaMetformina, reglaSglt2, reglaGlp1Semanal, reglaGlp1Diario, reglaAntidiabeticoNoDiaIq, reglaDpp4, reglaInsulinaGlp1Fija } from './antidiabeticos.ts';
 import { reglaInsulinaBasal, reglaInsulinaNph, reglaInsulinaPremezclada, reglaInsulinaRapida } from './insulinas.ts';
@@ -21,7 +21,7 @@ import { reglaLitio, reglaMoclobemida, reglaImaoIrreversible, reglaImaoB } from 
 import { reglaAine } from './aine.ts';
 import { reglaMetotrexato, reglaBiologico, reglaInmunosupresorClasico, reglaFameMantener, reglaJak } from './inmunosupresores.ts';
 import { reglaAntiangiogenico, reglaTirosinaCinasa } from './oncologicos.ts';
-import { reglaFitoterapia, reglaAnticonceptivoThs, reglaCorticoide, reglaNoCatalogado, reglaMantener, reglaAlfabloqueanteFlacido } from './otros.ts';
+import { reglaFitoterapia, reglaAnticonceptivoThs, reglaCorticoide, reglaNoCatalogado, reglaMantener, reglaAlfabloqueanteFlacido, aplicarPlazoNoAlcanzable } from './otros.ts';
 
 /** Datos recogidos por la enfermera para un fármaco en el paso 8. */
 export interface DatosFarmacoUi {
@@ -109,7 +109,17 @@ function aplicarOverridesCatalogo(d: DatosFarmacoUi, r: ResultadoFarmaco): Resul
  * @param clin hechos clínicos de la entrevista (stent, válvula, IC, etc.).
  */
 export function evaluarFarmacoUi(d: DatosFarmacoUi, ctx: ContextoReglas, clin: DatosClinicos = HECHOS_VACIOS): ResultadoFarmaco {
-  return aplicarOverridesCatalogo(d, evaluarRegla(d, { ...ctx, pautaFarmaco: P(d.horas) }, clin));
+  const ctxPauta = { ...ctx, pautaFarmaco: P(d.horas) };
+  const base = aplicarOverridesCatalogo(d, evaluarRegla(d, ctxPauta, clin));
+  // Plazo no alcanzable (§4, paso 1): si con la fecha prevista la última toma ya cae
+  // en el pasado, el fármaco pasa a "consultar" y eleva una alerta roja (igual que el QR).
+  const { resultado, alerta } = aplicarPlazoNoAlcanzable(base, ctxPauta, new Date());
+  return alerta ? agregarAlerta(resultado, alerta) : resultado;
+}
+
+/** Añade una alerta al ResultadoFarmaco sin perder las que ya tuviera. */
+function agregarAlerta(r: ResultadoFarmaco, alerta: Alerta): ResultadoFarmaco {
+  return { ...r, alertas: [...(r.alertas ?? []), alerta] };
 }
 
 /**
@@ -140,6 +150,16 @@ export function evaluarCombinacionUi(
   return combinacionFija(d.idFarmaco, d.nombreComercial, componentes, contieneMetformina);
 }
 
+/** Funde el `{ farmaco, alerta? }` de una regla en un ResultadoFarmaco con sus alertas. */
+function conAlerta(r: { farmaco: ResultadoFarmaco; alerta?: Alerta }): ResultadoFarmaco {
+  return r.alerta ? { ...r.farmaco, alertas: [...(r.farmaco.alertas ?? []), r.alerta] } : r.farmaco;
+}
+
+/** ¿La oftalmología es de riesgo moderado o alto (§8.3)? */
+function oftalmoModeradoAlto(ctx: ContextoReglas): boolean {
+  return ctx.grupoOftalmologico === 'riesgo_moderado_alto';
+}
+
 function evaluarRegla(d: DatosFarmacoUi, ctxPauta: ContextoReglas, clin: DatosClinicos): ResultadoFarmaco {
   const nc = d.nombreComercial;
   const id = d.idFarmaco;
@@ -160,11 +180,19 @@ function evaluarRegla(d: DatosFarmacoUi, ctxPauta: ContextoReglas, clin: DatosCl
     case 'aas':
       return reglaAas({ idFarmaco: id, nombreComercial: nc, dosisDiariaMg: d.dosisMg ?? 100, indicacionCardiovascular: d.indicacionCardiovascular === true }, ctxPauta);
     case 'p2y12_clopidogrel':
-      return reglaP2y12({ idFarmaco: id, nombreComercial: nc, principio: 'clopidogrel', monoterapia: !clin.tieneAas, portadorStent }, ctxPauta);
     case 'p2y12_prasugrel':
-      return reglaP2y12({ idFarmaco: id, nombreComercial: nc, principio: 'prasugrel', monoterapia: !clin.tieneAas, portadorStent }, ctxPauta);
-    case 'p2y12_ticagrelor':
-      return reglaP2y12({ idFarmaco: id, nombreComercial: nc, principio: 'ticagrelor', monoterapia: !clin.tieneAas, portadorStent }, ctxPauta);
+    case 'p2y12_ticagrelor': {
+      const principio = d.idRegla === 'p2y12_prasugrel' ? 'prasugrel' : d.idRegla === 'p2y12_ticagrelor' ? 'ticagrelor' : 'clopidogrel';
+      // Oftalmología de riesgo bajo (catarata tópica): no se suspende (§8.3).
+      if (ctxPauta.grupoOftalmologico === 'riesgo_bajo') {
+        return reglaMantener(id, nc, [principio], 'Oftalmología de riesgo bajo: no se suspende el antiagregante (§8.3)', d.via);
+      }
+      // Oftalmología de riesgo moderado/alto: sustituir por AAS 100 mg y suspender el P2Y12 (§8.3).
+      if (oftalmoModeradoAlto(ctxPauta)) {
+        return reglaP2y12Oftalmo({ idFarmaco: id, nombreComercial: nc, principio, monoterapia: !clin.tieneAas, portadorStent }, ctxPauta);
+      }
+      return reglaP2y12({ idFarmaco: id, nombreComercial: nc, principio, monoterapia: !clin.tieneAas, portadorStent }, ctxPauta);
+    }
     case 'triflusal':
       return reglaTriflusal(id, nc, ctxPauta);
     case 'dipiridamol':
@@ -179,7 +207,7 @@ function evaluarRegla(d: DatosFarmacoUi, ctxPauta: ContextoReglas, clin: DatosCl
     case 'hbpm':
       return reglaHbpm({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'hbpm', tipo: d.tipoHbpm ?? 'indeterminada' }, ctxPauta);
     case 'fondaparinux':
-      return reglaFondaparinux({ idFarmaco: id, nombreComercial: nc, dosis: d.tipoHbpm === 'terapeutica' ? 'terapeutico' : 'profilactico' }, ctxPauta).farmaco;
+      return conAlerta(reglaFondaparinux({ idFarmaco: id, nombreComercial: nc, dosis: d.tipoHbpm === 'terapeutica' ? 'terapeutico' : 'profilactico' }, ctxPauta));
     case 'heparina_sodica':
       return reglaHeparinaSodica(id, nc, ctxPauta);
 
@@ -262,10 +290,10 @@ function evaluarRegla(d: DatosFarmacoUi, ctxPauta: ContextoReglas, clin: DatosCl
       const semanas = d.fechaUltimaDosis
         ? Math.floor((ctxPauta.fechaHoraIntervencion.getTime() - d.fechaUltimaDosis.getTime()) / (7 * 24 * 60 * 60 * 1000))
         : undefined;
-      return reglaAntiangiogenico({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'antiangiogenico', ...(semanas !== undefined ? { semanasDesdeUltimaDosis: semanas } : {}) }).farmaco;
+      return conAlerta(reglaAntiangiogenico({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'antiangiogenico', ...(semanas !== undefined ? { semanasDesdeUltimaDosis: semanas } : {}) }));
     }
     case 'antiangiogenico_intravitreo':
-      return reglaAntiangiogenico({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'antiangiogenico', intravitreo: true }).farmaco;
+      return conAlerta(reglaAntiangiogenico({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'antiangiogenico', intravitreo: true }));
     case 'tirosina_cinasa':
       return reglaTirosinaCinasa({ idFarmaco: id, nombreComercial: nc, principio: d.principiosActivos[0] ?? 'tirosina_cinasa' });
 

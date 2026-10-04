@@ -325,19 +325,29 @@ describe('Punto 4 · E otros: despachador == regla directa', () => {
     const directo = reglaBiologico({ idFarmaco: 'adalimumab', nombreComercial: 'Humira', principio: 'adalimumab', periodicidadDias: 14, fechaUltimaDosis: fecha }, IV);
     expect(evaluarFarmacoUi(d('biologico', { idFarmaco: 'adalimumab', nombreComercial: 'Humira', principiosActivos: ['adalimumab'], via: 'subcutanea', fechaUltimaDosis: fecha, periodicidadDias: 14 }), c, clin())).toEqual(directo);
   });
-  it('E13 bevacizumab, última dosis hace 4 semanas', () => {
+  it('E13 bevacizumab, última dosis hace 4 semanas (el despachador conserva la alerta de la regla)', () => {
     const c = ctx();
-    const directo = reglaAntiangiogenico({ idFarmaco: 'bevacizumab', nombreComercial: 'Avastin', principio: 'bevacizumab', semanasDesdeUltimaDosis: 4 }).farmaco;
+    const directo = reglaAntiangiogenico({ idFarmaco: 'bevacizumab', nombreComercial: 'Avastin', principio: 'bevacizumab', semanasDesdeUltimaDosis: 4 });
     const fecha = new Date(2026, 8, 17); // 28 días antes de la intervención → 4 semanas
-    expect(evaluarFarmacoUi(d('antiangiogenico', { idFarmaco: 'bevacizumab', nombreComercial: 'Avastin', principiosActivos: ['bevacizumab'], via: 'subcutanea', fechaUltimaDosis: fecha }), c, clin())).toEqual(directo);
+    const via = evaluarFarmacoUi(d('antiangiogenico', { idFarmaco: 'bevacizumab', nombreComercial: 'Avastin', principiosActivos: ['bevacizumab'], via: 'subcutanea', fechaUltimaDosis: fecha }), c, clin());
+    // La pauta coincide con la regla directa…
+    const { alertas, ...pauta } = via;
+    expect(pauta).toEqual(directo.farmaco);
+    // …y además el despachador eleva la alerta amarilla que la regla devuelve (antes se perdía).
+    expect(alertas).toContainEqual(directo.alerta);
   });
   it('E14 Eylea intravítreo: mantener', () => {
     const c = ctx();
     const directo = reglaAntiangiogenico({ idFarmaco: 'aflibercept_intravitreo', nombreComercial: 'Eylea', principio: 'aflibercept', intravitreo: true }).farmaco;
     expect(evaluarFarmacoUi(d('antiangiogenico_intravitreo', { idFarmaco: 'aflibercept_intravitreo', nombreComercial: 'Eylea', principiosActivos: ['aflibercept'], via: 'subcutanea' }), c, clin())).toEqual(directo);
   });
-  it('E15 ginkgo fitoterapia', () => {
-    const c = ctx({ pautaFarmaco: P('09:00') });
+  it('E15 ginkgo fitoterapia: la pauta de la regla coincide (plazo de 14 días)', () => {
+    // La regla directa suspende 14 días. A través del despachador, si HOY la fecha
+    // límite ya no se puede cumplir, se aplica el post-proceso de "plazo no alcanzable"
+    // (§4, paso 1): pasa a "consultar" con alerta roja. Para comparar la PAUTA con la
+    // regla directa, se usa una intervención lo bastante lejana (deadline en el futuro).
+    const futuro = new Date(Date.now() + 60 * 86_400_000);
+    const c = ctx({ fechaHoraIntervencion: futuro, pautaFarmaco: P('09:00') });
     const directo = reglaFitoterapia({ idFarmaco: 'ginkgo', nombreComercial: 'Ginkgo', principio: 'ginkgo' }, c);
     expect(evaluarFarmacoUi(d('fitoterapia', { idFarmaco: 'ginkgo', nombreComercial: 'Ginkgo', principiosActivos: ['ginkgo'], horas: ['09:00'] }), c, clin())).toEqual(directo);
   });

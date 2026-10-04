@@ -61,7 +61,7 @@
           "fuente": "§5.16.13"
         }
       ],
-      "etiquetaSap": "trombosis/SAF"
+      "etiquetaSap": "trombosis o síndrome antifosfolípido"
     },
     {
       "id": "anemia_plaquetas",
@@ -86,7 +86,7 @@
           "fuente": "§5.16.13"
         }
       ],
-      "etiquetaSap": "anemia/plaquetopenia"
+      "etiquetaSap": "anemia o plaquetopenia"
     },
     {
       "id": "corticoides_3m",
@@ -104,7 +104,7 @@
           }
         }
       ],
-      "etiquetaSap": "corticoides recientes"
+      "etiquetaSap": "corticoides en los últimos 3 meses"
     },
     {
       "id": "cortico_farmaco",

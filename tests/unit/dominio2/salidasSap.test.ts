@@ -66,6 +66,7 @@ const MODULO_DEMO: ModuloPatologia = {
   preguntas: [
     { id: 'ortopnea', etiqueta: '¿Ortopnea?', tipo: 'boolean', etiquetaSap: 'ortopnea' },
     { id: 'edemas', etiqueta: '¿Edemas?', tipo: 'boolean', etiquetaSap: 'edemas' },
+    { id: 'saos', etiqueta: '¿SAOS?', tipo: 'boolean', etiquetaSap: 'SAOS diagnosticado', etiquetaSapNo: 'SAOS no diagnosticado' },
     { id: 'nyha', etiqueta: 'Clase NYHA', tipo: 'opcion', etiquetaSap: 'NYHA', opciones: [
       { valor: 'III', etiqueta: 'III' }, { valor: 'IV', etiqueta: 'IV' },
     ] },
@@ -85,6 +86,15 @@ describe('§10.1 · resumenModuloSap (solo contestadas; sí/no breve; multi marc
   it('una booleana no contestada no aparece', () => {
     const r = resumenModuloSap(MODULO_DEMO, { ortopnea: true });
     expect(r).not.toContain('edemas');
+  });
+  it('etiquetaSapNo: "no" usa la etiqueta específica en lugar de "no " + etiqueta', () => {
+    const r = resumenModuloSap(MODULO_DEMO, { saos: false });
+    expect(r).toContain('SAOS no diagnosticado');
+    expect(r).not.toContain('no SAOS diagnosticado');
+  });
+  it('sin etiquetaSapNo, "no" sigue siendo "no " + etiqueta', () => {
+    const r = resumenModuloSap(MODULO_DEMO, { ortopnea: false });
+    expect(r).toContain('no ortopnea');
   });
   it('opción usa la etiqueta de la opción y la etiquetaSap de la pregunta', () => {
     const r = resumenModuloSap(MODULO_DEMO, { nyha: 'III' });

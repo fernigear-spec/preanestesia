@@ -5,7 +5,7 @@ import { calcularStbur } from '../../../src/dominio/escalas/stbur.ts';
 import { calcularApfel } from '../../../src/dominio/escalas/apfel.ts';
 import { calcularPovoc } from '../../../src/dominio/escalas/povoc.ts';
 import { calcularCha2ds2va } from '../../../src/dominio/escalas/cha2ds2va.ts';
-import { calcularDasi, metsDesdeDasi } from '../../../src/dominio/escalas/dasi.ts';
+import { calcularDasi } from '../../../src/dominio/escalas/dasi.ts';
 import { calcularAclaramiento } from '../../../src/dominio/escalas/cockcroftGault.ts';
 import { calcularMorfinaEquivalente } from '../../../src/dominio/escalas/morfinaEquivalente.ts';
 import { calcularAuditC } from '../../../src/dominio/escalas/auditC.ts';
@@ -125,8 +125,9 @@ describe('CHA2DS2-VA', () => {
 });
 
 describe('DASI y METs', () => {
-  it('METs = (0,43×DASI+9,6)/3,5', () => {
-    expect(metsDesdeDasi(0)).toBeCloseTo(2.743, 3);
+  it('METs = (0,43×DASI+9,6)/3,5 (DASI 0)', () => {
+    // Vía el cálculo público: con DASI 0, METs = 9,6/3,5 ≈ 2,743.
+    expect(calcularDasi([]).mets).toBeCloseTo(2.743, 2);
   });
   it('capacidad reducida si DASI ≤ 34', () => {
     const r = calcularDasi(['autocuidado', 'caminarDentroCasa']); // 2,75 + 1,75 = 4,5

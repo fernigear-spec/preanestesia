@@ -23,6 +23,8 @@ type Matchers = {
   toBeFalse(): void;
   toBeUndefined(): void;
   toContain(expected: unknown): void;
+  toContainEqual(expected: unknown): void;
+  toMatch(expected: RegExp | string): void;
   toHaveLength(expected: number): void;
   toBeGreaterThan(expected: number): void;
   toBeGreaterThanOrEqual(expected: number): void;
@@ -66,6 +68,16 @@ function build(actual: unknown, negated: boolean): Omit<Matchers, 'not'> {
         ? actual.includes(expected)
         : typeof actual === 'string' && actual.includes(String(expected));
       check(ok, `esperado que contuviera ${String(expected)}`);
+    },
+    toContainEqual(expected) {
+      const ok = Array.isArray(actual) && actual.some((x) => {
+        try { assert.deepStrictEqual(x, expected); return true; } catch { return false; }
+      });
+      check(ok, `esperado que contuviera (por valor) ${JSON.stringify(expected)}`);
+    },
+    toMatch(expected) {
+      const re = expected instanceof RegExp ? expected : new RegExp(expected);
+      check(typeof actual === 'string' && re.test(actual), `esperado que ${JSON.stringify(actual)} casara con ${String(expected)}`);
     },
     toHaveLength(expected) {
       const len = (actual as { length?: number })?.length;

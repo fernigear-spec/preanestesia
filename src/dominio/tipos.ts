@@ -145,6 +145,12 @@ export interface ResultadoFarmaco {
   confirmadoPor?: string;
   /** Dato que falta y bloquea la recomendación (R12.5), si aplica. */
   datoQueFalta?: string;
+  /**
+   * Alertas de seguridad que la regla quiera elevar al resumen del anestesiólogo
+   * (p. ej. antiangiogénico reciente, fondaparinux con aclaramiento < 20). El
+   * despachador las conserva y el resumen las recoge de todo el plan (§8).
+   */
+  alertas?: Alerta[];
 }
 
 // ————————————————————————————————————————————————————————————————

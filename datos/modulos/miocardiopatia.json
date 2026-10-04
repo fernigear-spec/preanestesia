@@ -48,7 +48,8 @@
           }
         }
       ],
-      "etiquetaSap": "miocardiopatía sintomática"
+      "etiquetaSap": "miocardiopatía sintomática",
+      "etiquetaSapNo": "miocardiopatía asintomática"
     }
   ]
 }

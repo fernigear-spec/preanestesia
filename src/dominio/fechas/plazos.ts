@@ -6,15 +6,6 @@
  * La traducción a lenguaje del paciente incluye siempre el día de la semana.
  */
 
-const DIAS_SEMANA = [
-  'domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado',
-] as const;
-
-const MESES = [
-  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto',
-  'septiembre', 'octubre', 'noviembre', 'diciembre',
-] as const;
-
 export const HORAS_POR_DIA = 24;
 
 export function diasAHoras(dias: number): number {
@@ -33,32 +24,8 @@ export function plazoNoAlcanzable(limite: Date, ahora: Date): boolean {
   return limite.getTime() <= finDeHoy.getTime();
 }
 
-/** "martes 13 de octubre" (con día de la semana, §8.0). */
-export function fechaLarga(d: Date): string {
-  return `${DIAS_SEMANA[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}`;
-}
-
-export type FranjaDia = 'mañana' | 'mediodía' | 'tarde' | 'noche';
-
-export function franja(d: Date): FranjaDia {
-  const h = d.getHours();
-  if (h < 12) return 'mañana';
-  if (h < 15) return 'mediodía';
-  if (h < 21) return 'tarde';
-  return 'noche';
-}
-
-/** "el martes 13 de octubre por la mañana" */
-export function fechaConFranja(d: Date): string {
-  return `el ${fechaLarga(d)} por la ${franja(d)}`;
-}
-
-/** Hora de reloj "HH:MM" (para ayuno, §8.14). */
-export function horaReloj(d: Date): string {
-  const hh = String(d.getHours()).padStart(2, '0');
-  const mm = String(d.getMinutes()).padStart(2, '0');
-  return `${hh}:${mm}`;
-}
+// `fechaLarga`, `horaReloj` y las utilidades de franja horaria vivían también aquí;
+// se retiraron (2026-10-04) por duplicar las de `ultimaToma.ts` (las que se usan).
 
 export function startOfDay(d: Date): Date {
   const r = new Date(d);

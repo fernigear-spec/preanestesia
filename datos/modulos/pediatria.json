@@ -115,7 +115,7 @@
       "etiqueta": "¿Tiene algún síndrome (por ejemplo, síndrome de Down)?",
       "tipo": "boolean",
       "porque": "Algunos síndromes se asocian a vía aérea difícil o inestabilidad cervical (§5.12).",
-      "etiquetaSap": "síndrome (p. ej. Down)"
+      "etiquetaSap": "síndrome genético"
     },
     {
       "id": "sindrome_cual",

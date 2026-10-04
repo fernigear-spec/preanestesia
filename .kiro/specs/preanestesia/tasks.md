@@ -273,3 +273,11 @@ Cada subtarea incluye su fichero en `src/dominio/escalas/` **y** sus pruebas uni
 - [x] **19.19** El texto de SAP incluye el resultado del consentimiento del paso 10 (entregado y explicado con fecha / pendiente de entregar / no procede). _(R10.1)_
 - [x] **19.20** SAP: solo las preguntas contestadas; booleanas con `etiquetaSap` breve (sí = la palabra; no = «no» + la palabra); casillas múltiples solo las opciones marcadas. Nuevo campo `etiquetaSap` en `PreguntaModulo`, poblado en las 80 preguntas booleanas; función pura `resumenModuloSap`. _(R10.1)_
 - [x] **19.21** Prueba que falla si alguna pregunta booleana no tiene `etiquetaSap` (`tests/unit/datos/etiquetaSap.test.ts`); pruebas de `resumenModuloSap` y del consentimiento en el SAP; E2E del flujo sin bloqueo y del consentimiento en el SAP. _(R15)_
+
+### Fase 3 bis — Alertas de reglas, oftalmología P2Y12, plazo no alcanzable, limpieza (2026-10-04)
+- [x] **19.22** `ResultadoFarmaco` lleva un campo opcional `alertas`; el despachador conserva siempre las alertas que devuelve cualquier regla (antiangiogénico, fondaparinux…) y el resumen las recoge de todo el plan de medicación. La de fondaparinux con aclaramiento < 20 es roja y se ve. Prueba de barrido en `alertasDespachador.test.ts`. _(R8, R10.3)_
+- [x] **19.23** `reglaP2y12Oftalmo` conectada en el despachador: oftalmología de riesgo moderado/alto sustituye por AAS 100 mg y suspende el P2Y12; oftalmología de riesgo bajo (catarata tópica) no suspende. Pruebas (vitrectomía / catarata tópica). _(R8.3)_
+- [x] **19.24** `aplicarPlazoNoAlcanzable` conectado en el despachador: si con la fecha de la intervención el plazo ya no se puede cumplir, el fármaco pasa a «consultar» y eleva alerta roja (como el QR). _(R3.2.5)_
+- [x] **19.25** `evaluarStent` conectado al resumen (alerta roja de diferir + amarilla de neuroaxial). _(R12.7)_
+- [x] **19.26** Limpieza de restos: eliminadas `fechaConFranja`, `franja` y las copias duplicadas de `fechaLarga`/`horaReloj` de `plazos.ts`; `export` innecesarios retirados (`NOTA_ANESTESIA_SEGURA_IMAO`, `metsDesdeDasi`).
+- [x] **19.27** SAP: nuevo campo opcional `etiquetaSapNo` (para las respuestas «no» que se leen mal como «no …»); ajustes de etiquetas acordados por el servicio.

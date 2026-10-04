@@ -58,7 +58,7 @@
           }
         }
       ],
-      "etiquetaSap": "ronquera/afectación cricoaritenoidea"
+      "etiquetaSap": "ronquera o disnea"
     },
     {
       "id": "indicacion_inmunosupresor",
@@ -96,7 +96,7 @@
           }
         }
       ],
-      "etiquetaSap": "corticoides recientes"
+      "etiquetaSap": "corticoides en los últimos 3 meses"
     },
     {
       "id": "cortico_farmaco",

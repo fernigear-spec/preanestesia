@@ -26,7 +26,7 @@
           }
         }
       ],
-      "etiquetaSap": "disfagia/sialorrea"
+      "etiquetaSap": "disfagia o mal manejo de la saliva"
     },
     {
       "id": "ortostatismo",
@@ -45,7 +45,7 @@
           }
         }
       ],
-      "etiquetaSap": "ortostatismo"
+      "etiquetaSap": "hipotensión ortostática"
     }
   ]
 }

@@ -22,7 +22,7 @@ export const PESOS_DASI = {
 
 export type ItemDasi = keyof typeof PESOS_DASI;
 
-export function metsDesdeDasi(dasi: number): number {
+function metsDesdeDasi(dasi: number): number {
   return (0.43 * dasi + 9.6) / 3.5;
 }
 

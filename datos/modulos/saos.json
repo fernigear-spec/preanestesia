@@ -8,7 +8,8 @@
       "etiqueta": "¿Tiene diagnóstico confirmado de apnea del sueño?",
       "tipo": "boolean",
       "porque": "Con diagnóstico confirmado no hace falta calcular STOP-Bang; sin diagnóstico, se calcula.",
-      "etiquetaSap": "SAOS diagnosticado"
+      "etiquetaSap": "SAOS diagnosticado",
+      "etiquetaSapNo": "SAOS no diagnosticado"
     },
     {
       "id": "cpap",
@@ -28,7 +29,7 @@
         "pregunta": "cpap",
         "igual": true
       },
-      "etiquetaSap": "cumplimiento de la CPAP"
+      "etiquetaSap": "usa la CPAP habitualmente"
     },
     {
       "id": "presion",

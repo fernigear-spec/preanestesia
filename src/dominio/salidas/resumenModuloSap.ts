@@ -21,7 +21,8 @@ export function resumenModuloSap(modulo: ModuloPatologia, respuestas: Respuestas
     if (p.tipo === 'boolean') {
       if (v !== true && v !== false) continue; // sin contestar
       const etq = p.etiquetaSap ?? p.etiqueta;
-      partes.push(v === true ? etq : `no ${etq}`);
+      if (v === true) partes.push(etq);
+      else partes.push(p.etiquetaSapNo ?? `no ${etq}`);
     } else if (p.tipo === 'opcion_multiple') {
       if (!Array.isArray(v) || v.length === 0) continue;
       const etiquetas = v.map((val) => p.opciones?.find((o) => o.valor === val)?.etiqueta ?? String(val));

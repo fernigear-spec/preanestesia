@@ -20,7 +20,8 @@
           }
         }
       ],
-      "etiquetaSap": "hipertensión pulmonar"
+      "etiquetaSap": "hipertensión pulmonar confirmada",
+      "etiquetaSapNo": "hipertensión pulmonar no confirmada"
     },
     {
       "id": "tratamiento",

@@ -58,7 +58,7 @@
           }
         }
       ],
-      "etiquetaSap": "afectación cardiaca"
+      "etiquetaSap": "afectación cardiaca conocida"
     },
     {
       "id": "corticoides_3m",
@@ -76,7 +76,7 @@
           }
         }
       ],
-      "etiquetaSap": "corticoides recientes"
+      "etiquetaSap": "corticoides en los últimos 3 meses"
     },
     {
       "id": "cortico_farmaco",

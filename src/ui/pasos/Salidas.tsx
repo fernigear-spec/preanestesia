@@ -267,6 +267,12 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco }: Props) {
       fechaIntervencion: intervencion.fechaHora ?? null,
     });
     for (const a of efectosMod.alertas) alertas.push({ gravedad: a.gravedad, mensaje: a.mensaje });
+
+    // Alertas que elevan las reglas de medicación (§8): antiangiogénico reciente,
+    // fondaparinux con aclaramiento < 20 (roja), plazo no alcanzable, etc. El
+    // despachador las conserva en resultado.alertas; aquí se recogen de todo el plan.
+    for (const f of plan) for (const a of f.resultado.alertas ?? []) alertas.push({ gravedad: a.gravedad, mensaje: a.mensaje });
+
     alertas.sort((a, b) => ORDEN_GRAVEDAD[a.gravedad] - ORDEN_GRAVEDAD[b.gravedad]);
 
     // Notas técnicas.

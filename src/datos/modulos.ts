@@ -103,6 +103,12 @@ export interface PreguntaModulo {
    * "no " + la palabra. Es obligatoria en toda pregunta booleana (lo vigila un test).
    */
   etiquetaSap?: string;
+  /**
+   * Etiqueta de SAP para la respuesta "no", cuando "no " + `etiquetaSap` se lee mal
+   * (p. ej. "SAOS diagnosticado" → no "no SAOS diagnosticado" sino "SAOS no
+   * diagnosticado"). Si está presente, se usa en lugar de "no " + `etiquetaSap`.
+   */
+  etiquetaSapNo?: string;
   /** Visibilidad condicional (se muestra solo si se cumple). */
   visibleSi?: CondicionVisible;
   /** Efectos clínicos que generan las respuestas de esta pregunta (§5.16). */

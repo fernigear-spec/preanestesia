@@ -3,7 +3,7 @@
  * Las horas se calculan desde la hora prevista de inducción y se muestran como
  * horas de reloj. Cubre adultos, pediatría y situaciones especiales.
  */
-import { horaReloj } from '../fechas/plazos.ts';
+import { horaReloj } from '../fechas/ultimaToma.ts';
 import type { Alerta } from '../tipos.ts';
 
 /** Código de la línea de ayuno (idioma-independiente; la etiqueta se localiza). */

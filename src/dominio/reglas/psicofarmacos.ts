@@ -15,7 +15,7 @@ const HORAS_LITIO: Record<RiesgoCardiovascular, number> = {
 };
 
 /** Nota "anestesia segura con IMAO" (§8.7), común a IMAO irreversibles, moclobemida e IMAO-B. */
-export const NOTA_ANESTESIA_SEGURA_IMAO =
+const NOTA_ANESTESIA_SEGURA_IMAO =
   'Anestesia segura con IMAO: evitar meperidina, tramadol, metadona, efedrina, anfetaminas, ' +
   'linezolid y azul de metileno; preferir morfina (fentanilo y remifentanilo con precaución a ' +
   'dosis bajas), droperidol, dexametasona (ondansetrón con precaución) y vasopresores directos ' +

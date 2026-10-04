@@ -395,7 +395,7 @@ Las notas del anestesiólogo recuerdan **informar a la paciente al alta si se ha
 - Abreviaturas configurables, política de negativos configurable.
 - Opción «solo ASCII» (sin tildes ni símbolos especiales).
 - Sin límite de caracteres: el texto recoge los antecedentes patológicos y quirúrgicos y el **resultado del consentimiento** del paso 10 (2026-10-04); el resto del informe se rellena con los desplegables del propio SAP. *(Decisión del servicio, 30/09/2026; revisado 2026-10-04.)*
-- **Solo las preguntas contestadas** constan en el SAP; las no contestadas no aparecen. Las preguntas de sí o no se escriben con una etiqueta breve (`etiquetaSap`): sí = la palabra; no = «no» + la palabra. Las de casillas múltiples, solo las opciones marcadas, en forma breve. Un test falla si alguna pregunta booleana de los módulos no tiene `etiquetaSap`. *(2026-10-04.)*
+- **Solo las preguntas contestadas** constan en el SAP; las no contestadas no aparecen. Las preguntas de sí o no se escriben con una etiqueta breve (`etiquetaSap`): sí = la palabra; no = «no» + la palabra, salvo que la pregunta defina `etiquetaSapNo` (p. ej. «SAOS diagnosticado» → «SAOS no diagnosticado»). Las de casillas múltiples, solo las opciones marcadas, en forma breve. Un test falla si alguna pregunta booleana de los módulos no tiene `etiquetaSap`. *(2026-10-04.)*
 - Vista previa sobre los casos de entrenamiento en el panel de administración.
 
 ### R10.2 Hoja de recomendaciones para el paciente
