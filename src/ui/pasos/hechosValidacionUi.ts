@@ -124,18 +124,25 @@ export function construirHechosValidacion(e: EstadoEntrevista, hoy: Date): Hecho
   const incidencias = new Set((antecedentes?.intervencionesPrevias ?? []).flatMap((iq) => iq.incidencias));
   const ce = cribado.condicionesEspeciales;
 
-  // Prematuro con edad posconcepcional < 60 semanas (§5.12): semanas al nacer +
-  // edad del niño en semanas (de la edad en meses del paso 3). Riesgo de apnea.
+  // Prematuro (§5.12). Dos vías:
+  //  - edad posconcepcional < 60 semanas (semanas al nacer + edad del niño en
+  //    semanas, de la edad en meses del paso 3): riesgo de apnea;
+  //  - prematuro SIN semanas conocidas: se dispara igualmente si el niño tiene
+  //    menos de 12 meses (motivo «edad gestacional desconocida»).
   const pedResp = respuestas['pediatria'] ?? {};
   let prematuroApnea = false;
+  let prematuroGestacionDesconocida = false;
   if (pediatrico && pedResp['prematuro'] === true) {
     const semNacer = typeof pedResp['semanas_gestacion_nacer'] === 'number' ? (pedResp['semanas_gestacion_nacer'] as number) : null;
+    const edadMesesConocida = basicos.edadMeses ?? (basicos.edadAnios === 0 ? 0 : undefined);
     if (semNacer !== null && basicos.edadMeses !== undefined) {
       const edadPosconcepcional = semNacer + basicos.edadMeses * 4.345;
       prematuroApnea = edadPosconcepcional < 60;
-    } else if (semNacer !== null && basicos.edadMeses === undefined) {
-      // Sin edad en meses no se puede calcular; conservador si es un lactante muy pequeño (< 1 año).
-      prematuroApnea = basicos.edadAnios < 1;
+    } else {
+      // No se puede calcular la edad posconcepcional (faltan semanas al nacer):
+      // se dispara el punto de «edad gestacional desconocida» si es un lactante < 12 meses.
+      const menosDe12Meses = edadMesesConocida !== undefined ? edadMesesConocida < 12 : basicos.edadAnios < 1;
+      prematuroGestacionDesconocida = menosDe12Meses;
     }
   }
 
@@ -162,6 +169,9 @@ export function construirHechosValidacion(e: EstadoEntrevista, hoy: Date): Hecho
     testigo_jehova: basicos.rechazaHemoderivados === true,
     cocaina_reciente: habitos?.cocainaUltimaSemana === true,
     prematuro_edad_posconcepcional: prematuroApnea,
+    prematuro_gestacion_desconocida: prematuroGestacionDesconocida,
     preeclampsia: basicos.preeclampsia === true,
+    // Plaquetopenia obstétrica (§5.13): plaquetas < 80.000/µL (= 80 ×10⁹/L).
+    plaquetopenia_obstetrica: typeof basicos.plaquetasUltimaAnalitica === 'number' && basicos.plaquetasUltimaAnalitica < 80,
   };
 }

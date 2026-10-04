@@ -1960,7 +1960,9 @@ _Mecanismo distinto de las alertas: condiciones que el anestesiólogo revisa al 
 | Insuficiencia suprarrenal: validar la pauta de corticoides de estrés antes de la intervención. | `hipotiroidismo.insuficiencia_suprarrenal` | §5.3 |
 | Cardiopatía congénita (paciente pediátrico): validar antes de la intervención. | `pediatria.cardiopatia_congenita` | §5.12 |
 | Prematuro con edad posconcepcional < 60 semanas (riesgo de apnea postoperatoria): validar antes de la intervención. | `prematuro_edad_posconcepcional` | §5.12 |
+| Prematuro de edad gestacional desconocida (lactante < 12 meses): validar antes de la intervención (posible riesgo de apnea). | `prematuro_gestacion_desconocida` | §5.12 |
 | Preeclampsia o HTA gestacional: validar antes de la intervención. | `preeclampsia` | §5.13 |
+| Plaquetopenia (< 80.000/µL): validar antes de la intervención; condiciona la técnica neuroaxial. | `plaquetopenia_obstetrica` | §5.13 |
 
 ## 17. Pendiente de revisión por el servicio
 

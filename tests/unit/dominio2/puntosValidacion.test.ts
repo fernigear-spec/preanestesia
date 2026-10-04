@@ -193,13 +193,15 @@ describe('§13 bis · puntos de validación clínica', () => {
     expect(puntos.some((p) => p.id === 'cardiopatia_congenita')).toBeTrue();
   });
 
-  it('nuevas condiciones ancladas por hecho: preeclampsia y prematuro posconcepcional', () => {
+  it('nuevas condiciones ancladas por hecho: preeclampsia, prematuro (posconcepcional y gestación desconocida), plaquetopenia obstétrica', () => {
     const puntos = derivarPuntosValidacion({
       catalogo: CATALOGO, modulos: MODULOS, respuestas: {}, activos: new Set(), fechaIntervencion: IV,
-      hechos: { preeclampsia: true, prematuro_edad_posconcepcional: true },
+      hechos: { preeclampsia: true, prematuro_edad_posconcepcional: true, prematuro_gestacion_desconocida: true, plaquetopenia_obstetrica: true },
     });
     expect(puntos.find((p) => p.id === 'preeclampsia')?.tipo).toBe('validar');
     expect(puntos.find((p) => p.id === 'prematuro_apnea')?.tipo).toBe('validar');
+    expect(puntos.find((p) => p.id === 'prematuro_gestacion_desconocida')?.motivo).toMatch(/edad gestacional desconocida/);
+    expect(puntos.find((p) => p.id === 'plaquetopenia_obstetrica')?.motivo).toMatch(/condiciona la técnica neuroaxial/);
   });
 
   it('una condición antigua (ictus hace 6 meses) no genera punto', () => {

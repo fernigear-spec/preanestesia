@@ -398,9 +398,21 @@
       "fuente": "§5.12"
     },
     {
+      "id": "prematuro_gestacion_desconocida",
+      "origen": "prematuro_gestacion_desconocida",
+      "motivo": "Prematuro de edad gestacional desconocida (lactante < 12 meses): validar antes de la intervención (posible riesgo de apnea).",
+      "fuente": "§5.12"
+    },
+    {
       "id": "preeclampsia",
       "origen": "preeclampsia",
       "motivo": "Preeclampsia o HTA gestacional: validar antes de la intervención.",
+      "fuente": "§5.13"
+    },
+    {
+      "id": "plaquetopenia_obstetrica",
+      "origen": "plaquetopenia_obstetrica",
+      "motivo": "Plaquetopenia (< 80.000/µL): validar antes de la intervención; condiciona la técnica neuroaxial.",
       "fuente": "§5.13"
     }
   ]

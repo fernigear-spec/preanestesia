@@ -318,6 +318,10 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     const notas: string[] = [...ayuno.notasAnestesiologo];
     for (const n of efectosMod.notas) notas.push(n.texto);
     for (const n of dispositivo.notas) notas.push(`Dispositivo cardiaco: ${n}`);
+    // Plaquetopenia obstétrica (§5.13): nota sobre la técnica neuroaxial.
+    if (typeof basicos.plaquetasUltimaAnalitica === 'number' && basicos.plaquetasUltimaAnalitica < 80) {
+      notas.push('Plaquetopenia: condiciona la técnica neuroaxial.');
+    }
     for (const f of plan) if (f.resultado.textoAnestesiologo) notas.push(`${f.resultado.nombreComercial}: ${f.resultado.textoAnestesiologo}`);
     if (mt?.alerta?.gravedad === 'roja') notas.push('mtND4: seguir las medidas del consenso SEDAR (evitar halogenados/TIVA, regional preferente, monitorización de profundidad, etc.).');
 
