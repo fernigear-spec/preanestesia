@@ -19,7 +19,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "debilidad cervical/disfagia"
     },
     {
       "id": "disnea_fatiga",
@@ -37,7 +38,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "disnea/fatiga"
     },
     {
       "id": "problemas_cardiacos",
@@ -55,7 +57,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "afectación cardiaca"
     },
     {
       "id": "corticoides_3m",
@@ -72,7 +75,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "corticoides recientes"
     },
     {
       "id": "cortico_farmaco",

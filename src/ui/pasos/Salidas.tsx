@@ -10,6 +10,7 @@ import plantillasSap from '../../../datos/plantillas_sap.json';
 import type { GravedadAlerta } from '../../dominio/tipos.ts';
 import { calcularImc, type EstadoEntrevista } from '../estadoEntrevista.ts';
 import { MODULO_POR_ID, MODULOS } from '../../datos/modulosDatos.ts';
+import type { RespuestasModulos } from '../../datos/modulos.ts';
 import { derivarHechosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
 import { emitirEfectosModulos } from '../../dominio/entrevista/efectosModulos.ts';
 import { derivarHojaExtras } from '../../dominio/entrevista/hojaExtras.ts';
@@ -32,12 +33,15 @@ import opioidesData from '../../../datos/opioides.json';
 import { evaluarMtnd4 } from '../../dominio/mtnd4/mtnd4.ts';
 import { derivarAsa } from '../../dominio/salidas/asaSugerido.ts';
 import { construirSap, type EntradaSap } from '../../dominio/salidas/construirSap.ts';
+import { resumenModuloSap } from '../../dominio/salidas/resumenModuloSap.ts';
 import type { ClaseAsa } from '../../dominio/escalas/asa.ts';
 import type { PruebaSolicitada } from '../../dominio/pruebas/tablaPruebas.ts';
 
 interface Props {
   entrevista: EstadoEntrevista;
   modalidad: string;
+  /** Confirma o marca «le llamaremos» un fármaco pendiente (§12), por su índice en la medicación. */
+  onConfirmarFarmaco?: (indice: number, cambios: { confirmadoPor?: string; leLlamaremos?: boolean }) => void;
 }
 
 interface AlertaVista { gravedad: GravedadAlerta; mensaje: string; }
@@ -58,10 +62,11 @@ function fechaCorta(d: Date): string {
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 }
 
-export function Salidas({ entrevista, modalidad }: Props) {
+export function Salidas({ entrevista, modalidad, onConfirmarFarmaco }: Props) {
   const { intervencion, procedimiento, basicos, antecedentes, mtnd4, alergias, habitos, cribado, medicacion, viaAerea, consentimiento } = entrevista;
   const [soloAscii, setSoloAscii] = useState(false);
   const [asaManual, setAsaManual] = useState<ClaseAsa | ''>('');
+  const [nombresPend, setNombresPend] = useState<Record<number, string>>({});
   const [notasAbiertas, setNotasAbiertas] = useState(false);
   const [copiado, setCopiado] = useState(false);
 
@@ -273,6 +278,11 @@ export function Salidas({ entrevista, modalidad }: Props) {
       cabecera: `VALORACION PREANESTESICA ENFERMERIA ${fechaTxt} (${modalidad})`,
       antecedentesPatologicos: resumenModulos,
       antecedentesQuirurgicos,
+      ...(consentimiento
+        ? { consentimiento: consentimiento.estado === 'entregado'
+            ? { estado: 'entregado' as const, ...(consentimiento.fecha ? { fecha: consentimiento.fecha } : {}) }
+            : { estado: consentimiento.estado } }
+        : {}),
     };
     const sap = construirSap(entradaSap, { soloAscii, usarAbreviaturas: true, abreviaturas: plantillasSap.abreviaturas });
 
@@ -323,6 +333,57 @@ export function Salidas({ entrevista, modalidad }: Props) {
         </ul>
       )}
 
+      {/* Puntos pendientes de confirmación (§12). La hoja/QR se generan igualmente;
+          aquí el anestesiólogo confirma cada fármaco o lo marca como «le llamaremos». */}
+      {(() => {
+        const meds = medicacion ?? [];
+        const pendientes = salida.plan
+          .map((f, i) => ({ f, i }))
+          .filter(({ f, i }) => f.resultado.requiereConfirmacion && !meds[i]?.confirmadoPor && !meds[i]?.leLlamaremos);
+        if (pendientes.length === 0) return null;
+        return (
+          <>
+            <h4>Puntos pendientes de confirmación</h4>
+            <p className="aviso aviso-info">
+              La hoja y el QR del paciente se generan igualmente; mientras tanto, estos fármacos aparecen con la
+              frase «el anestesiólogo le llamará». Confirme cada uno con su nombre o márquelo como «le llamaremos».
+            </p>
+            <ul className="lista-pendientes">
+              {pendientes.map(({ f, i }) => (
+                <li key={`${f.resultado.nombreComercial}-${i}`} className="pendiente">
+                  <strong>{f.resultado.nombreComercial}</strong>
+                  <div className="pendiente-controles">
+                    <input
+                      type="text"
+                      placeholder="Nombre del anestesiólogo"
+                      value={nombresPend[i] ?? ''}
+                      onChange={(e) => setNombresPend((n) => ({ ...n, [i]: e.target.value }))}
+                      aria-label={`Nombre del anestesiólogo para ${f.resultado.nombreComercial}`}
+                    />
+                    <button
+                      type="button"
+                      className="boton-secundario"
+                      disabled={!(nombresPend[i] ?? '').trim() || !onConfirmarFarmaco}
+                      onClick={() => onConfirmarFarmaco?.(i, { confirmadoPor: (nombresPend[i] ?? '').trim(), leLlamaremos: false })}
+                    >
+                      Confirmar
+                    </button>
+                    <button
+                      type="button"
+                      className="boton-secundario"
+                      disabled={!onConfirmarFarmaco}
+                      onClick={() => onConfirmarFarmaco?.(i, { leLlamaremos: true })}
+                    >
+                      Le llamaremos
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        );
+      })()}
+
       <h4>Pruebas complementarias</h4>
       <ul className="resumen-lista">
         {salida.pruebas.length === 0 ? <li>Ninguna.</li> : salida.pruebas.map((p: PruebaSolicitada, i: number) => (
@@ -367,18 +428,9 @@ function grupoAntitrombotico(idRegla: string): string | null {
 }
 
 /** Resumen legible de un módulo (§5.16) a partir de sus respuestas contestadas. */
-function resumenModulo(id: string, respuestas: Record<string, Record<string, unknown>>): string | null {
+function resumenModulo(id: string, respuestas: RespuestasModulos): string | null {
   const moduloId = id === 'stent_o_infarto' ? 'cardiopatia_isquemica' : id === 'protesis_mecanica' ? 'valvulopatia' : id;
   const modulo = MODULO_POR_ID[moduloId];
-  const resp = respuestas[moduloId] ?? {};
   if (!modulo) return null;
-  const partes: string[] = [];
-  for (const p of modulo.preguntas) {
-    const v = resp[p.id];
-    if (v === undefined || v === null || v === false || v === '') continue;
-    if (v === true) partes.push(p.etiqueta);
-    else if (Array.isArray(v)) { if (v.length > 0) partes.push(`${p.etiqueta}: ${v.join(', ')}`); }
-    else partes.push(`${p.etiqueta}: ${String(v)}`);
-  }
-  return partes.length > 0 ? `${modulo.titulo} (${partes.slice(0, 4).join('; ')})` : modulo.titulo;
+  return resumenModuloSap(modulo, respuestas[moduloId] ?? {});
 }

@@ -3,17 +3,36 @@
   "titulo": "Cáncer en tratamiento",
   "fuente": "docs/documento_fuente.md §5.10, §8.9",
   "preguntas": [
-    { "id": "tipo", "etiqueta": "Tipo de cáncer", "tipo": "texto" },
+    {
+      "id": "tipo",
+      "etiqueta": "Tipo de cáncer",
+      "tipo": "texto"
+    },
     {
       "id": "tratamiento_en_curso",
       "etiqueta": "Tratamiento en curso",
       "tipo": "opcion_multiple",
       "opciones": [
-        { "valor": "quimioterapia", "etiqueta": "Quimioterapia" },
-        { "valor": "inmunoterapia", "etiqueta": "Inmunoterapia" },
-        { "valor": "antiangiogenico", "etiqueta": "Antiangiogénico (bevacizumab u otros)" },
-        { "valor": "hormonal", "etiqueta": "Hormonal" },
-        { "valor": "ninguno", "etiqueta": "Ninguno ahora" }
+        {
+          "valor": "quimioterapia",
+          "etiqueta": "Quimioterapia"
+        },
+        {
+          "valor": "inmunoterapia",
+          "etiqueta": "Inmunoterapia"
+        },
+        {
+          "valor": "antiangiogenico",
+          "etiqueta": "Antiangiogénico (bevacizumab u otros)"
+        },
+        {
+          "valor": "hormonal",
+          "etiqueta": "Hormonal"
+        },
+        {
+          "valor": "ninguno",
+          "etiqueta": "Ninguno ahora"
+        }
       ]
     },
     {
@@ -26,13 +45,15 @@
       "id": "antraciclinas_trastuzumab",
       "etiqueta": "¿Ha recibido antraciclinas o trastuzumab?",
       "tipo": "boolean",
-      "porque": "Estos fármacos pueden dañar el corazón: conviene revisar un ecocardiograma reciente."
+      "porque": "Estos fármacos pueden dañar el corazón: conviene revisar un ecocardiograma reciente.",
+      "etiquetaSap": "antraciclinas/trastuzumab previos"
     },
     {
       "id": "radioterapia_cervical_toracica",
       "etiqueta": "¿Radioterapia en cuello o tórax?",
       "tipo": "boolean",
-      "porque": "La radioterapia cervical puede dificultar la vía aérea (alerta)."
+      "porque": "La radioterapia cervical puede dificultar la vía aérea (alerta).",
+      "etiquetaSap": "radioterapia cervical/torácica"
     }
   ]
 }

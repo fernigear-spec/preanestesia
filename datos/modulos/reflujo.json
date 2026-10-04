@@ -8,16 +8,28 @@
       "etiqueta": "¿Cómo es el reflujo?",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "leve", "etiqueta": "Leve u ocasional" },
-        { "valor": "grave", "etiqueta": "Grave / frecuente" }
+        {
+          "valor": "leve",
+          "etiqueta": "Leve u ocasional"
+        },
+        {
+          "valor": "grave",
+          "etiqueta": "Grave / frecuente"
+        }
       ]
     },
     {
       "id": "sintomatico_estos_dias",
       "etiqueta": "¿Está con síntomas estos días?",
       "tipo": "boolean",
-      "porque": "El reflujo grave sintomático el día de la cirugía es una alerta de estómago lleno."
+      "porque": "El reflujo grave sintomático el día de la cirugía es una alerta de estómago lleno.",
+      "etiquetaSap": "reflujo sintomático"
     },
-    { "id": "tratamiento", "etiqueta": "¿Toma tratamiento para el reflujo?", "tipo": "boolean" }
+    {
+      "id": "tratamiento",
+      "etiqueta": "¿Toma tratamiento para el reflujo?",
+      "tipo": "boolean",
+      "etiquetaSap": "tratamiento antirreflujo"
+    }
   ]
 }

@@ -97,6 +97,12 @@ export interface PreguntaModulo {
   placeholder?: string;
   /** Texto del modo guiado (§5b.4): "¿Por qué preguntamos esto?". */
   porque?: string;
+  /**
+   * Etiqueta breve para el texto de SAP (§10.1, 2026-10-04). En preguntas booleanas:
+   * la palabra o expresión corta (p. ej. "ortopnea", "CPAP"); sí = la palabra, no =
+   * "no " + la palabra. Es obligatoria en toda pregunta booleana (lo vigila un test).
+   */
+  etiquetaSap?: string;
   /** Visibilidad condicional (se muestra solo si se cumple). */
   visibleSi?: CondicionVisible;
   /** Efectos clínicos que generan las respuestas de esta pregunta (§5.16). */

@@ -8,27 +8,55 @@
       "etiqueta": "Tipo de arritmia",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "fa_paroxistica", "etiqueta": "Fibrilación auricular paroxística" },
-        { "valor": "fa_persistente", "etiqueta": "Fibrilación auricular persistente" },
-        { "valor": "fa_permanente", "etiqueta": "Fibrilación auricular permanente" },
-        { "valor": "flutter", "etiqueta": "Flutter auricular" },
-        { "valor": "otra", "etiqueta": "Otra arritmia" }
+        {
+          "valor": "fa_paroxistica",
+          "etiqueta": "Fibrilación auricular paroxística"
+        },
+        {
+          "valor": "fa_persistente",
+          "etiqueta": "Fibrilación auricular persistente"
+        },
+        {
+          "valor": "fa_permanente",
+          "etiqueta": "Fibrilación auricular permanente"
+        },
+        {
+          "valor": "flutter",
+          "etiqueta": "Flutter auricular"
+        },
+        {
+          "valor": "otra",
+          "etiqueta": "Otra arritmia"
+        }
       ]
     },
     {
       "id": "ictus_ait_previo",
       "etiqueta": "¿Ha tenido un ictus, un AIT o una embolia?",
       "tipo": "boolean",
-      "porque": "Un ictus/AIT reciente (menos de 3 meses) con FA es criterio de alto riesgo y puede requerir terapia puente."
+      "porque": "Un ictus/AIT reciente (menos de 3 meses) con FA es criterio de alto riesgo y puede requerir terapia puente.",
+      "etiquetaSap": "ictus/AIT previo"
     },
     {
       "id": "ictus_ait_fecha",
       "etiqueta": "Fecha del ictus/AIT/embolia",
       "tipo": "fecha",
       "porque": "Un ictus/AIT de menos de 3 meses es alerta roja (valorar posponer la cirugía programada).",
-      "visibleSi": { "pregunta": "ictus_ait_previo", "igual": true },
+      "visibleSi": {
+        "pregunta": "ictus_ait_previo",
+        "igual": true
+      },
       "genera": [
-        { "cuando": "ictus/AIT en los últimos 3 meses", "tipo": "alerta", "gravedad": "roja", "efecto": "ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada", "fuente": "§5.1 (ESC 2022)", "si": { "recienteMeses": 3 } }
+        {
+          "cuando": "ictus/AIT en los últimos 3 meses",
+          "tipo": "alerta",
+          "gravedad": "roja",
+          "efecto": "ictus o AIT de menos de 3 meses: valorar posponer la cirugía programada",
+          "fuente": "§5.1 (ESC 2022)",
+          "si": {
+            "recienteMeses": 3
+          }
+        }
       ]
     }
   ]

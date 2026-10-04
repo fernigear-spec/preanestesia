@@ -140,7 +140,8 @@
     {
       "id": "aporta_informe",
       "etiqueta": "¿Aporta informe del equipo de trasplante?",
-      "tipo": "boolean"
+      "tipo": "boolean",
+      "etiquetaSap": "aporta informe del equipo de trasplante"
     },
     {
       "id": "niveles_en_rango",
@@ -190,7 +191,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "infección activa"
     },
     {
       "id": "profilaxis",

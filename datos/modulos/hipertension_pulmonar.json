@@ -9,14 +9,27 @@
       "tipo": "boolean",
       "porque": "La hipertensión pulmonar aumenta mucho el riesgo anestésico y es una señal de alerta (§5.2). Cuenta como comorbilidad cardiovascular para pedir BNP o NT-proBNP (§7.3).",
       "genera": [
-        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "hipertensión pulmonar: valorar antes de la intervención", "fuente": "§5.2", "si": { "igual": true } }
-      ]
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "hipertensión pulmonar: valorar antes de la intervención",
+          "fuente": "§5.2",
+          "si": {
+            "igual": true
+          }
+        }
+      ],
+      "etiquetaSap": "hipertensión pulmonar"
     },
     {
       "id": "tratamiento",
       "etiqueta": "Tratamiento específico (si lo tiene)",
       "tipo": "texto",
-      "visibleSi": { "pregunta": "confirmada", "igual": true }
+      "visibleSi": {
+        "pregunta": "confirmada",
+        "igual": true
+      }
     }
   ]
 }

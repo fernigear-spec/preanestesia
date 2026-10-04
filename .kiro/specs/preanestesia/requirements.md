@@ -394,7 +394,8 @@ Las notas del anestesiólogo recuerdan **informar a la paciente al alta si se ha
 - Utilidades gramaticales (enumeraciones, singular/plural, concordancia, omisión de vacíos, fechas cortas).
 - Abreviaturas configurables, política de negativos configurable.
 - Opción «solo ASCII» (sin tildes ni símbolos especiales).
-- Sin límite de caracteres: el texto recoge solo antecedentes patológicos y quirúrgicos; el resto del informe se rellena con los desplegables del propio SAP. *(Decisión del servicio, 30/09/2026.)*
+- Sin límite de caracteres: el texto recoge los antecedentes patológicos y quirúrgicos y el **resultado del consentimiento** del paso 10 (2026-10-04); el resto del informe se rellena con los desplegables del propio SAP. *(Decisión del servicio, 30/09/2026; revisado 2026-10-04.)*
+- **Solo las preguntas contestadas** constan en el SAP; las no contestadas no aparecen. Las preguntas de sí o no se escriben con una etiqueta breve (`etiquetaSap`): sí = la palabra; no = «no» + la palabra. Las de casillas múltiples, solo las opciones marcadas, en forma breve. Un test falla si alguna pregunta booleana de los módulos no tiene `etiquetaSap`. *(2026-10-04.)*
 - Vista previa sobre los casos de entrenamiento en el panel de administración.
 
 ### R10.2 Hoja de recomendaciones para el paciente
@@ -402,10 +403,10 @@ Las notas del anestesiólogo recuerdan **informar a la paciente al alta si se ha
 - Lenguaje sencillo, tratamiento de usted, letra grande, diseño táctil.
 - Secciones: día/hora, medicación en tabla, ayuno con horas de reloj, qué traer, tabaco/alcohol (hojas anexas si aplica), delirium si aplica (R6.10), consentimiento, prehabilitación **solo si `prehabilitacion_activa = true`** (R13), advertencia condicional de sugammadex si aplica (R8.15), cuándo llamar, teléfono de contacto, versión y fecha.
 - Disponible en pantalla (para leer en voz alta), PDF (generado en el navegador) y QR (R11.1).
-- **No se exporta ni genera QR sin resolver los puntos pendientes de confirmación** (confirmados o dejados explícitamente como «le llamaremos»).
+- **La hoja y el QR se generan siempre (2026-10-04), sin bloqueo por fármacos pendientes.** Los fármacos pendientes salen con la frase única de R12.1 y siguen listados y confirmables en el resumen del anestesiólogo; al confirmar uno, se puede regenerar la hoja con su pauta.
 
 ### R10.3 Resumen para el anestesiólogo
-- Pantalla y PDF: alertas por gravedad (roja, amarilla, informativa), puntos pendientes, cálculos con componentes, plan de medicación con fuente, pruebas, ayuno. Indica la modalidad en que se hizo la entrevista (relevante para el 4AT, R6.10.2).
+- Pantalla y PDF: alertas por gravedad (roja, amarilla, informativa), **puntos pendientes de confirmación** (cada fármaco pendiente, con la opción de confirmarlo con el nombre del anestesiólogo o marcarlo «le llamaremos»; 2026-10-04), cálculos con componentes, plan de medicación con fuente, pruebas, ayuno. Indica la modalidad en que se hizo la entrevista (relevante para el 4AT, R6.10.2).
 - Apartado plegable «Notas técnicas»: profilaxis de aspiración, anestesia segura con IMAO, medidas mtND4, reanudación de antitrombóticos, notas de diabetes y dolor, aviso de sugammadex al alta (R8.15), nota de vigilar glucemia en combinaciones fijas de antidiabéticos (R8.0).
 - Listado de sugerencias del asistente de coherencia descartadas por la enfermera.
 
@@ -417,7 +418,7 @@ Las notas del anestesiólogo recuerdan **informar a la paciente al alta si se ha
 - **R11.2** Cada carga útil incluye: tipo (paciente/anestesiólogo), versión del esquema, versión del contenido clínico, fecha de creación y fecha de caducidad.
 - **R11.3** Nunca incluyen nombre, número de historia ni campo de identificación.
 - **R11.4** Enlace caducado: muestra «Este enlace ha caducado. Llame al [teléfono]» sin mostrar datos.
-- **R11.5** QR del paciente: contiene la hoja ya calculada **en forma estructurada** (nombre comercial, código de acción y fecha/hora de cada fármaco, horas de ayuno, ids de los anexos aplicables, teléfono y **versión de los textos**), **no** las respuestas de la entrevista ni textos largos. La vista del paciente renderiza esa estructura en castellano o catalán con los textos de la versión indicada, tomados de `datos/textos/historico/<versión>/`, de modo que la hoja no cambie aunque luego se actualice el catálogo o los textos. Caducidad: 30 días después de la fecha de intervención (configurable). Vista de solo lectura adaptada a móvil con conmutador de idioma, botón para guardar como PDF e indicación de cómo añadirla a la pantalla de inicio. No se genera mientras haya puntos pendientes sin resolver (R12).
+- **R11.5** QR del paciente: contiene la hoja ya calculada **en forma estructurada** (nombre comercial, código de acción y fecha/hora de cada fármaco, horas de ayuno, ids de los anexos aplicables, teléfono y **versión de los textos**), **no** las respuestas de la entrevista ni textos largos. La vista del paciente renderiza esa estructura en castellano o catalán con los textos de la versión indicada, tomados de `datos/textos/historico/<versión>/`, de modo que la hoja no cambie aunque luego se actualice el catálogo o los textos. Caducidad: 30 días después de la fecha de intervención (configurable). Vista de solo lectura adaptada a móvil con conmutador de idioma, botón para guardar como PDF e indicación de cómo añadirla a la pantalla de inicio. Se genera siempre (2026-10-04); los fármacos pendientes aparecen con la frase única de R12.1 (R12.3).
 - **R11.6** QR del anestesiólogo: contiene la entrevista completa. Al abrirlo, el anestesiólogo puede confirmar puntos pendientes con su nombre; la aplicación genera el QR/enlace definitivo del paciente y el SAP actualizado. Caducidad: 60 días (configurable).
 - **R11.7** Si la versión del contenido del enlace difiere de la actual: aviso visible.
 - **R11.8** Si la carga supera la capacidad del QR (~2,9 KB con corrección media/baja), la aplicación avisa y ofrece copiar el enlace.
@@ -430,7 +431,7 @@ Las notas del anestesiólogo recuerdan **informar a la paciente al alta si se ha
 
 - **R12.1** Los fármacos/recomendaciones con «requiere confirmación» aparecen en la hoja del paciente como «Sobre [fármaco], el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta». Esto incluye el caso de los anticonceptivos hormonales combinados y la THS con riesgo trombótico alto (R8.11, Decisión 4): la hoja del paciente muestra esta línea referida al anticonceptivo hasta que se confirme el punto.
 - **R12.2** Se puede marcar «confirmado por el anestesiólogo» con su nombre, desde la tablet o desde el QR del anestesiólogo. Solo entonces se muestra la pauta. El nombre aparece en el texto de SAP.
-- **R12.3** La hoja del paciente no se exporta ni genera QR sin revisar todos los puntos pendientes.
+- **R12.3** *(Revisado 2026-10-04.)* La hoja y el QR se generan siempre, sin bloqueo por fármacos pendientes. Los pendientes aparecen con la frase de R12.1 y quedan listados y confirmables en el resumen del anestesiólogo; al confirmar uno, se regenera la hoja con su pauta.
 - **R12.4** Pie en todas las salidas: «Recomendaciones generadas según los protocolos del Servicio de Anestesiología (versión X, revisión fecha). Validación final por el anestesiólogo.»
 - **R12.5** Si falta un dato que cambia la recomendación, ésta requiere confirmación e indica qué dato falta.
 - **R12.6** Validación de rangos en peso, talla, edad, dosis y fechas, con aviso ante valores improbables.

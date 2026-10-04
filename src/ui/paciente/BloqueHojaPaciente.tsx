@@ -26,7 +26,6 @@ interface Props {
   cribado: CribadoUi;
   habitos: HabitosUi | null;
   consentimiento: ConsentimientoUi | null;
-  onActualizar: (indice: number, cambios: Partial<FarmacoTomadoUi>) => void;
 }
 
 const CONS_MAP: Record<ConsentimientoUi['estado'], 'entregado' | 'pendiente' | 'no_procede'> = {
@@ -35,8 +34,7 @@ const CONS_MAP: Record<ConsentimientoUi['estado'], 'entregado' | 'pendiente' | '
   no_procede: 'no_procede',
 };
 
-export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado, habitos, consentimiento, onActualizar }: Props) {
-  const [nombres, setNombres] = useState<Record<number, string>>({});
+export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado, habitos, consentimiento }: Props) {
   const [generar, setGenerar] = useState(false);
 
   const sexo: Sexo = basicos.sexo;
@@ -91,48 +89,10 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
     return { ayunoQr: ayunoQrDesde(planAyuno, extrasIn.pediatrico, extrasIn.situacion), extras };
   }, [basicos, cribado, habitos, sexo, intervencion.fechaHora, medicacion, consentimiento]);
 
-  const pendientes = medicacion
-    .map((f, i) => ({ f, i, requiere: plan[i]?.resultado.requiereConfirmacion === true }))
-    .filter(({ f, requiere }) => requiere && !f.confirmadoPor && !f.leLlamaremos);
-
-  if (pendientes.length > 0) {
-    return (
-      <div className="pendientes-confirmacion">
-        <p className="aviso aviso-atencion" role="alert">
-          No se puede generar la hoja ni el QR mientras haya fármacos pendientes de confirmar
-          por el anestesiólogo. Confirme cada uno con su nombre o márquelo como «le llamaremos».
-        </p>
-        <ul className="lista-pendientes">
-          {pendientes.map(({ f, i }) => (
-            <li key={`${f.idFarmaco}-${i}`} className="pendiente">
-              <strong>{f.nombreComercial}</strong>
-              <div className="pendiente-controles">
-                <input
-                  type="text"
-                  placeholder="Nombre del anestesiólogo"
-                  value={nombres[i] ?? ''}
-                  onChange={(e) => setNombres((n) => ({ ...n, [i]: e.target.value }))}
-                  aria-label={`Nombre del anestesiólogo para ${f.nombreComercial}`}
-                />
-                <button
-                  type="button"
-                  className="boton-secundario"
-                  disabled={!(nombres[i] ?? '').trim()}
-                  onClick={() => onActualizar(i, { confirmadoPor: (nombres[i] ?? '').trim(), leLlamaremos: false })}
-                >
-                  Confirmar
-                </button>
-                <button type="button" className="boton-secundario" onClick={() => onActualizar(i, { leLlamaremos: true })}>
-                  Le llamaremos
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
-
+  // §3 (2026-10-04): la hoja y el QR se generan SIEMPRE, sin bloqueo por fármacos
+  // pendientes. Los pendientes aparecen en la hoja con la frase única de §12
+  // («Sobre [fármaco], el anestesiólogo le llamará…») y siguen listados y
+  // confirmables en el resumen del anestesiólogo (sección «Puntos pendientes»).
   if (!generar) {
     return (
       <button type="button" className="boton-primario" onClick={() => setGenerar(true)}>

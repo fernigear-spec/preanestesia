@@ -60,7 +60,8 @@
           "efecto": "criterio de alto riesgo trombótico (enlaza con trombofilia §8.1)",
           "fuente": "§5.16.13"
         }
-      ]
+      ],
+      "etiquetaSap": "trombosis/SAF"
     },
     {
       "id": "anemia_plaquetas",
@@ -84,7 +85,8 @@
           "efecto": "hemograma y coagulación",
           "fuente": "§5.16.13"
         }
-      ]
+      ],
+      "etiquetaSap": "anemia/plaquetopenia"
     },
     {
       "id": "corticoides_3m",
@@ -101,7 +103,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "corticoides recientes"
     },
     {
       "id": "cortico_farmaco",

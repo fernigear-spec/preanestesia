@@ -135,7 +135,8 @@
             "igual": false
           }
         }
-      ]
+      ],
+      "etiquetaSap": "hipoglucemias advertidas"
     },
     {
       "id": "complicaciones",
@@ -187,12 +188,14 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "gastroparesia"
     },
     {
       "id": "hipoglucemias",
       "etiqueta": "¿Hipoglucemias frecuentes?",
-      "tipo": "boolean"
+      "tipo": "boolean",
+      "etiquetaSap": "hipoglucemias frecuentes"
     },
     {
       "id": "bomba_o_sensor",

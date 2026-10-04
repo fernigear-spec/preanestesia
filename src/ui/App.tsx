@@ -521,12 +521,6 @@ export function App() {
                 cribado={cribado}
                 habitos={habitos}
                 consentimiento={consentimiento}
-                onActualizar={(i, cambios) =>
-                  setEntrevista((e) => ({
-                    ...e,
-                    medicacion: (e.medicacion ?? []).map((f, j) => (j === i ? { ...f, ...cambios } : f)),
-                  }))
-                }
               />
             )}
 
@@ -540,7 +534,16 @@ export function App() {
               </div>
             )}
 
-            <Salidas entrevista={entrevista} modalidad={modalidad ?? 'presencial'} />
+            <Salidas
+              entrevista={entrevista}
+              modalidad={modalidad ?? 'presencial'}
+              onConfirmarFarmaco={(i, cambios) =>
+                setEntrevista((e) => ({
+                  ...e,
+                  medicacion: (e.medicacion ?? []).map((f, j) => (j === i ? { ...f, ...cambios } : f)),
+                }))
+              }
+            />
 
             <div className="acciones">
               <button type="button" className="boton-secundario" onClick={() => setPantalla('intervencion')}>Editar desde el paso 1</button>

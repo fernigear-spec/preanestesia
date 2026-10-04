@@ -267,3 +267,9 @@ Cada subtarea incluye su fichero en `src/dominio/escalas/` **y** sus pruebas uni
 - [x] **19.15** Vía aérea: no se muestra en telefónica; el resumen la marca pendiente y no calcula EGRI/Langeron. _(R3.2.28, R6.2.5)_
 - [x] **19.16** mtND4: pregunta puerta «¿Es posible que su ascendencia materna sea de origen venezolano?»; «no» pasa de largo sin alerta ni línea en la hoja. _(R3.2.13, R9)_
 - [x] **19.17** E2E y pruebas actualizadas al nuevo flujo; nuevas pruebas de telefónica, alergias conocidas, efectos de módulo y coherencia.
+
+### Fase 3 — Salidas (hoja/QR siempre; SAP con consentimiento y etiquetaSap)
+- [x] **19.18** Se elimina el bloqueo: la hoja y el QR del paciente se generan siempre. Los fármacos pendientes aparecen con la frase única de §12 y quedan listados y confirmables en el resumen del anestesiólogo («Puntos pendientes de confirmación»); al confirmar uno, se regenera la hoja con su pauta. _(R10.2, R11.5, R12.3)_
+- [x] **19.19** El texto de SAP incluye el resultado del consentimiento del paso 10 (entregado y explicado con fecha / pendiente de entregar / no procede). _(R10.1)_
+- [x] **19.20** SAP: solo las preguntas contestadas; booleanas con `etiquetaSap` breve (sí = la palabra; no = «no» + la palabra); casillas múltiples solo las opciones marcadas. Nuevo campo `etiquetaSap` en `PreguntaModulo`, poblado en las 80 preguntas booleanas; función pura `resumenModuloSap`. _(R10.1)_
+- [x] **19.21** Prueba que falla si alguna pregunta booleana no tiene `etiquetaSap` (`tests/unit/datos/etiquetaSap.test.ts`); pruebas de `resumenModuloSap` y del consentimiento en el SAP; E2E del flujo sin bloqueo y del consentimiento en el SAP. _(R15)_

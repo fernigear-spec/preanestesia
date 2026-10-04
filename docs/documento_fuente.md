@@ -557,7 +557,9 @@ Texto plano en bloque, listo para copiar con un botón. El generador redacta fra
 - Lista de abreviaturas permitidas (AP, IQ, tto, HTA, DM2, FA, AG, MP, AB, DTM, HM, NAMC y las que añadamos) y opción de escribirlas desarrolladas.
 - Qué negativos se escriben siempre (por ejemplo «NAMC», «niega HM», «niega antecedentes familiares anestésicos», «cribado mtND4 negativo») y cuáles se omiten.
 - Opción «solo ASCII» que sustituye tildes y símbolos si SAP da problemas.
-- Sin límite de caracteres: el texto recoge solo antecedentes patológicos y quirúrgicos; el resto del informe se rellena con los desplegables del propio SAP (decisión del servicio, §10.1).
+- Sin límite de caracteres: el texto recoge los antecedentes patológicos y quirúrgicos y el resultado del consentimiento del paso 10 (2026-10-04); el resto del informe se rellena con los desplegables del propio SAP.
+- **Solo las preguntas contestadas** (marcadas o con texto) constan en el SAP; las no contestadas no aparecen. Las preguntas de sí o no se escriben con una **etiqueta breve** (`etiquetaSap` del módulo): sí = la palabra («ortopnea»); no = «no» más la palabra («no ortopnea»). En las preguntas de casillas múltiples, solo las opciones marcadas, en forma breve. *(Decisión del servicio, 2026-10-04.)*
+- **Consentimiento (paso 10):** se añade una línea según su estado: «Consentimiento: entregado y explicado (fecha)», «Consentimiento: pendiente de entregar» o «Consentimiento: no procede».
 - Las plantillas se editan desde el panel de administración (14.1), con vista previa sobre los casos de entrenamiento.
 
 Ejemplo del estilo esperado:
@@ -613,7 +615,7 @@ Un QR admite unos 2,9 KB en modo binario con corrección de errores baja; usa co
 ## 12. Seguridad clínica
 
 - Cada fármaco o recomendación que requiere confirmación aparece en la hoja del paciente como «Sobre [fármaco], el anestesiólogo le llamará para indicarle qué hacer. No lo cambie por su cuenta», salvo que se marque «confirmado por el anestesiólogo» con su nombre, en la tablet o desde el QR del anestesiólogo. Entonces se muestra la pauta. El nombre aparece en el texto de SAP.
-- La hoja del paciente no se exporta ni genera QR sin revisar los puntos pendientes (confirmados o dejados explícitamente como «le llamaremos»).
+- **La hoja del paciente y el QR se generan SIEMPRE (2026-10-04), sin bloqueo por fármacos pendientes.** Los fármacos pendientes aparecen en la hoja con la frase única de arriba y siguen listados como pendientes, con la opción de confirmarlos, en el resumen del anestesiólogo. Si se confirma un fármaco después, se vuelve a generar la hoja con la pauta.
 - Pie en todas las salidas: «Recomendaciones generadas según los protocolos del Servicio de Anestesiología (versión X, revisión fecha). Validación final por el anestesiólogo».
 - Si falta un dato que cambia la recomendación (aclaramiento, técnica anestésica, fecha del stent, indicación), la recomendación requiere confirmación y se dice qué dato falta.
 - Validación de rangos en peso, talla, edad, dosis y fechas, con aviso ante valores improbables.

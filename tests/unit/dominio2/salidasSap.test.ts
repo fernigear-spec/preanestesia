@@ -4,6 +4,8 @@
 import { describe, it, expect } from '../../_harness.ts';
 import { construirSap, type EntradaSap } from '../../../src/dominio/salidas/construirSap.ts';
 import { derivarAsa, type EntradaAsa } from '../../../src/dominio/salidas/asaSugerido.ts';
+import { resumenModuloSap } from '../../../src/dominio/salidas/resumenModuloSap.ts';
+import type { ModuloPatologia } from '../../../src/datos/modulos.ts';
 
 function entradaSap(p: Partial<EntradaSap> = {}): EntradaSap {
   return {
@@ -35,6 +37,70 @@ describe('§10.1 · texto de SAP (solo antecedentes patológicos y quirúrgicos)
   it('opción solo ASCII quita tildes y símbolos', () => {
     const r = construirSap(entradaSap(), { soloAscii: true });
     expect(/[áéíóúñ«»]/.test(r.texto)).toBeFalse();
+  });
+
+  // Consentimiento (§10, paso 10) en el SAP (2026-10-04).
+  it('consentimiento entregado con fecha → línea «entregado y explicado (fecha)»', () => {
+    const r = construirSap(entradaSap({ consentimiento: { estado: 'entregado', fecha: '30/09/2026' } }));
+    expect(r.texto).toContain('Consentimiento: entregado y explicado (30/09/2026)');
+  });
+  it('consentimiento pendiente → línea «pendiente de entregar»', () => {
+    const r = construirSap(entradaSap({ consentimiento: { estado: 'pendiente_entregar' } }));
+    expect(r.texto).toContain('Consentimiento: pendiente de entregar');
+  });
+  it('consentimiento no procede → línea «no procede»', () => {
+    const r = construirSap(entradaSap({ consentimiento: { estado: 'no_procede' } }));
+    expect(r.texto).toContain('Consentimiento: no procede');
+  });
+  it('sin consentimiento → no se escribe ninguna línea de consentimiento', () => {
+    const r = construirSap(entradaSap());
+    expect(r.texto).not.toContain('Consentimiento:');
+  });
+});
+
+// Módulo de prueba con una booleana (con etiquetaSap), una opción_multiple y un número.
+const MODULO_DEMO: ModuloPatologia = {
+  id: 'demo',
+  titulo: 'Insuficiencia cardiaca',
+  fuente: 'test',
+  preguntas: [
+    { id: 'ortopnea', etiqueta: '¿Ortopnea?', tipo: 'boolean', etiquetaSap: 'ortopnea' },
+    { id: 'edemas', etiqueta: '¿Edemas?', tipo: 'boolean', etiquetaSap: 'edemas' },
+    { id: 'nyha', etiqueta: 'Clase NYHA', tipo: 'opcion', etiquetaSap: 'NYHA', opciones: [
+      { valor: 'III', etiqueta: 'III' }, { valor: 'IV', etiqueta: 'IV' },
+    ] },
+    { id: 'sintomas', etiqueta: 'Síntomas', tipo: 'opcion_multiple', opciones: [
+      { valor: 'disnea', etiqueta: 'disnea' }, { valor: 'sincope', etiqueta: 'síncope' },
+    ] },
+    { id: 'fevi', etiqueta: 'FEVI', tipo: 'numero', etiquetaSap: 'FEVI' },
+  ],
+};
+
+describe('§10.1 · resumenModuloSap (solo contestadas; sí/no breve; multi marcadas)', () => {
+  it('booleana sí → la palabra; booleana no → "no " + palabra; sin contestar se omite', () => {
+    const r = resumenModuloSap(MODULO_DEMO, { ortopnea: true, edemas: false });
+    expect(r).toContain('ortopnea');
+    expect(r).toContain('no edemas');
+  });
+  it('una booleana no contestada no aparece', () => {
+    const r = resumenModuloSap(MODULO_DEMO, { ortopnea: true });
+    expect(r).not.toContain('edemas');
+  });
+  it('opción usa la etiqueta de la opción y la etiquetaSap de la pregunta', () => {
+    const r = resumenModuloSap(MODULO_DEMO, { nyha: 'III' });
+    expect(r).toContain('NYHA: III');
+  });
+  it('opción_multiple: solo las opciones marcadas, en forma breve', () => {
+    const r = resumenModuloSap(MODULO_DEMO, { sintomas: ['disnea'] });
+    expect(r).toContain('disnea');
+    expect(r).not.toContain('síncope');
+  });
+  it('número contestado aparece con su etiquetaSap', () => {
+    const r = resumenModuloSap(MODULO_DEMO, { fevi: 30 });
+    expect(r).toContain('FEVI: 30');
+  });
+  it('sin ninguna respuesta → solo el título del módulo', () => {
+    expect(resumenModuloSap(MODULO_DEMO, {})).toBe('Insuficiencia cardiaca');
   });
 });
 

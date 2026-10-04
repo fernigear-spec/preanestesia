@@ -78,7 +78,8 @@
     {
       "id": "aura",
       "etiqueta": "¿Tiene aura o pródromos antes de la crisis?",
-      "tipo": "boolean"
+      "tipo": "boolean",
+      "etiquetaSap": "aura/pródromos"
     },
     {
       "id": "desencadenantes",
@@ -131,7 +132,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "estatus epiléptico previo"
     }
   ]
 }

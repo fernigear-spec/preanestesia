@@ -7,49 +7,78 @@
       "id": "diagnosticado",
       "etiqueta": "¿Tiene diagnóstico confirmado de apnea del sueño?",
       "tipo": "boolean",
-      "porque": "Con diagnóstico confirmado no hace falta calcular STOP-Bang; sin diagnóstico, se calcula."
+      "porque": "Con diagnóstico confirmado no hace falta calcular STOP-Bang; sin diagnóstico, se calcula.",
+      "etiquetaSap": "SAOS diagnosticado"
     },
     {
       "id": "cpap",
       "etiqueta": "¿Usa CPAP o BiPAP?",
       "tipo": "boolean",
-      "visibleSi": { "pregunta": "diagnosticado", "igual": true }
+      "visibleSi": {
+        "pregunta": "diagnosticado",
+        "igual": true
+      },
+      "etiquetaSap": "CPAP"
     },
     {
       "id": "cumplimiento",
       "etiqueta": "¿La usa la mayoría de las noches?",
       "tipo": "boolean",
-      "visibleSi": { "pregunta": "cpap", "igual": true }
+      "visibleSi": {
+        "pregunta": "cpap",
+        "igual": true
+      },
+      "etiquetaSap": "cumplimiento de la CPAP"
     },
     {
       "id": "presion",
       "etiqueta": "Presión de la CPAP (si la sabe)",
       "tipo": "texto",
-      "visibleSi": { "pregunta": "cpap", "igual": true }
+      "visibleSi": {
+        "pregunta": "cpap",
+        "igual": true
+      }
     },
     {
       "id": "ronquido_fuerte",
       "etiqueta": "¿Ronca fuerte (se oye a través de la puerta o molesta a quien duerme al lado)?",
       "tipo": "boolean",
-      "visibleSi": { "pregunta": "diagnosticado", "igual": false },
+      "visibleSi": {
+        "pregunta": "diagnosticado",
+        "igual": false
+      },
       "porque": "Es uno de los cuatro componentes principales del STOP-Bang (§6.3).",
       "genera": [
-        { "cuando": "= sí", "tipo": "hecho", "efecto": "suma un punto en el STOP-Bang; STOP-Bang ≥ 5 genera alerta de riesgo alto", "fuente": "§6.3" }
-      ]
+        {
+          "cuando": "= sí",
+          "tipo": "hecho",
+          "efecto": "suma un punto en el STOP-Bang; STOP-Bang ≥ 5 genera alerta de riesgo alto",
+          "fuente": "§6.3"
+        }
+      ],
+      "etiquetaSap": "ronquido fuerte"
     },
     {
       "id": "cansancio_diurno",
       "etiqueta": "¿Se siente cansado o somnoliento durante el día?",
       "tipo": "boolean",
-      "visibleSi": { "pregunta": "diagnosticado", "igual": false },
-      "porque": "Componente STOP-Bang: somnolencia diurna (§6.3)."
+      "visibleSi": {
+        "pregunta": "diagnosticado",
+        "igual": false
+      },
+      "porque": "Componente STOP-Bang: somnolencia diurna (§6.3).",
+      "etiquetaSap": "somnolencia diurna"
     },
     {
       "id": "apneas_observadas",
       "etiqueta": "¿Alguien le ha visto dejar de respirar mientras duerme?",
       "tipo": "boolean",
-      "visibleSi": { "pregunta": "diagnosticado", "igual": false },
-      "porque": "Componente STOP-Bang: apneas observadas (§6.3)."
+      "visibleSi": {
+        "pregunta": "diagnosticado",
+        "igual": false
+      },
+      "porque": "Componente STOP-Bang: apneas observadas (§6.3).",
+      "etiquetaSap": "apneas observadas"
     },
     {
       "id": "perimetro_cuello",
@@ -58,10 +87,18 @@
       "unidad": "cm",
       "min": 20,
       "max": 70,
-      "visibleSi": { "pregunta": "diagnosticado", "igual": false },
+      "visibleSi": {
+        "pregunta": "diagnosticado",
+        "igual": false
+      },
       "porque": "Un cuello > 40 cm suma en el STOP-Bang (§6.3).",
       "genera": [
-        { "cuando": "> 40 cm", "tipo": "hecho", "efecto": "suma un punto en el STOP-Bang; STOP-Bang ≥ 5 genera alerta de riesgo alto", "fuente": "§6.3" }
+        {
+          "cuando": "> 40 cm",
+          "tipo": "hecho",
+          "efecto": "suma un punto en el STOP-Bang; STOP-Bang ≥ 5 genera alerta de riesgo alto",
+          "fuente": "§6.3"
+        }
       ]
     }
   ]

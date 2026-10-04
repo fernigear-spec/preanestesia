@@ -8,12 +8,30 @@
       "etiqueta": "Tipo de anemia (si se conoce)",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "ferropenica", "etiqueta": "Ferropénica (falta de hierro)" },
-        { "valor": "b12_folico", "etiqueta": "Por déficit de B12 o fólico" },
-        { "valor": "enfermedad_cronica", "etiqueta": "De enfermedad crónica" },
-        { "valor": "hemolitica", "etiqueta": "Hemolítica" },
-        { "valor": "talasemia", "etiqueta": "Talasemia" },
-        { "valor": "desconocida", "etiqueta": "Desconocida" }
+        {
+          "valor": "ferropenica",
+          "etiqueta": "Ferropénica (falta de hierro)"
+        },
+        {
+          "valor": "b12_folico",
+          "etiqueta": "Por déficit de B12 o fólico"
+        },
+        {
+          "valor": "enfermedad_cronica",
+          "etiqueta": "De enfermedad crónica"
+        },
+        {
+          "valor": "hemolitica",
+          "etiqueta": "Hemolítica"
+        },
+        {
+          "valor": "talasemia",
+          "etiqueta": "Talasemia"
+        },
+        {
+          "valor": "desconocida",
+          "etiqueta": "Desconocida"
+        }
       ]
     },
     {
@@ -21,11 +39,26 @@
       "etiqueta": "Tratamiento actual",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "hierro_oral", "etiqueta": "Hierro oral" },
-        { "valor": "hierro_iv", "etiqueta": "Hierro intravenoso" },
-        { "valor": "b12", "etiqueta": "Vitamina B12" },
-        { "valor": "eritropoyetina", "etiqueta": "Eritropoyetina" },
-        { "valor": "ninguno", "etiqueta": "Ninguno" }
+        {
+          "valor": "hierro_oral",
+          "etiqueta": "Hierro oral"
+        },
+        {
+          "valor": "hierro_iv",
+          "etiqueta": "Hierro intravenoso"
+        },
+        {
+          "valor": "b12",
+          "etiqueta": "Vitamina B12"
+        },
+        {
+          "valor": "eritropoyetina",
+          "etiqueta": "Eritropoyetina"
+        },
+        {
+          "valor": "ninguno",
+          "etiqueta": "Ninguno"
+        }
       ]
     },
     {
@@ -37,20 +70,48 @@
       "max": 20,
       "porque": "Una Hb < 13 g/dL antes de cirugía con sangrado previsible aconseja optimizar la anemia y pedir ferritina.",
       "genera": [
-        { "cuando": "< 13 g/dL", "tipo": "prueba", "efecto": "apoya pedir hemograma y ferritina; valorar optimizar la anemia", "fuente": "§7.3" }
+        {
+          "cuando": "< 13 g/dL",
+          "tipo": "prueba",
+          "efecto": "apoya pedir hemograma y ferritina; valorar optimizar la anemia",
+          "fuente": "§7.3"
+        }
       ]
     },
-    { "id": "hemoglobina_fecha", "etiqueta": "Fecha de esa hemoglobina", "tipo": "fecha" },
-    { "id": "ferropenia", "etiqueta": "¿Ferropenia (falta de hierro) conocida?", "tipo": "boolean" },
-    { "id": "sangrado_reciente", "etiqueta": "¿Sangrado reciente?", "tipo": "boolean" },
+    {
+      "id": "hemoglobina_fecha",
+      "etiqueta": "Fecha de esa hemoglobina",
+      "tipo": "fecha"
+    },
+    {
+      "id": "ferropenia",
+      "etiqueta": "¿Ferropenia (falta de hierro) conocida?",
+      "tipo": "boolean",
+      "etiquetaSap": "ferropenia"
+    },
+    {
+      "id": "sangrado_reciente",
+      "etiqueta": "¿Sangrado reciente?",
+      "tipo": "boolean",
+      "etiquetaSap": "sangrado reciente"
+    },
     {
       "id": "sintomas",
       "etiqueta": "Síntomas",
       "tipo": "opcion_multiple",
       "opciones": [
-        { "valor": "astenia", "etiqueta": "Cansancio" },
-        { "valor": "disnea", "etiqueta": "Falta de aire" },
-        { "valor": "palidez", "etiqueta": "Palidez" }
+        {
+          "valor": "astenia",
+          "etiqueta": "Cansancio"
+        },
+        {
+          "valor": "disnea",
+          "etiqueta": "Falta de aire"
+        },
+        {
+          "valor": "palidez",
+          "etiqueta": "Palidez"
+        }
       ]
     }
   ]

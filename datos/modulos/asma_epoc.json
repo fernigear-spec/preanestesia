@@ -57,7 +57,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "crisis en el último mes"
     },
     {
       "id": "urgencias_anio",
@@ -69,7 +70,8 @@
     {
       "id": "corticoides_orales_anio",
       "etiqueta": "¿Corticoides orales en el último año?",
-      "tipo": "boolean"
+      "tipo": "boolean",
+      "etiquetaSap": "corticoides orales en el último año"
     },
     {
       "id": "ingresos_ultimo_anio",
@@ -86,7 +88,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "ingresos en el último año"
     },
     {
       "id": "rescate_semana",
@@ -204,7 +207,8 @@
           "efecto": "sube la clase de riesgo del paciente a alta",
           "fuente": "§5.2"
         }
-      ]
+      ],
+      "etiquetaSap": "oxigenoterapia domiciliaria"
     },
     {
       "id": "oxigeno_tipo",
@@ -228,12 +232,14 @@
     {
       "id": "cpap_bipap",
       "etiqueta": "¿Usa CPAP o BiPAP?",
-      "tipo": "boolean"
+      "tipo": "boolean",
+      "etiquetaSap": "CPAP/BiPAP"
     },
     {
       "id": "tos_expectoracion",
       "etiqueta": "¿Tos con expectoración habitual?",
-      "tipo": "boolean"
+      "tipo": "boolean",
+      "etiquetaSap": "tos con expectoración"
     },
     {
       "id": "sintomas_respiratorios_nuevos",
@@ -257,7 +263,8 @@
           "efecto": "radiografía de tórax",
           "fuente": "§7.3"
         }
-      ]
+      ],
+      "etiquetaSap": "cambio reciente del esputo/síntomas nuevos"
     }
   ]
 }

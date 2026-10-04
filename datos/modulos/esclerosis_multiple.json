@@ -70,7 +70,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "intolerancia al calor (Uhthoff)"
     },
     {
       "id": "corticoides_3m",
@@ -87,7 +88,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "corticoides recientes"
     },
     {
       "id": "cortico_farmaco",

@@ -8,10 +8,22 @@
       "etiqueta": "Tipo de miocardiopatía (si lo conoce)",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "dilatada", "etiqueta": "Dilatada" },
-        { "valor": "hipertrofica", "etiqueta": "Hipertrófica" },
-        { "valor": "restrictiva", "etiqueta": "Restrictiva" },
-        { "valor": "otra", "etiqueta": "Otra o no la sabe" }
+        {
+          "valor": "dilatada",
+          "etiqueta": "Dilatada"
+        },
+        {
+          "valor": "hipertrofica",
+          "etiqueta": "Hipertrófica"
+        },
+        {
+          "valor": "restrictiva",
+          "etiqueta": "Restrictiva"
+        },
+        {
+          "valor": "otra",
+          "etiqueta": "Otra o no la sabe"
+        }
       ]
     },
     {
@@ -25,8 +37,18 @@
       "tipo": "boolean",
       "porque": "La miocardiopatía cuenta como comorbilidad cardiovascular para pedir BNP o NT-proBNP (§7.3). Los síntomas recientes aconsejan valorarla antes de la intervención.",
       "genera": [
-        { "cuando": "= sí", "tipo": "alerta", "gravedad": "amarilla", "efecto": "miocardiopatía sintomática: valorar antes de la intervención", "fuente": "§5.1", "si": { "igual": true } }
-      ]
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "miocardiopatía sintomática: valorar antes de la intervención",
+          "fuente": "§5.1",
+          "si": {
+            "igual": true
+          }
+        }
+      ],
+      "etiquetaSap": "miocardiopatía sintomática"
     }
   ]
 }

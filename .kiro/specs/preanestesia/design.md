@@ -315,14 +315,14 @@ Hasta la Fase 1 el campo `genera` era solo descriptivo. Ahora cada efecto de tip
 - Utilidades gramaticales: enumeración con «y» final, singular/plural, concordancia de género, omisión de bloques vacíos, fechas cortas.
 - Política de abreviaturas y de negativos configurable.
 - Modo «solo ASCII» (transliteración de tildes/símbolos).
-- Sin límite de caracteres: `construirSap` solo emite antecedentes patológicos y quirúrgicos; el resto del informe se rellena con los desplegables del SAP (decisión 30/09/2026).
+- Sin límite de caracteres: `construirSap` emite antecedentes patológicos, quirúrgicos y el **resultado del consentimiento** del paso 10 (2026-10-04); el resto del informe se rellena con los desplegables del SAP. Solo constan las preguntas contestadas; las booleanas usan `etiquetaSap` (sí = la palabra; no = «no» + la palabra) vía la función pura `resumenModuloSap`; las de casillas múltiples, solo las opciones marcadas. Un test vigila que toda booleana tenga `etiquetaSap`.
 - Vista previa sobre los casos de entrenamiento en el panel de administración.
 
 ---
 
 ## Salidas y su separación de audiencias
 
-- **Hoja del paciente**: nunca contiene notas técnicas ni alertas «solo anestesiólogo». Los puntos que requieren confirmación aparecen como «el anestesiólogo le llamará…».
+- **Hoja del paciente**: nunca contiene notas técnicas ni alertas «solo anestesiólogo». Los puntos que requieren confirmación aparecen como «el anestesiólogo le llamará…». La hoja y el QR se generan **siempre** (2026-10-04): se retira el bloqueo por fármacos pendientes de `BloqueHojaPaciente`; los pendientes se listan y confirman en el resumen del anestesiólogo (`Salidas.tsx`, sección «Puntos pendientes de confirmación»).
 - **Resumen del anestesiólogo**: incluye todo, con un apartado plegable «Notas técnicas».
 - Una sola vista de la aplicación para todos los usuarios; la separación es de **salida**, no de rol.
 - Pie común en todas las salidas con versión y fecha de revisión (R12.4).

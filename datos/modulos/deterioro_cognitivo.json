@@ -83,7 +83,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "episodios de delirio previos"
     }
   ]
 }

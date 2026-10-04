@@ -7,7 +7,8 @@
       "id": "infarto_previo",
       "etiqueta": "¿Ha tenido un infarto o un síndrome coronario agudo?",
       "tipo": "boolean",
-      "porque": "Un infarto reciente aumenta el riesgo perioperatorio y cambia el manejo de la medicación del corazón."
+      "porque": "Un infarto reciente aumenta el riesgo perioperatorio y cambia el manejo de la medicación del corazón.",
+      "etiquetaSap": "infarto/SCA previo"
     },
     {
       "id": "infarto_fecha",
@@ -75,7 +76,8 @@
           "efecto": "stent coronario: condiciona la antiagregación y puede obligar a diferir la cirugía (§8)",
           "fuente": "§5.1"
         }
-      ]
+      ],
+      "etiquetaSap": "stent coronario"
     },
     {
       "id": "stent_fecha",
@@ -131,7 +133,8 @@
     {
       "id": "angina_residual",
       "etiqueta": "¿Tiene angina (dolor u opresión en el pecho al esforzarse) actualmente?",
-      "tipo": "boolean"
+      "tipo": "boolean",
+      "etiquetaSap": "angina"
     },
     {
       "id": "angina_esfuerzo",
@@ -194,7 +197,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "angina con cambio reciente"
     },
     {
       "id": "prueba_isquemia",

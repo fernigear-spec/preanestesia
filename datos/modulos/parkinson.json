@@ -25,7 +25,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "disfagia/sialorrea"
     },
     {
       "id": "ortostatismo",
@@ -43,7 +44,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "ortostatismo"
     }
   ]
 }

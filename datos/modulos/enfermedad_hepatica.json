@@ -8,21 +8,54 @@
       "etiqueta": "Causa",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "alcohol", "etiqueta": "Alcohol" },
-        { "valor": "viral", "etiqueta": "Viral (hepatitis B/C)" },
-        { "valor": "metabolica", "etiqueta": "Metabólica (hígado graso)" },
-        { "valor": "otra", "etiqueta": "Otra / no lo sabe" }
+        {
+          "valor": "alcohol",
+          "etiqueta": "Alcohol"
+        },
+        {
+          "valor": "viral",
+          "etiqueta": "Viral (hepatitis B/C)"
+        },
+        {
+          "valor": "metabolica",
+          "etiqueta": "Metabólica (hígado graso)"
+        },
+        {
+          "valor": "otra",
+          "etiqueta": "Otra / no lo sabe"
+        }
       ]
     },
     {
       "id": "cirrosis",
       "etiqueta": "¿Tiene cirrosis?",
       "tipo": "boolean",
-      "porque": "La hepatopatía conocida hace que se añadan transaminasas y bilirrubina a la analítica."
+      "porque": "La hepatopatía conocida hace que se añadan transaminasas y bilirrubina a la analítica.",
+      "etiquetaSap": "cirrosis"
     },
-    { "id": "ascitis", "etiqueta": "¿Ascitis (líquido en el abdomen)?", "tipo": "boolean" },
-    { "id": "varices", "etiqueta": "¿Varices esofágicas conocidas?", "tipo": "boolean" },
-    { "id": "encefalopatia", "etiqueta": "¿Episodios de encefalopatía (confusión)?", "tipo": "boolean" },
-    { "id": "plaquetas_bajas", "etiqueta": "¿Plaquetas bajas conocidas?", "tipo": "boolean" }
+    {
+      "id": "ascitis",
+      "etiqueta": "¿Ascitis (líquido en el abdomen)?",
+      "tipo": "boolean",
+      "etiquetaSap": "ascitis"
+    },
+    {
+      "id": "varices",
+      "etiqueta": "¿Varices esofágicas conocidas?",
+      "tipo": "boolean",
+      "etiquetaSap": "varices esofágicas"
+    },
+    {
+      "id": "encefalopatia",
+      "etiqueta": "¿Episodios de encefalopatía (confusión)?",
+      "tipo": "boolean",
+      "etiquetaSap": "encefalopatía"
+    },
+    {
+      "id": "plaquetas_bajas",
+      "etiqueta": "¿Plaquetas bajas conocidas?",
+      "tipo": "boolean",
+      "etiquetaSap": "plaquetopenia"
+    }
   ]
 }

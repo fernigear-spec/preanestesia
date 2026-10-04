@@ -9,14 +9,36 @@
       "tipo": "opcion",
       "porque": "La clase NYHA describe cuánto le limita el corazón y sube la clase de riesgo del paciente.",
       "opciones": [
-        { "valor": "I", "etiqueta": "I — sin síntomas con la actividad normal" },
-        { "valor": "II", "etiqueta": "II — síntomas con esfuerzos moderados" },
-        { "valor": "III", "etiqueta": "III — síntomas con pequeños esfuerzos" },
-        { "valor": "IV", "etiqueta": "IV — síntomas en reposo" }
+        {
+          "valor": "I",
+          "etiqueta": "I — sin síntomas con la actividad normal"
+        },
+        {
+          "valor": "II",
+          "etiqueta": "II — síntomas con esfuerzos moderados"
+        },
+        {
+          "valor": "III",
+          "etiqueta": "III — síntomas con pequeños esfuerzos"
+        },
+        {
+          "valor": "IV",
+          "etiqueta": "IV — síntomas en reposo"
+        }
       ],
       "genera": [
-        { "cuando": "= III o IV", "tipo": "clase_riesgo", "efecto": "sube la clase de riesgo del paciente a alta", "fuente": "§5.1" },
-        { "cuando": "= III o IV", "tipo": "asa", "efecto": "ASA mínimo 4", "fuente": "§5.1" }
+        {
+          "cuando": "= III o IV",
+          "tipo": "clase_riesgo",
+          "efecto": "sube la clase de riesgo del paciente a alta",
+          "fuente": "§5.1"
+        },
+        {
+          "cuando": "= III o IV",
+          "tipo": "asa",
+          "efecto": "ASA mínimo 4",
+          "fuente": "§5.1"
+        }
       ]
     },
     {
@@ -28,7 +50,12 @@
       "max": 85,
       "porque": "Una FEVI reducida (≤ 40 %) hace que los IECA/ARA-II se mantengan el día de la cirugía.",
       "genera": [
-        { "cuando": "≤ 40 %", "tipo": "regla", "efecto": "los IECA/ARA-II se mantienen el día de la cirugía", "fuente": "§8" }
+        {
+          "cuando": "≤ 40 %",
+          "tipo": "regla",
+          "efecto": "los IECA/ARA-II se mantienen el día de la cirugía",
+          "fuente": "§8"
+        }
       ]
     },
     {
@@ -36,8 +63,14 @@
       "etiqueta": "¿Le han dicho que tiene el corazón «débil» o con la función disminuida (disfunción sistólica)?",
       "tipo": "boolean",
       "genera": [
-        { "cuando": "= sí", "tipo": "regla", "efecto": "los IECA/ARA-II se mantienen el día de la cirugía", "fuente": "§8" }
-      ]
+        {
+          "cuando": "= sí",
+          "tipo": "regla",
+          "efecto": "los IECA/ARA-II se mantienen el día de la cirugía",
+          "fuente": "§8"
+        }
+      ],
+      "etiquetaSap": "disfunción sistólica"
     },
     {
       "id": "ultimo_ingreso",
@@ -47,12 +80,14 @@
     {
       "id": "ortopnea",
       "etiqueta": "¿Necesita dormir incorporado o con varias almohadas (ortopnea)?",
-      "tipo": "boolean"
+      "tipo": "boolean",
+      "etiquetaSap": "ortopnea"
     },
     {
       "id": "edemas",
       "etiqueta": "¿Tiene hinchazón de piernas (edemas)?",
-      "tipo": "boolean"
+      "tipo": "boolean",
+      "etiquetaSap": "edemas"
     },
     {
       "id": "ecocardiograma_fecha",

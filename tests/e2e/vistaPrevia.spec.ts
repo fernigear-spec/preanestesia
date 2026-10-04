@@ -177,6 +177,7 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('heading', { name: /Paso 9 · Vía aérea/ })).toBeVisible();
     await page.getByRole('button', { name: 'Continuar' }).click();
     await expect(page.getByRole('heading', { name: /Paso 10 · Consentimiento/ })).toBeVisible();
+    await page.getByRole('radio', { name: /Pendiente de entregar/ }).check();
     await page.getByRole('button', { name: 'Continuar' }).click();
 
     // Paso 11 — mtND4. Puerta en "Sí, es posible" → aparece el guion y los factores.
@@ -197,11 +198,14 @@ test.describe('Vista previa', () => {
     await expect(page.locator('label[for="asa-manual"]')).toContainText('ASA sugerido');
     await expect(page.getByRole('heading', { name: /Escalas/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: /Texto para SAP/ })).toBeVisible();
-    await expect(page.getByRole('textbox', { name: 'Texto para SAP' })).toBeVisible();
+    const sap = page.getByRole('textbox', { name: 'Texto para SAP' });
+    await expect(sap).toBeVisible();
+    // El SAP incluye el resultado del consentimiento (§10, 2026-10-04).
+    await expect(sap).toHaveValue(/Consentimiento: pendiente de entregar/);
     await expect(page.getByRole('button', { name: 'Copiar', exact: true })).toBeVisible();
   });
 
-  test('§12: no se genera la hoja/QR con Plavix y stent sin confirmar; sí tras confirmar', async ({ page }) => {
+  test('§3/§12: la hoja/QR se generan igualmente; Plavix pendiente sale con la frase única y se confirma en el resumen', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Presencial' }).click();
     await page.getByRole('button', { name: 'Comenzar' }).click();
@@ -237,16 +241,23 @@ test.describe('Vista previa', () => {
     await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento
     await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
 
-    // Resumen: hay pendiente → no se puede generar.
-    await expect(page.getByText(/pendientes de confirmar/)).toBeVisible();
-    await expect(page.getByRole('button', { name: /Generar hoja y QR del paciente/ })).toHaveCount(0);
+    // Resumen: el fármaco pendiente se lista en «Puntos pendientes de confirmación»,
+    // pero la hoja/QR se pueden generar IGUALMENTE (ya no hay bloqueo).
+    await expect(page.getByRole('heading', { name: /Puntos pendientes de confirmación/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Generar hoja y QR del paciente/ })).toBeVisible();
 
-    // Confirmar con el nombre del anestesiólogo.
+    // Al generar la hoja, Plavix aparece con la frase única de §12.
+    await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
+    await expect(page.getByText(/Sobre Plavix, el anestesiólogo le llamará/)).toBeVisible();
+
+    // Confirmar con el nombre del anestesiólogo en el resumen.
     await page.getByLabel(/Nombre del anestesiólogo para Plavix/).fill('Dra. García');
     await page.getByRole('button', { name: 'Confirmar', exact: true }).click();
 
-    // Ahora sí se puede generar.
-    await expect(page.getByRole('button', { name: /Generar hoja y QR del paciente/ })).toBeVisible();
+    // Tras confirmar: ya no queda la sección de pendientes y la hoja (que seguía
+    // mostrada) se recalcula, mostrando la pauta en lugar de la frase única de §12.
+    await expect(page.getByRole('heading', { name: /Puntos pendientes de confirmación/ })).toHaveCount(0);
+    await expect(page.getByText(/Sobre Plavix, el anestesiólogo le llamará/)).toHaveCount(0);
   });
 
   test('genera la hoja del paciente con su QR desde el resumen', async ({ page }) => {

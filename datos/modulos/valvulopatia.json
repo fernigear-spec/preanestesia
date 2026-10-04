@@ -8,11 +8,26 @@
       "etiqueta": "¿Qué válvula está afectada?",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "aortica", "etiqueta": "Aórtica" },
-        { "valor": "mitral", "etiqueta": "Mitral" },
-        { "valor": "tricuspide", "etiqueta": "Tricúspide" },
-        { "valor": "pulmonar", "etiqueta": "Pulmonar" },
-        { "valor": "varias", "etiqueta": "Varias" }
+        {
+          "valor": "aortica",
+          "etiqueta": "Aórtica"
+        },
+        {
+          "valor": "mitral",
+          "etiqueta": "Mitral"
+        },
+        {
+          "valor": "tricuspide",
+          "etiqueta": "Tricúspide"
+        },
+        {
+          "valor": "pulmonar",
+          "etiqueta": "Pulmonar"
+        },
+        {
+          "valor": "varias",
+          "etiqueta": "Varias"
+        }
       ]
     },
     {
@@ -20,14 +35,36 @@
       "etiqueta": "Gravedad",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "leve", "etiqueta": "Leve" },
-        { "valor": "moderada", "etiqueta": "Moderada" },
-        { "valor": "grave", "etiqueta": "Grave" },
-        { "valor": "no_lo_sabe", "etiqueta": "No lo sabe" }
+        {
+          "valor": "leve",
+          "etiqueta": "Leve"
+        },
+        {
+          "valor": "moderada",
+          "etiqueta": "Moderada"
+        },
+        {
+          "valor": "grave",
+          "etiqueta": "Grave"
+        },
+        {
+          "valor": "no_lo_sabe",
+          "etiqueta": "No lo sabe"
+        }
       ],
       "genera": [
-        { "cuando": "= moderada o grave", "tipo": "clase_riesgo", "efecto": "sube la clase de riesgo del paciente a alta", "fuente": "§5.1" },
-        { "cuando": "= grave", "tipo": "asa", "efecto": "ASA mínimo 4 (moderada: mínimo 3)", "fuente": "§5.1" }
+        {
+          "cuando": "= moderada o grave",
+          "tipo": "clase_riesgo",
+          "efecto": "sube la clase de riesgo del paciente a alta",
+          "fuente": "§5.1"
+        },
+        {
+          "cuando": "= grave",
+          "tipo": "asa",
+          "efecto": "ASA mínimo 4 (moderada: mínimo 3)",
+          "fuente": "§5.1"
+        }
       ]
     },
     {
@@ -36,12 +73,26 @@
       "tipo": "opcion",
       "porque": "Una prótesis mecánica obliga a coordinar la anticoagulación y puede requerir terapia puente.",
       "opciones": [
-        { "valor": "no", "etiqueta": "No" },
-        { "valor": "mecanica", "etiqueta": "Sí, mecánica" },
-        { "valor": "biologica", "etiqueta": "Sí, biológica" }
+        {
+          "valor": "no",
+          "etiqueta": "No"
+        },
+        {
+          "valor": "mecanica",
+          "etiqueta": "Sí, mecánica"
+        },
+        {
+          "valor": "biologica",
+          "etiqueta": "Sí, biológica"
+        }
       ],
       "genera": [
-        { "cuando": "= mecánica", "tipo": "hecho", "efecto": "criterio de alto riesgo trombótico: coordinar anticoagulación y valorar terapia puente (§8.1)", "fuente": "§5.1" }
+        {
+          "cuando": "= mecánica",
+          "tipo": "hecho",
+          "efecto": "criterio de alto riesgo trombótico: coordinar anticoagulación y valorar terapia puente (§8.1)",
+          "fuente": "§5.1"
+        }
       ]
     },
     {
@@ -49,11 +100,26 @@
       "etiqueta": "Posición de la prótesis",
       "tipo": "opcion",
       "opciones": [
-        { "valor": "aortica", "etiqueta": "Aórtica" },
-        { "valor": "mitral", "etiqueta": "Mitral" },
-        { "valor": "tricuspide", "etiqueta": "Tricúspide" }
+        {
+          "valor": "aortica",
+          "etiqueta": "Aórtica"
+        },
+        {
+          "valor": "mitral",
+          "etiqueta": "Mitral"
+        },
+        {
+          "valor": "tricuspide",
+          "etiqueta": "Tricúspide"
+        }
       ],
-      "visibleSi": { "pregunta": "protesis", "enLista": ["mecanica", "biologica"] }
+      "visibleSi": {
+        "pregunta": "protesis",
+        "enLista": [
+          "mecanica",
+          "biologica"
+        ]
+      }
     },
     {
       "id": "ecocardiograma_fecha",
@@ -66,8 +132,14 @@
       "etiqueta": "¿Síntomas nuevos (más disnea, síncope o angina)?",
       "tipo": "boolean",
       "genera": [
-        { "cuando": "= sí", "tipo": "prueba", "efecto": "ecocardiograma", "fuente": "§7.3" }
-      ]
+        {
+          "cuando": "= sí",
+          "tipo": "prueba",
+          "efecto": "ecocardiograma",
+          "fuente": "§7.3"
+        }
+      ],
+      "etiquetaSap": "síntomas valvulares nuevos"
     }
   ]
 }

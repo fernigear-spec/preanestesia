@@ -60,7 +60,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "insuficiencia respiratoria/soporte ventilatorio"
     },
     {
       "id": "ecocardiograma_fecha",
@@ -95,7 +96,8 @@
             "igual": true
           }
         }
-      ]
+      ],
+      "etiquetaSap": "antecedente de complicación anestésica grave"
     }
   ]
 }
