@@ -294,6 +294,7 @@ export function App() {
           <PasoCribado
             inicial={cribado}
             pediatrico={basicos ? basicos.edadAnios <= config.edad_pediatrica_maxima : false}
+            obstetrico={basicos ? basicos.moduloObstetrico === true || basicos.embarazada === true : false}
             onVolver={() => setPantalla('habitos')}
             onContinuar={(datos) => {
               setEntrevista((e) => ({ ...e, cribado: datos }));

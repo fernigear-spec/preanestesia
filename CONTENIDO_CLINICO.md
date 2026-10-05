@@ -1724,6 +1724,36 @@ _Fuente: docs/documento_fuente.md §5.3_
 - **Observaciones (el IMC se calcula con el peso y la talla del paso 2)** — _texto_
   - Por qué: El grado de obesidad se obtiene del IMC; un IMC ≥ 40 es una alerta y sube la clase de riesgo.
 
+### Obstetricia (embarazo)
+
+_Fuente: docs/documento_fuente.md §5.13_
+
+- **Semanas de gestación** (semanas) — _numero_
+  - Por qué: A partir de las 20 semanas el ayuno se individualiza y se añade profilaxis de aspiración.
+  - Genera → 📝 nota: si ≥ 20 semanas → embarazo ≥ 20 semanas: ayuno individualizado y profilaxis de aspiración. _(§5.13)_ **[se emite]**
+- **¿Embarazo múltiple (gemelar o más)?** — _boolean_
+  - Por qué: El embarazo múltiple aumenta el riesgo de hemorragia y de hipotensión.
+  - Genera → 📝 nota: si = sí → embarazo múltiple: mayor riesgo de hemorragia y de hipotensión. _(§5.13)_ **[se emite]**
+- **¿Preeclampsia o hipertensión gestacional?** — _boolean_
+  - Por qué: La preeclampsia o la HTA gestacional aconsejan validar antes de la intervención.
+  - Genera → 🔔 alerta amarilla: si = sí → preeclampsia o HTA gestacional: validar antes de la intervención. _(§5.13)_ **[se emite]**
+- **Plaquetas de la última analítica** (×10⁹/L) — _numero_
+  - Por qué: Una plaquetopenia < 80.000/µL condiciona la técnica neuroaxial: aconseja validar antes de la intervención.
+- **¿Diabetes gestacional?** — _boolean_
+  - Por qué: La diabetes gestacional cambia el manejo del ayuno y de la glucemia.
+- **Tratamiento de la diabetes gestacional** — _opcion_: Solo dieta / Metformina / Insulina
+  - Genera → 📝 nota: si = insulina → diabetes gestacional con insulina: aplicar la pauta de insulina y el control de glucemia del ayuno. _(§5.13)_ **[se emite]**
+- **¿Problemas de columna?** — _opcion_: Ninguno / Cirugía de columna previa / Escoliosis / Otros
+  - Por qué: Los problemas de columna pueden dificultar la técnica neuroaxial.
+  - Genera → 📝 nota: si = cirugía, escoliosis u otros → problemas de columna: valorar la técnica neuroaxial. _(§5.13)_ **[se emite]**
+- **Número de cesáreas previas** — _numero_
+  - Por qué: Las cesáreas previas aumentan el riesgo de acretismo si hay placenta previa.
+- **¿Dificultad previa con la epidural o la raquídea?** — _boolean_
+  - Por qué: Una dificultad previa con la técnica neuroaxial conviene tenerla en cuenta al planificarla.
+  - Genera → 📝 nota: si = sí → dificultad previa con la epidural/raquídea: valorar la técnica neuroaxial. _(§5.13)_ **[se emite]**
+- **¿Placenta previa o sospecha de acretismo?** — _boolean_
+  - Por qué: La placenta previa o el acretismo conllevan riesgo de hemorragia masiva: aconsejan reservar hemoderivados y planificar la cirugía.
+
 ### Parkinson
 
 _Fuente: docs/documento_fuente.md §5.6, §5.16.10_
@@ -1961,8 +1991,10 @@ _Mecanismo distinto de las alertas: condiciones que el anestesiólogo revisa al 
 | Cardiopatía congénita (paciente pediátrico): validar antes de la intervención. | `pediatria.cardiopatia_congenita` | §5.12 |
 | Prematuro con edad posconcepcional < 60 semanas (riesgo de apnea postoperatoria): validar antes de la intervención. | `prematuro_edad_posconcepcional` | §5.12 |
 | Prematuro de edad gestacional desconocida (lactante < 12 meses): validar antes de la intervención (posible riesgo de apnea). | `prematuro_gestacion_desconocida` | §5.12 |
-| Preeclampsia o HTA gestacional: validar antes de la intervención. | `preeclampsia` | §5.13 |
+| Preeclampsia o HTA gestacional: validar antes de la intervención. | `obstetricia.preeclampsia` | §5.13 |
 | Plaquetopenia (< 80.000/µL): validar antes de la intervención; condiciona la técnica neuroaxial. | `plaquetopenia_obstetrica` | §5.13 |
+| Placenta previa o sospecha de acretismo: riesgo de hemorragia masiva: reservar hemoderivados y planificar la cirugía. | `placenta_previa` | §5.13 |
+| Placenta previa con una o más cesáreas previas: riesgo alto de acretismo. | `placenta_previa_cesareas` | §5.13 |
 
 ## 17. Pendiente de revisión por el servicio
 
@@ -1980,4 +2012,4 @@ _Mecanismo distinto de las alertas: condiciones que el anestesiólogo revisa al 
   - `ths_vaginal` — terapia hormonal sustitutiva vaginal\|THS vaginal (no)
 
 ---
-_Generado el 2026-10-04._
+_Generado el 2026-10-05._

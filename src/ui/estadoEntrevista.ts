@@ -12,16 +12,10 @@ export interface DatosBasicosUi extends DatosBasicos {
   posibleEmbarazo?: boolean;
   /** Fecha de la última regla (ISO yyyy-mm-dd), si aplica. */
   fechaUltimaRegla?: string;
-  /** Semanas de gestación (procedimiento obstétrico → embarazo asumido). */
-  semanasGestacion?: number;
   /** Módulo obstétrico activo (procedimiento obstétrico o embarazo confirmado). */
   moduloObstetrico?: boolean;
   /** Testigo de Jehová o rechazo de hemoderivados (§5.8). Pregunta opcional. */
   rechazaHemoderivados?: boolean;
-  /** Obstétrico (§5.13): preeclampsia o HTA gestacional. Pregunta opcional. */
-  preeclampsia?: boolean;
-  /** Obstétrico (§5.13): plaquetas de la última analítica (×10⁹/L). Opcional. */
-  plaquetasUltimaAnalitica?: number;
 }
 
 /** Una intervención previa (paso 3, R3.2.10). */

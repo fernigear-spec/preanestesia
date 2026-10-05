@@ -1,0 +1,47 @@
+{
+  "id": "cesarea_placenta_previa",
+  "titulo": "Cesárea programada · placenta previa con cesárea previa",
+  "descripcion": "Gestante de 37 semanas para cesárea programada, con una cesárea previa y placenta previa (sospecha de acretismo), plaquetas 70 ×10⁹/L. Pensado para ver los puntos de validación obstétricos (§5.13): placenta previa (riesgo de hemorragia masiva), placenta previa + cesárea previa (riesgo de acretismo) y plaquetopenia.",
+  "modalidad": "presencial",
+  "esperado": [
+    "Se activa el módulo obstétrico (procedimiento obstétrico).",
+    "🟡 Validar antes: placenta previa o sospecha de acretismo (reservar hemoderivados y planificar la cirugía).",
+    "🟡 Validar antes: placenta previa con cesárea previa (riesgo alto de acretismo).",
+    "🟡 Validar antes: plaquetopenia (< 80.000/µL); nota «condiciona la técnica neuroaxial».",
+    "Ayuno individualizado y profilaxis de aspiración (≥ 20 semanas)."
+  ],
+  "intervencion": {
+    "procedimientoId": "obs_cesarea",
+    "fecha": "2026-11-05",
+    "hora": "08:00",
+    "tecnica": "neuroaxial",
+    "contrasteYodado": "no"
+  },
+  "basicos": {
+    "edadAnios": 33,
+    "sexo": "mujer",
+    "pesoKg": 72,
+    "tallaCm": 165,
+    "embarazada": true,
+    "moduloObstetrico": true
+  },
+  "cribado": {
+    "ningunaConocida": true,
+    "enfermedades": [],
+    "respuestasModulos": {
+      "obstetricia": {
+        "semanas_gestacion": 37,
+        "embarazo_multiple": false,
+        "preeclampsia": false,
+        "plaquetas": 70,
+        "diabetes_gestacional": false,
+        "problemas_columna": "ninguno",
+        "cesareas_previas": 1,
+        "dificultad_epidural_previa": false,
+        "placenta_previa": true
+      }
+    }
+  },
+  "medicacion": [],
+  "consentimiento": { "estado": "pendiente_entregar" }
+}

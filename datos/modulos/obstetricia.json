@@ -1,0 +1,154 @@
+{
+  "id": "obstetricia",
+  "titulo": "Obstetricia (embarazo)",
+  "fuente": "docs/documento_fuente.md §5.13",
+  "preguntas": [
+    {
+      "id": "semanas_gestacion",
+      "etiqueta": "Semanas de gestación",
+      "tipo": "numero",
+      "unidad": "semanas",
+      "min": 0,
+      "max": 45,
+      "porque": "A partir de las 20 semanas el ayuno se individualiza y se añade profilaxis de aspiración.",
+      "genera": [
+        {
+          "cuando": "≥ 20 semanas",
+          "tipo": "nota",
+          "efecto": "embarazo ≥ 20 semanas: ayuno individualizado y profilaxis de aspiración",
+          "fuente": "§5.13",
+          "si": { "mayorIgualQue": 20 }
+        }
+      ],
+      "etiquetaSap": "semanas de gestación"
+    },
+    {
+      "id": "embarazo_multiple",
+      "etiqueta": "¿Embarazo múltiple (gemelar o más)?",
+      "tipo": "boolean",
+      "porque": "El embarazo múltiple aumenta el riesgo de hemorragia y de hipotensión.",
+      "etiquetaSap": "embarazo múltiple",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "nota",
+          "efecto": "embarazo múltiple: mayor riesgo de hemorragia y de hipotensión",
+          "fuente": "§5.13",
+          "si": { "igual": true }
+        }
+      ]
+    },
+    {
+      "id": "preeclampsia",
+      "etiqueta": "¿Preeclampsia o hipertensión gestacional?",
+      "tipo": "boolean",
+      "porque": "La preeclampsia o la HTA gestacional aconsejan validar antes de la intervención.",
+      "etiquetaSap": "preeclampsia/HTA gestacional",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "alerta",
+          "gravedad": "amarilla",
+          "efecto": "preeclampsia o HTA gestacional: validar antes de la intervención",
+          "fuente": "§5.13",
+          "si": { "igual": true }
+        }
+      ]
+    },
+    {
+      "id": "plaquetas",
+      "etiqueta": "Plaquetas de la última analítica",
+      "tipo": "numero",
+      "unidad": "×10⁹/L",
+      "min": 0,
+      "max": 1000,
+      "porque": "Una plaquetopenia < 80.000/µL condiciona la técnica neuroaxial: aconseja validar antes de la intervención.",
+      "etiquetaSap": "plaquetas"
+    },
+    {
+      "id": "diabetes_gestacional",
+      "etiqueta": "¿Diabetes gestacional?",
+      "tipo": "boolean",
+      "porque": "La diabetes gestacional cambia el manejo del ayuno y de la glucemia.",
+      "etiquetaSap": "diabetes gestacional"
+    },
+    {
+      "id": "diabetes_gestacional_tratamiento",
+      "etiqueta": "Tratamiento de la diabetes gestacional",
+      "tipo": "opcion",
+      "visibleSi": {
+        "pregunta": "diabetes_gestacional",
+        "igual": true
+      },
+      "opciones": [
+        { "valor": "dieta", "etiqueta": "Solo dieta" },
+        { "valor": "metformina", "etiqueta": "Metformina" },
+        { "valor": "insulina", "etiqueta": "Insulina" }
+      ],
+      "genera": [
+        {
+          "cuando": "= insulina",
+          "tipo": "nota",
+          "efecto": "diabetes gestacional con insulina: aplicar la pauta de insulina y el control de glucemia del ayuno",
+          "fuente": "§5.13",
+          "si": { "igual": "insulina" }
+        }
+      ],
+      "etiquetaSap": "tratamiento de la diabetes gestacional"
+    },
+    {
+      "id": "problemas_columna",
+      "etiqueta": "¿Problemas de columna?",
+      "tipo": "opcion",
+      "porque": "Los problemas de columna pueden dificultar la técnica neuroaxial.",
+      "opciones": [
+        { "valor": "ninguno", "etiqueta": "Ninguno" },
+        { "valor": "cirugia", "etiqueta": "Cirugía de columna previa" },
+        { "valor": "escoliosis", "etiqueta": "Escoliosis" },
+        { "valor": "otros", "etiqueta": "Otros" }
+      ],
+      "genera": [
+        {
+          "cuando": "= cirugía, escoliosis u otros",
+          "tipo": "nota",
+          "efecto": "problemas de columna: valorar la técnica neuroaxial",
+          "fuente": "§5.13",
+          "si": { "enLista": ["cirugia", "escoliosis", "otros"] }
+        }
+      ],
+      "etiquetaSap": "problemas de columna"
+    },
+    {
+      "id": "cesareas_previas",
+      "etiqueta": "Número de cesáreas previas",
+      "tipo": "numero",
+      "min": 0,
+      "max": 10,
+      "porque": "Las cesáreas previas aumentan el riesgo de acretismo si hay placenta previa.",
+      "etiquetaSap": "cesáreas previas"
+    },
+    {
+      "id": "dificultad_epidural_previa",
+      "etiqueta": "¿Dificultad previa con la epidural o la raquídea?",
+      "tipo": "boolean",
+      "porque": "Una dificultad previa con la técnica neuroaxial conviene tenerla en cuenta al planificarla.",
+      "etiquetaSap": "dificultad previa con epidural/raquídea",
+      "genera": [
+        {
+          "cuando": "= sí",
+          "tipo": "nota",
+          "efecto": "dificultad previa con la epidural/raquídea: valorar la técnica neuroaxial",
+          "fuente": "§5.13",
+          "si": { "igual": true }
+        }
+      ]
+    },
+    {
+      "id": "placenta_previa",
+      "etiqueta": "¿Placenta previa o sospecha de acretismo?",
+      "tipo": "boolean",
+      "porque": "La placenta previa o el acretismo conllevan riesgo de hemorragia masiva: aconsejan reservar hemoderivados y planificar la cirugía.",
+      "etiquetaSap": "placenta previa/acretismo"
+    }
+  ]
+}

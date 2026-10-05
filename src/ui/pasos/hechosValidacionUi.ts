@@ -123,6 +123,7 @@ export function construirHechosValidacion(e: EstadoEntrevista, hoy: Date): Hecho
 
   const incidencias = new Set((antecedentes?.intervencionesPrevias ?? []).flatMap((iq) => iq.incidencias));
   const ce = cribado.condicionesEspeciales;
+  const obstetricia = respuestas['obstetricia'] ?? {};
 
   // Prematuro (§5.12). Dos vías:
   //  - edad posconcepcional < 60 semanas (semanas al nacer + edad del niño en
@@ -170,8 +171,11 @@ export function construirHechosValidacion(e: EstadoEntrevista, hoy: Date): Hecho
     cocaina_reciente: habitos?.cocainaUltimaSemana === true,
     prematuro_edad_posconcepcional: prematuroApnea,
     prematuro_gestacion_desconocida: prematuroGestacionDesconocida,
-    preeclampsia: basicos.preeclampsia === true,
     // Plaquetopenia obstétrica (§5.13): plaquetas < 80.000/µL (= 80 ×10⁹/L).
-    plaquetopenia_obstetrica: typeof basicos.plaquetasUltimaAnalitica === 'number' && basicos.plaquetasUltimaAnalitica < 80,
+    plaquetopenia_obstetrica: typeof obstetricia['plaquetas'] === 'number' && (obstetricia['plaquetas'] as number) < 80,
+    // Placenta previa o sospecha de acretismo (§5.13): riesgo de hemorragia masiva.
+    placenta_previa: obstetricia['placenta_previa'] === true,
+    // Placenta previa + ≥ 1 cesárea previa: riesgo alto de acretismo.
+    placenta_previa_cesareas: obstetricia['placenta_previa'] === true && typeof obstetricia['cesareas_previas'] === 'number' && (obstetricia['cesareas_previas'] as number) >= 1,
   };
 }

@@ -76,6 +76,7 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
   const revisionPendiente = useMemo(() => {
     const activos = new Set(cribado.enfermedades);
     if (basicos.edadAnios <= EDAD_PEDIATRICA_MAXIMA) activos.add('pediatria');
+    if (basicos.moduloObstetrico === true || basicos.embarazada === true) activos.add('obstetricia');
     const puntos = derivarPuntosValidacion({
       catalogo: VALIDACIONES, modulos: MODULOS, respuestas: cribado.respuestasModulos, activos,
       fechaIntervencion: intervencion.fechaHora ?? null, fechaReferencia: hoy,
@@ -95,9 +96,10 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
       ? calcularAuditC({ frecuenciaConsumo: habitos.auditFrecuencia, cantidadTipica: habitos.auditCantidad, frecuenciaAtracon: habitos.auditAtracon, sexo }).positivo
       : false;
     const cuatroAtPuntuacion = habitos?.cuatroAt ? calcular4AT(habitos.cuatroAt).puntuacion : undefined;
+    const semanasObst = cribado.respuestasModulos['obstetricia']?.['semanas_gestacion'];
     const extrasIn = derivarHojaExtras({
       edadAnios: basicos.edadAnios,
-      ...(basicos.semanasGestacion !== undefined ? { semanasGestacion: basicos.semanasGestacion } : {}),
+      ...(typeof semanasObst === 'number' ? { semanasGestacion: semanasObst } : {}),
       enfermedades: new Set(cribado.enfermedades),
       respuestas: cribado.respuestasModulos,
       tabacoActivo: habitos?.tabaco === 'activo',

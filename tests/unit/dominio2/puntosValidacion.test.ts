@@ -193,15 +193,25 @@ describe('§13 bis · puntos de validación clínica', () => {
     expect(puntos.some((p) => p.id === 'cardiopatia_congenita')).toBeTrue();
   });
 
-  it('nuevas condiciones ancladas por hecho: preeclampsia, prematuro (posconcepcional y gestación desconocida), plaquetopenia obstétrica', () => {
+  it('condiciones por hecho: prematuro (posconcepcional y gestación desconocida), plaquetopenia y placenta previa obstétricas', () => {
     const puntos = derivarPuntosValidacion({
       catalogo: CATALOGO, modulos: MODULOS, respuestas: {}, activos: new Set(), fechaIntervencion: IV,
-      hechos: { preeclampsia: true, prematuro_edad_posconcepcional: true, prematuro_gestacion_desconocida: true, plaquetopenia_obstetrica: true },
+      hechos: { prematuro_edad_posconcepcional: true, prematuro_gestacion_desconocida: true, plaquetopenia_obstetrica: true, placenta_previa: true, placenta_previa_cesareas: true },
     });
-    expect(puntos.find((p) => p.id === 'preeclampsia')?.tipo).toBe('validar');
     expect(puntos.find((p) => p.id === 'prematuro_apnea')?.tipo).toBe('validar');
     expect(puntos.find((p) => p.id === 'prematuro_gestacion_desconocida')?.motivo).toMatch(/edad gestacional desconocida/);
     expect(puntos.find((p) => p.id === 'plaquetopenia_obstetrica')?.motivo).toMatch(/condiciona la técnica neuroaxial/);
+    expect(puntos.find((p) => p.id === 'placenta_previa')?.motivo).toMatch(/hemorragia masiva/);
+    expect(puntos.find((p) => p.id === 'placenta_previa_cesareas')?.motivo).toMatch(/riesgo alto de acretismo/);
+  });
+
+  it('obstetricia por módulo: preeclampsia emite su punto', () => {
+    const puntos = derivarPuntosValidacion({
+      catalogo: CATALOGO, modulos: MODULOS,
+      respuestas: { obstetricia: { preeclampsia: true } },
+      activos: new Set(['obstetricia']), fechaIntervencion: IV,
+    });
+    expect(puntos.find((p) => p.id === 'preeclampsia')?.tipo).toBe('validar');
   });
 
   it('una condición antigua (ictus hace 6 meses) no genera punto', () => {

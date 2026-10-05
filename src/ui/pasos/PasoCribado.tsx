@@ -26,11 +26,13 @@ interface Props {
   inicial: CribadoUi | null;
   /** El paciente es pediátrico (edad ≤ edad pediátrica máxima): activa el módulo de pediatría. */
   pediatrico?: boolean;
+  /** La paciente es obstétrica (procedimiento obstétrico o embarazo): activa el módulo de obstetricia. */
+  obstetrico?: boolean;
   onContinuar: (datos: CribadoUi) => void;
   onVolver: () => void;
 }
 
-export function PasoCribado({ inicial, pediatrico = false, onContinuar, onVolver }: Props) {
+export function PasoCribado({ inicial, pediatrico = false, obstetrico = false, onContinuar, onVolver }: Props) {
   const [ninguna, setNinguna] = useState(inicial?.ningunaConocida ?? false);
   const [enfermedades, setEnfermedades] = useState<Set<string>>(new Set(inicial?.enfermedades ?? []));
   const [respuestasModulos, setRespuestasModulos] = useState<RespuestasModulos>(inicial?.respuestasModulos ?? {});
@@ -58,10 +60,14 @@ export function PasoCribado({ inicial, pediatrico = false, onContinuar, onVolver
   const modulosPorCasilla = [...new Set([...enfermedades].map(moduloDeEnfermedad))]
     .map((idModulo) => MODULO_POR_ID[idModulo])
     .filter((m): m is NonNullable<typeof m> => m !== undefined);
-  const moduloPediatria = pediatrico ? MODULO_POR_ID['pediatria'] : undefined;
-  const modulosActivos = moduloPediatria
-    ? [moduloPediatria, ...modulosPorCasilla.filter((m) => m.id !== 'pediatria')]
-    : modulosPorCasilla;
+  // El módulo de pediatría (§5.12) y el de obstetricia (§5.13) se activan por el
+  // tipo de paciente, no por casilla, y van los primeros.
+  const modulosPorTipo = [
+    ...(pediatrico ? [MODULO_POR_ID['pediatria']] : []),
+    ...(obstetrico ? [MODULO_POR_ID['obstetricia']] : []),
+  ].filter((m): m is NonNullable<typeof m> => m !== undefined);
+  const idsPorTipo = new Set(modulosPorTipo.map((m) => m.id));
+  const modulosActivos = [...modulosPorTipo, ...modulosPorCasilla.filter((m) => !idsPorTipo.has(m.id))];
 
   function cambiarRespuesta(idModulo: string, idPregunta: string, valor: ValorRespuesta) {
     setRespuestasModulos((prev) => ({

@@ -405,7 +405,7 @@
     },
     {
       "id": "preeclampsia",
-      "origen": "preeclampsia",
+      "origen": "obstetricia.preeclampsia",
       "motivo": "Preeclampsia o HTA gestacional: validar antes de la intervención.",
       "fuente": "§5.13"
     },
@@ -413,6 +413,18 @@
       "id": "plaquetopenia_obstetrica",
       "origen": "plaquetopenia_obstetrica",
       "motivo": "Plaquetopenia (< 80.000/µL): validar antes de la intervención; condiciona la técnica neuroaxial.",
+      "fuente": "§5.13"
+    },
+    {
+      "id": "placenta_previa",
+      "origen": "placenta_previa",
+      "motivo": "Placenta previa o sospecha de acretismo: riesgo de hemorragia masiva: reservar hemoderivados y planificar la cirugía.",
+      "fuente": "§5.13"
+    },
+    {
+      "id": "placenta_previa_cesareas",
+      "origen": "placenta_previa_cesareas",
+      "motivo": "Placenta previa con una o más cesáreas previas: riesgo alto de acretismo.",
       "fuente": "§5.13"
     }
   ]

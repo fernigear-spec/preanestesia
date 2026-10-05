@@ -17,9 +17,6 @@ interface Props {
   onVolver: () => void;
 }
 
-/** Semana de gestación a partir de la cual el ayuno es individualizado (§5.13). */
-const SEMANAS_AYUNO_INDIVIDUALIZADO = 20;
-
 const EDAD_PEDIATRICA_MAX = (config as { edad_pediatrica_maxima: number }).edad_pediatrica_maxima;
 
 export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Props) {
@@ -31,9 +28,7 @@ export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Prop
   const [posibleEmbarazo, setPosibleEmbarazo] = useState<boolean | undefined>(inicial?.posibleEmbarazo);
   const [fechaUltimaRegla, setFechaUltimaRegla] = useState(inicial?.fechaUltimaRegla ?? '');
   const [rechazaHemoderivados, setRechazaHemoderivados] = useState(inicial?.rechazaHemoderivados ?? false);
-  const [semanas, setSemanas] = useState(inicial?.semanasGestacion !== undefined ? String(inicial.semanasGestacion) : '');
-  const [preeclampsia, setPreeclampsia] = useState(inicial?.preeclampsia ?? false);
-  const [plaquetas, setPlaquetas] = useState(inicial?.plaquetasUltimaAnalitica !== undefined ? String(inicial.plaquetasUltimaAnalitica) : '');
+
 
   const edadNum = Number(edad);
   const mesesNum = Number(meses);
@@ -41,22 +36,19 @@ export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Prop
   const tallaNum = Number(talla);
   const imc = calcularImc(pesoNum, tallaNum);
 
-  const semanasNum = Number(semanas);
   const esPediatrico = edad !== '' && edadNum <= EDAD_PEDIATRICA_MAX;
   const menorDe2 = edad !== '' && edadNum < 2;
   // En procedimiento obstétrico se da por hecho el embarazo: no se pregunta la
-  // posibilidad; se piden las semanas de gestación y se activa el módulo obstétrico.
+  // posibilidad. Las preguntas obstétricas (semanas, etc.) van al módulo obstétrico (§5.13).
   const preguntarEmbarazo = !obstetrico && sexo === 'mujer' && edad !== '' && edadNum >= 12 && edadNum <= 55;
-  const ayunoIndividualizado = obstetrico && semanas !== '' && semanasNum >= SEMANAS_AYUNO_INDIVIDUALIZADO;
 
   // Validación mínima.
   const edadOk = edad !== '' && edadNum >= 0 && edadNum < 130;
   // En menores de 2 años los meses son obligatorios (0-23) para el ayuno y la edad posconcepcional.
   const mesesOk = !menorDe2 || (meses !== '' && mesesNum >= 0 && mesesNum <= 23);
-  const semanasOk = !obstetrico || (semanas !== '' && semanasNum >= 0 && semanasNum <= 45);
   const pesoOk = pesoNum > 0 && (!esPediatrico || peso !== ''); // en pediátrico el peso es obligatorio
   const tallaOk = tallaNum > 0;
-  const puedeContinuar = edadOk && mesesOk && semanasOk && sexo !== '' && pesoOk && tallaOk;
+  const puedeContinuar = edadOk && mesesOk && sexo !== '' && pesoOk && tallaOk;
 
   function continuar() {
     if (sexo === '') return;
@@ -71,10 +63,9 @@ export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Prop
     if (menorDe2 && meses !== '') datos.edadMeses = mesesNum;
     if (rechazaHemoderivados) datos.rechazaHemoderivados = true;
     if (obstetrico) {
+      // Las preguntas obstétricas (semanas, preeclampsia, plaquetas…) viven ahora en
+      // el módulo obstétrico (§5.13), que se activa por este flag en el paso 7.
       datos.moduloObstetrico = true;
-      if (semanas !== '') datos.semanasGestacion = semanasNum;
-      if (preeclampsia) datos.preeclampsia = true;
-      if (plaquetas !== '' && !Number.isNaN(Number(plaquetas))) datos.plaquetasUltimaAnalitica = Number(plaquetas);
     } else if (preguntarEmbarazo) {
       if (posibleEmbarazo !== undefined) datos.posibleEmbarazo = posibleEmbarazo;
       if (fechaUltimaRegla !== '') datos.fechaUltimaRegla = fechaUltimaRegla;
@@ -140,25 +131,9 @@ export function PasoBasicos({ inicial, obstetrico, onContinuar, onVolver }: Prop
         <fieldset className="campo">
           <legend>Embarazo (procedimiento obstétrico)</legend>
           <p className="aviso aviso-info" role="note">
-            Al ser un procedimiento obstétrico, se da por hecho el embarazo y se activa el <strong>módulo obstétrico</strong>.
+            Al ser un procedimiento obstétrico, se da por hecho el embarazo y se activa el <strong>módulo
+            obstétrico</strong> (semanas de gestación, preeclampsia, plaquetas, placenta previa, etc.) en el paso de enfermedades.
           </p>
-          <div className="campo">
-            <label htmlFor="semanas">Semanas de gestación</label>
-            <input id="semanas" type="number" min={0} max={45} inputMode="numeric" value={semanas} onChange={(e) => setSemanas(e.target.value)} />
-          </div>
-          {ayunoIndividualizado && (
-            <p className="aviso aviso-atencion" role="note">
-              Embarazo de {semanasNum} semanas (≥ {SEMANAS_AYUNO_INDIVIDUALIZADO}): <strong>ayuno individualizado</strong> y profilaxis de aspiración.
-            </p>
-          )}
-          <label className="radio-tarjeta">
-            <input type="checkbox" checked={preeclampsia} onChange={(e) => setPreeclampsia(e.target.checked)} />
-            Preeclampsia o hipertensión gestacional
-          </label>
-          <div className="campo">
-            <label htmlFor="plaquetas">Plaquetas de la última analítica (×10⁹/L, opcional)</label>
-            <input id="plaquetas" type="number" min={0} max={1000} inputMode="numeric" value={plaquetas} onChange={(e) => setPlaquetas(e.target.value)} />
-          </div>
         </fieldset>
       )}
 

@@ -96,6 +96,12 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     // (p. ej. cardiopatía congénita) se emitan, se añade a los módulos «activos».
     const activos = new Set(enfermedades);
     if (basicos.edadAnios <= config.edad_pediatrica_maxima) activos.add('pediatria');
+    const esObstetrica = basicos.moduloObstetrico === true || basicos.embarazada === true;
+    if (esObstetrica) activos.add('obstetricia');
+    // Datos obstétricos del módulo (§5.13): semanas de gestación y plaquetas.
+    const obstetricia = respuestas['obstetricia'] ?? {};
+    const semanasGestacion = typeof obstetricia['semanas_gestacion'] === 'number' ? (obstetricia['semanas_gestacion'] as number) : undefined;
+    const plaquetasObst = typeof obstetricia['plaquetas'] === 'number' ? (obstetricia['plaquetas'] as number) : undefined;
 
     const clin = derivarHechosClinicos({
       respuestas, enfermedades,
@@ -148,7 +154,7 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     });
 
     const extras = derivarHojaExtras({
-      edadAnios: basicos.edadAnios, ...(basicos.semanasGestacion !== undefined ? { semanasGestacion: basicos.semanasGestacion } : {}),
+      edadAnios: basicos.edadAnios, ...(semanasGestacion !== undefined ? { semanasGestacion } : {}),
       enfermedades, respuestas, tabacoActivo: habitos?.tabaco === 'activo', auditPositivo: audit?.positivo ?? false,
       ...(habitos?.cfs !== undefined ? { cfs: habitos.cfs } : {}), ...(cuatroAt ? { cuatroAtPuntuacion: cuatroAt.puntuacion } : {}),
       edadPediatricaMaxima: config.edad_pediatrica_maxima, glp1Semanal: (medicacion ?? []).some((f) => f.idRegla === 'glp1_semanal'), diabetes: enfermedades.has('diabetes'),
@@ -319,14 +325,15 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     for (const n of efectosMod.notas) notas.push(n.texto);
     for (const n of dispositivo.notas) notas.push(`Dispositivo cardiaco: ${n}`);
     // Plaquetopenia obstétrica (§5.13): nota sobre la técnica neuroaxial.
-    if (typeof basicos.plaquetasUltimaAnalitica === 'number' && basicos.plaquetasUltimaAnalitica < 80) {
+    if (plaquetasObst !== undefined && plaquetasObst < 80) {
       notas.push('Plaquetopenia: condiciona la técnica neuroaxial.');
     }
     for (const f of plan) if (f.resultado.textoAnestesiologo) notas.push(`${f.resultado.nombreComercial}: ${f.resultado.textoAnestesiologo}`);
     if (mt?.alerta?.gravedad === 'roja') notas.push('mtND4: seguir las medidas del consenso SEDAR (evitar halogenados/TIVA, regional preferente, monitorización de profundidad, etc.).');
 
-    // Resumen de módulos (§5.16) para el SAP.
-    const resumenModulos = [...enfermedades].map((id) => resumenModulo(id, respuestas)).filter((s): s is string => s !== null);
+    // Resumen de módulos (§5.16) para el SAP. Incluye los activados por tipo de
+    // paciente (pediatría, obstetricia), no solo las casillas de enfermedades.
+    const resumenModulos = [...activos].map((id) => resumenModulo(id, respuestas)).filter((s): s is string => s !== null);
 
     // SAP (§10.1): SOLO antecedentes patológicos y quirúrgicos (decisión del servicio).
     const fechaTxt = intervencion.fechaHora ? fechaCorta(intervencion.fechaHora) : 'sin fecha';

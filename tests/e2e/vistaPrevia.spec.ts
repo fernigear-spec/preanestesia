@@ -840,6 +840,19 @@ test.describe('Vista previa', () => {
     await expect(seccion.getByText(/Cardiopatía congénita/)).toBeVisible();
   });
 
+  test('§5.13: caso de cesárea con placenta previa y cesárea previa muestra los puntos obstétricos', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await abrirCasoEntrenamiento(page, /Cesárea programada/);
+    await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
+    const seccion = page.locator('section.validaciones');
+    await expect(seccion.getByText(/placenta previa o sospecha de acretismo/i)).toBeVisible();
+    await expect(seccion.getByText(/riesgo alto de acretismo/i)).toBeVisible();
+    await expect(seccion.getByText(/Plaquetopenia .*80\.000/)).toBeVisible();
+    // Nota técnica de la plaquetopenia.
+    await page.getByRole('button', { name: /Notas técnicas/ }).click();
+    await expect(page.getByText('Plaquetopenia: condiciona la técnica neuroaxial.')).toBeVisible();
+  });
+
   test('§14.4 guía imprimible: se genera desde los módulos con casillas en blanco', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Guía imprimible' }).click();
