@@ -20,6 +20,33 @@ async function pasoAlergiasSinAlergias(page: Page) {
   await page.getByRole('button', { name: 'Continuar' }).click();
 }
 
+/** Recorre una entrevista presencial mínima (hernioplastia, varón 60) hasta el resumen. */
+async function entrevistaMinimaHastaResumen(page: Page) {
+  await page.goto('/preanestesia/');
+  await page.getByRole('button', { name: 'Presencial' }).click();
+  await page.getByRole('button', { name: 'Comenzar' }).click();
+  await page.locator('#fecha').fill('2026-11-05');
+  await page.locator('#proc').fill('hernioplastia');
+  await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+  await page.getByRole('button', { name: 'Continuar' }).click(); // 1 -> 2
+  await pasoAlergiasSinAlergias(page);
+  await page.locator('#edad').fill('60');
+  await page.getByRole('radio', { name: 'Hombre' }).check();
+  await page.locator('#peso').fill('80');
+  await page.locator('#talla').fill('175');
+  await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
+  await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+  await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
+  await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+  await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+  await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
+  await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
+  await page.getByRole('button', { name: 'Continuar' }).click(); // 9 -> 10
+  await page.getByRole('button', { name: 'Continuar' }).click(); // 10 -> 11 mtND4
+  await pasoMtnd4NoVenezolana(page); // 11 -> resumen
+  await expect(page.getByRole('heading', { name: /Resumen de la entrevista/ })).toBeVisible();
+}
+
 /** Paso 11 · mtND4: puerta en «No» → pasa de largo sin alerta. */
 async function pasoMtnd4NoVenezolana(page: Page) {
   await expect(page.getByRole('heading', { name: /Paso 11 · Origen materno/ })).toBeVisible();
@@ -788,6 +815,63 @@ test.describe('Vista previa', () => {
     await page.locator('#al-reaccion').fill('exantema');
     await page.getByRole('button', { name: 'Añadir a la lista' }).click();
     await expect(page.getByText('Penicilina')).toBeVisible();
+  });
+
+  test('Nueva valoración: pide confirmación; «Cancelar» conserva los datos', async ({ page }) => {
+    await entrevistaMinimaHastaResumen(page);
+    // Botón al final del resumen (en el contenido, no el de la cabecera).
+    await page.locator('main').getByRole('button', { name: 'Nueva valoración' }).click();
+    // Diálogo de confirmación.
+    await expect(page.getByText(/Se borrarán todos los datos de esta valoración/)).toBeVisible();
+    await page.getByRole('button', { name: 'Cancelar' }).click();
+    // Al cancelar seguimos en el resumen con los datos (p. ej. el procedimiento).
+    await expect(page.getByRole('heading', { name: /Resumen de la entrevista/ })).toBeVisible();
+    await expect(page.getByText(/Hernioplastia inguinal abierta/)).toBeVisible();
+  });
+
+  test('Nueva valoración: «Sí, empezar una nueva» borra todo y vuelve al inicio', async ({ page }) => {
+    await entrevistaMinimaHastaResumen(page);
+    await page.locator('main').getByRole('button', { name: 'Nueva valoración' }).click();
+    await page.getByRole('button', { name: 'Sí, empezar una nueva' }).click();
+
+    // Vuelve a la pantalla de inicio (elección de modalidad).
+    await expect(page.getByRole('heading', { name: /Nueva entrevista/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Presencial' })).toBeVisible();
+
+    // Al recorrer de nuevo los pasos, no queda ningún dato de la valoración anterior.
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+    await expect(page.getByRole('heading', { name: /Paso 1 · Datos de la intervención/ })).toBeVisible();
+    await expect(page.locator('#fecha')).toHaveValue('');
+    await expect(page.locator('#proc')).toHaveValue('');
+    // Y el procedimiento anterior ya no aparece.
+    await expect(page.getByText(/Hernioplastia inguinal abierta/)).toHaveCount(0);
+  });
+
+  test('Nueva valoración: acceso discreto en la cabecera durante la entrevista', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+    // En el paso 1 ya está el acceso de la cabecera; al pulsarlo pide confirmación.
+    await expect(page.getByRole('heading', { name: /Paso 1 · Datos de la intervención/ })).toBeVisible();
+    await page.locator('header.cabecera').getByRole('button', { name: 'Nueva valoración' }).click();
+    await expect(page.getByText(/Se borrarán todos los datos de esta valoración/)).toBeVisible();
+    await page.getByRole('button', { name: 'Sí, empezar una nueva' }).click();
+    await expect(page.getByRole('heading', { name: /Nueva entrevista/ })).toBeVisible();
+  });
+
+  test('modo entrenamiento: el resumen ofrece volver a los casos y salir, sin confirmación', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await abrirCasoEntrenamiento(page, /Mujer sana/);
+    await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
+    // No aparece el botón de «Nueva valoración» en entrenamiento.
+    await expect(page.getByRole('button', { name: 'Nueva valoración' })).toHaveCount(0);
+    // Sí los dos botones propios del entrenamiento.
+    await expect(page.getByRole('button', { name: 'Volver a los casos de entrenamiento' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salir del modo entrenamiento' })).toBeVisible();
+    // «Salir» vuelve al inicio sin pedir confirmación.
+    await page.getByRole('button', { name: 'Salir del modo entrenamiento' }).click();
+    await expect(page.getByRole('heading', { name: /Nueva entrevista/ })).toBeVisible();
   });
 
   test('§14.2 modo entrenamiento: carga un caso y muestra la comparación con lo esperado', async ({ page }) => {

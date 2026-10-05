@@ -84,6 +84,8 @@ export function App() {
   // Modo entrenamiento (§14.2): banda ENTRENAMIENTO y resultados esperados.
   const [entrenamiento, setEntrenamiento] = useState(false);
   const [esperado, setEsperado] = useState<string[]>([]);
+  // Confirmación de «Nueva valoración» (borra todos los datos de la entrevista).
+  const [confirmarNueva, setConfirmarNueva] = useState(false);
   // Contador de uso (§14.3): inicio de la entrevista y marca de "ya registrada".
   const inicioRef = useRef<number | null>(null);
   const registradoRef = useRef(false);
@@ -167,6 +169,22 @@ export function App() {
     registradoRef.current = true;
   }
 
+  /** Confirma «Nueva valoración»: registra el uso (si procede) y borra todo. */
+  function confirmarNuevaValoracion() {
+    registrarUsoSiProcede(); // marca la valoración como terminada en el cuadro de mando
+    setConfirmarNueva(false);
+    nuevoPaciente(); // mismo mecanismo que el borrado por inactividad
+  }
+
+  /** Modo entrenamiento: vuelve a la lista de casos (sin confirmación, no hay datos reales). */
+  function volverACasosEntrenamiento() {
+    setEntrevista(ESTADO_INICIAL);
+    setEsperado([]);
+    setEntrenamiento(false);
+    setPantalla('inicio');
+    setHerramienta('entrenamiento');
+  }
+
   return (
     <div className="app">
       <BandaPrueba />
@@ -174,7 +192,35 @@ export function App() {
       <header className="cabecera">
         <h1>AnesHealth · Entrevista preanestésica</h1>
         <p className="subtitulo">Servicio de Anestesiología · Hospital Vithas Barcelona</p>
+        {/* Acceso discreto para abandonar una entrevista a medias (todos los pasos,
+            no en la pantalla de inicio ni en modo entrenamiento). No se imprime. */}
+        {pantalla !== 'inicio' && !entrenamiento && (
+          <button
+            type="button"
+            className="boton-enlace cabecera-nueva no-print"
+            onClick={() => setConfirmarNueva(true)}
+          >
+            Nueva valoración
+          </button>
+        )}
       </header>
+
+      {confirmarNueva && (
+        <div className="aviso-inactividad no-print" role="alertdialog" aria-labelledby="nueva-tit">
+          <p id="nueva-tit">
+            <strong>Se borrarán todos los datos de esta valoración.</strong> ¿Ha copiado el
+            texto para SAP y entregado la hoja o el QR al paciente?
+          </p>
+          <div className="acciones">
+            <button type="button" className="boton-primario" onClick={confirmarNuevaValoracion}>
+              Sí, empezar una nueva
+            </button>
+            <button type="button" className="boton-secundario" onClick={() => setConfirmarNueva(false)}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
 
       {inactividad.avisoVisible && (
         <div className="aviso-inactividad" role="alertdialog" aria-labelledby="inactividad-tit">
@@ -563,10 +609,23 @@ export function App() {
               }
             />
 
-            <div className="acciones">
-              <button type="button" className="boton-secundario" onClick={() => setPantalla('intervencion')}>Editar desde el paso 1</button>
-              <button type="button" className="boton-secundario" onClick={nuevoPaciente}>Nuevo paciente</button>
-            </div>
+            {entrenamiento ? (
+              <div className="acciones no-print">
+                <button type="button" className="boton-primario" onClick={volverACasosEntrenamiento}>
+                  Volver a los casos de entrenamiento
+                </button>
+                <button type="button" className="boton-secundario" onClick={nuevoPaciente}>
+                  Salir del modo entrenamiento
+                </button>
+              </div>
+            ) : (
+              <div className="acciones no-print">
+                <button type="button" className="boton-secundario" onClick={() => setPantalla('intervencion')}>Editar desde el paso 1</button>
+                <button type="button" className="boton-primario boton-nueva-valoracion" onClick={() => setConfirmarNueva(true)}>
+                  Nueva valoración
+                </button>
+              </div>
+            )}
           </section>
         )}
       </main>

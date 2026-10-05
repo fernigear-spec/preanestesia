@@ -38,10 +38,24 @@ body {
   background: var(--color-principal);
   color: #fff;
   padding: 16px 20px;
+  position: relative;
 }
 .cabecera h1 {
   margin: 0;
   font-size: 1.4rem;
+}
+/* Acceso discreto «Nueva valoración» en la cabecera (todos los pasos). */
+.cabecera-nueva {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  color: #fff;
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
+/* Botón principal de «Nueva valoración» al final del resumen. */
+.boton-nueva-valoracion {
+  margin-left: auto;
 }
 .subtitulo {
   margin: 4px 0 0;
