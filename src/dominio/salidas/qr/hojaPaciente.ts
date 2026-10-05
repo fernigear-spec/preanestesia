@@ -135,6 +135,13 @@ export interface ExtrasHojaQr {
    * su caso y, si es necesario, se pondrá en contacto.
    */
   revisionPendiente?: boolean;
+  /**
+   * Advertencia del sugammadex (§8.15) para la paciente con anticonceptivo hormonal
+   * y posible anestesia general: 'oral' (equivale a olvidar una toma) o 'no_oral'
+   * (método de barrera 7 días). Ausente si no procede (incluida la THS, que no es
+   * anticonceptiva).
+   */
+  sugammadex?: 'oral' | 'no_oral';
 }
 
 /** Datos del paciente que viajan en el QR (campo `d` del Payload, §8.16d). */

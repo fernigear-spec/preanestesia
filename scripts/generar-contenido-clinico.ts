@@ -252,11 +252,17 @@ p();
 p('## 8. Sugammadex y anticoncepción hormonal — §8.15');
 p();
 [
-  'En toda mujer con anticonceptivo hormonal y posible anestesia general, si se usa sugammadex la hoja lo advierte de forma condicional.',
-  '**Anticonceptivo oral:** equivale a olvidar una toma → seguir las instrucciones de «dosis olvidada».',
-  '**No oral** (implante, anillo, parche, DIU hormonal): usar método de barrera durante **7 días**.',
-  'La nota del anestesiólogo recuerda informar a la paciente al alta si se ha usado.',
+  'En toda mujer con **anticonceptivo hormonal** (NO la terapia hormonal sustitutiva, que no es anticonceptiva) y posible anestesia general, la **hoja del paciente** incluye un aviso condicional (y las notas del anestesiólogo recuerdan informar a la paciente al alta si se usó sugammadex).',
+  '**Anticonceptivo oral:** si se usa sugammadex, equivale a olvidar una toma → seguir las instrucciones de «dosis olvidada» del prospecto y usar además preservativo 7 días.',
+  '**No oral** (implante, DIU hormonal, anillo, parche, inyectable): si se usa sugammadex, usar además preservativo durante **7 días**.',
+  'El texto va en condicional («si durante la anestesia le administran…») e indica que el equipo de anestesia lo confirmará después de la intervención.',
 ].forEach((s) => p(`- ${s}`));
+p();
+p('**Texto para el paciente (hoja), castellano:**');
+p();
+p(`- Oral: ${esc((textos as unknown as { sugammadex_oral?: string }).sugammadex_oral ?? '')}`);
+p(`- No oral: ${esc((textos as unknown as { sugammadex_no_oral?: string }).sugammadex_no_oral ?? '')}`);
+p(`- Confirmación: ${esc((textos as unknown as { sugammadex_confirmacion?: string }).sugammadex_confirmacion ?? '')}`);
 p();
 
 // —————————————————————————————— 9. mtND4 ——————————————————————————————

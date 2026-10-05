@@ -471,10 +471,16 @@ Las horas se calculan desde la hora prevista de inducción y se muestran como ho
 
 ## 8. Sugammadex y anticoncepción hormonal — §8.15
 
-- En toda mujer con anticonceptivo hormonal y posible anestesia general, si se usa sugammadex la hoja lo advierte de forma condicional.
-- **Anticonceptivo oral:** equivale a olvidar una toma → seguir las instrucciones de «dosis olvidada».
-- **No oral** (implante, anillo, parche, DIU hormonal): usar método de barrera durante **7 días**.
-- La nota del anestesiólogo recuerda informar a la paciente al alta si se ha usado.
+- En toda mujer con **anticonceptivo hormonal** (NO la terapia hormonal sustitutiva, que no es anticonceptiva) y posible anestesia general, la **hoja del paciente** incluye un aviso condicional (y las notas del anestesiólogo recuerdan informar a la paciente al alta si se usó sugammadex).
+- **Anticonceptivo oral:** si se usa sugammadex, equivale a olvidar una toma → seguir las instrucciones de «dosis olvidada» del prospecto y usar además preservativo 7 días.
+- **No oral** (implante, DIU hormonal, anillo, parche, inyectable): si se usa sugammadex, usar además preservativo durante **7 días**.
+- El texto va en condicional («si durante la anestesia le administran…») e indica que el equipo de anestesia lo confirmará después de la intervención.
+
+**Texto para el paciente (hoja), castellano:**
+
+- Oral: Si durante la anestesia le administran un medicamento llamado sugammadex, el efecto sobre su anticonceptivo es como si hubiera olvidado una toma de la píldora. En ese caso, siga las instrucciones para una «toma olvidada» del prospecto de su anticonceptivo y, además, use preservativo durante los 7 días siguientes.
+- No oral: Si durante la anestesia le administran un medicamento llamado sugammadex, su anticonceptivo puede perder eficacia unos días. En ese caso, use además preservativo durante los 7 días siguientes.
+- Confirmación: Usted no sabe de antemano si se usará ese medicamento. El equipo de anestesia se lo confirmará después de la intervención.
 
 ## 9. Cribado mitocondrial mtND4 (SEDAR 2026) — §9
 

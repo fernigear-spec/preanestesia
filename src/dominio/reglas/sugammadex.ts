@@ -33,6 +33,36 @@ export interface AvisoSugammadex {
 
 const FUENTE = 'docs/documento_fuente.md §8.15 (ficha técnica de sugammadex)';
 
+/**
+ * ¿Un fármaco es un anticonceptivo HORMONAL (no THS)? La terapia hormonal
+ * sustitutiva no es anticonceptiva y NO debe disparar el aviso del sugammadex.
+ * Se distingue por el id del catálogo: los anticonceptivos empiezan por
+ * «anticonceptivo_»; la THS, por «ths».
+ */
+export function esAnticonceptivoHormonal(idFarmaco: string): boolean {
+  return idFarmaco.startsWith('anticonceptivo_');
+}
+
+/** Vías consideradas «orales» para el aviso del sugammadex (toma por boca). */
+export function esViaOralSugammadex(via: string): boolean {
+  return via === 'oral';
+}
+
+/**
+ * Determina el aviso de sugammadex para la HOJA DEL PACIENTE a partir de la
+ * medicación y la posibilidad de anestesia general. Devuelve 'oral' | 'no_oral'
+ * según la vía del anticonceptivo hormonal, o undefined si no procede.
+ */
+export function sugammadexParaHoja(
+  medicacion: Array<{ idFarmaco: string; via: string }>,
+  posibleAnestesiaGeneral: boolean,
+): 'oral' | 'no_oral' | undefined {
+  if (!posibleAnestesiaGeneral) return undefined;
+  const anticon = medicacion.find((f) => esAnticonceptivoHormonal(f.idFarmaco));
+  if (!anticon) return undefined;
+  return esViaOralSugammadex(anticon.via) ? 'oral' : 'no_oral';
+}
+
 export function avisoSugammadex(e: EntradaSugammadex): AvisoSugammadex {
   if (!e.mujerConAnticonceptivoHormonal || !e.posibleAnestesiaGeneral) {
     return { aplica: false, textoPaciente: '', textoAnestesiologo: '' };

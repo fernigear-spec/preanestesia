@@ -357,6 +357,51 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('button', { name: /Copiar enlace para el paciente/ })).toBeVisible();
   });
 
+  test('§8.15: anticonceptivo oral + anestesia general → la hoja del paciente muestra la advertencia del sugammadex', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    // Mujer 30 años, sin posibilidad de embarazo.
+    await pasoAlergiasSinAlergias(page);
+    await page.locator('#edad').fill('30');
+    await page.getByRole('radio', { name: 'Mujer' }).check();
+    await page.locator('#peso').fill('62');
+    await page.locator('#talla').fill('165');
+    await page.getByRole('radio', { name: /No hay posibilidad/ }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
+
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+
+    // Paso 7: técnica general (para que aplique la advertencia del sugammadex).
+    await page.getByRole('radio', { name: 'General', exact: true }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+
+    // Paso 8: anticonceptivo oral combinado.
+    await page.locator('#med').fill('anticonceptivo oral combinado');
+    await page.getByRole('button', { name: /anticonceptivo oral combinado/i }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
+
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 vía aérea
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento
+    await pasoMtnd4NoVenezolana(page); // 11 -> resumen
+
+    // Generar la hoja: aparece la advertencia del sugammadex (versión oral).
+    await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
+    const hoja = page.locator('section.hoja-paciente');
+    await expect(hoja.getByRole('heading', { name: /Su anticonceptivo y la anestesia/ })).toBeVisible();
+    await expect(hoja.getByText(/como si hubiera olvidado una toma/)).toBeVisible();
+    await expect(hoja.getByText(/El equipo de anestesia se lo confirmará después de la intervención/)).toBeVisible();
+  });
+
   test('privacidad (caso 23): sin datos clínicos en localStorage/sessionStorage/cookies', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Presencial' }).click();

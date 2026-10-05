@@ -46,6 +46,10 @@
   "alcohol_texto": "Redueixi o eviti l'alcohol els dies previs a la intervenció.",
   "delirium_titulo": "Després de l'operació",
   "delirium_texto": "Per prevenir la desorientació després de l'anestèsia: porti les seves ulleres i audiòfons, vingui acompanyat i no comenci pastilles per dormir pel seu compte.",
+  "sugammadex_titulo": "El seu anticonceptiu i l'anestèsia",
+  "sugammadex_oral": "Si durant l'anestèsia li administren un medicament anomenat sugammadex, l'efecte sobre el seu anticonceptiu és com si hagués oblidat una presa de la píndola. En aquest cas, segueixi les instruccions per a una «presa oblidada» del prospecte del seu anticonceptiu i, a més, faci servir preservatiu durant els 7 dies següents.",
+  "sugammadex_no_oral": "Si durant l'anestèsia li administren un medicament anomenat sugammadex, el seu anticonceptiu pot perdre eficàcia uns dies. En aquest cas, faci servir a més preservatiu durant els 7 dies següents.",
+  "sugammadex_confirmacion": "Vostè no sap per endavant si es farà servir aquest medicament. L'equip d'anestèsia l'hi confirmarà després de la intervenció.",
   "dias_semana": ["diumenge", "dilluns", "dimarts", "dimecres", "dijous", "divendres", "dissabte"],
   "meses": ["gener", "febrer", "març", "abril", "maig", "juny", "juliol", "agost", "setembre", "octubre", "novembre", "desembre"],
   "med": {

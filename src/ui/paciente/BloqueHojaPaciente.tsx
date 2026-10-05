@@ -12,6 +12,7 @@ import { derivarPuntosValidacion } from '../../dominio/entrevista/puntosValidaci
 import { VALIDACIONES } from '../../datos/validacionesDatos.ts';
 import { MODULOS } from '../../datos/modulosDatos.ts';
 import { construirHechosValidacion } from '../pasos/hechosValidacionUi.ts';
+import { sugammadexParaHoja } from '../../dominio/reglas/sugammadex.ts';
 import type { EstadoEntrevista, EstadoPuntoValidacion } from '../estadoEntrevista.ts';
 import { calcularAyuno } from '../../dominio/ayuno/ayuno.ts';
 import { ayunoQrDesde } from '../../dominio/salidas/qr/construirContenido.ts';
@@ -97,6 +98,8 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
       : false;
     const cuatroAtPuntuacion = habitos?.cuatroAt ? calcular4AT(habitos.cuatroAt).puntuacion : undefined;
     const semanasObst = cribado.respuestasModulos['obstetricia']?.['semanas_gestacion'];
+    const posibleAnestesiaGeneral = intervencion.tecnica === 'general' || intervencion.tecnica === 'no_se_sabe';
+    const sugammadexHoja = sugammadexParaHoja(medicacion.map((f) => ({ idFarmaco: f.idFarmaco, via: f.via })), posibleAnestesiaGeneral);
     const extrasIn = derivarHojaExtras({
       edadAnios: basicos.edadAnios,
       ...(typeof semanasObst === 'number' ? { semanasGestacion: semanasObst } : {}),
@@ -110,6 +113,7 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
       glp1Semanal: medicacion.some((f) => f.idRegla === 'glp1_semanal'),
       diabetes: new Set(cribado.enfermedades).has('diabetes'),
       ...(revisionPendiente ? { revisionPendiente: true } : {}),
+      ...(sugammadexHoja ? { sugammadex: sugammadexHoja } : {}),
     });
     const refFecha = intervencion.fechaHora ?? new Date(hoy.getTime() + 90 * MS_DIA);
     const planAyuno = calcularAyuno({
@@ -120,7 +124,7 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
     });
     const extras = consentimiento ? { ...extrasIn.extras, cons: CONS_MAP[consentimiento.estado] } : extrasIn.extras;
     return { ayunoQr: ayunoQrDesde(planAyuno, extrasIn.pediatrico, extrasIn.situacion), extras };
-  }, [basicos, cribado, habitos, sexo, intervencion.fechaHora, medicacion, consentimiento, hoy, revisionPendiente]);
+  }, [basicos, cribado, habitos, sexo, intervencion.fechaHora, intervencion.tecnica, medicacion, consentimiento, hoy, revisionPendiente]);
 
   // §3 (2026-10-04): la hoja y el QR se generan SIEMPRE, sin bloqueo por fármacos
   // pendientes. Los pendientes aparecen en la hoja con la frase única de §12

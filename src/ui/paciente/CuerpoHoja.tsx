@@ -85,6 +85,14 @@ export function CuerpoHoja({ instrucciones, ay, ex, fecha, t }: Props) {
         </>
       )}
 
+      {ex?.sugammadex && (
+        <>
+          <h2>{t.sugammadex_titulo}</h2>
+          <p>{ex.sugammadex === 'oral' ? t.sugammadex_oral : t.sugammadex_no_oral}</p>
+          <p className="aviso aviso-info">{t.sugammadex_confirmacion}</p>
+        </>
+      )}
+
       <h2>{t.cuando_llamar_titulo}</h2>
       <ul>{t.cuando_llamar_items.map((it, k) => <li key={k}>{it}</li>)}</ul>
 

@@ -22,6 +22,7 @@ import { construirPlanPaciente } from '../paciente/construirPlanUi.ts';
 import { construirContexto } from '../../dominio/reglas/motor.ts';
 import { evaluarStent } from '../../dominio/reglas/antiagregantes.ts';
 import { evaluarDispositivoCardiaco } from '../../dominio/reglas/dispositivosCardiacos.ts';
+import { sugammadexParaHoja } from '../../dominio/reglas/sugammadex.ts';
 import { calcularAyuno } from '../../dominio/ayuno/ayuno.ts';
 import { calcularEgri, EGRI_UMBRAL_RIESGO } from '../../dominio/escalas/egri.ts';
 import { calcularLangeron } from '../../dominio/escalas/langeron.ts';
@@ -153,11 +154,14 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
       },
     });
 
+    const posibleAnestesiaGeneral = intervencion.tecnica === 'general' || intervencion.tecnica === 'no_se_sabe';
+    const sugammadex = sugammadexParaHoja((medicacion ?? []).map((f) => ({ idFarmaco: f.idFarmaco, via: f.via })), posibleAnestesiaGeneral);
     const extras = derivarHojaExtras({
       edadAnios: basicos.edadAnios, ...(semanasGestacion !== undefined ? { semanasGestacion } : {}),
       enfermedades, respuestas, tabacoActivo: habitos?.tabaco === 'activo', auditPositivo: audit?.positivo ?? false,
       ...(habitos?.cfs !== undefined ? { cfs: habitos.cfs } : {}), ...(cuatroAt ? { cuatroAtPuntuacion: cuatroAt.puntuacion } : {}),
       edadPediatricaMaxima: config.edad_pediatrica_maxima, glp1Semanal: (medicacion ?? []).some((f) => f.idRegla === 'glp1_semanal'), diabetes: enfermedades.has('diabetes'),
+      ...(sugammadex ? { sugammadex } : {}),
     });
     const refFecha = intervencion.fechaHora ?? new Date(hoy.getTime() + 90 * 86_400_000);
     const ayuno = calcularAyuno({ induccion: refFecha, pediatrico: extras.pediatrico, ...(basicos.edadMeses !== undefined ? { edadMeses: basicos.edadMeses } : {}), situacion: extras.situacion });

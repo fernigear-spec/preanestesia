@@ -45,6 +45,10 @@
   "alcohol_texto": "Reduzca o evite el alcohol en los días previos a la intervención.",
   "delirium_titulo": "Después de la operación",
   "delirium_texto": "Para prevenir la desorientación tras la anestesia: traiga sus gafas y audífonos, venga acompañado y no empiece pastillas para dormir por su cuenta.",
+  "sugammadex_titulo": "Su anticonceptivo y la anestesia",
+  "sugammadex_oral": "Si durante la anestesia le administran un medicamento llamado sugammadex, el efecto sobre su anticonceptivo es como si hubiera olvidado una toma de la píldora. En ese caso, siga las instrucciones para una «toma olvidada» del prospecto de su anticonceptivo y, además, use preservativo durante los 7 días siguientes.",
+  "sugammadex_no_oral": "Si durante la anestesia le administran un medicamento llamado sugammadex, su anticonceptivo puede perder eficacia unos días. En ese caso, use además preservativo durante los 7 días siguientes.",
+  "sugammadex_confirmacion": "Usted no sabe de antemano si se usará ese medicamento. El equipo de anestesia se lo confirmará después de la intervención.",
   "dias_semana": ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
   "meses": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
   "med": {

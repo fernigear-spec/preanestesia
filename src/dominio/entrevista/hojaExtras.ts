@@ -25,6 +25,11 @@ export interface EntradaHojaExtras {
   diabetes: boolean;
   /** Hay puntos de validación clínica activos (§13 bis): aviso de revisión en la hoja. */
   revisionPendiente?: boolean;
+  /**
+   * Advertencia del sugammadex (§8.15): 'oral' | 'no_oral' si la paciente toma un
+   * anticonceptivo hormonal (NO THS) y es posible la anestesia general. Ausente si no.
+   */
+  sugammadex?: 'oral' | 'no_oral';
 }
 
 export interface ResultadoHojaExtras {
@@ -72,6 +77,7 @@ export function derivarHojaExtras(e: EntradaHojaExtras): ResultadoHojaExtras {
     anexos,
   };
   if (e.revisionPendiente) extras.revisionPendiente = true;
+  if (e.sugammadex) extras.sugammadex = e.sugammadex;
 
   return { pediatrico, situacion, extras };
 }
