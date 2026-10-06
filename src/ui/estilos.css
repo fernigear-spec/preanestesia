@@ -176,6 +176,20 @@ body {
   border-color: var(--color-principal);
 }
 
+/* Dosis genérica del paso 8 (cantidad + unidad, y «otra unidad» si procede). */
+.dosis-generica {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dosis-generica input[type='number'] {
+  flex: 1 1 120px;
+}
+.dosis-generica select,
+.dosis-generica input[type='text'] {
+  flex: 1 1 140px;
+}
+
 /* Buscador de procedimiento */
 .lista-resultados {
   list-style: none;

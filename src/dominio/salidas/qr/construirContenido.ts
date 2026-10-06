@@ -26,13 +26,15 @@ export interface FarmacoPlan {
   variante?: Via;
   /** Ajuste de insulina estructurado, si el fármaco es una insulina. */
   ins?: InsulinaQr;
+  /** Dosis + frecuencia legible (§8), p. ej. «100 mg cada 24 h»; se añade al nombre en la hoja. */
+  dosisFrecuencia?: string;
 }
 
 /** Construye un FarmacoQr a partir de un fármaco del plan. */
 export function farmacoQrDesde(f: FarmacoPlan): FarmacoQr {
   const r = f.resultado;
   const item: FarmacoQr = {
-    n: r.nombreComercial,
+    n: f.dosisFrecuencia ? `${r.nombreComercial} ${f.dosisFrecuencia}` : r.nombreComercial,
     pt: f.meta.pt,
     hh: f.horas,
     ad: f.meta.ad,

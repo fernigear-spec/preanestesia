@@ -21,12 +21,19 @@ import {
   type Tarjeta,
 } from '../../dominio/coherencia/coherencia.ts';
 import { cargarFarmacos, buscarFarmacos, type FarmacoCatalogoUi } from '../../datos/farmacos.ts';
-import { HORAS_FRECUENTES, reglaNecesitaHoras, reglaDependeAclaramiento, type FarmacoTomadoUi, type AclaramientoManual } from '../estadoEntrevista.ts';
+import { HORAS_FRECUENTES, reglaNecesitaHoras, reglaDependeAclaramiento, UNIDADES_DOSIS, FRECUENCIAS, horasEsperadasDeFrecuencia, type FarmacoTomadoUi, type AclaramientoManual } from '../estadoEntrevista.ts';
 import { resolverAclaramiento } from '../../dominio/entrevista/aclaramiento.ts';
 import reglasFarmacos from '../../../datos/reglas_farmacos.json';
 import { clasificarHbpm, type TablaSeth } from '../../dominio/reglas/heparinas.ts';
 
 const TABLAS_SETH = reglasFarmacos.tablas_seth as Record<string, TablaSeth>;
+
+/**
+ * Cambios parciales a un fármaco. A diferencia de `Partial<FarmacoTomadoUi>`, admite
+ * `undefined` como valor explícito (con `exactOptionalPropertyTypes`), de modo que un
+ * campo opcional (dosis, frecuencia…) pueda vaciarse al desmarcarlo.
+ */
+type CambioFarmaco = { [K in keyof FarmacoTomadoUi]?: FarmacoTomadoUi[K] | undefined };
 
 interface Props {
   inicial: FarmacoTomadoUi[] | null;
@@ -100,8 +107,8 @@ export function PasoMedicacion({ inicial, intervencion, enfermedades, respuestas
     setMedicacion((m) => [...m, nuevo]);
     setConsulta('');
   }
-  function actualizar(i: number, cambios: Partial<FarmacoTomadoUi>) {
-    setMedicacion((m) => m.map((f, j) => (j === i ? { ...f, ...cambios } : f)));
+  function actualizar(i: number, cambios: CambioFarmaco) {
+    setMedicacion((m) => m.map((f, j) => (j === i ? ({ ...f, ...cambios } as FarmacoTomadoUi) : f)));
   }
   function quitar(i: number) {
     setMedicacion((m) => m.filter((_, j) => j !== i));
@@ -199,7 +206,7 @@ function FichaFarmaco({
   /** Aclaramiento efectivo (módulo o manual); sustituye a hechos.aclaramiento. */
   aclaramientoEfectivo: number | null;
   pesoKg: number;
-  onCambio: (c: Partial<FarmacoTomadoUi>) => void;
+  onCambio: (c: CambioFarmaco) => void;
   onQuitar: () => void;
 }) {
   const [horaLibre, setHoraLibre] = useState('');
@@ -227,6 +234,11 @@ function FichaFarmaco({
   }
   const esOpioide = f.grupo === 'opioides';
   const esParche = esOpioide && f.via === 'transdermica';
+  // ¿La regla ya tiene su propio campo de dosis? Entonces no se duplica la dosis genérica.
+  const dosisPropia = necesitaDosis || esInsulinaBasal || esInsulinaNph || esInsulinaPremezclada || esHbpmSeth || esOpioide;
+  // Aviso si la frecuencia elegida no cuadra con el número de horas de toma.
+  const horasEsperadas = horasEsperadasDeFrecuencia(f.frecuencia);
+  const descuadreFrecuencia = necesitaHoras && horasEsperadas !== undefined && f.horas.length > 0 && f.horas.length !== horasEsperadas;
 
   function alternarHora(h: string) {
     const horas = f.horas.includes(h) ? f.horas.filter((x) => x !== h) : [...f.horas, h].sort();
@@ -361,6 +373,40 @@ function FichaFarmaco({
           )}
         </div>
       )}
+
+      {/* Dosis genérica (solo si la regla no pide ya una dosis propia) y frecuencia (§8). */}
+      {!dosisPropia && (
+        <div className="campo">
+          <label htmlFor={`dc-${f.idFarmaco}`}>Dosis (opcional)</label>
+          <div className="dosis-generica">
+            <input id={`dc-${f.idFarmaco}`} type="number" min={0} inputMode="decimal" step="0.01" placeholder="cantidad" value={f.dosisCantidad ?? ''} onChange={(e) => onCambio({ dosisCantidad: e.target.value === '' ? undefined : Number(e.target.value) })} />
+            <select aria-label="Unidad" value={f.dosisUnidad ?? ''} onChange={(e) => onCambio({ dosisUnidad: e.target.value || undefined })}>
+              <option value="">unidad</option>
+              {UNIDADES_DOSIS.map((u) => <option key={u.valor} value={u.valor}>{u.etiqueta}</option>)}
+            </select>
+            {f.dosisUnidad === 'otra' && (
+              <input type="text" aria-label="Otra unidad" placeholder="otra unidad" value={f.dosisUnidadOtra ?? ''} onChange={(e) => onCambio({ dosisUnidadOtra: e.target.value || undefined })} />
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="campo">
+        <label htmlFor={`fr-${f.idFarmaco}`}>Frecuencia (opcional)</label>
+        <select id={`fr-${f.idFarmaco}`} value={f.frecuencia ?? ''} onChange={(e) => onCambio({ frecuencia: e.target.value || undefined })}>
+          <option value="">— elija —</option>
+          {FRECUENCIAS.map((fr) => <option key={fr.valor} value={fr.valor}>{fr.etiqueta}</option>)}
+        </select>
+        {f.frecuencia === 'otra' && (
+          <input type="text" aria-label="Otra frecuencia" placeholder="otra frecuencia" value={f.frecuenciaOtra ?? ''} onChange={(e) => onCambio({ frecuenciaOtra: e.target.value || undefined })} />
+        )}
+        {descuadreFrecuencia && (
+          <p className="aviso aviso-atencion" role="note">
+            La frecuencia elegida no cuadra con las {f.horas.length} horas de toma marcadas
+            (se esperaban {horasEsperadas}). Revise las horas o la frecuencia.
+          </p>
+        )}
+      </div>
 
       {/* Resultado del motor en vivo */}
       <div className={`resultado-motor ${resultado.claseAviso}`} aria-live="polite">

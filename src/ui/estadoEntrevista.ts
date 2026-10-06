@@ -189,6 +189,76 @@ export interface FarmacoTomadoUi {
   confirmadoPor?: string;
   /** Marcado explícitamente como «le llamaremos» (§12): se muestra la frase única. */
   leLlamaremos?: boolean;
+  /**
+   * Dosis informativa (cantidad + unidad), opcional. Para los fármacos cuya regla NO
+   * exige ya una dosis numérica propia (AAS, metotrexato, HBPM, insulinas, opioides);
+   * en esos, la dosis es su campo específico y no se duplica. Aparece, cuando se
+   * conoce, en el plan del resumen y en la hoja del paciente.
+   */
+  dosisCantidad?: number;
+  /** Unidad de la dosis: mg, mcg, UI, mL, comprimidos, inhalaciones, gotas u «otra». */
+  dosisUnidad?: string;
+  /** Texto libre de la unidad cuando `dosisUnidad === 'otra'`. */
+  dosisUnidadOtra?: string;
+  /** Frecuencia de la toma (§8): c/24h, c/12h, c/8h, c/6h, semanal, a_demanda u «otra». */
+  frecuencia?: string;
+  /** Texto libre de la frecuencia cuando `frecuencia === 'otra'`. */
+  frecuenciaOtra?: string;
+}
+
+/** Opciones de unidad de dosis para el paso 8 (§8). */
+export const UNIDADES_DOSIS: Array<{ valor: string; etiqueta: string }> = [
+  { valor: 'mg', etiqueta: 'mg' },
+  { valor: 'mcg', etiqueta: 'µg' },
+  { valor: 'UI', etiqueta: 'UI' },
+  { valor: 'mL', etiqueta: 'mL' },
+  { valor: 'comprimidos', etiqueta: 'comprimidos' },
+  { valor: 'inhalaciones', etiqueta: 'inhalaciones' },
+  { valor: 'gotas', etiqueta: 'gotas' },
+  { valor: 'otra', etiqueta: 'otra' },
+];
+
+/** Opciones de frecuencia para el paso 8 (§8), con las horas de toma que implican. */
+export const FRECUENCIAS: Array<{ valor: string; etiqueta: string; horasEsperadas?: number }> = [
+  { valor: 'c24h', etiqueta: 'Cada 24 h', horasEsperadas: 1 },
+  { valor: 'c12h', etiqueta: 'Cada 12 h', horasEsperadas: 2 },
+  { valor: 'c8h', etiqueta: 'Cada 8 h', horasEsperadas: 3 },
+  { valor: 'c6h', etiqueta: 'Cada 6 h', horasEsperadas: 4 },
+  { valor: 'semanal', etiqueta: 'Semanal' },
+  { valor: 'a_demanda', etiqueta: 'A demanda' },
+  { valor: 'otra', etiqueta: 'Otra' },
+];
+
+/** Nº de horas de toma que implica una frecuencia (undefined si no aplica). */
+export function horasEsperadasDeFrecuencia(frecuencia: string | undefined): number | undefined {
+  return FRECUENCIAS.find((f) => f.valor === frecuencia)?.horasEsperadas;
+}
+
+/** Texto legible «dosis unidad frecuencia» para el resumen y la hoja (vacío si no hay nada). */
+export function textoDosisFrecuencia(f: {
+  dosisCantidad?: number; dosisUnidad?: string; dosisUnidadOtra?: string;
+  frecuencia?: string; frecuenciaOtra?: string;
+  dosisMg?: number; idRegla?: string;
+}): string {
+  const partes: string[] = [];
+  // Dosis: la genérica si existe; si no, la específica (mg) de la regla.
+  if (f.dosisCantidad !== undefined && f.dosisCantidad > 0) {
+    const u = f.dosisUnidad === 'otra' ? (f.dosisUnidadOtra ?? '').trim() : etiquetaUnidad(f.dosisUnidad);
+    partes.push(`${f.dosisCantidad}${u ? ' ' + u : ''}`);
+  } else if (f.dosisMg !== undefined && f.dosisMg > 0) {
+    partes.push(`${f.dosisMg} mg`);
+  }
+  const fr = f.frecuencia === 'otra' ? (f.frecuenciaOtra ?? '').trim() : etiquetaFrecuencia(f.frecuencia);
+  if (fr) partes.push(fr.toLowerCase());
+  return partes.join(' ');
+}
+
+function etiquetaUnidad(valor: string | undefined): string {
+  return UNIDADES_DOSIS.find((u) => u.valor === valor)?.etiqueta ?? valor ?? '';
+}
+function etiquetaFrecuencia(valor: string | undefined): string {
+  if (!valor || valor === 'a_demanda' || valor === 'otra') return valor === 'a_demanda' ? 'a demanda' : '';
+  return FRECUENCIAS.find((f) => f.valor === valor)?.etiqueta ?? '';
 }
 
 /** Vía aérea del paso 9 (§6.2). Todos opcionales; en telefónica solo anamnesis. */

@@ -913,6 +913,67 @@ test.describe('Vista previa', () => {
     await expect(page.getByText(/Consultar con el anestesiólogo/).first()).toBeVisible();
   });
 
+  test('§8 dosis y frecuencia en el paso 8: el plan del resumen muestra «Adiro 100 mg cada 24 h» y avisa del descuadre con las horas', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await pasoAlergiasSinAlergias(page);
+    await page.locator('#edad').fill('50');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('70');
+    await page.locator('#talla').fill('170');
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
+
+    // Paso 8: añadir Adiro con una hora de toma, dosis 100 mg y frecuencia cada 24 h.
+    // (AAS ya pide su dosis propia en «mg/día»; no se duplica el campo genérico.)
+    await page.locator('#med').fill('Adiro');
+    await page.getByRole('button', { name: /Adiro/ }).first().click();
+    await page.getByRole('button', { name: '09:00', exact: true }).first().click();
+    await page.getByLabel('Dosis (mg/día)').fill('100');
+    await page.getByLabel('Frecuencia (opcional)').selectOption('c24h');
+
+    // Añadir Eutirox (levotiroxina): NO pide dosis propia, así que aparece el campo de
+    // dosis genérico (cantidad + unidad). Lo rellenamos como «75 µg».
+    await page.locator('#med').fill('Eutirox');
+    await page.getByRole('button', { name: /Eutirox/ }).first().click();
+    const fichaEutirox = page.locator('.ficha-farmaco').filter({ hasText: 'Eutirox' });
+    await fichaEutirox.getByLabel('Dosis (opcional)').fill('75');
+    await fichaEutirox.getByLabel('Unidad').selectOption('mcg');
+
+    // Con 1 hora de toma y «cada 24 h» (1 toma): no hay descuadre en el Adiro.
+    const fichaAdiro = page.locator('.ficha-farmaco').filter({ hasText: 'Adiro' });
+    await expect(fichaAdiro.getByText(/La frecuencia elegida no cuadra/)).toHaveCount(0);
+
+    // Cambiar a «cada 12 h» (2 tomas) con 1 sola hora marcada → aviso de descuadre.
+    await fichaAdiro.getByLabel('Frecuencia (opcional)').selectOption('c12h');
+    await expect(fichaAdiro.getByText(/La frecuencia elegida no cuadra con las 1 horas de toma/)).toBeVisible();
+
+    // Volver a «cada 24 h» para un plan coherente y continuar al resumen.
+    await fichaAdiro.getByLabel('Frecuencia (opcional)').selectOption('c24h');
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 vía aérea
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento
+    await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
+
+    // El plan del resumen del anestesiólogo lleva la dosis y la frecuencia junto al nombre.
+    await expect(page.getByRole('heading', { name: /Resumen de la entrevista/ })).toBeVisible();
+    await expect(page.getByText(/Adiro 100 mg cada 24 h:/)).toBeVisible();
+    await expect(page.getByText(/Eutirox 75 µg:/)).toBeVisible();
+
+    // La hoja del paciente también muestra la dosis y la frecuencia junto al nombre.
+    await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
+    await expect(page.getByText(/Adiro 100 mg cada 24 h/).first()).toBeVisible();
+  });
+
   test('§14.2 modo entrenamiento: carga un caso y muestra la comparación con lo esperado', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Modo entrenamiento' }).click();

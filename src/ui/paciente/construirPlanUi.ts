@@ -13,7 +13,7 @@ import { evaluarCombinacionUi, metadatosPlazo, type DatosFarmacoUi } from '../..
 import type { DatosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
 import type { FarmacoPlan } from '../../dominio/salidas/qr/construirContenido.ts';
 import type { InsulinaQr } from '../../dominio/salidas/qr/hojaPaciente.ts';
-import type { FarmacoTomadoUi } from '../estadoEntrevista.ts';
+import { textoDosisFrecuencia, type FarmacoTomadoUi } from '../estadoEntrevista.ts';
 
 const MS_DIA = 86_400_000;
 
@@ -95,6 +95,7 @@ export function construirPlanPaciente(
     const resultado = f.confirmadoPor ? { ...evaluado, confirmadoPor: f.confirmadoPor } : evaluado;
     const meta = metadatosPlazo(f.idRegla, f.dosisMg, f.tipoHbpm);
     const ins = insulinaDe(f);
-    return { resultado, horas: f.horas, meta, variante: varianteMantener(f), ...(ins ? { ins } : {}) };
+    const dosisFrecuencia = textoDosisFrecuencia(f);
+    return { resultado, horas: f.horas, meta, variante: varianteMantener(f), ...(ins ? { ins } : {}), ...(dosisFrecuencia ? { dosisFrecuencia } : {}) };
   });
 }

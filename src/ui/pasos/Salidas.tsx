@@ -8,7 +8,7 @@ import { useMemo, useState } from 'react';
 import config from '../../../datos/config.json';
 import plantillasSap from '../../../datos/plantillas_sap.json';
 import type { GravedadAlerta } from '../../dominio/tipos.ts';
-import { calcularImc, type EstadoEntrevista, type EstadoPuntoValidacion } from '../estadoEntrevista.ts';
+import { calcularImc, textoDosisFrecuencia, type EstadoEntrevista, type EstadoPuntoValidacion } from '../estadoEntrevista.ts';
 import { MODULO_POR_ID, MODULOS } from '../../datos/modulosDatos.ts';
 import type { RespuestasModulos } from '../../datos/modulos.ts';
 import { derivarHechosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
@@ -484,9 +484,14 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
       <h4>Plan de medicación</h4>
       {salida.plan.length === 0 ? <p>Sin medicación.</p> : (
         <ul className="resumen-lista">
-          {salida.plan.map((f, i) => (
-            <li key={i}><strong>{f.resultado.nombreComercial}:</strong> {f.resultado.accion} · {f.resultado.reglaAplicada} <em>({f.resultado.fuente})</em></li>
-          ))}
+          {salida.plan.map((f, i) => {
+            const df = textoDosisFrecuencia((medicacion ?? [])[i] ?? {});
+            return (
+              <li key={i}>
+                <strong>{f.resultado.nombreComercial}{df ? ` ${df}` : ''}:</strong> {f.resultado.accion} · {f.resultado.reglaAplicada} <em>({f.resultado.fuente})</em>
+              </li>
+            );
+          })}
         </ul>
       )}
 

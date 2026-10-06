@@ -92,6 +92,8 @@ Técnica prevista (general, sedación, neuroaxial, bloqueo periférico, bloqueo 
 ### Paso 8. Medicación habitual
 Buscador por principio activo o nombre comercial con autocompletado sobre `farmacos.csv`, tolerante a tildes, mayúsculas y errores menores. Para cada fármaco: dosis, pauta y hora habitual. Si no está en el catálogo, se escribe a mano y queda marcado «no catalogado: mantener y consultar con el anestesiólogo». Al añadir cada fármaco actúa el asistente de coherencia (sección 5b). Al volver al paso 7 para cambiar la técnica, la medicación introducida se conserva y se recalcula.
 
+**Dosis y frecuencia (informativas, 2026-10-04).** Para cada fármaco se pueden anotar, de forma opcional, su dosis (cantidad + unidad: mg, µg, UI, mL, comprimidos, inhalaciones, gotas u otra que se escribe) y su frecuencia (cada 24 h, cada 12 h, cada 8 h, cada 6 h, semanal, a demanda u otra que se escribe). No cambian ninguna regla de suspensión ni ningún plazo: solo documentan la pauta. Cuando una regla ya pide la dosis como dato clínico (AAS, metotrexato, HBPM, insulinas, opioides), esa dosis es la misma y sigue siendo obligatoria; no se duplica el campo. La frecuencia se contrasta con las horas de toma marcadas: si no cuadran (p. ej. «cada 12 h» con una sola hora), se avisa para que se revise. La dosis y la frecuencia conocidas acompañan al nombre del fármaco en el plan del resumen del anestesiólogo y en la hoja del paciente (p. ej. «Adiro 100 mg cada 24 h: siga tomándolo»).
+
 ### Paso 9. Vía aérea
 Sección 6.2. En modalidad telefónica **no se muestra este paso** (2026-10-04): el resumen indica «Vía aérea: pendiente de explorar el día de la intervención» y las escalas de vía aérea (EGRI, Langeron) no se calculan.
 
