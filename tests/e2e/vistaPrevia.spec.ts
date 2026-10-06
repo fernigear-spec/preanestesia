@@ -974,6 +974,51 @@ test.describe('Vista previa', () => {
     await expect(page.getByText(/Adiro 100 mg cada 24 h/).first()).toBeVisible();
   });
 
+  test('§6 otras enfermedades: se añade una a mano en el paso 6, sale en el SAP como «nombre (detalle)» y avisa al anestesiólogo', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await pasoAlergiasSinAlergias(page);
+    await page.locator('#edad').fill('50');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('70');
+    await page.locator('#talla').fill('170');
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
+
+    // Paso 6: añadir una enfermedad no incluida en la lista (nombre + detalle).
+    await expect(page.getByRole('heading', { name: /Paso 6 · Enfermedades/ })).toBeVisible();
+    await page.locator('#oe-nombre').fill('Enfermedad de Behçet');
+    await page.locator('#oe-detalle').fill('brotes frecuentes');
+    await page.getByRole('button', { name: 'Añadir otra enfermedad no incluida en la lista' }).click();
+
+    // La entrada aparece en la lista y se puede quitar.
+    await expect(page.getByText('Enfermedad de Behçet')).toBeVisible();
+    await expect(page.getByText('brotes frecuentes')).toBeVisible();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades -> 7
+
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 medicación -> 9
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 vía aérea -> 10
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento -> 11
+    await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
+
+    // El SAP incluye la enfermedad como «nombre (detalle)» en los AP.
+    await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
+    const sap = page.getByRole('textbox', { name: 'Texto para SAP' });
+    await expect(sap).toContainText('Enfermedad de Behçet (brotes frecuentes)');
+
+    // El aviso al anestesiólogo aparece en las notas técnicas.
+    await page.getByRole('button', { name: /Notas técnicas/ }).click();
+    await expect(page.getByText(/Enfermedad no incluida en los módulos: Enfermedad de Behçet \(brotes frecuentes\)/)).toBeVisible();
+    await expect(page.getByText(/no aplica reglas ni alertas sobre ella/)).toBeVisible();
+  });
+
   test('§14.2 modo entrenamiento: carga un caso y muestra la comparación con lo esperado', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Modo entrenamiento' }).click();

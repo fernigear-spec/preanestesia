@@ -8,7 +8,7 @@ import { useMemo, useState } from 'react';
 import config from '../../../datos/config.json';
 import plantillasSap from '../../../datos/plantillas_sap.json';
 import type { GravedadAlerta } from '../../dominio/tipos.ts';
-import { calcularImc, textoDosisFrecuencia, type EstadoEntrevista, type EstadoPuntoValidacion } from '../estadoEntrevista.ts';
+import { calcularImc, textoDosisFrecuencia, textoOtraEnfermedad, type EstadoEntrevista, type EstadoPuntoValidacion } from '../estadoEntrevista.ts';
 import { MODULO_POR_ID, MODULOS } from '../../datos/modulosDatos.ts';
 import type { RespuestasModulos } from '../../datos/modulos.ts';
 import { derivarHechosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
@@ -343,6 +343,15 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     // paciente (pediatría, obstetricia), no solo las casillas de enfermedades.
     const resumenModulos = [...activos].map((id) => resumenModulo(id, respuestas)).filter((s): s is string => s !== null);
 
+    // Otras enfermedades escritas a mano (§6): van al SAP como «nombre (detalle)» o
+    // solo «nombre», y generan una nota de aviso para el anestesiólogo (el programa
+    // no les aplica reglas ni alertas).
+    const otrasEnfermedades = cribado.otrasEnfermedades ?? [];
+    const otrasEnfermedadesSap = otrasEnfermedades.map(textoOtraEnfermedad);
+    for (const o of otrasEnfermedades) {
+      notas.push(`Enfermedad no incluida en los módulos: ${textoOtraEnfermedad(o)} — revisar, porque el programa no aplica reglas ni alertas sobre ella.`);
+    }
+
     // SAP (§10.1): SOLO antecedentes patológicos y quirúrgicos (decisión del servicio).
     const fechaTxt = intervencion.fechaHora ? fechaCorta(intervencion.fechaHora) : 'sin fecha';
     const antecedentesQuirurgicos = (antecedentes?.intervencionesPrevias ?? []).map((iq) => {
@@ -354,7 +363,7 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     });
     const entradaSap: EntradaSap = {
       cabecera: `VALORACION PREANESTESICA ENFERMERIA ${fechaTxt} (${modalidad})`,
-      antecedentesPatologicos: resumenModulos,
+      antecedentesPatologicos: [...resumenModulos, ...otrasEnfermedadesSap],
       antecedentesQuirurgicos,
       ...(consentimiento
         ? { consentimiento: consentimiento.estado === 'entregado'

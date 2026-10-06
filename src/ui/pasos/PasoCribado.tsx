@@ -17,6 +17,7 @@ import {
   type CribadoUi,
   type CondicionesEspeciales,
   type PruebasRecientesUi,
+  type OtraEnfermedad,
 } from '../estadoEntrevista.ts';
 import { MODULO_POR_ID } from '../../datos/modulosDatos.ts';
 import { RenderizadorModulo } from '../modulos/RenderizadorModulo.tsx';
@@ -43,8 +44,27 @@ export function PasoCribado({ inicial, pediatrico = false, obstetrico = false, o
   const [pruebasRecientes, setPruebasRecientes] = useState<PruebasRecientesUi>(
     inicial?.pruebasRecientes ?? {},
   );
+  // Otras enfermedades escritas a mano (§6), no incluidas en el catálogo.
+  const [otrasEnfermedades, setOtrasEnfermedades] = useState<OtraEnfermedad[]>(
+    inicial?.otrasEnfermedades ?? [],
+  );
+  const [otraNombre, setOtraNombre] = useState('');
+  const [otraDetalle, setOtraDetalle] = useState('');
 
   const resHemstop = calcularHemstop(hemstop);
+
+  function anadirOtraEnfermedad() {
+    if (otraNombre.trim() === '') return;
+    const nueva: OtraEnfermedad = { nombre: otraNombre.trim() };
+    if (otraDetalle.trim() !== '') nueva.detalle = otraDetalle.trim();
+    setOtrasEnfermedades((lista) => [...lista, nueva]);
+    setOtraNombre('');
+    setOtraDetalle('');
+    setNinguna(false);
+  }
+  function quitarOtraEnfermedad(indice: number) {
+    setOtrasEnfermedades((lista) => lista.filter((_, i) => i !== indice));
+  }
 
   function cambiarPruebaReciente(id: keyof PruebasRecientesUi, valor: string) {
     setPruebasRecientes((p) => {
@@ -88,6 +108,7 @@ export function PasoCribado({ inicial, pediatrico = false, obstetrico = false, o
   function marcarNinguna() {
     setNinguna(true);
     setEnfermedades(new Set());
+    setOtrasEnfermedades([]);
   }
   function alternarHemstop(id: keyof EntradaHemstop) {
     setHemstop((h) => ({ ...h, [id]: !h[id] }));
@@ -105,12 +126,13 @@ export function PasoCribado({ inicial, pediatrico = false, obstetrico = false, o
       if (idsActivos.has(idModulo)) respuestasFiltradas[idModulo] = resp;
     }
     onContinuar({
-      ningunaConocida: ninguna && enfermedades.size === 0,
+      ningunaConocida: ninguna && enfermedades.size === 0 && otrasEnfermedades.length === 0,
       enfermedades: [...enfermedades],
       respuestasModulos: respuestasFiltradas,
       hemstop,
       condicionesEspeciales: condiciones,
       pruebasRecientes,
+      otrasEnfermedades,
     });
   }
 
@@ -119,8 +141,8 @@ export function PasoCribado({ inicial, pediatrico = false, obstetrico = false, o
       <h2 id="paso7-tit">Paso 6 · Enfermedades y hemostasia</h2>
 
       <p>Marque las enfermedades conocidas. Cada una activará su módulo de preguntas específicas.</p>
-      <label className={`radio-tarjeta ${ninguna && enfermedades.size === 0 ? 'seleccionado' : ''}`}>
-        <input type="checkbox" checked={ninguna && enfermedades.size === 0} onChange={() => (ninguna ? setNinguna(false) : marcarNinguna())} />
+      <label className={`radio-tarjeta ${ninguna && enfermedades.size === 0 && otrasEnfermedades.length === 0 ? 'seleccionado' : ''}`}>
+        <input type="checkbox" checked={ninguna && enfermedades.size === 0 && otrasEnfermedades.length === 0} onChange={() => (ninguna ? setNinguna(false) : marcarNinguna())} />
         Ninguna enfermedad conocida
       </label>
 
@@ -137,6 +159,41 @@ export function PasoCribado({ inicial, pediatrico = false, obstetrico = false, o
           </div>
         </fieldset>
       ))}
+
+      <h3>Otras enfermedades no incluidas en la lista</h3>
+      <p>
+        Si el paciente tiene alguna enfermedad que no aparece arriba, puede añadirla a mano. El programa
+        la recoge en el informe, pero <strong>no le aplica reglas ni alertas</strong>: revísela usted.
+      </p>
+      {otrasEnfermedades.length === 0 ? (
+        <p>No se ha añadido ninguna enfermedad fuera de la lista.</p>
+      ) : (
+        <ul className="lista-previas">
+          {otrasEnfermedades.map((o, i) => (
+            <li key={`${o.nombre}-${i}`} className="previa">
+              <div>
+                <strong>{o.nombre}</strong>
+                {o.detalle ? <div className="previa-incid">{o.detalle}</div> : null}
+              </div>
+              <button type="button" className="boton-enlace" onClick={() => quitarOtraEnfermedad(i)}>Quitar</button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <fieldset className="campo bloque-anadir">
+        <legend>Añadir otra enfermedad no incluida en la lista</legend>
+        <div className="campo">
+          <label htmlFor="oe-nombre">Nombre de la enfermedad</label>
+          <input id="oe-nombre" type="text" value={otraNombre} onChange={(e) => setOtraNombre(e.target.value)} placeholder="p. ej. Enfermedad de Behçet" />
+        </div>
+        <div className="campo">
+          <label htmlFor="oe-detalle">Detalle (opcional)</label>
+          <textarea id="oe-detalle" rows={2} value={otraDetalle} onChange={(e) => setOtraDetalle(e.target.value)} placeholder="Lo que quiera anotar sobre esta enfermedad" />
+        </div>
+        <button type="button" className="boton-secundario" disabled={otraNombre.trim() === ''} onClick={anadirOtraEnfermedad}>
+          Añadir otra enfermedad no incluida en la lista
+        </button>
+      </fieldset>
 
       {modulosActivos.length > 0 && (
         <div className="modulos-desplegados">

@@ -145,6 +145,27 @@ export interface CribadoUi {
   condicionesEspeciales: CondicionesEspeciales;
   /** Pruebas recientes y su fecha (§7.4), para descontar las vigentes. Opcional. */
   pruebasRecientes?: PruebasRecientesUi;
+  /**
+   * Otras enfermedades escritas a mano, no incluidas en el catálogo por aparatos
+   * (§6). Cada una con un nombre obligatorio y un detalle opcional. El programa NO
+   * les aplica reglas ni alertas: solo las documenta en el SAP y avisa al
+   * anestesiólogo para que las revise. Opcional.
+   */
+  otrasEnfermedades?: OtraEnfermedad[];
+}
+
+/** Una enfermedad escrita a mano en el paso 6, fuera del catálogo (§6). */
+export interface OtraEnfermedad {
+  /** Nombre de la enfermedad (obligatorio). */
+  nombre: string;
+  /** Detalle libre opcional (multilínea). */
+  detalle?: string;
+}
+
+/** Texto de una «otra enfermedad» para el SAP y el resumen: «nombre (detalle)» o «nombre». */
+export function textoOtraEnfermedad(o: OtraEnfermedad): string {
+  const detalle = o.detalle?.trim();
+  return detalle ? `${o.nombre} (${detalle})` : o.nombre;
 }
 
 /** Un fármaco que el paciente toma, recogido en el paso 8. */

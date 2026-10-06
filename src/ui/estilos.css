@@ -157,7 +157,8 @@ body {
 .campo input[type='search'],
 .campo input[type='number'],
 .campo input[type='text'],
-.campo select {
+.campo select,
+.campo textarea {
   width: 100%;
   min-height: 52px;
   font-size: 1.05rem;
@@ -170,10 +171,16 @@ body {
 }
 .campo input:focus,
 .campo select:focus,
+.campo textarea:focus,
 .opcion-resultado:focus,
 .radio-tarjeta:focus-within {
   outline: 3px solid var(--color-principal-claro);
   border-color: var(--color-principal);
+}
+.campo textarea {
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.4;
 }
 
 /* Dosis genérica del paso 8 (cantidad + unidad, y «otra unidad» si procede). */

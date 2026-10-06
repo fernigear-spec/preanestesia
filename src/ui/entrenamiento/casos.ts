@@ -24,7 +24,7 @@ interface CasoJson {
     contrasteYodado: DatosIntervencion['contrasteYodado'];
   };
   basicos: EstadoEntrevista['basicos'];
-  cribado?: { ningunaConocida?: boolean; enfermedades?: string[]; respuestasModulos?: RespuestasModulos };
+  cribado?: { ningunaConocida?: boolean; enfermedades?: string[]; respuestasModulos?: RespuestasModulos; otrasEnfermedades?: Array<{ nombre: string; detalle?: string }> };
   medicacion?: FarmacoTomadoUi[];
   consentimiento?: EstadoEntrevista['consentimiento'];
   habitos?: EstadoEntrevista['habitos'];
@@ -81,6 +81,7 @@ function hidratar(c: CasoJson): CasoEntrenamiento {
       respuestasModulos: c.cribado?.respuestasModulos ?? {},
       hemstop: { ...HEMSTOP_VACIO },
       condicionesEspeciales: { ...CONDICIONES_ESPECIALES_VACIO },
+      otrasEnfermedades: c.cribado?.otrasEnfermedades ?? [],
     },
     medicacion: c.medicacion ?? [],
     viaAerea: c.viaAerea ?? null,
