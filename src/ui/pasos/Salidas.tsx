@@ -12,6 +12,7 @@ import { calcularImc, type EstadoEntrevista, type EstadoPuntoValidacion } from '
 import { MODULO_POR_ID, MODULOS } from '../../datos/modulosDatos.ts';
 import type { RespuestasModulos } from '../../datos/modulos.ts';
 import { derivarHechosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
+import { resolverAclaramiento } from '../../dominio/entrevista/aclaramiento.ts';
 import { emitirEfectosModulos } from '../../dominio/entrevista/efectosModulos.ts';
 import { derivarPuntosValidacion } from '../../dominio/entrevista/puntosValidacion.ts';
 import { VALIDACIONES } from '../../datos/validacionesDatos.ts';
@@ -104,12 +105,15 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     const semanasGestacion = typeof obstetricia['semanas_gestacion'] === 'number' ? (obstetricia['semanas_gestacion'] as number) : undefined;
     const plaquetasObst = typeof obstetricia['plaquetas'] === 'number' ? (obstetricia['plaquetas'] as number) : undefined;
 
-    const clin = derivarHechosClinicos({
+    const clinBase = derivarHechosClinicos({
       respuestas, enfermedades,
       medicacion: (medicacion ?? []).map((f) => ({ principiosActivos: f.principiosActivos, idRegla: f.idRegla })),
       edadAnios: basicos.edadAnios, pesoKg: basicos.pesoKg, sexo: basicos.sexo,
       fechaIntervencion: intervencion.fechaHora, espacioCerrado: intervencion.espacioCerrado, contrasteYodado: intervencion.contrasteYodado,
     });
+    // Aclaramiento efectivo (§8.2/§8.4): módulo renal/trasplante o, si no, el manual del paso 8.
+    const aclaramiento = resolverAclaramiento(clinBase.aclaramiento, entrevista.aclaramientoManual, basicos).valor;
+    const clin = { ...clinBase, aclaramiento };
     const plan = construirPlanPaciente(medicacion ?? [], intervencion, clin, basicos.pesoKg, hoy);
 
     // AUDIT-C solo si las tres preguntas están contestadas (§6.9); si no, no genera alertas ni anexo.

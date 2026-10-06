@@ -316,6 +316,8 @@ Pregunta de dos pisos y DASI: autocuidado 2,75; caminar dentro de casa 1,75; cam
 ### 6.7 Aclaramiento de creatinina
 Cockcroft-Gault con peso real: ((140 − edad) × peso) / (72 × creatinina en mg/dL), × 0,85 en mujeres. Acepta µmol/L con conversión. Si solo hay filtrado estimado del informe, se usa y se indica. Sin dato, las reglas que dependen de la función renal lo dicen y requieren confirmación hasta que se introduzca.
 
+**Entrada del aclaramiento en el paso 8 (§8.2/§8.4):** el aclaramiento es un valor ÚNICO para toda la entrevista. Si lo aporta un módulo (enfermedad renal o trasplante, con la creatinina), ese valor manda. Si no, y se añade un fármaco cuya suspensión depende del riñón (dabigatrán, rivaroxabán, apixabán, edoxabán, fondaparinux y las HBPM para su clasificación y plazos), el paso 8 muestra junto a la medicación una ficha de «función renal» para introducir el aclaramiento directamente, o la creatinina sérica con su fecha (el programa calcula Cockcroft-Gault con la edad, el peso y el sexo del paso 3), o marcar «No disponible». Si se marca «No disponible», esas reglas devuelven «requiere confirmación» (caso A7). Al cambiar el valor en un sitio, se actualiza en el otro y se recalculan las reglas.
+
 ### 6.8 Dosis equivalente de morfina oral
 Suma de dosis diarias × factor de `opioides.json`. Factores iniciales (CDC 2022): morfina oral 1; codeína 0,15; tramadol 0,2; tapentadol 0,4; oxicodona 1,5; hidromorfona oral 5; fentanilo transdérmico µg/h × 2,4. Buprenorfina y metadona sin conversión (5.7).
 

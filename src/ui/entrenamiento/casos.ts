@@ -87,6 +87,7 @@ function hidratar(c: CasoJson): CasoEntrenamiento {
     consentimiento: c.consentimiento ?? null,
     habitos: c.habitos ?? null,
     validaciones: {},
+    aclaramientoManual: null,
   };
 
   return { id: c.id, titulo: c.titulo, descripcion: c.descripcion, esperado: c.esperado, modalidad: c.modalidad, entrevista };

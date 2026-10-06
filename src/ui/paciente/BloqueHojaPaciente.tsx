@@ -7,6 +7,7 @@
 import { useMemo, useState } from 'react';
 import type { DatosIntervencion, Sexo } from '../../dominio/tipos.ts';
 import { derivarHechosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
+import { resolverAclaramiento } from '../../dominio/entrevista/aclaramiento.ts';
 import { derivarHojaExtras } from '../../dominio/entrevista/hojaExtras.ts';
 import { derivarPuntosValidacion } from '../../dominio/entrevista/puntosValidacion.ts';
 import { VALIDACIONES } from '../../datos/validacionesDatos.ts';
@@ -52,18 +53,23 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
 
   const sexo: Sexo = basicos.sexo;
   const clin = useMemo(
-    () => derivarHechosClinicos({
-      respuestas: cribado.respuestasModulos,
-      enfermedades: new Set(cribado.enfermedades),
-      medicacion: medicacion.map((f) => ({ principiosActivos: f.principiosActivos, idRegla: f.idRegla })),
-      edadAnios: basicos.edadAnios,
-      pesoKg: basicos.pesoKg,
-      sexo,
-      fechaIntervencion: intervencion.fechaHora,
-      espacioCerrado: intervencion.espacioCerrado,
-      contrasteYodado: intervencion.contrasteYodado,
-    }),
-    [cribado, medicacion, basicos, sexo, intervencion],
+    () => {
+      const base = derivarHechosClinicos({
+        respuestas: cribado.respuestasModulos,
+        enfermedades: new Set(cribado.enfermedades),
+        medicacion: medicacion.map((f) => ({ principiosActivos: f.principiosActivos, idRegla: f.idRegla })),
+        edadAnios: basicos.edadAnios,
+        pesoKg: basicos.pesoKg,
+        sexo,
+        fechaIntervencion: intervencion.fechaHora,
+        espacioCerrado: intervencion.espacioCerrado,
+        contrasteYodado: intervencion.contrasteYodado,
+      });
+      // Aclaramiento efectivo (§8.2/§8.4): módulo o, si no, el manual del paso 8.
+      const aclaramiento = resolverAclaramiento(base.aclaramiento, entrevista.aclaramientoManual, { edadAnios: basicos.edadAnios, pesoKg: basicos.pesoKg, sexo }).valor;
+      return { ...base, aclaramiento };
+    },
+    [cribado, medicacion, basicos, sexo, intervencion, entrevista.aclaramientoManual],
   );
 
   const plan = useMemo(

@@ -372,6 +372,8 @@ export function App() {
             enfermedades={cribado?.enfermedades ?? []}
             respuestasModulos={cribado?.respuestasModulos ?? {}}
             basicos={{ edadAnios: basicos.edadAnios, pesoKg: basicos.pesoKg, sexo: basicos.sexo }}
+            aclaramientoManual={entrevista.aclaramientoManual}
+            onAclaramientoManual={(a) => setEntrevista((e) => ({ ...e, aclaramientoManual: a }))}
             onVolver={(datos) => {
               setEntrevista((e) => ({ ...e, medicacion: datos }));
               setPantalla('tecnica');

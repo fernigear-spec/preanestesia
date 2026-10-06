@@ -21,7 +21,8 @@ import {
   type Tarjeta,
 } from '../../dominio/coherencia/coherencia.ts';
 import { cargarFarmacos, buscarFarmacos, type FarmacoCatalogoUi } from '../../datos/farmacos.ts';
-import { HORAS_FRECUENTES, reglaNecesitaHoras, type FarmacoTomadoUi } from '../estadoEntrevista.ts';
+import { HORAS_FRECUENTES, reglaNecesitaHoras, reglaDependeAclaramiento, type FarmacoTomadoUi, type AclaramientoManual } from '../estadoEntrevista.ts';
+import { resolverAclaramiento } from '../../dominio/entrevista/aclaramiento.ts';
 import reglasFarmacos from '../../../datos/reglas_farmacos.json';
 import { clasificarHbpm, type TablaSeth } from '../../dominio/reglas/heparinas.ts';
 
@@ -36,6 +37,10 @@ interface Props {
   respuestasModulos: RespuestasModulos;
   /** Datos básicos del paso 2 (para el aclaramiento y el peso del contexto). */
   basicos: { edadAnios: number; pesoKg: number; sexo: Sexo };
+  /** Aclaramiento introducido a mano (único para toda la entrevista, §8.2/§8.4). */
+  aclaramientoManual: AclaramientoManual | null;
+  /** Cambia el aclaramiento manual (se recalculan las reglas renales). */
+  onAclaramientoManual: (a: AclaramientoManual | null) => void;
   onContinuar: (medicacion: FarmacoTomadoUi[]) => void;
   /** Al volver se conserva la medicación introducida (para recalcular tras cambiar la técnica). */
   onVolver: (medicacion: FarmacoTomadoUi[]) => void;
@@ -43,7 +48,7 @@ interface Props {
 
 const DIAS_SEMANA = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
-export function PasoMedicacion({ inicial, intervencion, enfermedades, respuestasModulos, basicos, onContinuar, onVolver }: Props) {
+export function PasoMedicacion({ inicial, intervencion, enfermedades, respuestasModulos, basicos, aclaramientoManual, onAclaramientoManual, onContinuar, onVolver }: Props) {
   const catalogo = useMemo(() => cargarFarmacos(), []);
   const [medicacion, setMedicacion] = useState<FarmacoTomadoUi[]>(inicial ?? []);
   const [consulta, setConsulta] = useState('');
@@ -65,6 +70,15 @@ export function PasoMedicacion({ inicial, intervencion, enfermedades, respuestas
     }),
     [respuestasModulos, enfermedades, medicacion, basicos, intervencion.fechaHora],
   );
+
+  // Aclaramiento efectivo (§8.2/§8.4): el del módulo renal/trasplante si existe; si
+  // no, el introducido a mano en este paso. Valor único para toda la entrevista.
+  const aclaramiento = useMemo(
+    () => resolverAclaramiento(hechos.aclaramiento, aclaramientoManual, basicos),
+    [hechos.aclaramiento, aclaramientoManual, basicos],
+  );
+  // ¿Hay algún fármaco cuya suspensión dependa del riñón y el aclaramiento no venga de un módulo?
+  const pedirAclaramiento = aclaramiento.fuente !== 'modulo' && medicacion.some((f) => reglaDependeAclaramiento(f.idRegla));
 
   function anadir(f: FarmacoCatalogoUi) {
     const nuevo: FarmacoTomadoUi = {
@@ -135,11 +149,22 @@ export function PasoMedicacion({ inicial, intervencion, enfermedades, respuestas
             f={f}
             intervencion={intervencion}
             hechos={hechos}
+            aclaramientoEfectivo={aclaramiento.valor}
             pesoKg={basicos.pesoKg}
             onCambio={(c) => actualizar(i, c)}
             onQuitar={() => quitar(i)}
           />
         ))
+      )}
+
+      {/* Aclaramiento de creatinina (§8.2/§8.4): se pide aquí cuando un fármaco renal
+          lo necesita y no viene de un módulo. Valor único para toda la entrevista. */}
+      {pedirAclaramiento && (
+        <AclaramientoFicha
+          manual={aclaramientoManual}
+          resuelto={aclaramiento.valor}
+          onCambio={onAclaramientoManual}
+        />
       )}
 
       {tarjetas.length > 0 && (
@@ -163,6 +188,7 @@ function FichaFarmaco({
   f,
   intervencion,
   hechos,
+  aclaramientoEfectivo,
   pesoKg,
   onCambio,
   onQuitar,
@@ -170,6 +196,8 @@ function FichaFarmaco({
   f: FarmacoTomadoUi;
   intervencion: DatosIntervencion;
   hechos: DatosClinicos;
+  /** Aclaramiento efectivo (módulo o manual); sustituye a hechos.aclaramiento. */
+  aclaramientoEfectivo: number | null;
   pesoKg: number;
   onCambio: (c: Partial<FarmacoTomadoUi>) => void;
   onQuitar: () => void;
@@ -193,7 +221,7 @@ function FichaFarmaco({
     const tomas = cambios.hbpmTomasDia ?? f.hbpmTomasDia;
     let tipo: FarmacoTomadoUi['tipoHbpm'] = f.tipoHbpm;
     if (dosis && tomas && tablaSeth) {
-      tipo = clasificarHbpm({ dosisPorToma: dosis, tomasDia: tomas, pesoKg, aclaramiento: hechos.aclaramiento }, tablaSeth);
+      tipo = clasificarHbpm({ dosisPorToma: dosis, tomasDia: tomas, pesoKg, aclaramiento: aclaramientoEfectivo }, tablaSeth);
     }
     onCambio({ ...cambios, ...(tipo ? { tipoHbpm: tipo } : {}) });
   }
@@ -210,7 +238,7 @@ function FichaFarmaco({
     setHoraLibre('');
   }
 
-  const resultado = evaluarFicha(f, intervencion, hechos, pesoKg);
+  const resultado = evaluarFicha(f, intervencion, hechos, pesoKg, aclaramientoEfectivo);
 
   return (
     <div className="ficha-farmaco">
@@ -349,7 +377,7 @@ interface ResultadoFicha {
 
 /** Calcula el resultado en vivo de un fármaco. Con fecha usa el despachador; sin
  *  fecha usa el modo margen del QR (garantía §8.16: nunca llama a construirContexto). */
-function evaluarFicha(f: FarmacoTomadoUi, intervencion: DatosIntervencion, hechos: DatosClinicos, pesoKg: number): ResultadoFicha {
+function evaluarFicha(f: FarmacoTomadoUi, intervencion: DatosIntervencion, hechos: DatosClinicos, pesoKg: number, aclaramientoEfectivo: number | null): ResultadoFicha {
   const necesitaHoras = reglaNecesitaHoras(f.idRegla);
   if (necesitaHoras && f.horas.length === 0) {
     return { texto: 'Requiere dato: hora de la toma.', claseAviso: 'aviso-atencion' };
@@ -372,8 +400,8 @@ function evaluarFicha(f: FarmacoTomadoUi, intervencion: DatosIntervencion, hecho
     return { texto: inst[0]?.texto ?? '', claseAviso: 'aviso-info' };
   }
 
-  // Con fecha: despachador del motor, con peso y aclaramiento reales.
-  const ctx = construirContexto(intervencion, pesoKg, hechos.aclaramiento);
+  // Con fecha: despachador del motor, con peso y aclaramiento reales (módulo o manual).
+  const ctx = construirContexto(intervencion, pesoKg, aclaramientoEfectivo);
   const datos: DatosFarmacoUi = {
     idFarmaco: f.idFarmaco,
     nombreComercial: f.nombreComercial,
@@ -439,6 +467,81 @@ function TarjetaCoherencia({ t }: { t: Tarjeta }) {
   return (
     <div className="aviso aviso-info" role="note">
       {t.mensaje}
+    </div>
+  );
+}
+
+/** Ficha para introducir el aclaramiento (§8.2/§8.4) cuando un fármaco renal lo necesita. */
+function AclaramientoFicha({
+  manual,
+  resuelto,
+  onCambio,
+}: {
+  manual: AclaramientoManual | null;
+  resuelto: number | null;
+  onCambio: (a: AclaramientoManual | null) => void;
+}) {
+  const tipo = manual?.tipo ?? '';
+  const valor = manual && (manual.tipo === 'aclaramiento' || manual.tipo === 'creatinina') ? String(manual.valor) : '';
+  const fecha = manual && (manual.tipo === 'aclaramiento' || manual.tipo === 'creatinina') ? manual.fecha ?? '' : '';
+
+  function cambiarTipo(nuevo: string) {
+    if (nuevo === '') onCambio(null);
+    else if (nuevo === 'no_disponible') onCambio({ tipo: 'no_disponible' });
+    else onCambio({ tipo: nuevo as 'aclaramiento' | 'creatinina', valor: 0 });
+  }
+  function cambiarValor(v: string) {
+    if (manual?.tipo !== 'aclaramiento' && manual?.tipo !== 'creatinina') return;
+    onCambio({ ...manual, valor: Number(v) });
+  }
+  function cambiarFecha(d: string) {
+    if (manual?.tipo !== 'aclaramiento' && manual?.tipo !== 'creatinina') return;
+    onCambio({ ...manual, ...(d ? { fecha: d } : {}) });
+  }
+
+  return (
+    <div className="ficha-farmaco" aria-labelledby="aclaramiento-tit">
+      <div className="ficha-cabecera">
+        <strong id="aclaramiento-tit">Función renal (para los anticoagulantes)</strong>
+      </div>
+      <p className="horas-elegidas">
+        Un fármaco que ha añadido se suspende según la función renal. Introduzca el aclaramiento o la
+        creatinina, o marque «No disponible».
+      </p>
+      <div className="campo">
+        <label htmlFor="acl-tipo">Dato disponible</label>
+        <select id="acl-tipo" value={tipo} onChange={(e) => cambiarTipo(e.target.value)}>
+          <option value="">— elija —</option>
+          <option value="aclaramiento">Aclaramiento de creatinina (mL/min)</option>
+          <option value="creatinina">Creatinina sérica (mg/dL)</option>
+          <option value="no_disponible">No disponible</option>
+        </select>
+      </div>
+      {(tipo === 'aclaramiento' || tipo === 'creatinina') && (
+        <>
+          <div className="campo">
+            <label htmlFor="acl-valor">{tipo === 'aclaramiento' ? 'Aclaramiento (mL/min)' : 'Creatinina (mg/dL)'}</label>
+            <input id="acl-valor" type="number" min={0} inputMode="decimal" step="0.01" value={valor} onChange={(e) => cambiarValor(e.target.value)} />
+          </div>
+          <div className="campo">
+            <label htmlFor="acl-fecha">Fecha de la analítica</label>
+            <input id="acl-fecha" type="date" value={fecha} onChange={(e) => cambiarFecha(e.target.value)} />
+          </div>
+          {tipo === 'creatinina' && (
+            <p className="horas-elegidas" aria-live="polite">
+              {resuelto !== null
+                ? `Aclaramiento calculado (Cockcroft-Gault): ${resuelto} mL/min.`
+                : 'Introduzca la creatinina para calcular el aclaramiento.'}
+            </p>
+          )}
+        </>
+      )}
+      {tipo === 'no_disponible' && (
+        <p className="aviso aviso-atencion" role="note">
+          Sin aclaramiento, los anticoagulantes dependientes del riñón quedan «pendientes de confirmar»
+          por el anestesiólogo.
+        </p>
+      )}
     </div>
   );
 }

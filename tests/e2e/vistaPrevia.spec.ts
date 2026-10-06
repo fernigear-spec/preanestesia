@@ -874,6 +874,45 @@ test.describe('Vista previa', () => {
     await expect(page.getByRole('heading', { name: /Nueva entrevista/ })).toBeVisible();
   });
 
+  test('§8.2 aclaramiento en el paso 8: ACOD sin módulo renal pide el aclaramiento; «No disponible» → requiere confirmación', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await pasoAlergiasSinAlergias(page);
+    await page.locator('#edad').fill('64'); // < 65 para no exigir CFS en el paso 5
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('70');
+    await page.locator('#talla').fill('170');
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
+
+    // Paso 8: añadir Eliquis (apixabán, anti-Xa) con una hora de toma.
+    await page.locator('#med').fill('Eliquis');
+    await page.getByRole('button', { name: /Eliquis/ }).first().click();
+    await page.getByRole('button', { name: '09:00', exact: true }).first().click();
+
+    // Aparece la ficha de función renal (no hay módulo renal).
+    await expect(page.getByText('Función renal (para los anticoagulantes)')).toBeVisible();
+
+    // Introducir la creatinina → se calcula el aclaramiento (Cockcroft-Gault).
+    await page.locator('#acl-tipo').selectOption('creatinina');
+    await page.locator('#acl-valor').fill('1');
+    await expect(page.getByText(/Aclaramiento calculado \(Cockcroft-Gault\): 73/)).toBeVisible();
+
+    // Marcar «No disponible» → el ACOD queda pendiente de confirmar (caso A7).
+    await page.locator('#acl-tipo').selectOption('no_disponible');
+    await expect(page.getByText(/quedan «pendientes de confirmar»/)).toBeVisible();
+    await expect(page.getByText(/Consultar con el anestesiólogo/).first()).toBeVisible();
+  });
+
   test('§14.2 modo entrenamiento: carga un caso y muestra la comparación con lo esperado', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Modo entrenamiento' }).click();

@@ -234,12 +234,34 @@ export interface EstadoEntrevista {
    * del anestesiólogo y lo lee la hoja del paciente (aviso de revisión pendiente).
    */
   validaciones: Record<string, EstadoPuntoValidacion>;
+  /**
+   * Aclaramiento de creatinina introducido en el paso 8 (§8.2/§8.4), cuando no se
+   * conoce por un módulo renal/trasplante. Valor ÚNICO para toda la entrevista: si
+   * se cambia aquí, se usa en todas las reglas renales. Si un módulo ya lo aporta,
+   * ese valor manda y este se ignora.
+   */
+  aclaramientoManual: AclaramientoManual | null;
 }
 
 /** Resolución de un punto de validación en la UI (§13 bis). */
 export interface EstadoPuntoValidacion {
   validadoPor?: string;
   posponer?: boolean;
+}
+
+/**
+ * Aclaramiento introducido a mano en el paso 8 (§8.2/§8.4). Puede ser el aclaramiento
+ * directo, la creatinina sérica (el programa calcula Cockcroft-Gault con edad/peso/
+ * sexo) o «no disponible» (las reglas renales requieren confirmación, caso A7).
+ */
+export type AclaramientoManual =
+  | { tipo: 'aclaramiento'; valor: number; fecha?: string }
+  | { tipo: 'creatinina'; valor: number; fecha?: string }
+  | { tipo: 'no_disponible' };
+
+/** ¿La regla de este fármaco depende de la función renal (§8.2/§8.4)? */
+export function reglaDependeAclaramiento(idRegla: string): boolean {
+  return idRegla === 'acod_antixa' || idRegla === 'acod_dabigatran' || idRegla === 'fondaparinux' || idRegla === 'hbpm';
 }
 
 /** Horas más habituales para los botones rápidos del paso 8 (tablet). */
@@ -269,6 +291,7 @@ export const ESTADO_INICIAL: EstadoEntrevista = {
   viaAerea: null,
   consentimiento: null,
   validaciones: {},
+  aclaramientoManual: null,
 };
 
 /** HEMSTOP vacío (todas las respuestas en «no»). */
