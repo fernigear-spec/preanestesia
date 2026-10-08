@@ -10,11 +10,20 @@ import { useState } from 'react';
 import type { TecnicaAnestesica, GrupoOftalmologico } from '../../dominio/tipos.ts';
 import type { Procedimiento } from '../../datos/procedimientos.ts';
 
+/** Subcampos de la técnica para la información de riesgos del paciente (§8.17). */
+export interface SubtecnicaRiesgos {
+  subtipoNeuroaxial?: 'raquidea' | 'epidural' | 'combinada';
+  combinadaConGeneral?: boolean;
+  conSedacion?: boolean;
+}
+
 interface Props {
   inicial: TecnicaAnestesica;
+  /** Subcampos iniciales (al volver al paso para cambiarlos). */
+  inicialSub?: SubtecnicaRiesgos | undefined;
   procedimiento: Procedimiento | null;
-  /** Devuelve la técnica y, en la catarata, el grupo oftalmológico derivado. */
-  onContinuar: (tecnica: TecnicaAnestesica, grupoOftalmologico?: GrupoOftalmologico) => void;
+  /** Devuelve la técnica, (en catarata) el grupo oftalmológico y los subcampos de §8.17. */
+  onContinuar: (tecnica: TecnicaAnestesica, grupoOftalmologico: GrupoOftalmologico | undefined, sub: SubtecnicaRiesgos) => void;
   onVolver: () => void;
 }
 
@@ -42,18 +51,30 @@ export function grupoCatarataPorTecnica(tecnica: TecnicaAnestesica | null): Grup
   return 'riesgo_moderado_alto'; // sin técnica elegida: se trata como moderado-alto
 }
 
-export function PasoTecnica({ inicial, procedimiento, onContinuar, onVolver }: Props) {
+export function PasoTecnica({ inicial, inicialSub, procedimiento, onContinuar, onVolver }: Props) {
   const esOftalmo = procedimiento?.especialidad === 'oftalmologia';
   const esCatarata = /catarata/i.test(procedimiento?.id ?? '') || /catarata/i.test(procedimiento?.nombre ?? '');
   const opciones = esOftalmo ? TECNICAS_OFTALMO : TECNICAS_GENERAL;
   // Valor inicial válido para el tipo de procedimiento.
   const inicialValido = opciones.some((o) => o.valor === inicial) ? inicial : null;
   const [tecnica, setTecnica] = useState<TecnicaAnestesica | null>(inicialValido);
+  // Subcampos de §8.17 (solo deciden qué información de riesgos ve el paciente).
+  const [subtipoNeuroaxial, setSubtipoNeuroaxial] = useState<'raquidea' | 'epidural' | 'combinada' | ''>(inicialSub?.subtipoNeuroaxial ?? '');
+  const [combinadaConGeneral, setCombinadaConGeneral] = useState<boolean>(inicialSub?.combinadaConGeneral ?? false);
+  const [conSedacion, setConSedacion] = useState<boolean>(inicialSub?.conSedacion ?? false);
+
+  const esNeuroaxial = tecnica === 'neuroaxial';
+  const esBloqueo = tecnica === 'bloqueo_periferico' || tecnica === 'bloqueo_profundo';
 
   function continuar() {
     const t = tecnica ?? 'no_se_sabe';
-    if (esCatarata) onContinuar(t, grupoCatarataPorTecnica(tecnica));
-    else onContinuar(t);
+    // Los subcampos solo se guardan cuando aplican a la técnica elegida.
+    const sub: SubtecnicaRiesgos = {
+      ...(esNeuroaxial && subtipoNeuroaxial ? { subtipoNeuroaxial } : {}),
+      ...((esNeuroaxial || esBloqueo) && combinadaConGeneral ? { combinadaConGeneral: true } : {}),
+      ...((esNeuroaxial || esBloqueo) && conSedacion ? { conSedacion: true } : {}),
+    };
+    onContinuar(t, esCatarata ? grupoCatarataPorTecnica(tecnica) : undefined, sub);
   }
 
   return (
@@ -72,6 +93,43 @@ export function PasoTecnica({ inicial, procedimiento, onContinuar, onVolver }: P
           ))}
         </div>
       </fieldset>
+
+      {/* Subcampos de §8.17: solo deciden qué información de riesgos ve el paciente;
+          NO cambian ninguna regla ni plazo (para las reglas sigue siendo neuroaxial). */}
+      {esNeuroaxial && (
+        <fieldset className="campo">
+          <legend>Tipo de técnica neuroaxial (para la información al paciente)</legend>
+          <div className="grupo-radios">
+            {([
+              { valor: 'raquidea', etiqueta: 'Raquídea (intradural)' },
+              { valor: 'epidural', etiqueta: 'Epidural' },
+              { valor: 'combinada', etiqueta: 'Combinada raquídea-epidural' },
+            ] as const).map((o) => (
+              <label key={o.valor} className={`radio-tarjeta ${subtipoNeuroaxial === o.valor ? 'seleccionado' : ''}`}>
+                <input type="radio" name="subneuroaxial" checked={subtipoNeuroaxial === o.valor} onChange={() => setSubtipoNeuroaxial(o.valor)} />
+                {o.etiqueta}
+              </label>
+            ))}
+          </div>
+          <p className="horas-elegidas">Si no se especifica, el paciente verá la información de la raquídea y una nota sobre la epidural.</p>
+        </fieldset>
+      )}
+
+      {(esNeuroaxial || esBloqueo) && (
+        <fieldset className="campo">
+          <legend>Se combina con (para la información al paciente)</legend>
+          <div className="grupo-checks">
+            <label className={`radio-tarjeta ${combinadaConGeneral ? 'seleccionado' : ''}`}>
+              <input type="checkbox" checked={combinadaConGeneral} onChange={() => setCombinadaConGeneral((v) => !v)} />
+              Combinada con anestesia general
+            </label>
+            <label className={`radio-tarjeta ${conSedacion ? 'seleccionado' : ''}`}>
+              <input type="checkbox" checked={conSedacion} onChange={() => setConSedacion((v) => !v)} />
+              Con sedación
+            </label>
+          </div>
+        </fieldset>
+      )}
 
       {esCatarata && tecnica === null && (
         <p className="aviso aviso-atencion" role="note">

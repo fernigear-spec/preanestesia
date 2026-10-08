@@ -84,7 +84,7 @@ export function VistaPaciente({ cadena }: Props) {
 
         <h1>{t.titulo}</h1>
 
-        <CuerpoHoja instrucciones={instrucciones} ay={estado.contenido.ay} ex={estado.contenido.ex} fecha={fechaEfectiva ? fechaEfectiva.getTime() : null} t={t} />
+        <CuerpoHoja instrucciones={instrucciones} ay={estado.contenido.ay} ex={estado.contenido.ex} fecha={fechaEfectiva ? fechaEfectiva.getTime() : null} t={t} idioma={idioma} interactivo />
 
         <p className="aviso aviso-info">{t.aviso_cambio_fecha}</p>
 

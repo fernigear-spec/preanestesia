@@ -5,6 +5,8 @@
  */
 import { describe, it, expect } from '../_harness.ts';
 import { serializar, deserializar, cabeEnQr, type Payload } from '../../src/dominio/salidas/qr/serializar.ts';
+import { construirContenidoQrPaciente, payloadPaciente } from '../../src/dominio/salidas/qr/construirContenido.ts';
+import type { ExtrasHojaQr } from '../../src/dominio/salidas/qr/hojaPaciente.ts';
 
 const IV = new Date(2026, 9, 15, 8, 0);
 const X = IV.getTime() + 60 * 86_400_000;
@@ -84,5 +86,33 @@ describe('QR de máxima complejidad (§11.3)', () => {
     const r = await deserializar(s, IV, '0.1.0');
     expect(r.estado).toBe('ok');
     expect(cabeEnQr(s)).toBeTrue();
+  });
+
+  it('§8.17: la info de riesgos solo añade las CLAVES al QR, no el texto (crece pocos bytes)', async () => {
+    // Extras base (sin riesgos) y con el peor caso de claves de secciones (§8.17).
+    const extrasBase: ExtrasHojaQr = {
+      cpap: false, inhaladores: false, delirium: false, tabaco: false, alcohol: false, anexos: [],
+    };
+    const extrasConRiesgos: ExtrasHojaQr = {
+      ...extrasBase,
+      // Peor caso: todas las secciones y las frases sueltas a la vez.
+      riesgos: ['general', 'raquidea', 'epidural_combinada', 'bloqueo', 'bloqueo_hombro_brazo', 'sedacion', 'nino', 'epidural_no_especificada', 'bloqueo_ojo', 'local_sola'],
+    };
+    const hacer = (ex: ExtrasHojaQr) => payloadPaciente(
+      construirContenidoQrPaciente([], '000000000', IV, undefined, ex), '0.1.0', IV, X,
+    );
+    const sinR = await serializar(hacer(extrasBase));
+    const conR = await serializar(hacer(extrasConRiesgos));
+    const delta = conR.length - sinR.length;
+    console.log(`[QR paciente §8.17] sin riesgos ${sinR.length} b · con riesgos ${conR.length} b · +${delta} b`);
+    // Cabe de sobra y el texto NO viaja (solo las claves): el aumento es pequeño.
+    expect(cabeEnQr(conR)).toBeTrue();
+    expect(delta).toBeLessThan(200);
+    // El texto literal de las secciones NO debe aparecer en el QR.
+    expect(conR.includes('anestesia general')).toBeFalse();
+    expect(conR.includes('Náuseas')).toBeFalse();
+    // Round-trip correcto.
+    const r = await deserializar(conR, IV, '0.1.0');
+    expect(r.estado).toBe('ok');
   });
 });

@@ -1,0 +1,178 @@
+{
+  "idioma": "ca",
+  "pendiente_revision": true,
+  "anexo_titulo": "Informació sobre la seva anestèsia",
+  "primera_pagina": "Al final d'aquest full trobarà informació sobre la seva anestèsia i els seus riscos.",
+  "frases": {
+    "epidural_no_especificada": "Si finalment s'utilitza una anestèsia epidural, l'anestesiòleg li n'explicarà les diferències.",
+    "bloqueo_ojo": "L'anestesiòleg li explicarà els riscos propis del bloqueig de l'ull.",
+    "local_sola": "La seva operació es farà amb anestèsia local, que posa el mateix cirurgià. Els seus riscos són mínims.",
+    "bloqueo_hombro_brazo": "En els bloquejos de l'espatlla i del braç que es posen al coll o al costat de la clavícula és molt freqüent notar, mentre dura l'efecte, ronquera, la parpella caiguda d'aquell costat o la sensació de no poder respirar fondo. Desapareixen sols en passar l'efecte. Menys d'1 de cada 1.000 vegades entra aire entre el pulmó i la paret del tòrax (pneumotòrax), que pot necessitar tractament."
+  },
+  "intro": {
+    "titulo": "Abans de llegir",
+    "parrafos": [
+      "L'anestèsia actual és molt segura. Gairebé tot el que apareix en aquestes pàgines és lleu i desapareix en hores o dies, i les complicacions greus són molt poc freqüents.",
+      "Les xifres són mitjanes d'estudis en adults sans operats de manera programada. El seu risc personal pot ser més gran o més petit segons la seva salut i el tipus d'operació, i l'anestesiòleg li explicarà els que més l'afecten a vostè. Aquest full completa la informació del consentiment informat i de la consulta amb l'anestesiòleg, però no els substitueix.",
+      "Per indicar amb quina freqüència passa cada cosa fem servir aquestes paraules."
+    ],
+    "tabla": {
+      "cabeceras": ["Paraula", "Quantes persones", "Per fer-se'n una idea"],
+      "filas": [
+        ["Molt freqüent", "Més d'1 de cada 10", "Una persona de la seva família"],
+        ["Freqüent", "Entre 1 de cada 10 i 1 de cada 100", "Una persona del seu carrer"],
+        ["Poc freqüent", "Entre 1 de cada 100 i 1 de cada 1.000", "Una persona d'un poble"],
+        ["Rara", "Entre 1 de cada 1.000 i 1 de cada 10.000", "Una persona d'una ciutat petita"],
+        ["Molt rara", "Menys d'1 de cada 10.000", "Una persona d'una ciutat gran"]
+      ]
+    }
+  },
+  "secciones": {
+    "general": {
+      "titulo": "Anestèsia general",
+      "parrafos": [
+        "Amb l'anestèsia general vostè està adormit i no sent res durant l'operació. Els medicaments se li donen per la vena i de vegades també com a gas. Mentre dorm, li col·loquem un tub o una mascareta a la gola per ajudar-lo a respirar."
+      ],
+      "tabla": {
+        "cabeceras": ["Freqüència", "Què pot passar", "Xifra i comentari"],
+        "filas": [
+          ["Molt freqüent", "Nàusees o vòmits", "Fins a 1 de cada 3 persones. Es tracten amb medicaments."],
+          ["Molt freqüent", "Mal de coll", "Fins a 4 de cada 10. Millora en un o dos dies."],
+          ["Molt freqüent", "Tremolors, set, mareig o dolor a la punxada del sèrum", "Passen en poques hores."],
+          ["Freqüent", "Petites ferides als llavis o a la llengua", "1 de cada 20. Es curen soles."],
+          ["Freqüent", "Confusió o despiste durant uns dies, sobretot en persones grans", "Sol desaparèixer en dies."],
+          ["Poc freqüent", "Infecció respiratòria o dificultat per orinar després de l'operació", "Més probable si fuma o té una malaltia del pulmó."],
+          ["Rara", "Esgarrapada a l'ull (còrnia)", "1 de cada 2.800. Molesta uns dies."],
+          ["Rara", "Dany en una dent que necessita tractament", "1 de cada 4.500. Més probable amb dents fluixes, fundes o ponts."],
+          ["Molt rara", "Reacció al·lèrgica greu (anafilaxi)", "1 de cada 10.000. Es tracta immediatament al quiròfan."],
+          ["Molt rara", "Despertar durant l'anestèsia", "1 de cada 20.000."],
+          ["Molt rara", "Pèrdua de visió", "Al voltant d'1 de cada 100.000."],
+          ["Molt rara", "Mort a causa de l'anestèsia", "Al voltant d'1 de cada 100.000 en persones sanes."]
+        ]
+      },
+      "cierre": [
+        "Durant les 24 hores següents a una anestèsia general no condueixi, no faci servir màquines perilloses i no signi documents importants."
+      ]
+    },
+    "raquidea": {
+      "titulo": "Anestèsia raquídia (intradural)",
+      "parrafos": [
+        "És una única punxada a la part baixa de l'esquena que adorm la meitat inferior del cos durant dues a quatre hores. Vostè resta despert o, si ho prefereix, amb una mica de sedació. S'utilitza en operacions de maluc, genoll, pròstata, bufeta o cesària, entre d'altres."
+      ],
+      "tabla": {
+        "cabeceras": ["Freqüència", "Què pot passar", "Xifra i comentari"],
+        "filas": [
+          ["Molt freqüent", "Baixada de tensió, que pot donar mareig o nàusees", "Es corregeix de seguida amb sèrum i medicaments."],
+          ["Molt freqüent", "Tremolors", "Passen quan se'n va l'efecte de l'anestèsia."],
+          ["Freqüent", "Picor, si s'afegeix un analgèsic de la família de la morfina", "Dura unes hores i té tractament."],
+          ["Freqüent", "Dificultat per orinar", "De vegades cal una sonda durant unes hores."],
+          ["Freqüent", "L'anestèsia no és suficient i cal repetir-la o passar a anestèsia general", "Unes poques persones de cada 100."],
+          ["Poc freqüent", "Mal de cap intens que empitjora en estar dret", "Entre 1 de cada 100 i 1 de cada 200. Apareix la primera setmana. Sol millorar amb repòs i analgèsics i, si no, té un tractament específic."],
+          ["Rara", "Formigueig, debilitat o una zona adormida en una cama durant dies o setmanes", "1 de cada 2.000. Es recupera sola."],
+          ["Rara", "Pèrdua de consciència o aturada cardíaca", "Entre 1 de cada 3.000 i 1 de cada 20.000. L'anestesiòleg és al seu costat i la tracta immediatament."],
+          ["Molt rara", "Lesió d'un nervi que no es recupera", "1 de cada 20.000."],
+          ["Molt rara", "Meningitis", "1 de cada 50.000. Es tracta amb antibiòtics."],
+          ["Molt rara", "Infecció al voltant de la columna", "1 de cada 100.000."],
+          ["Molt rara", "Hematoma al voltant de la medul·la", "Entre 1 de cada 100.000 i 1 de cada 200.000. Pot necessitar una operació urgent."],
+          ["Molt rara", "Paràlisi", "1 de cada 250.000."]
+        ]
+      },
+      "cierre": [
+        "Si en els dies següents nota febre amb mal d'esquena, o pèrdua de força o sensibilitat a les cames, acudeixi a urgències i digui que li han posat una anestèsia raquídia."
+      ]
+    },
+    "epidural_combinada": {
+      "titulo": "Anestèsia epidural i combinada",
+      "parrafos": [
+        "L'epidural també es posa amb una punxada a l'esquena, però deixa col·locat un tub molt fi (catèter) pel qual s'administra el medicament durant hores o dies. Triga més que la raquídia a fer efecte, i la seva intensitat es pot ajustar. S'utilitza sobretot en el part i per controlar el dolor després d'operacions grans de tòrax o abdomen.",
+        "L'anestèsia combinada ajunta les dues tècniques en la mateixa punxada: la raquídia per a l'operació i l'epidural per al dolor de després. Els seus riscos són els de totes dues."
+      ],
+      "tabla": {
+        "cabeceras": ["Freqüència", "Què pot passar", "Xifra i comentari"],
+        "filas": [
+          ["Molt freqüent", "Baixada de tensió, picor, tremolors o dificultat per orinar", "Es tracten durant l'ingrés."],
+          ["Freqüent", "L'alleujament no és suficient i cal ajustar l'epidural o tornar-la a posar", "1 de cada 8."],
+          ["Freqüent", "Molèstia a l'esquena on es va posar", "Dura uns dies."],
+          ["Poc freqüent", "Mal de cap intens que empitjora en estar dret", "1 de cada 100."],
+          ["Rara", "Formigueig, debilitat o una zona adormida que es recupera", "1 de cada 1.000."],
+          ["Rara", "L'anestèsia s'estén massa i costa respirar", "1 de cada 2.000. Es tracta immediatament."],
+          ["Molt rara", "Lesió d'un nervi que dura més de sis mesos", "1 de cada 13.000."],
+          ["Molt rara", "Abscés (infecció) a la columna", "1 de cada 50.000."],
+          ["Molt rara", "Meningitis", "1 de cada 100.000."],
+          ["Molt rara", "Pèrdua de consciència accidental", "1 de cada 100.000."],
+          ["Molt rara", "Hematoma al voltant de la medul·la", "1 de cada 170.000."],
+          ["Molt rara", "Lesió greu, inclosa la paràlisi", "1 de cada 250.000."]
+        ]
+      },
+      "cierre": [
+        "Aquestes xifres provenen d'epidurals de part, que són les més ben estudiades. En les epidurals per a cirurgia major el risc de lesió permanent és una mica més gran, entre 1 de cada 6.000 i 1 de cada 12.000, en part perquè són pacients de més edat i amb més malalties.",
+        "Mentre porti el catèter, avisi de seguida si nota debilitat a les cames que augmenta, dolor fort d'esquena o febre. Després de l'alta, si apareix qualsevol d'aquestes tres coses, acudeixi a urgències."
+      ]
+    },
+    "bloqueo": {
+      "titulo": "Bloqueig de nervis (anestèsia locoregional)",
+      "parrafos": [
+        "S'injecta anestèsia local al costat dels nervis d'un braç, una cama o una zona del tronc, guiant l'agulla amb un ecògraf. Serveix per operar sense anestèsia general o, juntament amb ella, perquè tingui menys dolor en les primeres hores. La zona pot quedar adormida i sense força entre 6 i 24 hores. Fins que recuperi la sensibilitat, protegeixi-la de cops, de la calor i del fred, i no hi carregui pes."
+      ],
+      "tabla": {
+        "cabeceras": ["Freqüència", "Què pot passar", "Xifra i comentari"],
+        "filas": [
+          ["Freqüent", "Blau o molèstia on es va punxar", "Passa en uns dies."],
+          ["Freqüent", "El bloqueig no és suficient i cal afegir anestèsia o passar a anestèsia general", "Es decideix en el moment."],
+          ["Freqüent", "Formigueig o una zona adormida que dura més de dos dies", "Menys d'1 de cada 10. Gairebé sempre es recupera en setmanes o pocs mesos."],
+          ["Rara", "Lesió d'un nervi que no es recupera", "Entre 1 de cada 2.000 i 1 de cada 5.000."],
+          ["Rara", "Reacció a l'anestèsic local que arriba a la sang: mareig, gust metàl·lic, convulsions o alteracions del ritme del cor", "Es vigila durant i després del bloqueig i té tractament."]
+        ]
+      },
+      "cierre": [
+        "En els bloquejos del tronc (paret del tòrax o de l'abdomen) hi ha un risc molt rar de punxar un òrgan intern."
+      ]
+    },
+    "sedacion": {
+      "titulo": "Sedació",
+      "parrafos": [
+        "Amb la sedació rep per la vena medicaments que el relaxen i li donen son, sense arribar a l'anestèsia general. Es combina amb anestèsia local o amb un bloqueig, per exemple en endoscòpies, cataractes o cirurgia menor. Pot estar adormit a estones i no recordar la intervenció, o estar despert i tranquil. Respira per si mateix, encara que el vigilem tot el temps i li donem oxigen.",
+        "Per a la sedació no hi ha xifres tan precises com per a les altres tècniques, perquè la seva profunditat varia molt d'un cas a un altre."
+      ],
+      "tabla": {
+        "cabeceras": ["Freqüència", "Què pot passar", "Comentari"],
+        "filas": [
+          ["Molt freqüent", "Somnolència i oblit del que ha passat durant unes hores", "És un efecte buscat."],
+          ["Freqüent", "Respiració més lenta o superficial", "Es corregeix amb oxigen o demanant-li que respiri fondo."],
+          ["Freqüent", "Baixada de tensió o nàusees", "Tenen tractament."],
+          ["Poc freqüent", "La sedació no és suficient i cal passar a anestèsia general", "Es decideix en el moment."],
+          ["Rara", "Pas del contingut de l'estómac als pulmons (aspiració)", "Per això el dejuni és el mateix que per a una anestèsia general."],
+          ["Molt rara", "Reacció al·lèrgica greu", "Es tracta immediatament."]
+        ]
+      },
+      "cierre": [
+        "Després d'una sedació vagi-se'n a casa acompanyat i, durant 24 hores, no condueixi ni signi documents importants."
+      ]
+    },
+    "nino": {
+      "titulo": "Si el pacient és un nen",
+      "parrafos": [
+        "En nens sans l'anestèsia general és tan segura com en els adults, amb algunes diferències. Les xifres d'aquesta taula substitueixen les de l'anestèsia general d'adults."
+      ],
+      "tabla": {
+        "cabeceras": ["Freqüència", "Què pot passar", "Xifra i comentari"],
+        "filas": [
+          ["Molt freqüent", "Mal de coll", "Millora en un o dos dies."],
+          ["Molt freqüent", "Agitació o plor en despertar", "Passa en minuts."],
+          ["Freqüent", "Nàusees o vòmits, petites ferides als llavis o a la llengua", "Tenen tractament o es curen soles."],
+          ["Poc freqüent", "Problemes per respirar durant l'anestèsia (tos, tancament de la laringe)", "Més probables si el nen ha tingut un refredat les últimes setmanes."],
+          ["Rara", "Ingrés no previst a cures intensives", "1 de cada 2.400. Més probable en menors d'un any."],
+          ["Molt rara", "Reacció al·lèrgica greu", "1 de cada 40.000."],
+          ["Molt rara", "Despertar durant l'anestèsia", "1 de cada 60.000."],
+          ["Molt rara", "Mort a causa de l'anestèsia", "Entre 1 de cada 100.000 i 1 de cada 1.000.000."]
+        ]
+      },
+      "cierre": [
+        "Si en els dies abans de l'operació el seu fill té febre, tos o mocs, truqui al telèfon d'aquest full abans de venir."
+      ]
+    }
+  },
+  "cierre": [
+    "Si té dubtes sobre la seva anestèsia o sobre aquests riscos, pregunti'ls a la consulta o el dia de la intervenció. L'anestesiòleg estarà amb vostè durant tota l'operació."
+  ]
+}

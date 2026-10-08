@@ -75,6 +75,7 @@ export function PasoIntervencion({ onContinuar, onVolver }: Props) {
       espacioCerrado: false,
       retina: false,
       obstetrico: false,
+      bloqueoMiembroSuperior: false,
       ...(otroZona !== '' ? { zonaDispositivo: otroZona } : {}),
     };
     const datos: DatosIntervencion = {

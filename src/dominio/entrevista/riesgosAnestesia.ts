@@ -25,7 +25,8 @@ export type ClaveRiesgo =
   | 'nino'
   | 'local_sola'
   | 'epidural_no_especificada'
-  | 'bloqueo_ojo';
+  | 'bloqueo_ojo'
+  | 'bloqueo_hombro_brazo';
 
 export interface EntradaRiesgos {
   tecnica: DatosIntervencion['tecnica'];
@@ -36,6 +37,8 @@ export interface EntradaRiesgos {
   grupoOftalmologico: DatosIntervencion['grupoOftalmologico'];
   /** El procedimiento es oftalmológico (especialidad). */
   oftalmologico: boolean;
+  /** El procedimiento es de hombro o brazo (añade el párrafo de bloqueo de miembro superior). */
+  bloqueoMiembroSuperior?: boolean;
   edadAnios: number;
   /** Edad a partir de la cual se usa la sección de adulto en vez de la de niño (§config). */
   edadPediatricaMaxima: number;
@@ -94,6 +97,8 @@ export function seccionesRiesgoAnestesia(e: EntradaRiesgos): ClaveRiesgo[] {
   if (esBloqueo) {
     // El bloqueo profundo usa la misma sección que el bloqueo periférico.
     anadir('bloqueo');
+    // El párrafo de hombro/brazo solo aparece si el procedimiento es de esa zona.
+    if (e.bloqueoMiembroSuperior) anadir('bloqueo_hombro_brazo');
   }
 
   // Combinaciones (solo para neuroaxial y bloqueo): «con general» y «con sedación».
@@ -101,4 +106,41 @@ export function seccionesRiesgoAnestesia(e: EntradaRiesgos): ClaveRiesgo[] {
   if ((esNeuroaxial || esBloqueo) && e.conSedacion) anadir('sedacion');
 
   return claves;
+}
+
+/**
+ * Texto legible de la técnica prevista para el resumen del anestesiólogo (§8.17),
+ * incluyendo los subcampos (subtipo neuroaxial, «con general», «con sedación»).
+ */
+export function textoTecnicaPrevista(e: {
+  tecnica: DatosIntervencion['tecnica'];
+  subtipoNeuroaxial?: DatosIntervencion['subtipoNeuroaxial'];
+  combinadaConGeneral?: boolean;
+  conSedacion?: boolean;
+}): string {
+  const BASE: Record<DatosIntervencion['tecnica'], string> = {
+    general: 'Anestesia general',
+    sedacion: 'Sedación',
+    neuroaxial: 'Neuroaxial',
+    bloqueo_periferico: 'Bloqueo periférico',
+    bloqueo_profundo: 'Bloqueo profundo',
+    local: 'Anestesia local',
+    topica: 'Tópica',
+    retrobulbar_peribulbar: 'Retrobulbar o peribulbar',
+    no_se_sabe: 'Sin decidir',
+  };
+  let txt = BASE[e.tecnica];
+  if (e.tecnica === 'neuroaxial') {
+    const SUB: Record<NonNullable<DatosIntervencion['subtipoNeuroaxial']>, string> = {
+      raquidea: 'raquídea',
+      epidural: 'epidural',
+      combinada: 'combinada raquídea-epidural',
+    };
+    if (e.subtipoNeuroaxial) txt += ` (${SUB[e.subtipoNeuroaxial]})`;
+  }
+  const extras: string[] = [];
+  if (e.combinadaConGeneral) extras.push('combinada con anestesia general');
+  if (e.conSedacion) extras.push('con sedación');
+  if (extras.length > 0) txt += `, ${extras.join(' y ')}`;
+  return txt;
 }

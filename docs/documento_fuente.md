@@ -565,6 +565,26 @@ e) Si al recalcular algún plazo ya no se puede cumplir, la vista del paciente n
 f) Sin fecha, el QR del paciente caduca a los 90 días de su creación (configurable en config.json); con fecha, a los 30 días después de la intervención, como hasta ahora. Si el paciente introduce una fecha nueva, la caducidad se calcula sobre ella.
 g) El texto del paciente siempre incluye: 'Si le cambian la fecha o la hora de la intervención, abra de nuevo este código e introduzca la nueva fecha'.
 
+### 8.17 Información sobre su anestesia (riesgos para el paciente)
+
+La hoja del paciente incluye un anexo, «Información sobre su anestesia», con los riesgos de la técnica anestésica prevista, en lenguaje llano y con una escala de frecuencias (muy frecuente a muy rara). El **texto literal** (castellano) es la fuente única `docs/riesgos_anestesia_es.md`; se copia sin cambiar cifras ni palabras a `datos/textos/es/riesgos_anestesia.json`, y una prueba comprueba la coincidencia palabra por palabra. El catalán (`datos/textos/ca/riesgos_anestesia.json`) está marcado como pendiente de revisión del servicio.
+
+**Qué secciones ve cada paciente (según la técnica del paso 7):**
+- Anestesia general → sección «anestesia general» (o la de «niño» si el paciente es pediátrico, que la sustituye).
+- Neuroaxial: si se indica raquídea → sección de la raquídea; si se indica epidural o combinada → sección de epidural y combinada; si no se especifica → la raquídea más la frase «Si finalmente se usa una anestesia epidural, el anestesiólogo le explicará sus diferencias».
+- Bloqueo periférico o profundo → sección «bloqueo de nervios» (ambos la misma). Si el procedimiento es de hombro o brazo (columna `bloqueo_miembro_superior` de `procedimientos.csv`), se añade el párrafo propio de esos bloqueos.
+- Sedación → sección «sedación».
+- En neuroaxial y en bloqueo, dos casillas opcionales del paso 7 añaden información: «combinada con anestesia general» añade la sección general (o la de niño), y «con sedación» añade la de sedación.
+- Oftalmología: tópica → sección de sedación; retrobulbar o peribulbar → sedación más la frase «El anestesiólogo le explicará los riesgos propios del bloqueo del ojo».
+- Anestesia local sin sedación → ninguna sección, solo la frase «Su operación se hará con anestesia local, que pone el propio cirujano. Sus riesgos son mínimos».
+- Siempre que se muestre algo, se abren con la introducción (tabla de frecuencias) y se cierran con el párrafo de cierre.
+
+**Importante:** estos subcampos del paso 7 (subtipo neuroaxial, «combinada con general», «con sedación») SOLO deciden qué información de riesgos ve el paciente. **No cambian ninguna regla de medicación ni ningún plazo**: para el motor, una técnica neuroaxial sigue siendo «neuroaxial». La batería de casos de referencia da los mismos resultados que antes.
+
+**Presentación:** en la hoja de la consulta y en el PDF, el anexo va en una página nueva y en la primera página aparece la línea «Al final de esta hoja encontrará información sobre su anestesia y sus riesgos». En la vista del paciente por QR, el anexo se muestra en una sección plegable cerrada por defecto. El QR solo transporta las **claves** de las secciones a mostrar (no el texto), por lo que crece muy poco; el texto lo pinta la vista del paciente desde el JSON. El resumen del anestesiólogo muestra la técnica prevista con sus subcampos.
+
+**Fuentes del texto (no para el paciente):** Royal College of Anaesthetists (Common events and risks in anaesthesia, 2019; Your airway and breathing during anaesthesia, 2020; Spinal anaesthetics: risks and side effects, 2025; Nerve damage after a spinal or epidural anaesthetic; Nerve damage associated with peripheral nerve block; Common events and risks for children and young people having a general anaesthetic, 2022); tarjeta informativa de la epidural de parto de la Obstetric Anaesthetists' Association; Cook TM et al., NAP3, Br J Anaesth 2009;102:179-90.
+
 ## 9. Cribado de riesgo mitocondrial mtND4 (consenso SEDAR 2026)
 
 Pregunta obligatoria en todos los pacientes. **Pregunta puerta (2026-10-04):** el paso empieza con una sola pregunta, «¿Es posible que su ascendencia materna sea de origen venezolano?». Si la respuesta es **no**, se pasa directamente al paso siguiente, sin alerta y sin línea en la hoja del paciente. Si es **sí**, se muestran el guion y el resto de campos. Guion para la enfermera: «Hacemos esta pregunta a todos los pacientes porque se ha descrito una variante genética heredada por vía materna, más frecuente en familias de origen venezolano, que puede influir en cómo se elige la anestesia».

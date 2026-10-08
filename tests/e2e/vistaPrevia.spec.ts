@@ -951,6 +951,50 @@ test.describe('Vista previa', () => {
     await expect(alertas.getByText(/Aclaramiento de una analítica de hace más de 3 meses/)).toBeVisible();
   });
 
+  test('§8.17 riesgos de la anestesia: raquídea con sedación muestra el anexo del paciente con esas secciones y la línea de la primera página', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('Artroplastia total de rodilla');
+    await page.getByRole('button', { name: /Artroplastia total de rodilla/i }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await pasoAlergiasSinAlergias(page);
+    await page.locator('#edad').fill('50');
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('80');
+    await page.locator('#talla').fill('175');
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+
+    // Paso 7: técnica neuroaxial → subtipo raquídea + «con sedación».
+    await page.getByRole('radio', { name: /Neuroaxial/ }).check();
+    await page.getByRole('radio', { name: 'Raquídea (intradural)' }).check();
+    await page.getByRole('checkbox', { name: 'Con sedación' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 -> 8
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 medicación -> 9
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 vía aérea -> 10
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento -> 11
+    await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
+
+    // El resumen del anestesiólogo muestra la técnica prevista con sus subcampos.
+    await expect(page.getByText(/Técnica prevista:\s*Neuroaxial \(raquídea\), con sedación/)).toBeVisible();
+
+    // Generar la hoja del paciente: anexo de riesgos con raquídea y sedación.
+    await page.getByRole('button', { name: /Generar hoja y QR del paciente/ }).click();
+    const anexo = page.locator('section.anexo.riesgos-anestesia');
+    await expect(anexo.getByRole('heading', { name: 'Información sobre su anestesia' })).toBeVisible();
+    await expect(anexo.getByRole('heading', { name: 'Anestesia raquídea (intradural)' })).toBeVisible();
+    await expect(anexo.getByRole('heading', { name: 'Sedación' })).toBeVisible();
+    // No debe aparecer la sección de anestesia general (no se eligió).
+    await expect(anexo.getByRole('heading', { name: 'Anestesia general' })).toHaveCount(0);
+    // Línea en la primera página que remite al anexo.
+    await expect(page.getByText(/Al final de esta hoja encontrará información sobre su anestesia/)).toBeVisible();
+  });
+
   test('§8 dosis y frecuencia en el paso 8: el plan del resumen muestra «Adiro 100 mg cada 24 h» y avisa del descuadre con las horas', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Presencial' }).click();

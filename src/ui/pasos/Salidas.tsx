@@ -13,6 +13,7 @@ import { MODULO_POR_ID, MODULOS } from '../../datos/modulosDatos.ts';
 import type { RespuestasModulos } from '../../datos/modulos.ts';
 import { derivarHechosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
 import { resolverAclaramiento, aclaramientoDeMasDe3Meses } from '../../dominio/entrevista/aclaramiento.ts';
+import { textoTecnicaPrevista } from '../../dominio/entrevista/riesgosAnestesia.ts';
 import { emitirEfectosModulos } from '../../dominio/entrevista/efectosModulos.ts';
 import { derivarPuntosValidacion } from '../../dominio/entrevista/puntosValidacion.ts';
 import { VALIDACIONES } from '../../datos/validacionesDatos.ts';
@@ -397,7 +398,14 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
       puntosValidacion.push({ id: p.id, tipo: 'validar', motivo: p.motivo, origen: 'dispositivo_cardiaco', ...(p.fuente ? { fuente: p.fuente } : {}) });
     }
 
-    return { asa, escalas, alertas, notas, plan, pruebas: rp.pruebas, claseRiesgo: rp.clase, ayuno, sap, puntosValidacion };
+    const tecnicaPrevista = textoTecnicaPrevista({
+      tecnica: intervencion.tecnica,
+      ...(intervencion.subtipoNeuroaxial ? { subtipoNeuroaxial: intervencion.subtipoNeuroaxial } : {}),
+      ...(intervencion.combinadaConGeneral ? { combinadaConGeneral: true } : {}),
+      ...(intervencion.conSedacion ? { conSedacion: true } : {}),
+    });
+
+    return { asa, escalas, alertas, notas, plan, pruebas: rp.pruebas, claseRiesgo: rp.clase, ayuno, sap, puntosValidacion, tecnicaPrevista };
   }, [intervencion, basicos, cribado, medicacion, habitos, viaAerea, consentimiento, antecedentes, mtnd4, alergias, modalidad, soloAscii, asaManual, fechaReferencia]);
 
   if (!salida) return null;
@@ -409,6 +417,8 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
   return (
     <>
       <h3>Resumen del anestesiólogo</h3>
+
+      <p className="tecnica-prevista"><strong>Técnica prevista:</strong> {salida.tecnicaPrevista}</p>
 
       {/* Puntos de validación clínica (§13 bis): al principio del resumen. No bloquean
           nada; cada uno se resuelve con «Validado por [nombre]» o «Posponer o derivar». */}

@@ -40,6 +40,8 @@ export interface Procedimiento {
   retina: boolean;
   /** Procedimiento del embarazo (cesárea, cerclaje, legrado obstétrico…). */
   obstetrico: boolean;
+  /** El bloqueo locorregional es de hombro o brazo (añade el párrafo propio en §8.17). */
+  bloqueoMiembroSuperior: boolean;
   /** Zona respecto a un dispositivo cardiaco implantable (§5.1 bis). */
   zonaDispositivo?: ZonaDispositivo;
 }
@@ -65,6 +67,7 @@ export function cargarProcedimientos(csvTexto: string = csvProcedimientos): Proc
       espacioCerrado: si(v.espacio_cerrado),
       retina: si(v.retina),
       obstetrico: si(v.obstetrico),
+      bloqueoMiembroSuperior: si(v.bloqueo_miembro_superior),
       ...(v.zona_dispositivo && (ZONAS_DISPOSITIVO as string[]).includes(v.zona_dispositivo.trim())
         ? { zonaDispositivo: v.zona_dispositivo.trim() as ZonaDispositivo }
         : {}),

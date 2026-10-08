@@ -353,11 +353,28 @@ export function App() {
         {pantalla === 'tecnica' && (
           <PasoTecnica
             inicial={intervencion?.tecnica ?? 'no_se_sabe'}
+            inicialSub={intervencion ? {
+              ...(intervencion.subtipoNeuroaxial ? { subtipoNeuroaxial: intervencion.subtipoNeuroaxial } : {}),
+              ...(intervencion.combinadaConGeneral ? { combinadaConGeneral: true } : {}),
+              ...(intervencion.conSedacion ? { conSedacion: true } : {}),
+            } : undefined}
             procedimiento={procedimiento}
             onVolver={() => setPantalla('enfermedades')}
-            onContinuar={(tecnica, grupoOft) => {
+            onContinuar={(tecnica, grupoOft, sub) => {
               setEntrevista((e) => (e.intervencion
-                ? { ...e, intervencion: { ...e.intervencion, tecnica, ...(grupoOft ? { grupoOftalmologico: grupoOft } : {}) } }
+                ? { ...e, intervencion: (() => {
+                    // Se parte de la intervención SIN los subcampos de §8.17 (así se
+                    // borran los que ya no apliquen) y se añaden solo los presentes.
+                    const { subtipoNeuroaxial: _s, combinadaConGeneral: _g, conSedacion: _c, ...resto } = e.intervencion;
+                    return {
+                      ...resto,
+                      tecnica,
+                      ...(grupoOft ? { grupoOftalmologico: grupoOft } : {}),
+                      ...(sub.subtipoNeuroaxial ? { subtipoNeuroaxial: sub.subtipoNeuroaxial } : {}),
+                      ...(sub.combinadaConGeneral ? { combinadaConGeneral: true } : {}),
+                      ...(sub.conSedacion ? { conSedacion: true } : {}),
+                    };
+                  })() }
                 : e));
               setPantalla('medicacion');
             }}

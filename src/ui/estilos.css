@@ -604,8 +604,36 @@ body {
   .no-print, .banda-prueba, .cabecera, .pie-app { display: none !important; }
   .app, .contenido, .tarjeta { margin: 0; padding: 0; box-shadow: none; border: none; }
   .tabla-medicacion th { background: #eee !important; -webkit-print-color-adjust: exact; }
+  .tabla-riesgos th { background: #eee !important; -webkit-print-color-adjust: exact; }
   .anexo { break-before: page; page-break-before: always; }
+  /* Al imprimir, la sección plegable de riesgos empieza en página nueva. */
+  .riesgos-anestesia-plegable { break-before: page; page-break-before: always; }
 }
+
+/* Información de riesgos de la anestesia (§8.17) */
+.remite-riesgos { font-style: italic; }
+.riesgos-anestesia-plegable > summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 10px 0;
+}
+.riesgo-seccion { margin-bottom: 16px; }
+.riesgo-seccion h3 { margin: 12px 0 6px; }
+.tabla-riesgos {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 12px;
+}
+.tabla-riesgos th,
+.tabla-riesgos td {
+  border: 1px solid var(--color-borde, #d0d5dd);
+  padding: 6px 9px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.9rem;
+}
+.tabla-riesgos th { background: var(--color-principal-claro); }
 
 /* Aviso de inactividad (privacidad §2) */
 .aviso-inactividad {

@@ -127,6 +127,13 @@ export interface ExtrasHojaQr {
   alcohol: boolean;
   /** Ids de las hojas anexas que aplican (§8.14 bis). */
   anexos: string[];
+  /**
+   * Claves de las secciones de la información de riesgos de la anestesia (§8.17) que
+   * ve el paciente, según la técnica prevista. SOLO viajan las CLAVES (texto cortas);
+   * el texto completo lo pinta la vista del paciente desde `riesgos_anestesia.json`.
+   * Ausente o vacío = no se muestra el anexo de riesgos.
+   */
+  riesgos?: string[];
   /** Estado del consentimiento (§10) para la línea de la hoja del paciente. */
   cons?: 'entregado' | 'pendiente' | 'no_procede';
   /**

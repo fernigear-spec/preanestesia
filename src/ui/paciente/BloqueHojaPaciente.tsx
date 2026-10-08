@@ -9,6 +9,7 @@ import type { DatosIntervencion, Sexo } from '../../dominio/tipos.ts';
 import { derivarHechosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
 import { resolverAclaramiento } from '../../dominio/entrevista/aclaramiento.ts';
 import { derivarHojaExtras } from '../../dominio/entrevista/hojaExtras.ts';
+import { seccionesRiesgoAnestesia } from '../../dominio/entrevista/riesgosAnestesia.ts';
 import { derivarPuntosValidacion } from '../../dominio/entrevista/puntosValidacion.ts';
 import { VALIDACIONES } from '../../datos/validacionesDatos.ts';
 import { MODULOS } from '../../datos/modulosDatos.ts';
@@ -128,9 +129,23 @@ export function BloqueHojaPaciente({ medicacion, intervencion, basicos, cribado,
       ...(basicos.edadMeses !== undefined ? { edadMeses: basicos.edadMeses } : {}),
       situacion: extrasIn.situacion,
     });
-    const extras = consentimiento ? { ...extrasIn.extras, cons: CONS_MAP[consentimiento.estado] } : extrasIn.extras;
+    const extrasConCons = consentimiento ? { ...extrasIn.extras, cons: CONS_MAP[consentimiento.estado] } : extrasIn.extras;
+    // Información de riesgos de la anestesia (§8.17): claves de las secciones a mostrar.
+    const riesgos = seccionesRiesgoAnestesia({
+      tecnica: intervencion.tecnica,
+      neuroaxialProbable: intervencion.neuroaxialProbable,
+      ...(intervencion.subtipoNeuroaxial ? { subtipoNeuroaxial: intervencion.subtipoNeuroaxial } : {}),
+      ...(intervencion.combinadaConGeneral ? { combinadaConGeneral: true } : {}),
+      ...(intervencion.conSedacion ? { conSedacion: true } : {}),
+      grupoOftalmologico: intervencion.grupoOftalmologico,
+      oftalmologico: entrevista.procedimiento?.especialidad === 'oftalmologia',
+      ...(entrevista.procedimiento?.bloqueoMiembroSuperior ? { bloqueoMiembroSuperior: true } : {}),
+      edadAnios: basicos.edadAnios,
+      edadPediatricaMaxima: EDAD_PEDIATRICA_MAXIMA,
+    });
+    const extras = riesgos.length > 0 ? { ...extrasConCons, riesgos } : extrasConCons;
     return { ayunoQr: ayunoQrDesde(planAyuno, extrasIn.pediatrico, extrasIn.situacion), extras };
-  }, [basicos, cribado, habitos, sexo, intervencion.fechaHora, intervencion.tecnica, medicacion, consentimiento, hoy, revisionPendiente]);
+  }, [basicos, cribado, habitos, sexo, intervencion, medicacion, consentimiento, hoy, revisionPendiente, entrevista.procedimiento]);
 
   // §3 (2026-10-04): la hoja y el QR se generan SIEMPRE, sin bloqueo por fármacos
   // pendientes. Los pendientes aparecen en la hoja con la frase única de §12
