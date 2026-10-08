@@ -12,7 +12,7 @@ import { calcularImc, textoDosisFrecuencia, textoOtraEnfermedad, type EstadoEntr
 import { MODULO_POR_ID, MODULOS } from '../../datos/modulosDatos.ts';
 import type { RespuestasModulos } from '../../datos/modulos.ts';
 import { derivarHechosClinicos } from '../../dominio/entrevista/hechosClinicos.ts';
-import { resolverAclaramiento } from '../../dominio/entrevista/aclaramiento.ts';
+import { resolverAclaramiento, aclaramientoDeMasDe3Meses } from '../../dominio/entrevista/aclaramiento.ts';
 import { emitirEfectosModulos } from '../../dominio/entrevista/efectosModulos.ts';
 import { derivarPuntosValidacion } from '../../dominio/entrevista/puntosValidacion.ts';
 import { VALIDACIONES } from '../../datos/validacionesDatos.ts';
@@ -112,8 +112,11 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
       fechaIntervencion: intervencion.fechaHora, espacioCerrado: intervencion.espacioCerrado, contrasteYodado: intervencion.contrasteYodado,
     });
     // Aclaramiento efectivo (§8.2/§8.4): módulo renal/trasplante o, si no, el manual del paso 8.
-    const aclaramiento = resolverAclaramiento(clinBase.aclaramiento, entrevista.aclaramientoManual, basicos).valor;
+    const aclaramientoResuelto = resolverAclaramiento(clinBase.aclaramiento, entrevista.aclaramientoManual, basicos, clinBase.aclaramientoFecha);
+    const aclaramiento = aclaramientoResuelto.valor;
     const clin = { ...clinBase, aclaramiento };
+    // ¿La analítica del aclaramiento es de hace más de 3 meses? (ref.: la intervención, o hoy).
+    const aclaramientoAntiguo = aclaramientoDeMasDe3Meses(aclaramientoResuelto, intervencion.fechaHora ?? hoy);
     const plan = construirPlanPaciente(medicacion ?? [], intervencion, clin, basicos.pesoKg, hoy);
 
     // AUDIT-C solo si las tres preguntas están contestadas (§6.9); si no, no genera alertas ni anexo.
@@ -311,6 +314,19 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     // despachador las conserva en resultado.alertas; aquí se recogen de todo el plan.
     for (const f of plan) for (const a of f.resultado.alertas ?? []) alertas.push({ gravedad: a.gravedad, mensaje: a.mensaje });
 
+    // Aclaramiento de una analítica de hace más de 3 meses (§6.7): aviso informativo.
+    if (aclaramientoAntiguo) {
+      alertas.push({ gravedad: 'informativa', mensaje: 'Aclaramiento de una analítica de hace más de 3 meses.' });
+    }
+
+    // Otras enfermedades escritas a mano (§6): el programa no les aplica reglas ni
+    // alertas, así que cada una genera una alerta INFORMATIVA visible en el bloque de
+    // alertas del resumen (sin desplegar nada) para que el anestesiólogo las revise.
+    const otrasEnfermedades = cribado.otrasEnfermedades ?? [];
+    for (const o of otrasEnfermedades) {
+      alertas.push({ gravedad: 'informativa', mensaje: `Enfermedad no incluida en los módulos: ${textoOtraEnfermedad(o)} — revisar, porque el programa no aplica reglas ni alertas sobre ella.` });
+    }
+
     alertas.sort((a, b) => ORDEN_GRAVEDAD[a.gravedad] - ORDEN_GRAVEDAD[b.gravedad]);
 
     // Dispositivos cardiacos implantables (§5.1 bis): notas técnicas y puntos de
@@ -343,14 +359,9 @@ export function Salidas({ entrevista, modalidad, onConfirmarFarmaco, validacione
     // paciente (pediatría, obstetricia), no solo las casillas de enfermedades.
     const resumenModulos = [...activos].map((id) => resumenModulo(id, respuestas)).filter((s): s is string => s !== null);
 
-    // Otras enfermedades escritas a mano (§6): van al SAP como «nombre (detalle)» o
-    // solo «nombre», y generan una nota de aviso para el anestesiólogo (el programa
-    // no les aplica reglas ni alertas).
-    const otrasEnfermedades = cribado.otrasEnfermedades ?? [];
+    // Otras enfermedades escritas a mano (§6) para el SAP: «nombre (detalle)» o
+    // solo «nombre». (El aviso al anestesiólogo va como alerta informativa, arriba.)
     const otrasEnfermedadesSap = otrasEnfermedades.map(textoOtraEnfermedad);
-    for (const o of otrasEnfermedades) {
-      notas.push(`Enfermedad no incluida en los módulos: ${textoOtraEnfermedad(o)} — revisar, porque el programa no aplica reglas ni alertas sobre ella.`);
-    }
 
     // SAP (§10.1): SOLO antecedentes patológicos y quirúrgicos (decisión del servicio).
     const fechaTxt = intervencion.fechaHora ? fechaCorta(intervencion.fechaHora) : 'sin fecha';

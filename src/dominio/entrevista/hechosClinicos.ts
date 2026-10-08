@@ -27,6 +27,13 @@ export interface HechoStent {
 export interface DatosClinicos {
   /** Aclaramiento de creatinina (mL/min) o null si no se conoce (§6.7). */
   aclaramiento: number | null;
+  /**
+   * Fecha (ISO yyyy-mm-dd) de la analítica de la que sale el aclaramiento del
+   * módulo (renal o injerto), o null si no se conoce. Sirve para avisar de que la
+   * analítica es de hace más de 3 meses (§6.7). El aclaramiento manual lleva su
+   * propia fecha en `aclaramientoManual`.
+   */
+  aclaramientoFecha: string | null;
   /** El paciente toma AAS (para detectar monoterapia con P2Y12, §8.3). */
   tieneAas: boolean;
   /** Portador de stent coronario, o null si no lo es (§5.1 → §8.3). */
@@ -56,6 +63,7 @@ export interface DatosClinicos {
 /** Hechos "vacíos": nada conocido. Base segura (todo se pedirá o requerirá confirmación). */
 export const HECHOS_VACIOS: DatosClinicos = {
   aclaramiento: null,
+  aclaramientoFecha: null,
   tieneAas: false,
   stent: null,
   valvulaMecanica: false,
@@ -179,9 +187,15 @@ export function derivarHechosClinicos(e: EntradaDerivacion): DatosClinicos {
   // defecto, la del injerto renal del módulo de trasplante.
   const creatRenal = typeof renal.creatinina === 'number' ? (renal.creatinina as number) : NaN;
   const creatTrasplante = typeof trasplante.creatinina === 'number' ? (trasplante.creatinina as number) : NaN;
-  const creat = creatRenal > 0 ? creatRenal : creatTrasplante;
+  const usaCreatRenal = creatRenal > 0;
+  const creat = usaCreatRenal ? creatRenal : creatTrasplante;
   const aclaramiento = creat > 0
     ? calcularAclaramiento({ edadAnios: e.edadAnios, pesoKg: e.pesoKg, sexo: e.sexo, creatinina: creat, unidad: 'mg_dl' })
+    : null;
+  // Fecha de la analítica usada (la del módulo que aportó la creatinina).
+  const fechaCreatModulo = usaCreatRenal ? renal.creatinina_fecha : trasplante.creatinina_fecha;
+  const aclaramientoFecha = aclaramiento !== null && typeof fechaCreatModulo === 'string' && fechaCreatModulo !== ''
+    ? fechaCreatModulo
     : null;
 
   // AAS en la medicación → detecta monoterapia P2Y12.
@@ -233,6 +247,7 @@ export function derivarHechosClinicos(e: EntradaDerivacion): DatosClinicos {
 
   return {
     aclaramiento,
+    aclaramientoFecha,
     tieneAas,
     stent,
     valvulaMecanica: protesisMecanica,

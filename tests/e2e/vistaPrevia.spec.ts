@@ -913,6 +913,44 @@ test.describe('Vista previa', () => {
     await expect(page.getByText(/Consultar con el anestesiólogo/).first()).toBeVisible();
   });
 
+  test('§6.7 aclaramiento antiguo: una analítica de hace más de 3 meses avisa en el resumen del anestesiólogo', async ({ page }) => {
+    await page.goto('/preanestesia/');
+    await page.getByRole('button', { name: 'Presencial' }).click();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+    await page.locator('#fecha').fill('2026-11-05');
+    await page.locator('#proc').fill('hernioplastia');
+    await page.getByRole('button', { name: /Hernioplastia inguinal abierta/ }).first().click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await pasoAlergiasSinAlergias(page);
+    await page.locator('#edad').fill('64'); // < 65 para no exigir CFS en el paso 5
+    await page.getByRole('radio', { name: 'Hombre' }).check();
+    await page.locator('#peso').fill('70');
+    await page.locator('#talla').fill('170');
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 3 básicos
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 4 antecedentes
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 5 hábitos
+    await page.getByRole('checkbox', { name: 'Ninguna enfermedad conocida' }).check();
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 6 enfermedades
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 7 técnica -> 8
+
+    // Paso 8: añadir Eliquis y dar el aclaramiento con una analítica antigua (junio).
+    await page.locator('#med').fill('Eliquis');
+    await page.getByRole('button', { name: /Eliquis/ }).first().click();
+    await page.getByRole('button', { name: '09:00', exact: true }).first().click();
+    await page.locator('#acl-tipo').selectOption('aclaramiento');
+    await page.locator('#acl-valor').fill('80');
+    await page.locator('#acl-fecha').fill('2026-06-01'); // > 3 meses antes del 05/11/2026
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 8 -> 9
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 9 vía aérea -> 10
+    await page.getByRole('button', { name: 'Continuar' }).click(); // 10 consentimiento -> 11
+    await pasoMtnd4NoVenezolana(page); // 11 mtND4 -> resumen
+
+    // El aviso aparece como alerta informativa en el bloque de alertas del resumen.
+    await expect(page.getByRole('heading', { name: /Resumen del anestesiólogo/ })).toBeVisible();
+    const alertas = page.locator('.resumen-alertas');
+    await expect(alertas.getByText(/Aclaramiento de una analítica de hace más de 3 meses/)).toBeVisible();
+  });
+
   test('§8 dosis y frecuencia en el paso 8: el plan del resumen muestra «Adiro 100 mg cada 24 h» y avisa del descuadre con las horas', async ({ page }) => {
     await page.goto('/preanestesia/');
     await page.getByRole('button', { name: 'Presencial' }).click();
@@ -1013,10 +1051,11 @@ test.describe('Vista previa', () => {
     const sap = page.getByRole('textbox', { name: 'Texto para SAP' });
     await expect(sap).toContainText('Enfermedad de Behçet (brotes frecuentes)');
 
-    // El aviso al anestesiólogo aparece en las notas técnicas.
-    await page.getByRole('button', { name: /Notas técnicas/ }).click();
-    await expect(page.getByText(/Enfermedad no incluida en los módulos: Enfermedad de Behçet \(brotes frecuentes\)/)).toBeVisible();
-    await expect(page.getByText(/no aplica reglas ni alertas sobre ella/)).toBeVisible();
+    // El aviso al anestesiólogo aparece como alerta informativa en el bloque de
+    // alertas del resumen, SIN desplegar las notas técnicas.
+    const alertas = page.locator('.resumen-alertas');
+    await expect(alertas.getByText(/Enfermedad no incluida en los módulos: Enfermedad de Behçet \(brotes frecuentes\)/)).toBeVisible();
+    await expect(alertas.getByText(/no aplica reglas ni alertas sobre ella/)).toBeVisible();
   });
 
   test('§14.2 modo entrenamiento: carga un caso y muestra la comparación con lo esperado', async ({ page }) => {

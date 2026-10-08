@@ -4,7 +4,7 @@
  * creatinina → Cockcroft-Gault, o «no disponible» → requiere confirmación, A7).
  */
 import { describe, it, expect } from '../../_harness.ts';
-import { resolverAclaramiento } from '../../../src/dominio/entrevista/aclaramiento.ts';
+import { resolverAclaramiento, aclaramientoDeMasDe3Meses } from '../../../src/dominio/entrevista/aclaramiento.ts';
 
 const DATOS = { edadAnios: 70, pesoKg: 70, sexo: 'hombre' as const };
 
@@ -42,5 +42,51 @@ describe('§8.2/§8.4 · resolverAclaramiento', () => {
 
   it('aclaramiento manual no positivo se trata como desconocido', () => {
     expect(resolverAclaramiento(null, { tipo: 'aclaramiento', valor: 0 }, DATOS).valor).toBe(null);
+  });
+
+  it('la fuente módulo lleva la fecha de la analítica del módulo', () => {
+    const r = resolverAclaramiento(45, null, DATOS, '2026-06-01');
+    expect(r.fuente).toBe('modulo');
+    expect(r.fecha).toBe('2026-06-01');
+  });
+
+  it('la fuente manual lleva la fecha del dato manual', () => {
+    const r = resolverAclaramiento(null, { tipo: 'creatinina', valor: 1.0, fecha: '2026-05-10' }, DATOS);
+    expect(r.fuente).toBe('manual');
+    expect(r.fecha).toBe('2026-05-10');
+  });
+});
+
+describe('§6.7 · aclaramientoDeMasDe3Meses', () => {
+  const REF = new Date(2026, 10, 5); // 5 nov 2026
+
+  it('analítica de hace más de 3 meses → true', () => {
+    const r = resolverAclaramiento(45, null, DATOS, '2026-06-01'); // ~5 meses antes
+    expect(aclaramientoDeMasDe3Meses(r, REF)).toBeTrue();
+  });
+
+  it('analítica reciente (menos de 3 meses) → false', () => {
+    const r = resolverAclaramiento(45, null, DATOS, '2026-10-01'); // ~1 mes antes
+    expect(aclaramientoDeMasDe3Meses(r, REF)).toBeFalse();
+  });
+
+  it('poco menos de 3 meses no se considera antiguo', () => {
+    const r = resolverAclaramiento(45, null, DATOS, '2026-08-10'); // ~87 días (< 3 meses)
+    expect(aclaramientoDeMasDe3Meses(r, REF)).toBeFalse();
+  });
+
+  it('sin fecha de analítica → false (no se afirma nada)', () => {
+    const r = resolverAclaramiento(45, null, DATOS, null);
+    expect(aclaramientoDeMasDe3Meses(r, REF)).toBeFalse();
+  });
+
+  it('sin valor de aclaramiento → false aunque haya fecha', () => {
+    const r = resolverAclaramiento(null, { tipo: 'no_disponible' }, DATOS);
+    expect(aclaramientoDeMasDe3Meses(r, REF)).toBeFalse();
+  });
+
+  it('fecha manual de hace más de 3 meses → true', () => {
+    const r = resolverAclaramiento(null, { tipo: 'aclaramiento', valor: 55, fecha: '2026-01-10' }, DATOS);
+    expect(aclaramientoDeMasDe3Meses(r, REF)).toBeTrue();
   });
 });
